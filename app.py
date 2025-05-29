@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, redirect, session
+from flask import Flask, request, jsonify, send_from_directory, redirect, session, make_response, render_template
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -10,6 +10,9 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-secret-key'  # Change this to a secure secret key
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 db = SQLAlchemy(app)
 
@@ -31,13 +34,18 @@ with app.app_context():
 # Serve static files
 @app.route('/')
 def home():
+    print("Accessing home route")  # Debug print
     if 'user_id' not in session:
-        return redirect('/login.html')
-    return send_from_directory('.', 'home.html')
+        print("No user_id in session, redirecting to login")  # Debug print
+        return redirect('/login')
+    print("User is logged in, serving home.html")  # Debug print
+    return render_template('home.html')
 
-@app.route('/<path:path>')
-def send_file(path):
-    return send_from_directory('.', path)
+@app.route('/login')
+def login_page():
+    if 'user_id' in session:
+        return redirect('/')
+    return render_template('login.html')
 
 # API endpoints
 @app.route('/api/register', methods=['POST'])
@@ -67,24 +75,52 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    try:
+        print("Received login request")  # Debug print
+        if not request.is_json:
+            print("Request is not JSON")  # Debug print
+            return jsonify({'error': 'Missing JSON in request'}), 400
 
-    if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'Missing email or password'}), 400
+        data = request.get_json()
+        print("Received login data:", data)  # Debug print
 
-    user = User.query.filter_by(email=data['email']).first()
+        # Check for empty email or password
+        if not data.get('email') or not data.get('password'):
+            print("Missing email or password")  # Debug print
+            return jsonify({'error': 'Please enter both email and password'}), 400
 
-    if not user or not check_password_hash(user.password, data['password']):
-        return jsonify({'error': 'Invalid email or password'}), 401
+        # Check if email and password are empty strings after stripping whitespace
+        if not data['email'].strip() or not data['password'].strip():
+            print("Empty email or password fields")  # Debug print
+            return jsonify({'error': 'Please enter both email and password'}), 400
 
-    session['user_id'] = user.id
-    return jsonify({
-        'message': 'Login successful',
-        'user': {
-            'email': user.email,
-            'name': user.name
-        }
-    }), 200
+        user = User.query.filter_by(email=data['email']).first()
+        print(f"Found user: {user}")  # Debug print
+
+        if not user or not check_password_hash(user.password, data['password']):
+            print("Invalid credentials")  # Debug print
+            return jsonify({'error': 'Incorrect email or password'}), 401
+
+        # Clear and set new session
+        session.clear()
+        session['user_id'] = user.id
+        session.modified = True
+        print(f"Set session for user_id: {user.id}")  # Debug print
+
+        response = make_response(jsonify({
+            'message': 'Login successful',
+            'user': {
+                'email': user.email,
+                'name': user.name
+            }
+        }))
+        
+        print("Sending successful response")  # Debug print
+        return response, 200
+
+    except Exception as e:
+        print('Login error:', str(e))  # Debug print
+        return jsonify({'error': 'An error occurred during login'}), 500
 
 @app.route('/api/google-login', methods=['POST'])
 def google_login():
@@ -123,6 +159,24 @@ def google_login():
 def logout():
     session.pop('user_id', None)
     return jsonify({'message': 'Logged out successfully'}), 200
+
+@app.route('/api/check-login', methods=['GET'])
+def check_login():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return jsonify({'error': 'User not found'}), 401
+
+    return jsonify({
+        'message': 'Logged in',
+        'user': {
+            'email': user.email,
+            'name': user.name
+        }
+    }), 200
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True) 
