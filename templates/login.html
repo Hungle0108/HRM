@@ -672,6 +672,21 @@
             // Save language preference and current language
             localStorage.setItem('preferredLanguage', lang);
             currentLanguage = lang;
+
+            // Update error message if it's currently shown
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage.classList.contains('show')) {
+                // Try to determine which error message to show based on current content
+                let newErrorMessage;
+                if (errorMessage.textContent.includes('enter both') || errorMessage.textContent.includes('nhập email')) {
+                    newErrorMessage = translations[lang].errorMissingFields;
+                } else if (errorMessage.textContent.includes('Incorrect') || errorMessage.textContent.includes('không đúng')) {
+                    newErrorMessage = translations[lang].errorIncorrectCredentials;
+                } else {
+                    newErrorMessage = translations[lang].errorGeneric;
+                }
+                errorMessage.textContent = newErrorMessage;
+            }
             
             // Update Google Sign-In button text
             const googleButton = document.querySelector('.g_id_signin');
