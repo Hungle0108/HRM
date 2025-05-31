@@ -157,8 +157,9 @@ def google_login():
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    session.pop('user_id', None)
-    return jsonify({'message': 'Logged out successfully'}), 200
+    # Clear the session
+    session.clear()
+    return jsonify({'message': 'Logged out successfully', 'redirect': '/login'}), 200
 
 @app.route('/api/check-login', methods=['GET'])
 def check_login():
@@ -177,6 +178,15 @@ def check_login():
             'name': user.name
         }
     }), 200
+
+@app.route('/settings')
+def settings():
+    print("Accessing settings route")
+    if 'user_id' not in session:
+        print("No user_id in session, redirecting to login")
+        return redirect('/login')
+    print("User is logged in, serving settings.html")
+    return render_template('settings.html')
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True) 
