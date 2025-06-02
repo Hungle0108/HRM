@@ -47,6 +47,12 @@ def login_page():
         return redirect('/')
     return render_template('login.html')
 
+@app.route('/signup')
+def signup_page():
+    if 'user_id' in session:
+        return redirect('/')
+    return render_template('signup.html')
+
 # API endpoints
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -187,6 +193,48 @@ def settings():
         return redirect('/login')
     print("User is logged in, serving settings.html")
     return render_template('settings.html')
+
+@app.route('/api/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Please enter both email and password'}), 400
+
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'error': 'Email already registered'}), 400
+
+    # Create new user
+    hashed_password = generate_password_hash(password)
+    new_user = User(email=email, password=hashed_password)
+    
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+        return jsonify({'message': 'Signup successful'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'An error occurred during signup'}), 500
+
+@app.route('/api/verify-email', methods=['POST'])
+def verify_email():
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Please enter an email'}), 400
+
+    # Check if user exists
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'Email does not exist'}), 404
+
+    return jsonify({'message': 'Email exists'}), 200
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True) 

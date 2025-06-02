@@ -473,7 +473,7 @@
             </div>
 
             <div class="signup-prompt">
-                Need to create account? <a href="#" class="signup-link">Sign up</a>
+                Need to create account? <a href="/signup" class="signup-link">Sign up</a>
             </div>
 
             <div class="language-selector">
@@ -762,7 +762,7 @@
             
             // Update signup section
             const signupPrompt = document.querySelector('.signup-prompt');
-            signupPrompt.innerHTML = `${translations[lang].needAccount} <a href="#" class="signup-link">${translations[lang].signUp}</a>`;
+            signupPrompt.innerHTML = `${translations[lang].needAccount} <a href="/signup" class="signup-link">${translations[lang].signUp}</a>`;
 
             // Update button states
             document.getElementById('vn-btn').classList.toggle('active', lang === 'vi');

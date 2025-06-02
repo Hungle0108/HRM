@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - HRM</title>
+    <!-- Add Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: white;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .account-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .login-nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 6px;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .login-nav-button:hover {
+            background: #eee;
+        }
+
+        .login-nav-button svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #000;
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 64px); /* Subtract nav height */
+            padding: 2rem;
+        }
+
+        .signup-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: none;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+            color: #000;
+            font-weight: 700;
+            width: 100%;
+            text-align: left;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .password-requirements {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #eee;
+        }
+
+        .password-requirements h4 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .requirement.valid {
+            color: #10b981;
+        }
+
+        .requirement svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .requirement.valid svg {
+            color: #10b981;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .continue-with {
+            text-align: center;
+            margin: 24px 0;
+            color: #666;
+            font-size: 14px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .continue-with::before,
+        .continue-with::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .continue-with span {
+            padding: 0 5px;
+            background: white;
+            white-space: nowrap;
+        }
+
+        .gmail-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .gmail-button:hover {
+            background: #f0f0f0;
+            border-color: #999;
+        }
+
+        .signup-button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .signup-button.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .signup-button:hover {
+            background: #333;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: #fde8e8;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .input-error {
+            border-color: #dc3545 !important;
+            background-color: #fff9f9;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .terms-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .terms-text a {
+            color: #000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-left">
+            <a href="/login" class="back-link" onclick="navigateToLogin(event)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back
+            </a>
+        </div>
+        <div class="nav-right">
+            <span class="account-text">Already have an account?</span>
+            <a href="/login" class="login-nav-button" onclick="navigateToLogin(event)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Log in
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="signup-container">
+            <h1>Create account</h1>
+            <p class="subtitle">Sign up using the form, or the Google account you use at work</p>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-field-wrapper">
+                        <input type="password" id="password" placeholder="Enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="password-requirements">
+                        <h4>Your password must contain</h4>
+                        <div class="requirement" id="length-req">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Between 10 and 70 characters
+                        </div>
+                        <div class="requirement" id="uppercase-req">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            An uppercase character
+                        </div>
+                        <div class="requirement" id="lowercase-req">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            A lowercase character
+                        </div>
+                        <div class="requirement" id="number-req">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            A number
+                        </div>
+                        <div class="requirement" id="special-req">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            A special character
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="firstName">Legal first name</label>
+                    <input type="text" id="firstName" placeholder="Enter your first name">
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Legal last name</label>
+                    <input type="text" id="lastName" placeholder="Enter your last name">
+                </div>
+
+                <div class="continue-with"><span>or</span></div>
+
+                <!-- Google Sign-In button -->
+                <div id="g_id_onload"
+                     data-client_id="36720020978-877sp06tqf0tslnhembg2jvd3hr8aleo.apps.googleusercontent.com"
+                     data-context="signup"
+                     data-ux_mode="popup"
+                     data-login_uri="http://localhost:8000/api/google-signup"
+                     data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin gmail-button"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="filled_white"
+                     data-text="signup_with"
+                     data-shape="rectangular"
+                     data-width="550"
+                     data-logo_alignment="left">
+                </div>
+
+                <button type="submit" class="signup-button" id="submitButton">Create account</button>
+
+                <p class="terms-text">
+                    By creating your account, you agree to our <a href="#">Terms of Service</a>, 
+                    <a href="#">Privacy Policy</a>, and <a href="#">Cookie Policy</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function navigateToLogin(event) {
+            event.preventDefault();
+            window.location.href = '/login';
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>`;
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const errorMessage = document.getElementById('errorMessage');
+            const submitButton = document.getElementById('submitButton');
+
+            function checkFormCompletion() {
+                const isEmailValid = email.value.trim() !== '';
+                const isPasswordValid = validatePassword(password.value);
+                const isFirstNameValid = firstName.value.trim() !== '';
+                const isLastNameValid = lastName.value.trim() !== '';
+
+                if (isEmailValid && isPasswordValid && isFirstNameValid && isLastNameValid) {
+                    submitButton.classList.add('show');
+                } else {
+                    submitButton.classList.remove('show');
+                }
+            }
+
+            // Password validation
+            function validatePassword(password) {
+                const lengthValid = password.length >= 10 && password.length <= 70;
+                const uppercaseValid = /[A-Z]/.test(password);
+                const lowercaseValid = /[a-z]/.test(password);
+                const numberValid = /[0-9]/.test(password);
+                const specialValid = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+                document.getElementById('length-req').classList.toggle('valid', lengthValid);
+                document.getElementById('uppercase-req').classList.toggle('valid', uppercaseValid);
+                document.getElementById('lowercase-req').classList.toggle('valid', lowercaseValid);
+                document.getElementById('number-req').classList.toggle('valid', numberValid);
+                document.getElementById('special-req').classList.toggle('valid', specialValid);
+
+                return lengthValid && uppercaseValid && lowercaseValid && numberValid && specialValid;
+            }
+
+            // Add input event listeners to all fields
+            [email, password, firstName, lastName].forEach(input => {
+                input.addEventListener('input', checkFormCompletion);
+            });
+
+            password.addEventListener('input', function() {
+                validatePassword(this.value);
+                checkFormCompletion();
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset error states
+                [email, password, firstName, lastName].forEach(input => {
+                    input.classList.remove('input-error');
+                });
+                errorMessage.classList.remove('show');
+
+                // Validate all fields
+                if (!email.value.trim()) {
+                    errorMessage.textContent = 'Please enter your email';
+                    errorMessage.classList.add('show');
+                    email.classList.add('input-error');
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                    return;
+                }
+
+                if (!validatePassword(password.value)) {
+                    errorMessage.textContent = 'Please meet all password requirements';
+                    errorMessage.classList.add('show');
+                    password.classList.add('input-error');
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                    return;
+                }
+
+                if (!firstName.value.trim()) {
+                    errorMessage.textContent = 'Please enter your first name';
+                    errorMessage.classList.add('show');
+                    firstName.classList.add('input-error');
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                    return;
+                }
+
+                if (!lastName.value.trim()) {
+                    errorMessage.textContent = 'Please enter your last name';
+                    errorMessage.classList.add('show');
+                    lastName.classList.add('input-error');
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                    return;
+                }
+
+                // If all validations pass, redirect to login
+                window.location.href = '/login';
+            });
+        });
+    </script>
+</body>
+</html>
