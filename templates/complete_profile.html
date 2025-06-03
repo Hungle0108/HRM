@@ -5,13 +5,18 @@
 {% set hide_navbar = true %}
 
 {% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
 <style>
     :root {
-        --primary-color: #2563eb;
-        --primary-hover: #1d4ed8;
+        --primary-color: #000000;
+        --primary-hover: #333333;
         --background-color: #f8f9fa;
         --text-color: #1f2937;
         --border-color: #e5e7eb;
+    }
+
+    * {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     }
 
     .profile-container {
@@ -25,7 +30,7 @@
         width: 120px;
         height: 120px;
         margin: 0 auto 2rem;
-        background: #e0e7ff;
+        background: #f5f5f5;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -39,15 +44,18 @@
     }
 
     .welcome-title {
-        font-size: 2rem;
-        font-weight: 600;
+        font-size: 2.25rem;
+        font-weight: 700;
         margin-bottom: 1rem;
         color: var(--text-color);
+        letter-spacing: -0.025em;
     }
 
     .welcome-subtitle {
         color: #4b5563;
         margin-bottom: 3rem;
+        font-size: 1.1rem;
+        font-weight: 450;
     }
 
     .form-group {
@@ -57,18 +65,20 @@
 
     .form-label {
         display: block;
-        font-size: 0.875rem;
-        font-weight: 500;
+        font-size: 0.95rem;
+        font-weight: 600;
         color: var(--text-color);
         margin-bottom: 0.5rem;
+        letter-spacing: -0.01em;
     }
 
     .form-input {
         width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
+        padding: 0.875rem 1rem;
+        border: 1.5px solid var(--border-color);
+        border-radius: 0.5rem;
         font-size: 1rem;
+        font-weight: 450;
         transition: all 0.2s;
         background: white;
     }
@@ -76,7 +86,12 @@
     .form-input:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: #9ca3af;
+        font-weight: 450;
     }
 
     .error-text {
@@ -91,15 +106,59 @@
 
     .date-input-wrapper {
         position: relative;
+        display: flex;
+        align-items: center;
+        border: 1.5px solid var(--border-color);
+        border-radius: 0.5rem;
+        background: white;
+        transition: all 0.2s;
     }
 
-    .date-input-wrapper .calendar-icon {
+    .date-input-wrapper:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-input.date-input {
+        border: none;
+        padding: 0.875rem 1rem;
+        padding-right: 40px;
+        box-shadow: none;
+        flex: 1;
+        background: transparent;
+        cursor: default;
+    }
+
+    .form-input.date-input:focus {
+        border: none;
+        box-shadow: none;
+        outline: none;
+    }
+
+    .calendar-icon {
         position: absolute;
-        right: 1rem;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
+        background: none;
+        border: none;
+        padding: 8px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #6b7280;
+        transition: color 0.2s;
+        z-index: 1;
+    }
+
+    .calendar-icon:hover {
+        color: #000;
+    }
+
+    .calendar-icon svg {
+        width: 20px;
+        height: 20px;
     }
 
     .dropdown-wrapper {
@@ -151,15 +210,16 @@
 
     .btn-continue {
         width: 100%;
-        padding: 0.75rem;
+        padding: 0.875rem;
         background: var(--primary-color);
         color: white;
         border: none;
-        border-radius: 0.375rem;
+        border-radius: 0.5rem;
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
+        letter-spacing: -0.01em;
     }
 
     .btn-continue:hover {
@@ -169,8 +229,200 @@
     .next-step {
         text-align: right;
         margin-top: 1rem;
-        font-size: 0.875rem;
+        font-size: 0.95rem;
+        font-weight: 500;
         color: #4b5563;
+    }
+
+    /* Custom Flatpickr Styles */
+    .flatpickr-calendar {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        width: 320px !important;
+        padding: 20px;
+        border: none !important;
+    }
+
+    /* Header section */
+    .flatpickr-months {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .flatpickr-month {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .flatpickr-current-month {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        padding: 0;
+        position: relative;
+        flex: 1;
+    }
+
+    .cur-month {
+        margin-right: 4px;
+    }
+
+    /* Year toggle button */
+    .numInputWrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .numInput.cur-year {
+        font-size: 18px;
+        font-weight: 500;
+        border: none;
+        width: auto;
+        padding: 0 20px 0 0;
+        cursor: pointer;
+    }
+
+    .numInputWrapper::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #000;
+        transform: translateY(-50%);
+        transition: transform 0.2s;
+        pointer-events: none;
+    }
+
+    .numInputWrapper.active::after {
+        transform: translateY(-50%) rotate(180deg);
+    }
+
+    /* Navigation arrows */
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+        position: static;
+        height: auto;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+    }
+
+    .flatpickr-months .flatpickr-prev-month svg,
+    .flatpickr-months .flatpickr-next-month svg {
+        width: 20px;
+        height: 20px;
+        fill: none !important;
+        stroke: #000;
+        stroke-width: 2;
+    }
+
+    /* Weekday headers */
+    .flatpickr-weekdays {
+        margin-bottom: 8px;
+    }
+
+    .flatpickr-weekday {
+        font-size: 14px;
+        font-weight: 500;
+        color: #000;
+        opacity: 0.7;
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Calendar days */
+    .flatpickr-day {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+        border-radius: 50%;
+        margin: 2px;
+        color: #000;
+        opacity: 0.7;
+        border: none;
+    }
+
+    .flatpickr-day.selected {
+        background: #000;
+        color: #fff;
+        opacity: 1;
+    }
+
+    .flatpickr-day.prevMonthDay,
+    .flatpickr-day.nextMonthDay {
+        opacity: 0.3;
+    }
+
+    .flatpickr-day:hover {
+        background: #f3f4f6;
+    }
+
+    /* Year selection view */
+    .flatpickr-calendar.yearSelectView .flatpickr-monthContainer {
+        display: none;
+    }
+
+    .year-selection-view {
+        display: none;
+        padding: 0;
+    }
+
+    .year-selection-view.active {
+        display: block;
+    }
+
+    .year-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        padding: 0;
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+    .year-option {
+        font-size: 16px;
+        padding: 8px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 32px;
+        color: #000;
+        opacity: 0.7;
+    }
+
+    .year-option:hover {
+        background: #f3f4f6;
+    }
+
+    .year-option.selected {
+        background: #000;
+        color: #fff;
+        opacity: 1;
+    }
+
+    /* Animations */
+    .flatpickr-calendar.animate.open {
+        animation: fpFadeInDown 200ms cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes fpFadeInDown {
+        from { opacity: 0; transform: translate3d(0, -20px, 0); }
+        to { opacity: 1; transform: translate3d(0, 0, 0); }
     }
 </style>
 {% endblock %}
@@ -200,15 +452,15 @@
         <div class="form-group">
             <label class="form-label">Date of birth <span class="required">*</span></label>
             <div class="date-input-wrapper">
-                <input type="text" class="form-input" id="dateOfBirth" placeholder="MM/DD/YYYY" required>
-                <span class="calendar-icon" id="calendarToggle">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <input type="text" class="form-input date-input" id="dateOfBirth" placeholder="MM/DD/YYYY" required>
+                <button type="button" class="calendar-icon" id="calendarToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
-                </span>
+                </button>
             </div>
             <div class="error-text" id="dateError"></div>
         </div>
@@ -229,8 +481,9 @@
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 <script>
-const countries = [
+    const countries = [
     'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
     'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi',
     'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic',
@@ -255,12 +508,18 @@ const countries = [
     'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam',
     'Yemen',
     'Zambia', 'Zimbabwe'
-];
+    ];
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+
+    // Citizenship dropdown functionality
     const citizenshipInput = document.getElementById('citizenshipInput');
     const citizenshipDropdown = document.getElementById('citizenshipDropdown');
     let selectedCountry = '';
+
+    console.log('Citizenship input:', citizenshipInput);
+    console.log('Citizenship dropdown:', citizenshipDropdown);
 
     function filterCountries(searchText) {
         return countries.filter(country => 
@@ -289,110 +548,167 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    citizenshipInput.addEventListener('input', (e) => {
-        const searchText = e.target.value;
-        const filteredCountries = filterCountries(searchText);
-        updateDropdown(filteredCountries);
-    });
-
-    citizenshipInput.addEventListener('focus', () => {
-        if (citizenshipInput.value) {
-            const filteredCountries = filterCountries(citizenshipInput.value);
+    if (citizenshipInput) {
+        citizenshipInput.addEventListener('input', (e) => {
+            const searchText = e.target.value;
+            const filteredCountries = filterCountries(searchText);
             updateDropdown(filteredCountries);
-        }
-    });
+        });
+
+        citizenshipInput.addEventListener('focus', () => {
+            if (citizenshipInput.value) {
+                const filteredCountries = filterCountries(citizenshipInput.value);
+                updateDropdown(filteredCountries);
+            }
+        });
+    } else {
+        console.error('Citizenship input not found');
+    }
 
     document.addEventListener('click', (e) => {
-        if (!citizenshipInput.contains(e.target) && !citizenshipDropdown.contains(e.target)) {
+        if (citizenshipInput && !citizenshipInput.contains(e.target) && citizenshipDropdown && !citizenshipDropdown.contains(e.target)) {
             citizenshipDropdown.classList.remove('show');
         }
     });
-});
 
-// Date picker functionality
-const dateInput = document.getElementById('dateOfBirth');
-const calendarToggle = document.getElementById('calendarToggle');
+    // Date picker functionality
+    const dateInput = document.getElementById('dateOfBirth');
+    const calendarToggle = document.getElementById('calendarToggle');
 
-// Initialize flatpickr date picker
-const datePicker = flatpickr(dateInput, {
-    dateFormat: "m/d/Y",
-    maxDate: new Date(),
-    yearRange: [1900, new Date().getFullYear()],
-    defaultDate: null,
-});
+    console.log('Date input:', dateInput);
+    console.log('Calendar toggle:', calendarToggle);
 
-calendarToggle.onclick = () => {
-    datePicker.toggle();
-};
-
-// Phone number validation
-const phoneInput = document.getElementById('phoneNumber');
-phoneInput.addEventListener('input', (e) => {
-    // Remove any non-digit characters
-    let value = e.target.value.replace(/\D/g, '');
-    
-    // Ensure the number starts with '0' if not empty
-    if (value.length > 0 && value[0] !== '0') {
-        value = '0' + value;
-    }
-    
-    // Limit to 10 digits (Vietnamese phone number format)
-    value = value.slice(0, 10);
-    
-    e.target.value = value;
-});
-
-// Form submission
-document.getElementById('completeProfileForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Reset error messages
-    document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
-    
-    // Validate inputs
-    let isValid = true;
-    
-    if (!citizenshipInput.value) {
-        document.getElementById('citizenshipError').textContent = 'Please select your citizenship';
-        isValid = false;
-    }
-    
-    if (!dateInput.value) {
-        document.getElementById('dateError').textContent = 'Please enter your date of birth';
-        isValid = false;
-    }
-    
-    if (!phoneInput.value || phoneInput.value.length !== 10) {
-        document.getElementById('phoneError').textContent = 'Please enter a valid 10-digit phone number';
-        isValid = false;
-    }
-    
-    if (isValid) {
+    if (dateInput && calendarToggle) {
         try {
-            const response = await fetch('/api/complete-profile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            const fp = flatpickr(dateInput, {
+                dateFormat: "m/d/Y",
+                maxDate: new Date(),
+                minDate: "1900-01-01",
+                defaultDate: null,
+                clickOpens: false, // We will open it manually
+                static: true, // Keep the calendar in the DOM
+                prevArrow: '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',
+                nextArrow: '<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>',
+                locale: {
+                    weekdays: {
+                        shorthand: ["S", "M", "T", "W", "T", "F", "S"]
+                    }
                 },
-                body: JSON.stringify({
-                    citizenship: citizenshipInput.value,
-                    dateOfBirth: dateInput.value,
-                    phoneNumber: phoneInput.value,
-                }),
+                onReady: function(selectedDates, dateStr, instance) {
+                    console.log('Flatpickr ready', instance);
+                    // You can re-add setupYearSelection(instance) here if basic toggle works
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    console.log('Date changed:', dateStr);
+                    // dateInput.value = dateStr; // Flatpickr handles this if input is not readonly
+                }
             });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                // Redirect to organization setup or dashboard
-                window.location.href = '/organization-setup';
-            } else {
-                throw new Error(data.error || 'Failed to complete profile');
-            }
+
+            console.log('Flatpickr instance:', fp);
+
+            calendarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Calendar icon clicked');
+                if (fp) {
+                    fp.toggle();
+                    console.log('Flatpickr toggled. Is open:', fp.isOpen);
+                } else {
+                    console.error('Flatpickr instance (fp) is not available on click');
+                }
+            });
+
+            // Close calendar when clicking outside
+            document.addEventListener('click', function(e) {
+                if (fp && fp.isOpen && 
+                    !e.target.closest('.flatpickr-calendar') && 
+                    !e.target.closest('.date-input-wrapper')) {
+                    console.log('Clicked outside, closing calendar');
+                    fp.close();
+                }
+            });
+
         } catch (error) {
-            alert(error.message);
+            console.error('Error initializing Flatpickr:', error);
         }
+    } else {
+        console.error('Date input or calendar toggle button not found.');
+        if (!dateInput) console.error('dateOfBirth element is missing.');
+        if (!calendarToggle) console.error('calendarToggle element is missing.');
+    }
+
+    // Phone number validation
+    const phoneInput = document.getElementById('phoneNumber');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0 && value[0] !== '0') {
+                value = '0' + value;
+            }
+            e.target.value = value.slice(0, 10);
+        });
+    } else {
+        console.error('Phone input not found');
+    }
+
+    // Form submission
+    const completeProfileForm = document.getElementById('completeProfileForm');
+    if (completeProfileForm) {
+        completeProfileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset error messages
+            document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+            
+            // Validate inputs
+            let isValid = true;
+            
+            if (!citizenshipInput.value) {
+                document.getElementById('citizenshipError').textContent = 'Please select your citizenship';
+                isValid = false;
+            }
+            
+            if (!dateInput.value) {
+                document.getElementById('dateError').textContent = 'Please enter your date of birth';
+                isValid = false;
+            }
+            
+            if (!phoneInput.value || phoneInput.value.length !== 10) {
+                document.getElementById('phoneError').textContent = 'Please enter a valid 10-digit phone number';
+                isValid = false;
+            }
+            
+            if (isValid) {
+                try {
+                    const response = await fetch('/api/complete-profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            citizenship: citizenshipInput.value,
+                            dateOfBirth: dateInput.value,
+                            phoneNumber: phoneInput.value,
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Redirect to organization setup or dashboard
+                        window.location.href = '/organization-setup';
+                    } else {
+                        throw new Error(data.error || 'Failed to complete profile');
+                    }
+                } catch (error) {
+                    alert(error.message);
+                }
+            }
+        });
+    } else {
+        console.error('Complete profile form not found');
     }
 });
+
 </script>
 {% endblock %} 
