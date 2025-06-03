@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - HRM</title>
-    <!-- Add Google Sign-In API -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         * {
             margin: 0;
@@ -126,42 +124,11 @@
             position: relative;
         }
 
-        .password-requirements {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border: 1px solid #eee;
-        }
-
-        .password-requirements h4 {
-            color: #333;
-            font-size: 14px;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .requirement {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 6px;
-        }
-
-        .requirement.valid {
-            color: #10b981;
-        }
-
-        .requirement svg {
-            width: 14px;
-            height: 14px;
-            flex-shrink: 0;
-        }
-
-        .requirement.valid svg {
-            color: #10b981;
+        .password-field-wrapper {
+            position: relative;
+            width: 100%;
+            height: 44px;
+            display: block;
         }
 
         input[type="email"],
@@ -169,9 +136,21 @@
         input[type="text"] {
             width: 100%;
             padding: 12px;
+            padding-right: 40px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
+            line-height: 20px;
+            height: 44px;
+            box-sizing: border-box;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 44px;
+            max-height: 44px;
+            display: block;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
         }
 
         input[type="email"]:focus,
@@ -182,59 +161,86 @@
             box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
         }
 
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: color 0.2s ease;
+            z-index: 2;
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2px;
+            flex-shrink: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .password-toggle:hover {
+            color: #333;
+        }
+
+        .password-toggle:focus {
+            outline: none;
+        }
+
+        .password-requirements {
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .requirement svg {
+            width: 16px;
+            height: 16px;
+            color: #9ca3af;
+        }
+
+        .requirement.valid {
+            color: #059669;
+        }
+
+        .requirement.valid svg {
+            color: #059669;
+        }
+
         .helper-text {
             font-size: 12px;
             color: #666;
             margin-top: 4px;
         }
 
-        .continue-with {
-            text-align: center;
-            margin: 24px 0;
-            color: #666;
-            font-size: 14px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            gap: 15px;
-        }
-
-        .continue-with::before,
-        .continue-with::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background-color: #ddd;
-        }
-
-        .continue-with span {
-            padding: 0 5px;
-            background: white;
-            white-space: nowrap;
-        }
-
-        .gmail-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 12px;
-            background: #f8f8f8;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #333;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            margin-bottom: 24px;
-        }
-
-        .gmail-button:hover {
-            background: #f0f0f0;
-            border-color: #999;
+        .continue-with,
+        .gmail-button,
+        #g_id_onload,
+        .g_id_signin {
+            display: none;
         }
 
         .signup-button {
@@ -249,13 +255,14 @@
             width: 100%;
             transition: all 0.3s ease;
             margin-top: 24px;
-            opacity: 0;
+            opacity: 0.3;
             pointer-events: none;
         }
 
-        .signup-button.show {
+        .signup-button.enabled {
             opacity: 1;
             pointer-events: auto;
+            cursor: pointer;
         }
 
         .signup-button:hover {
@@ -308,6 +315,48 @@
         .terms-text a:hover {
             text-decoration: underline;
         }
+
+        .language-selector {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        .language-button {
+            padding: 8px 16px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: #000;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+        }
+
+        .language-button:hover {
+            transform: translateY(-1px);
+            border-color: #999;
+        }
+
+        .language-button:active {
+            transform: translateY(1px);
+        }
+
+        .language-button.active {
+            background: #000;
+            color: white;
+            border: none;
+        }
+
+        .language-button:not(.active) {
+            background: white;
+        }
+
+        .language-button:not(.active):hover {
+            background: #f8f8f8;
+        }
     </style>
 </head>
 <body>
@@ -317,7 +366,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back
+                <span class="back-text">Back</span>
             </a>
         </div>
         <div class="nav-right">
@@ -326,7 +375,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
-                Log in
+                <span class="login-text">Log in</span>
             </a>
         </div>
     </nav>
@@ -334,7 +383,7 @@
     <div class="main-content">
         <div class="signup-container">
             <h1>Create account</h1>
-            <p class="subtitle">Sign up using the form, or the Google account you use at work</p>
+            <p class="subtitle">Fill out the form below to create your account.</p>
 
             <div class="error-message" id="errorMessage"></div>
 
@@ -348,8 +397,8 @@
                     <label for="password">Password</label>
                     <div class="password-field-wrapper">
                         <input type="password" id="password" placeholder="Enter your password">
-                        <button type="button" class="password-toggle" onclick="togglePassword()">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 20px; height: 20px;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
@@ -400,32 +449,14 @@
                     <input type="text" id="lastName" placeholder="Enter your last name">
                 </div>
 
-                <div class="continue-with"><span>or</span></div>
-
-                <!-- Google Sign-In button -->
-                <div id="g_id_onload"
-                     data-client_id="36720020978-877sp06tqf0tslnhembg2jvd3hr8aleo.apps.googleusercontent.com"
-                     data-context="signup"
-                     data-ux_mode="popup"
-                     data-login_uri="http://localhost:8000/api/google-signup"
-                     data-auto_prompt="false">
-                </div>
-
-                <div class="g_id_signin gmail-button"
-                     data-type="standard"
-                     data-size="large"
-                     data-theme="filled_white"
-                     data-text="signup_with"
-                     data-shape="rectangular"
-                     data-width="550"
-                     data-logo_alignment="left">
-                </div>
-
                 <button type="submit" class="signup-button" id="submitButton">Create account</button>
 
                 <p class="terms-text">
-                    By creating your account, you agree to our <a href="#">Terms of Service</a>, 
-                    <a href="#">Privacy Policy</a>, and <a href="#">Cookie Policy</a>
+                    <span id="terms-text"></span>
+                    <a href="#" id="terms-link">Terms of Service</a>, 
+                    <a href="#" id="privacy-link">Privacy Policy</a>, 
+                    <span id="and-text">and</span> 
+                    <a href="#" id="cookie-link">Cookie Policy</a>
                 </p>
             </form>
         </div>
@@ -444,20 +475,152 @@
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 20px; height: 20px;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     </svg>`;
             } else {
                 passwordInput.type = 'password';
                 toggleButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 20px; height: 20px;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>`;
             }
         }
 
+        // Language translations
+        const translations = {
+            en: {
+                title: 'Create account',
+                subtitle: 'Fill out the form below to create your account.',
+                email: 'Email',
+                emailPlaceholder: 'Enter your email',
+                password: 'Password',
+                passwordPlaceholder: 'Enter your password',
+                firstName: 'Legal first name',
+                firstNamePlaceholder: 'Enter your first name',
+                lastName: 'Legal last name',
+                lastNamePlaceholder: 'Enter your last name',
+                createAccount: 'Create account',
+                passwordRequirements: 'Your password must contain',
+                lengthReq: 'Between 10 and 70 characters',
+                uppercaseReq: 'An uppercase character',
+                lowercaseReq: 'A lowercase character',
+                numberReq: 'A number',
+                specialReq: 'A special character',
+                termsText: 'By creating your account, you agree to our',
+                termsService: 'Terms of Service',
+                privacyPolicy: 'Privacy Policy',
+                and: 'and',
+                cookiePolicy: 'Cookie Policy',
+                backButton: 'Back',
+                loginPrompt: 'Already have an account?',
+                loginButton: 'Log in',
+                errorEmail: 'Please enter your email',
+                errorPassword: 'Please meet all password requirements',
+                errorFirstName: 'Please enter your first name',
+                errorLastName: 'Please enter your last name'
+            },
+            vi: {
+                title: 'Tạo tài khoản',
+                subtitle: 'Điền vào mẫu dưới đây để tạo tài khoản của bạn.',
+                email: 'Email',
+                emailPlaceholder: 'Nhập email của bạn',
+                password: 'Mật khẩu',
+                passwordPlaceholder: 'Nhập mật khẩu của bạn',
+                firstName: 'Tên',
+                firstNamePlaceholder: 'Nhập tên của bạn',
+                lastName: 'Họ',
+                lastNamePlaceholder: 'Nhập họ của bạn',
+                createAccount: 'Tạo tài khoản',
+                passwordRequirements: 'Mật khẩu của bạn phải chứa',
+                lengthReq: 'Từ 10 đến 70 ký tự',
+                uppercaseReq: 'Một ký tự viết hoa',
+                lowercaseReq: 'Một ký tự viết thường',
+                numberReq: 'Một số',
+                specialReq: 'Một ký tự đặc biệt',
+                termsText: 'Bằng cách tạo tài khoản, bạn đồng ý với',
+                termsService: 'Điều khoản Dịch vụ',
+                privacyPolicy: 'Chính sách Bảo mật',
+                and: 'và',
+                cookiePolicy: 'Chính sách Cookie',
+                backButton: 'Quay lại',
+                loginPrompt: 'Đã có tài khoản?',
+                loginButton: 'Đăng nhập',
+                errorEmail: 'Vui lòng nhập email của bạn',
+                errorPassword: 'Vui lòng đáp ứng tất cả các yêu cầu về mật khẩu',
+                errorFirstName: 'Vui lòng nhập tên của bạn',
+                errorLastName: 'Vui lòng nhập họ của bạn'
+            }
+        };
+
+        // Function to update all text content
+        function updateLanguage(lang) {
+            // Save language preference
+            localStorage.setItem('preferredLanguage', lang);
+            currentLanguage = lang;
+
+            // Update title and subtitle
+            document.querySelector('h1').textContent = translations[lang].title;
+            document.querySelector('.subtitle').textContent = translations[lang].subtitle;
+
+            // Update form labels and placeholders
+            document.querySelector('label[for="email"]').textContent = translations[lang].email;
+            document.getElementById('email').placeholder = translations[lang].emailPlaceholder;
+
+            document.querySelector('label[for="password"]').textContent = translations[lang].password;
+            document.getElementById('password').placeholder = translations[lang].passwordPlaceholder;
+
+            document.querySelector('label[for="firstName"]').textContent = translations[lang].firstName;
+            document.getElementById('firstName').placeholder = translations[lang].firstNamePlaceholder;
+
+            document.querySelector('label[for="lastName"]').textContent = translations[lang].lastName;
+            document.getElementById('lastName').placeholder = translations[lang].lastNamePlaceholder;
+
+            // Update password requirements
+            document.querySelector('.password-requirements h4').textContent = translations[lang].passwordRequirements;
+            document.getElementById('length-req').lastChild.textContent = translations[lang].lengthReq;
+            document.getElementById('uppercase-req').lastChild.textContent = translations[lang].uppercaseReq;
+            document.getElementById('lowercase-req').lastChild.textContent = translations[lang].lowercaseReq;
+            document.getElementById('number-req').lastChild.textContent = translations[lang].numberReq;
+            document.getElementById('special-req').lastChild.textContent = translations[lang].specialReq;
+
+            // Update create account button
+            document.getElementById('submitButton').textContent = translations[lang].createAccount;
+
+            // Update terms text
+            document.getElementById('terms-text').textContent = translations[lang].termsText + ' ';
+            document.getElementById('terms-link').textContent = translations[lang].termsService;
+            document.getElementById('privacy-link').textContent = translations[lang].privacyPolicy;
+            document.getElementById('and-text').textContent = translations[lang].and;
+            document.getElementById('cookie-link').textContent = translations[lang].cookiePolicy;
+
+            // Update navigation text
+            document.querySelector('.back-text').textContent = translations[lang].backButton;
+            document.querySelector('.account-text').textContent = translations[lang].loginPrompt;
+            document.querySelector('.login-text').textContent = translations[lang].loginButton;
+
+            // Update error message if it's currently shown
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage.classList.contains('show')) {
+                const currentError = errorMessage.textContent;
+                if (currentError.includes('email')) {
+                    errorMessage.textContent = translations[lang].errorEmail;
+                } else if (currentError.includes('password')) {
+                    errorMessage.textContent = translations[lang].errorPassword;
+                } else if (currentError.includes('first name')) {
+                    errorMessage.textContent = translations[lang].errorFirstName;
+                } else if (currentError.includes('last name')) {
+                    errorMessage.textContent = translations[lang].errorLastName;
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved language preference from localStorage
+            const savedLanguage = localStorage.getItem('preferredLanguage') || 'en';
+            updateLanguage(savedLanguage);
+
             const form = document.getElementById('signupForm');
             const email = document.getElementById('email');
             const password = document.getElementById('password');
@@ -467,15 +630,15 @@
             const submitButton = document.getElementById('submitButton');
 
             function checkFormCompletion() {
-                const isEmailValid = email.value.trim() !== '';
+                const isEmailValid = email.value.trim() !== '' && email.value.includes('@');
                 const isPasswordValid = validatePassword(password.value);
                 const isFirstNameValid = firstName.value.trim() !== '';
                 const isLastNameValid = lastName.value.trim() !== '';
 
                 if (isEmailValid && isPasswordValid && isFirstNameValid && isLastNameValid) {
-                    submitButton.classList.add('show');
+                    submitButton.classList.add('enabled');
                 } else {
-                    submitButton.classList.remove('show');
+                    submitButton.classList.remove('enabled');
                 }
             }
 
@@ -497,14 +660,10 @@
             }
 
             // Add input event listeners to all fields
-            [email, password, firstName, lastName].forEach(input => {
-                input.addEventListener('input', checkFormCompletion);
-            });
-
-            password.addEventListener('input', function() {
-                validatePassword(this.value);
-                checkFormCompletion();
-            });
+            email.addEventListener('input', checkFormCompletion);
+            password.addEventListener('input', checkFormCompletion);
+            firstName.addEventListener('input', checkFormCompletion);
+            lastName.addEventListener('input', checkFormCompletion);
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -517,7 +676,7 @@
 
                 // Validate all fields
                 if (!email.value.trim()) {
-                    errorMessage.textContent = 'Please enter your email';
+                    errorMessage.textContent = translations[currentLanguage].errorEmail;
                     errorMessage.classList.add('show');
                     email.classList.add('input-error');
                     errorMessage.classList.add('shake');
@@ -526,7 +685,7 @@
                 }
 
                 if (!validatePassword(password.value)) {
-                    errorMessage.textContent = 'Please meet all password requirements';
+                    errorMessage.textContent = translations[currentLanguage].errorPassword;
                     errorMessage.classList.add('show');
                     password.classList.add('input-error');
                     errorMessage.classList.add('shake');
@@ -535,7 +694,7 @@
                 }
 
                 if (!firstName.value.trim()) {
-                    errorMessage.textContent = 'Please enter your first name';
+                    errorMessage.textContent = translations[currentLanguage].errorFirstName;
                     errorMessage.classList.add('show');
                     firstName.classList.add('input-error');
                     errorMessage.classList.add('shake');
@@ -544,7 +703,7 @@
                 }
 
                 if (!lastName.value.trim()) {
-                    errorMessage.textContent = 'Please enter your last name';
+                    errorMessage.textContent = translations[currentLanguage].errorLastName;
                     errorMessage.classList.add('show');
                     lastName.classList.add('input-error');
                     errorMessage.classList.add('shake');
@@ -552,8 +711,37 @@
                     return;
                 }
 
-                // If all validations pass, redirect to login
-                window.location.href = '/login';
+                // Send signup request to the backend
+                fetch('/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email.value.trim(),
+                        password: password.value,
+                        name: `${firstName.value.trim()} ${lastName.value.trim()}`
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        errorMessage.textContent = data.error;
+                        errorMessage.classList.add('show');
+                        errorMessage.classList.add('shake');
+                        setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                    } else {
+                        // Redirect to home page on successful signup
+                        window.location.href = '/';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'An error occurred during signup. Please try again.';
+                    errorMessage.classList.add('show');
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                });
             });
         });
     </script>
