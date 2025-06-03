@@ -24,6 +24,10 @@ class User(db.Model):
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    citizenship = db.Column(db.String(100))
+    date_of_birth = db.Column(db.Date)
+    phone_number = db.Column(db.String(20))
+    profile_completed = db.Column(db.Boolean, default=False)
 
     @property
     def name(self):
@@ -200,8 +204,14 @@ def settings():
     if 'user_id' not in session:
         print("No user_id in session, redirecting to login")
         return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+        
     print("User is logged in, serving settings.html")
-    return render_template('settings.html')
+    return render_template('settings.html', user=user)
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -232,14 +242,18 @@ def signup():
         email=email, 
         password=hashed_password,
         first_name=first_name,
-        last_name=last_name
+        last_name=last_name,
+        profile_completed=False
     )
     
     try:
         db.session.add(new_user)
         db.session.commit()
         session['user_id'] = new_user.id
-        return jsonify({'message': 'Signup successful'})
+        return jsonify({
+            'message': 'Signup successful',
+            'redirect': '/complete-profile'
+        })
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'An error occurred during signup'}), 500
@@ -258,6 +272,57 @@ def verify_email():
         return jsonify({'error': 'Email does not exist'}), 404
 
     return jsonify({'message': 'Email exists'}), 200
+
+@app.route('/complete-profile')
+def complete_profile_page():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    if user.profile_completed:
+        return redirect('/')
+        
+    return render_template('complete_profile.html', user=user)
+
+@app.route('/api/complete-profile', methods=['POST'])
+def complete_profile():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return jsonify({'error': 'User not found'}), 401
+
+    data = request.get_json()
+    
+    # Validate required fields
+    if not all(key in data for key in ['citizenship', 'dateOfBirth', 'phoneNumber']):
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    try:
+        # Convert date string to Date object
+        date_of_birth = datetime.strptime(data['dateOfBirth'], '%m/%d/%Y').date()
+        
+        # Update user profile
+        user.citizenship = data['citizenship']
+        user.date_of_birth = date_of_birth
+        user.phone_number = data['phoneNumber']
+        user.profile_completed = True
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Profile completed successfully',
+            'redirect': '/'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True) 

@@ -1,720 +1,378 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - HR Management System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
+{% extends "base.html" %}
 
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
+{% block title %}Settings - HR Management System{% endblock %}
 
-        /* Navigation Bar Styles */
-        .navbar {
-            background: white;
-            padding: 0.75rem 1.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+{% block styles %}
+<style>
+    /* Settings Page Styles */
+    .settings-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+        display: flex;
+        gap: 2rem;
+    }
 
-        .company-section {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+    .settings-sidebar {
+        width: 250px;
+        flex-shrink: 0;
+    }
 
-        .company-logo {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .settings-menu {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
 
-        .company-logo svg {
-            width: 24px;
-            height: 24px;
-            color: #666;
-        }
+    .settings-menu-header {
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
 
-        .company-select {
-            border: none;
-            background: transparent;
-            font-size: 0.9rem;
-            padding: 0.5rem;
-            cursor: pointer;
-            color: #333;
-        }
+    .settings-menu-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
+    .settings-menu-items {
+        padding: 0.5rem 0;
+    }
 
-        .nav-link {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
+    .settings-menu-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
 
-        .nav-link:hover {
-            color: #333;
-            background-color: #f5f5f5;
-        }
+    .settings-menu-item:hover {
+        background-color: #f5f5f5;
+    }
 
-        .nav-link.active {
-            color: #333;
-            font-weight: 500;
-        }
+    .settings-menu-item.active {
+        background-color: #f0f0f0;
+        font-weight: 500;
+    }
 
-        .search-section {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+    .settings-content {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 2rem;
+    }
 
-        .search-bar-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+    .settings-section {
+        margin-bottom: 2rem;
+    }
 
-        .search-bar {
-            padding: 0.5rem 1rem;
-            padding-left: 2.5rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            width: 250px;
-            font-size: 0.9rem;
-            background: white;
-        }
+    .settings-section:last-child {
+        margin-bottom: 0;
+    }
 
-        .search-bar:focus {
-            outline: none;
-            border-color: #999;
-        }
+    .settings-section-header {
+        margin-bottom: 1.5rem;
+    }
 
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .settings-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
 
-        .search-icon svg {
-            width: 16px;
-            height: 16px;
-        }
+    .settings-section-description {
+        color: #666;
+        font-size: 0.9rem;
+    }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-        .notification-icon, .settings-icon {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
 
-        .notification-icon:hover, .settings-icon:hover {
-            background-color: #f5f5f5;
-            color: #333;
-        }
+    .form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
 
-        .notification-icon svg, .settings-icon svg {
-            width: 20px;
-            height: 20px;
-        }
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s;
+    }
 
-        .profile-pic {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            overflow: hidden;
-            border: 1px solid #e0e0e0;
-        }
+    .form-input:focus {
+        outline: none;
+        border-color: #999;
+    }
 
-        /* Settings Page Specific Styles */
-        .settings-container {
-            display: flex;
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
 
-        /* Sidebar Styles */
-        .settings-sidebar {
-            width: 280px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 1.5rem;
-            height: fit-content;
-        }
+    .form-row .form-group {
+        flex: 1;
+    }
 
-        .sidebar-header {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
 
-        .sidebar-search {
-            position: relative;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
+    .btn-primary {
+        background: #000;
+        color: white;
+    }
 
-        .sidebar-search svg {
-            width: 18px;
-            height: 18px;
-            color: #666;
-        }
+    .btn-primary:hover {
+        background: #333;
+    }
 
-        .sidebar-search input {
-            border: none;
-            background: none;
-            width: 100%;
-            font-size: 0.9rem;
-            color: #333;
-        }
+    .btn-outline {
+        background: white;
+        border: 1px solid #e0e0e0;
+        color: #333;
+    }
 
-        .sidebar-search input:focus {
-            outline: none;
-        }
+    .btn-outline:hover {
+        border-color: #999;
+    }
 
-        .sidebar-menu {
-            list-style: none;
-        }
+    .theme-toggle {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
 
-        .menu-item {
-            margin-bottom: 0.75rem;
-        }
+    .theme-toggle-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #333;
+    }
 
-        .menu-item a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            color: #333;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
+    .theme-toggle-description {
+        font-size: 0.85rem;
+        color: #666;
+    }
 
-        .menu-item a:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
 
-        .menu-item.active a {
-            background: white;
-            font-weight: 500;
-        }
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
 
-        .menu-item svg {
-            width: 20px;
-            height: 20px;
-            color: #666;
-            flex-shrink: 0;
-        }
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
 
-        .menu-divider {
-            color: #666;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 0.75rem;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
 
-        .submenu {
-            margin-left: 0.75rem;
-            margin-top: 0.5rem;
-            display: none;  /* Hidden by default */
-        }
+    input:checked + .toggle-slider {
+        background-color: #000;
+    }
 
-        .submenu .menu-item {
-            list-style: none;
-            margin-bottom: 0.25rem;
-        }
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+</style>
+{% endblock %}
 
-        .submenu .menu-item a {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.85rem;
-            color: #666;
-            transition: all 0.2s;
-        }
-
-        .submenu .menu-item a:hover {
-            color: #333;
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .submenu .menu-item.active a {
-            color: #333;
-            font-weight: 500;
-            background: white;
-        }
-
-        .menu-item.expanded .submenu {
-            display: block;
-        }
-
-        .menu-toggle {
-            cursor: pointer;
-        }
-
-        /* Main Content Styles */
-        .settings-content {
-            flex: 1;
-        }
-
-        .content-header {
-            margin-bottom: 2rem;
-        }
-
-        .content-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .content-subtitle {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .settings-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .edit-button {
-            padding: 0.5rem 1rem;
-            background: #f5f5f5;
-            border: none;
-            border-radius: 4px;
-            color: #333;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .edit-button:hover {
-            background: #e0e0e0;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            color: #666;
-            background: #f8f9fa;
-        }
-
-        .logo-upload {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed #e0e0e0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .logo-upload:hover {
-            border-color: #999;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 1.5rem;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 50%;
-            cursor: pointer;
-            color: #666;
-            transition: all 0.2s;
-        }
-
-        .theme-toggle:hover {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        /* Profile Dropdown Styles */
-        .profile-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 1rem;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            min-width: 200px;
-            z-index: 1000;
-            margin-top: 0.5rem;
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: #666;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .dropdown-item:hover {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .dropdown-item svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .user-profile {
-            position: relative;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-        <div class="company-section">
-            <div class="company-logo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                </svg>
+{% block content %}
+<div class="settings-container">
+    <!-- Settings Sidebar -->
+    <div class="settings-sidebar">
+        <div class="settings-menu">
+            <div class="settings-menu-header">
+                <div class="settings-menu-title">Organization Settings</div>
             </div>
-            <select class="company-select">
-                <option>Cop name</option>
-            </select>
-        </div>
-
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="#" class="nav-link">Members</a>
-            <a href="#" class="nav-link">Payroll</a>
-            <a href="#" class="nav-link">Schedule</a>
-            <a href="#" class="nav-link">PIT</a>
-            <a href="#" class="nav-link">VSS</a>
-        </div>
-
-        <div class="search-section">
-            <div class="search-bar-wrapper">
-                <div class="search-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                </div>
-                <input type="text" class="search-bar" placeholder="Search in member">
-            </div>
-            <div class="user-profile">
-                <div class="notification-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                </div>
-                <a href="/settings" class="settings-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                </a>
-                <div class="profile-pic" id="profileButton">
-                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div class="profile-dropdown" id="profileDropdown" style="display: none;">
-                    <a href="#" onclick="handleLogout(); return false;" class="dropdown-item">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                        Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="settings-container">
-        <div class="settings-sidebar">
-            <h2 class="sidebar-header">Organization Setting</h2>
-            
-            <div class="sidebar-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="M21 21l-4.35-4.35"></path>
-                </svg>
-                <input type="text" placeholder="Search">
-            </div>
-
-            <ul class="sidebar-menu">
-                <div class="menu-divider">Organization & security</div>
-                <li class="menu-item">
-                    <a href="#">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M3 2v20h18V2H3zm14 2v4h-4V4h4zm-4 6h4v4h-4v-4zm-6-6h4v4H7V4zm0 6h4v4H7v-4zm0 6h4v4H7v-4zm10 4h-4v-4h4v4z"/>
-                        </svg>
-                        Organization
-                    </a>
-                    <ul class="submenu">
-                        <li class="menu-item active"><a href="#">Organization details</a></li>
-                        <li class="menu-item"><a href="#">Analytics</a></li>
-                        <li class="menu-item"><a href="#">Billing & payments</a></li>
-                        <li class="menu-item"><a href="#">Custom branding</a></li>
-                        <li class="menu-item"><a href="#">Entities</a></li>
-                        <li class="menu-item"><a href="#">Groups</a></li>
-                        <li class="menu-item"><a href="#">Org chart and structure</a></li>
-                    </ul>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6a3 3 0 110 6 3 3 0 010-6z"/>
-                        </svg>
-                        Security
-                    </a>
-                </li>
-
-                <div class="menu-divider">Payroll</div>
-                <li class="menu-item">
-                    <a href="#">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-                        </svg>
-                        Expenses & adjustments
-                    </a>
-                </li>
-
-                <div class="menu-divider">Human resources</div>
-                <li class="menu-item">
-                    <a href="#">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
-                            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
-                        </svg>
-                        Settings
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M21 3H3v18h18V3zm-2 16H5V5h14v14z"/>
-                            <path d="M7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/>
-                        </svg>
-                        Customization
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Main Content -->
-        <div class="settings-content">
-            <div class="content-header">
-                <h1 class="content-title">Organization details</h1>
-                <p class="content-subtitle">Manage your organization's information</p>
-            </div>
-
-            <div class="settings-card">
-                <div class="card-header">
-                    <h2 class="card-title">Organization details</h2>
-                    <button class="edit-button">Edit</button>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" class="form-control" value="" disabled>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Logo</label>
-                    <div class="logo-upload">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Company website</label>
-                    <input type="text" class="form-control" value="Not specified" disabled>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">LinkedIn</label>
-                    <input type="text" class="form-control" value="Not specified" disabled>
-                </div>
-            </div>
-
-            <div class="settings-card">
-                <div class="card-header">
-                    <h2 class="card-title">Financial point of contact</h2>
-                    <button class="edit-button">Edit</button>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Full name</label>
-                    <input type="text" class="form-control" value="" disabled>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" value="" disabled>
-                </div>
+            <div class="settings-menu-items">
+                <a href="#" class="settings-menu-item active">Organization Details</a>
+                <a href="#" class="settings-menu-item">Financial Contact</a>
+                <a href="#" class="settings-menu-item">Billing</a>
+                <a href="#" class="settings-menu-item">Notifications</a>
+                <a href="#" class="settings-menu-item">Security</a>
+                <a href="#" class="settings-menu-item">API</a>
             </div>
         </div>
     </div>
 
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-        </svg>
-    </button>
+    <!-- Settings Content -->
+    <div class="settings-content">
+        <!-- Organization Details Section -->
+        <div class="settings-section">
+            <div class="settings-section-header">
+                <h2 class="settings-section-title">Organization Details</h2>
+                <p class="settings-section-description">Update your organization's information</p>
+            </div>
 
-    <script>
-        // Toggle profile dropdown
-        document.addEventListener('click', function(event) {
-            const profileButton = document.getElementById('profileButton');
-            const dropdown = document.getElementById('profileDropdown');
-            
-            if (profileButton.contains(event.target)) {
-                // Toggle dropdown when clicking profile button
-                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-            } else if (!dropdown.contains(event.target)) {
-                // Close dropdown when clicking outside
-                dropdown.style.display = 'none';
-            }
-        });
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Organization Name</label>
+                    <input type="text" class="form-input" value="Your Company Name">
+                </div>
 
-        // Handle logout
-        async function handleLogout() {
-            try {
-                const response = await fetch('/api/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Industry</label>
+                        <input type="text" class="form-input" value="Technology">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Company Size</label>
+                        <input type="text" class="form-input" value="50-100">
+                    </div>
+                </div>
 
-                if (response.ok) {
-                    // Force navigation to login page
-                    window.location.href = '/login';
-                } else {
-                    console.error('Logout failed');
-                    alert('Logout failed. Please try again.');
-                }
-            } catch (error) {
-                console.error('Logout error:', error);
-                alert('Logout failed. Please try again.');
-            }
+                <div class="form-group">
+                    <label class="form-label">Business Address</label>
+                    <input type="text" class="form-input" value="123 Business Street">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-input" value="San Francisco">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <input type="text" class="form-input" value="CA">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ZIP Code</label>
+                        <input type="text" class="form-input" value="94105">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Financial Contact Section -->
+        <div class="settings-section">
+            <div class="settings-section-header">
+                <h2 class="settings-section-title">Financial Contact</h2>
+                <p class="settings-section-description">Who should receive financial updates and invoices</p>
+            </div>
+
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" value="John">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-input" value="Doe">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" value="john.doe@company.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" value="+1 (555) 123-4567">
+                </div>
+            </form>
+        </div>
+
+        <!-- Theme Settings Section -->
+        <div class="settings-section">
+            <div class="settings-section-header">
+                <h2 class="settings-section-title">Theme Settings</h2>
+                <p class="settings-section-description">Customize your interface appearance</p>
+            </div>
+
+            <div class="theme-toggle">
+                <div>
+                    <div class="theme-toggle-label">Dark Mode</div>
+                    <div class="theme-toggle-description">Use dark theme across your account</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    
+    themeToggle.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
         }
+    });
 
-        // Check login status
-        async function checkLoginStatus() {
-            try {
-                const response = await fetch('/api/check-login');
-                if (!response.ok) {
-                    window.location.href = '/login';
-                }
-            } catch (error) {
-                console.error('Error checking login status:', error);
-                window.location.href = '/login';
-            }
-        }
-
-        // Check login status when page loads
-        checkLoginStatus();
-
-        // Toggle submenu when clicking on Organization
-        document.addEventListener('DOMContentLoaded', function() {
-            const organizationItem = Array.from(document.querySelectorAll('.menu-item')).find(item => 
-                item.querySelector('a').textContent.trim() === 'Organization'
-            );
-            
-            if (organizationItem) {
-                organizationItem.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    this.classList.toggle('expanded');
-                });
-            }
-        });
-    </script>
-</body>
-</html> 
+    // Check saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        themeToggle.checked = true;
+        document.body.classList.add('dark-mode');
+    }
+</script>
+{% endblock %} 

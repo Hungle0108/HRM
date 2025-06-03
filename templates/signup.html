@@ -284,9 +284,38 @@
             display: block;
         }
 
+        .error-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+        }
+
+        .error-text::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc2626'%3E%3Cpath d='M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            flex-shrink: 0;
+        }
+
         .input-error {
-            border-color: #dc3545 !important;
-            background-color: #fff9f9;
+            border-color: #dc2626 !important;
+            background-color: #fef2f2 !important;
+        }
+
+        .input-error:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
         }
 
         @keyframes shake {
@@ -399,6 +428,7 @@
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
+                    <div class="error-text" id="emailError" style="display: none;"></div>
                 </div>
                 <div class="form-group password-group">
                     <label for="password">Password</label>
@@ -516,7 +546,8 @@
                 errorEmail: 'Please enter your email',
                 errorPassword: 'Please meet all password requirements',
                 errorFirstName: 'Please enter your first name',
-                errorLastName: 'Please enter your last name'
+                errorLastName: 'Please enter your last name',
+                errorEmailTaken: 'This email is already registered'
             },
             vi: {
                 title: 'Tạo tài khoản',
@@ -547,7 +578,8 @@
                 errorEmail: 'Vui lòng nhập email của bạn',
                 errorPassword: 'Vui lòng đáp ứng tất cả các yêu cầu về mật khẩu',
                 errorFirstName: 'Vui lòng nhập tên của bạn',
-                errorLastName: 'Vui lòng nhập họ của bạn'
+                errorLastName: 'Vui lòng nhập họ của bạn',
+                errorEmailTaken: 'Email này đã được đăng ký'
             }
         };
 
@@ -662,84 +694,64 @@
             firstName.addEventListener('input', checkFormCompletion);
             lastName.addEventListener('input', checkFormCompletion);
 
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 // Reset error states
-                [email, password, firstName, lastName].forEach(input => {
-                    input.classList.remove('input-error');
+                document.querySelectorAll('.error-text').forEach(el => {
+                    el.style.display = 'none';
+                    el.textContent = '';
                 });
+                document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
                 errorMessage.classList.remove('show');
-
-                // Validate all fields
-                if (!email.value.trim()) {
-                    errorMessage.textContent = translations[currentLanguage].errorEmail;
-                    errorMessage.classList.add('show');
-                    email.classList.add('input-error');
-                    errorMessage.classList.add('shake');
-                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
-                    return;
-                }
-
-                if (!validatePassword(password.value)) {
-                    errorMessage.textContent = translations[currentLanguage].errorPassword;
-                    errorMessage.classList.add('show');
-                    password.classList.add('input-error');
-                    errorMessage.classList.add('shake');
-                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
-                    return;
-                }
-
-                if (!firstName.value.trim()) {
-                    errorMessage.textContent = translations[currentLanguage].errorFirstName;
-                    errorMessage.classList.add('show');
-                    firstName.classList.add('input-error');
-                    errorMessage.classList.add('shake');
-                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
-                    return;
-                }
-
-                if (!lastName.value.trim()) {
-                    errorMessage.textContent = translations[currentLanguage].errorLastName;
-                    errorMessage.classList.add('show');
-                    lastName.classList.add('input-error');
-                    errorMessage.classList.add('shake');
-                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
-                    return;
-                }
-
-                // Send signup request to the backend
-                fetch('/api/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email.value.trim(),
-                        password: password.value,
-                        firstName: firstName.value.trim(),
-                        lastName: lastName.value.trim()
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        errorMessage.textContent = data.error;
-                        errorMessage.classList.add('show');
-                        errorMessage.classList.add('shake');
-                        setTimeout(() => errorMessage.classList.remove('shake'), 650);
+                
+                // Get form values
+                const emailValue = email.value.trim();
+                const passwordValue = password.value;
+                const firstNameValue = firstName.value.trim();
+                const lastNameValue = lastName.value.trim();
+                
+                try {
+                    const response = await fetch('/api/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: emailValue,
+                            password: passwordValue,
+                            firstName: firstNameValue,
+                            lastName: lastNameValue
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // If signup successful, redirect to complete profile page
+                        window.location.href = '/complete-profile';
                     } else {
-                        // Redirect to home page on successful signup
-                        window.location.href = '/';
+                        // Handle specific error cases
+                        if (data.error === 'Email already registered') {
+                            const emailInput = document.getElementById('email');
+                            const emailError = document.getElementById('emailError');
+                            emailInput.classList.add('input-error');
+                            emailError.textContent = translations[currentLanguage].errorEmailTaken;
+                            emailError.style.display = 'flex';
+                            emailInput.focus();
+                            emailInput.classList.add('shake');
+                            setTimeout(() => emailInput.classList.remove('shake'), 600);
+                        } else {
+                            // Show general error message
+                            errorMessage.textContent = data.error || 'An error occurred during signup';
+                            errorMessage.classList.add('show');
+                        }
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
-                    errorMessage.textContent = 'An error occurred during signup. Please try again.';
+                    errorMessage.textContent = 'An error occurred. Please try again.';
                     errorMessage.classList.add('show');
-                    errorMessage.classList.add('shake');
-                    setTimeout(() => errorMessage.classList.remove('shake'), 650);
-                });
+                }
             });
         });
     </script>
