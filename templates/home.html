@@ -163,6 +163,11 @@
             cursor: pointer;
             overflow: hidden;
             border: 1px solid #e0e0e0;
+            transition: border-color 0.2s;
+        }
+
+        .profile-pic:hover {
+            border-color: #999;
         }
 
         /* Dropdown Menu Styles */
@@ -321,35 +326,93 @@
         /* Profile Dropdown Styles */
         .profile-dropdown {
             position: absolute;
-            top: 100%;
-            right: 1rem;
+            top: calc(100% + 8px);
+            right: 0;
             background: white;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 280px;
             z-index: 1000;
-            margin-top: 0.5rem;
+        }
+
+        .dropdown-header {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .dropdown-content {
+            padding: 8px 0;
         }
 
         .dropdown-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: #666;
+            padding: 8px 16px;
+            color: #333;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+            gap: 12px;
         }
 
         .dropdown-item:hover {
-            background: #f5f5f5;
-            color: #333;
+            background-color: #f5f5f5;
         }
 
         .dropdown-item svg {
             width: 16px;
             height: 16px;
+            color: #666;
+        }
+
+        .item-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+        }
+
+        .shortcut {
+            color: #666;
+            font-size: 0.85rem;
+            padding: 2px 6px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 8px 0;
         }
     </style>
 </head>
@@ -400,17 +463,61 @@
                     </svg>
                 </a>
                 <div class="profile-pic" id="profileButton">
-                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=random" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div class="profile-dropdown" id="profileDropdown" style="display: none;">
-                    <a href="#" onclick="handleLogout(); return false;" class="dropdown-item">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                        Logout
-                    </a>
+                    <div class="dropdown-header">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=random" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">{{ user.name }}</div>
+                                <div class="user-email">{{ user.email }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="#" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="M21 21l-4.35-4.35"></path>
+                            </svg>
+                            <div class="item-content">
+                                <span>Search</span>
+                                <span class="shortcut">Ctrl + K</span>
+                            </div>
+                        </a>
+                        <a href="/settings" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            <span>Profile settings</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                            </svg>
+                            <span>Language and region</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                            <span>Appearance</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="handleLogout(); return false;" class="dropdown-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Log out</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -501,6 +608,15 @@
             } else if (!dropdown.contains(event.target)) {
                 // Close dropdown when clicking outside
                 dropdown.style.display = 'none';
+            }
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Check if Ctrl + K is pressed
+            if (event.ctrlKey && event.key === 'k') {
+                event.preventDefault(); // Prevent default browser behavior
+                document.querySelector('.search-bar').focus();
             }
         });
 

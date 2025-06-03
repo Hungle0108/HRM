@@ -21,8 +21,15 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    name = db.Column(db.String(100))
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @property
+    def name(self):
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return "None"
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -34,12 +41,14 @@ with app.app_context():
 # Serve static files
 @app.route('/')
 def home():
-    print("Accessing home route")  # Debug print
+    print("Accessing home route")
     if 'user_id' not in session:
-        print("No user_id in session, redirecting to login")  # Debug print
+        print("No user_id in session, redirecting to login")
         return redirect('/login')
-    print("User is logged in, serving home.html")  # Debug print
-    return render_template('home.html')
+    
+    user = User.query.get(session['user_id'])
+    print("User is logged in, serving home.html")
+    return render_template('home.html', user=user)
 
 @app.route('/login')
 def login_page():
@@ -199,9 +208,18 @@ def signup():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
+    first_name = data.get('firstName', '').strip()
+    last_name = data.get('lastName', '').strip()
 
     if not email or not password:
         return jsonify({'error': 'Please enter both email and password'}), 400
+
+    if not first_name or not last_name:
+        return jsonify({'error': 'Please enter both first and last name'}), 400
+
+    # Capitalize first letter of first and last name
+    first_name = first_name.capitalize()
+    last_name = last_name.capitalize()
 
     # Check if user already exists
     existing_user = User.query.filter_by(email=email).first()
@@ -210,7 +228,12 @@ def signup():
 
     # Create new user
     hashed_password = generate_password_hash(password)
-    new_user = User(email=email, password=hashed_password)
+    new_user = User(
+        email=email, 
+        password=hashed_password,
+        first_name=first_name,
+        last_name=last_name
+    )
     
     try:
         db.session.add(new_user)

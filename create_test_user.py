@@ -1,28 +1,41 @@
-from app import app, db, User
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 
-# Test user credentials
-test_email = "test@example.com"
-test_password = "password123"
-test_name = "Test User"
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @property
+    def name(self):
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return "None"
+
+# Create tables
 with app.app_context():
-    # Check if user already exists
-    existing_user = User.query.filter_by(email=test_email).first()
+    db.drop_all()  # Drop all existing tables
+    db.create_all()  # Create new tables with updated schema
     
-    if existing_user:
-        print(f"User {test_email} already exists!")
-    else:
-        # Create new test user
-        new_user = User(
-            email=test_email,
-            password=generate_password_hash(test_password),
-            name=test_name
-        )
-        
-        # Add to database
-        db.session.add(new_user)
-        db.session.commit()
-        print(f"Test user created successfully!")
-        print(f"Email: {test_email}")
-        print(f"Password: {test_password}") 
+    # Create a test user
+    test_user = User(
+        email='test@example.com',
+        password=generate_password_hash('Test@123'),
+        first_name='John',
+        last_name='Doe'
+    )
+    
+    db.session.add(test_user)
+    db.session.commit()
+    print("Test user created successfully!") 

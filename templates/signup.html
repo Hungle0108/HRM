@@ -387,13 +387,20 @@
 
             <div class="error-message" id="errorMessage"></div>
 
-            <form id="signupForm">
+            <form id="signupForm" class="signup-form" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="firstName">Legal first name</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Legal last name</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter your email">
+                    <input type="email" id="email" name="email" required>
                 </div>
-
-                <div class="form-group">
+                <div class="form-group password-group">
                     <label for="password">Password</label>
                     <div class="password-field-wrapper">
                         <input type="password" id="password" placeholder="Enter your password">
@@ -437,16 +444,6 @@
                             A special character
                         </div>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="firstName">Legal first name</label>
-                    <input type="text" id="firstName" placeholder="Enter your first name">
-                </div>
-
-                <div class="form-group">
-                    <label for="lastName">Legal last name</label>
-                    <input type="text" id="lastName" placeholder="Enter your last name">
                 </div>
 
                 <button type="submit" class="signup-button" id="submitButton">Create account</button>
@@ -720,7 +717,8 @@
                     body: JSON.stringify({
                         email: email.value.trim(),
                         password: password.value,
-                        name: `${firstName.value.trim()} ${lastName.value.trim()}`
+                        firstName: firstName.value.trim(),
+                        lastName: lastName.value.trim()
                     })
                 })
                 .then(response => response.json())
