@@ -14,7 +14,9 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-db = SQLAlchemy(app)
+# Initialize SQLAlchemy with the app
+db = SQLAlchemy()
+db.init_app(app)
 
 # User model
 class User(db.Model):
@@ -28,6 +30,7 @@ class User(db.Model):
     date_of_birth = db.Column(db.Date)
     phone_number = db.Column(db.String(20))
     profile_completed = db.Column(db.Boolean, default=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
 
     @property
     def name(self):
@@ -38,9 +41,28 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.email}>'
 
+# Organization model
+class Organization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    size = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    users = db.relationship('User', backref='organization', lazy=True)
+
 # Create database tables
-with app.app_context():
-    db.create_all()
+def init_db():
+    with app.app_context():
+        # Drop all tables first to ensure clean state
+        db.drop_all()
+        # Create all tables
+        db.create_all()
+        print("Database initialized successfully!")
+
+# Initialize the database before first request
+@app.before_first_request
+def create_tables():
+    init_db()
 
 # Serve static files
 @app.route('/')
@@ -286,43 +308,144 @@ def complete_profile_page():
     if user.profile_completed:
         return redirect('/')
         
-    return render_template('complete_profile.html', user=user)
+    # Get stored profile data if it exists
+    profile_data = session.get('profile_data', {})
+        
+    return render_template('complete_profile.html', user=user, profile_data=profile_data)
 
 @app.route('/api/complete-profile', methods=['POST'])
 def complete_profile():
     if 'user_id' not in session:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return jsonify({'error': 'User not found'}), 401
+        return jsonify({'error': 'Not authenticated'}), 401
 
     data = request.get_json()
     
-    # Validate required fields
-    if not all(key in data for key in ['citizenship', 'dateOfBirth', 'phoneNumber']):
+    if not data or not all(key in data for key in ['citizenship', 'dateOfBirth', 'phoneNumber']):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    try:
+        # Store profile data in session
+        session['profile_data'] = {
+            'citizenship': data['citizenship'],
+            'date_of_birth': data['dateOfBirth'],
+            'phone_number': data['phoneNumber']
+        }
+        return jsonify({
+            'message': 'Profile data stored',
+            'redirect': '/organization-setup'
+        }), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to store profile data'}), 500
+
+@app.route('/organization-setup')
+def organization_setup():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if user.organization_id:
+        return redirect('/dashboard')
+
+    # Get stored organization data if it exists    
+    organization_data = session.get('organization_data', {})
+    
+    return render_template('organization_setup.html', organization_data=organization_data)
+
+@app.route('/api/setup-organization', methods=['POST'])
+def setup_organization():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    data = request.get_json()
+    
+    if not data or not all(key in data for key in ['organizationName', 'location']):
         return jsonify({'error': 'Missing required fields'}), 400
     
     try:
-        # Convert date string to Date object
-        date_of_birth = datetime.strptime(data['dateOfBirth'], '%m/%d/%Y').date()
-        
-        # Update user profile
-        user.citizenship = data['citizenship']
-        user.date_of_birth = date_of_birth
-        user.phone_number = data['phoneNumber']
-        user.profile_completed = True
-        
-        db.session.commit()
-        
+        # Store organization data in session
+        session['organization_data'] = {
+            'name': data['organizationName'],
+            'location': data['location']
+        }
         return jsonify({
-            'message': 'Profile completed successfully',
-            'redirect': '/'
-        })
+            'message': 'Organization data stored',
+            'redirect': '/people-count'
+        }), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to store organization data'}), 500
+
+@app.route('/people-count')
+def people_count():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if user.organization_id:
+        return redirect('/dashboard')
+
+    # Get stored size data if it exists    
+    size_data = session.get('size_data', {})
+    
+    return render_template('people_count.html', size_data=size_data)
+
+@app.route('/api/update-organization-size', methods=['POST'])
+def update_organization_size():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    data = request.get_json()
+    
+    if not data or 'size' not in data:
+        return jsonify({'error': 'Missing size field'}), 400
+
+    try:
+        # Store size data in session first
+        session['size_data'] = {
+            'size': data['size']
+        }
+
+        # Only create organization and update user if this is final submission
+        if data.get('isSubmitting', True):  # Default to True for backward compatibility
+            # Create new organization with all the stored data
+            org = Organization(
+                name=session['organization_data']['name'],
+                location=session['organization_data']['location'],
+                size=data['size']
+            )
+            db.session.add(org)
+            
+            # Update user with all the stored data
+            user = User.query.get(session['user_id'])
+            user.citizenship = session['profile_data']['citizenship']
+            user.date_of_birth = datetime.strptime(session['profile_data']['date_of_birth'], '%Y-%m-%d').date()
+            user.phone_number = session['profile_data']['phone_number']
+            user.organization_id = org.id
+            user.profile_completed = True
+            
+            # Commit all changes to database
+            db.session.commit()
+
+            # Clear temporary session data after successful commit
+            session.pop('profile_data', None)
+            session.pop('organization_data', None)
+            session.pop('size_data', None)
+
+            return jsonify({
+                'message': 'Setup completed successfully',
+                'redirect': '/dashboard'
+            }), 200
+        else:
+            # If not final submission, just store the data and return success
+            return jsonify({
+                'message': 'Size data stored',
+                'redirect': None
+            }), 200
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'Failed to complete setup'}), 500
 
 if __name__ == '__main__':
+    with app.app_context():
+        init_db()  # Initialize database tables before running
     app.run(port=8000, debug=True) 
