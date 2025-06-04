@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="settings-container">
+    <h1 class="settings-title">Profile settings</h1>
+    
+    <div class="settings-nav">
+        <a href="#" class="settings-tab active">Personal</a>
+        <a href="#" class="settings-tab">Account access</a>
+        <a href="#" class="settings-tab">Notifications</a>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <div class="section-header">
+                <h2>Personal details</h2>
+                <button class="edit-button">Edit</button>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <label>Legal first name</label>
+                    <div class="detail-value">{{ user.first_name }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Legal last name</label>
+                    <div class="detail-value">{{ user.last_name }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Preferred name</label>
+                    <div class="detail-value">{{ user.preferred_name or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Date of birth</label>
+                    <div class="detail-value">{{ user.date_of_birth or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Citizen of</label>
+                    <div class="detail-value">{{ user.citizenship or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Phone number</label>
+                    <div class="detail-value">{{ user.phone or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Email</label>
+                    <div class="detail-value">{{ user.email }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Country of tax residence</label>
+                    <div class="detail-value">{{ user.tax_residence or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Department</label>
+                    <div class="detail-value">{{ user.department or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Job title</label>
+                    <div class="detail-value">{{ user.job_title or 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Seniority level</label>
+                    <div class="detail-value">{{ user.seniority_level or 'Not specified' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Your Deel Account</h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <label>Account type</label>
+                    <div class="detail-value">Client</div>
+                </div>
+
+                <div class="detail-item">
+                    <label>Organization</label>
+                    <div class="detail-value">{{ organization.name if organization else 'Not specified' }}</div>
+                </div>
+
+                <div class="detail-item wide">
+                    <label>Roles assigned to you</label>
+                    <div class="roles-list">
+                        <div class="role-item">
+                            <div class="role-title">Organization Admin</div>
+                            <div class="role-scope">Scope: organization</div>
+                        </div>
+                        <div class="role-item">
+                            <div class="role-title">Group Admin</div>
+                            <div class="role-scope">Scope: group • 1 group assigned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Default currency</h2>
+            <div class="currency-selector">
+                <select class="form-select">
+                    <option value="VND">VND - Vietnamese Đồng</option>
+                    <option value="USD">USD - United States Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Profile photo</h2>
+            <p class="photo-description">Your photo will be visible to your clients and coworkers on Deel.</p>
+            <div class="profile-photo-upload">
+                <div class="photo-placeholder">
+                    <!-- Add profile photo upload UI here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.settings-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.settings-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.settings-nav {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+}
+
+.settings-tab {
+    padding: 1rem;
+    color: #666;
+    text-decoration: none;
+    position: relative;
+}
+
+.settings-tab.active {
+    color: #000;
+    font-weight: 500;
+}
+
+.settings-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #000;
+}
+
+.settings-section {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.edit-button {
+    padding: 0.5rem 1rem;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item.wide {
+    grid-column: span 2;
+}
+
+.detail-item label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: #333;
+    font-size: 1rem;
+}
+
+.roles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.role-item {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.role-title {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.role-scope {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.currency-selector {
+    position: relative;
+    max-width: 300px;
+}
+
+.currency-selector select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 2.5rem;
+    font-size: 0.95rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: #333;
+}
+
+.currency-selector select:hover {
+    border-color: #ccc;
+}
+
+.currency-selector select:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+}
+
+.currency-selector::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #666;
+    pointer-events: none;
+}
+
+.currency-selector select option {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+}
+
+.currency-selector select option:hover {
+    background-color: #f5f5f5;
+}
+
+.photo-description {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.profile-photo-upload {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+</style>
+{% endblock %} 

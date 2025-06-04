@@ -22,15 +22,21 @@ db.init_app(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    first_name = db.Column(db.String(50))
-    last_name = db.Column(db.String(50))
+    password = db.Column(db.String(80), nullable=False)
+    first_name = db.Column(db.String(80))
+    last_name = db.Column(db.String(80))
+    preferred_name = db.Column(db.String(80))
+    date_of_birth = db.Column(db.String(20))
+    citizenship = db.Column(db.String(80))
+    phone = db.Column(db.String(20))
+    tax_residence = db.Column(db.String(80))
+    department = db.Column(db.String(80))
+    job_title = db.Column(db.String(80))
+    seniority_level = db.Column(db.String(80))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    citizenship = db.Column(db.String(100))
-    date_of_birth = db.Column(db.Date)
-    phone_number = db.Column(db.String(20))
     profile_completed = db.Column(db.Boolean, default=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
+    organization = db.relationship('Organization')
 
     @property
     def name(self):
@@ -41,14 +47,43 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.email}>'
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'preferred_name': self.preferred_name,
+            'date_of_birth': self.date_of_birth,
+            'citizenship': self.citizenship,
+            'phone': self.phone,
+            'tax_residence': self.tax_residence,
+            'department': self.department,
+            'job_title': self.job_title,
+            'seniority_level': self.seniority_level,
+            'organization_id': self.organization_id
+        }
+
 # Organization model
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    location = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    industry = db.Column(db.String(80))
     size = db.Column(db.String(50))
+    location = db.Column(db.String(120))
+    logo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    users = db.relationship('User', backref='organization', lazy=True)
+    users = db.relationship('User', backref='org', lazy=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'industry': self.industry,
+            'size': self.size,
+            'location': self.location,
+            'logo_url': self.logo_url
+        }
 
 # Create database tables
 def init_db():
@@ -222,18 +257,19 @@ def check_login():
 
 @app.route('/settings')
 def settings():
-    print("Accessing settings route")
     if 'user_id' not in session:
-        print("No user_id in session, redirecting to login")
         return redirect('/login')
     
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
-        
-    print("User is logged in, serving settings.html")
-    return render_template('settings.html', user=user)
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('settings.html', user=user, organization=organization)
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -444,6 +480,58 @@ def update_organization_size():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to complete setup'}), 500
+
+@app.route('/api/update-organization-settings', methods=['POST'])
+def update_organization_settings():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'No organization found'}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    try:
+        organization = Organization.query.get(user.organization_id)
+        
+        # Update organization fields
+        if 'name' in data:
+            organization.name = data['name']
+        if 'location' in data:
+            organization.location = data['location']
+        if 'size' in data:
+            organization.size = data['size']
+            
+        db.session.commit()
+        return jsonify({'message': 'Organization settings updated successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update organization settings'}), 500
+
+# Add context processor for organization data
+@app.context_processor
+def inject_organization():
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user and user.organization_id:
+            organization = Organization.query.get(user.organization_id)
+            return {'organization': organization}
+    return {'organization': None}
+
+@app.route('/profile/settings')
+def profile_settings():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('profile_settings.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():

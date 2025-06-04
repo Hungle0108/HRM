@@ -35,7 +35,16 @@
         .company-section {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            padding: 0.25rem;
+            position: relative;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .company-section:hover {
+            background-color: #f5f5f5;
         }
 
         .company-logo {
@@ -44,21 +53,64 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: #f0f0f0;
+            border-radius: 6px;
         }
 
         .company-logo svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             color: #666;
         }
 
         .company-select {
-            border: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
             background: transparent;
-            font-size: 0.9rem;
+            border: none;
             padding: 0.5rem;
-            cursor: pointer;
+            padding-right: 1.5rem;
+            font-size: 0.95rem;
             color: #333;
+            cursor: pointer;
+            min-width: 200px;
+            font-weight: 500;
+        }
+
+        .company-select:focus {
+            outline: none;
+        }
+
+        .company-section::after {
+            content: '';
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #666;
+        }
+
+        /* Custom dropdown styles */
+        select option {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        select option:hover {
+            background-color: #f0f0f0;
+        }
+
+        select option[value="add"] {
+            color: #0066cc;
+            font-weight: 500;
+            border-top: 1px solid #eee;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
         }
 
         .nav-links {
@@ -71,9 +123,10 @@
             color: #666;
             text-decoration: none;
             font-size: 0.9rem;
-            padding: 0.5rem;
-            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
             transition: all 0.2s;
+            position: relative;
         }
 
         .nav-link:hover {
@@ -82,8 +135,21 @@
         }
 
         .nav-link.active {
-            color: #333;
-            font-weight: 500;
+            color: #000;
+            font-weight: 600;
+            background-color: #f0f0f0;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background-color: #000;
+            border-radius: 2px;
         }
 
         .search-section {
@@ -175,62 +241,43 @@
         /* Profile Dropdown Styles */
         .profile-dropdown {
             position: absolute;
-            top: calc(100% + 8px);
+            top: 100%;
             right: 0;
+            width: 260px;
             background: white;
-            border: 1px solid #e0e0e0;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            min-width: 280px;
+            margin-top: 0.5rem;
             z-index: 1000;
         }
 
         .dropdown-header {
-            padding: 16px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-
-        .user-details {
-            flex: 1;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
         }
 
         .user-name {
             font-weight: 500;
             color: #333;
-            margin-bottom: 4px;
+            margin-bottom: 0.25rem;
         }
 
         .user-email {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #666;
         }
 
         .dropdown-content {
-            padding: 8px 0;
+            padding: 0.5rem 0;
         }
 
         .dropdown-item {
             display: flex;
             align-items: center;
-            padding: 8px 16px;
+            padding: 0.75rem 1rem;
             color: #333;
             text-decoration: none;
             transition: background-color 0.2s;
-            font-size: 0.9rem;
-            gap: 12px;
         }
 
         .dropdown-item:hover {
@@ -238,30 +285,27 @@
         }
 
         .dropdown-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            color: #666;
+        }
+
+        .dropdown-item .chevron-right {
             width: 16px;
             height: 16px;
-            color: #666;
+            margin-left: auto;
+            margin-right: 0;
         }
 
-        .item-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .dropdown-item span {
             flex: 1;
-        }
-
-        .shortcut {
-            color: #666;
-            font-size: 0.85rem;
-            padding: 2px 6px;
-            background: #f0f0f0;
-            border-radius: 4px;
         }
 
         .dropdown-divider {
             height: 1px;
-            background-color: #e0e0e0;
-            margin: 8px 0;
+            background-color: #eee;
+            margin: 0.5rem 0;
         }
     </style>
     {% block styles %}{% endblock %}
@@ -275,8 +319,9 @@
                     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                 </svg>
             </div>
-            <select class="company-select">
-                <option>Cop name</option>
+            <select class="company-select" onchange="if(this.value === 'add') window.location.href='/organization/setup';">
+                <option value="{{ organization.id if organization else '' }}">{{ organization.name if organization else 'Select organization' }}</option>
+                <option value="add">+ Add another organization</option>
             </select>
         </div>
 
@@ -315,51 +360,41 @@
                 <div class="profile-pic" id="profileButton">
                     <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=random" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
-                <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+                <div id="profileDropdown" class="profile-dropdown" style="display: none;">
                     <div class="dropdown-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=random" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">{{ user.name }}</div>
-                                <div class="user-email">{{ user.email }}</div>
-                            </div>
-                        </div>
+                        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                        <div class="user-email">{{ user.email }}</div>
                     </div>
                     <div class="dropdown-content">
-                        <a href="#" class="dropdown-item">
+                        <a href="/profile/settings" class="dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="M21 21l-4.35-4.35"></path>
-                            </svg>
-                            <div class="item-content">
-                                <span>Search</span>
-                                <span class="shortcut">Ctrl + K</span>
-                            </div>
-                        </a>
-                        <a href="/settings" class="dropdown-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
                             </svg>
                             <span>Profile settings</span>
                         </a>
                         <a href="#" class="dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                                <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                <path d="M2 12h20"></path>
                             </svg>
                             <span>Language and region</span>
+                            <svg class="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"></path>
+                            </svg>
                         </a>
                         <a href="#" class="dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                             </svg>
                             <span>Appearance</span>
+                            <svg class="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"></path>
+                            </svg>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" onclick="handleLogout(); return false;" class="dropdown-item">
+                        <a href="/logout" class="dropdown-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                 <polyline points="16 17 21 12 16 7"></polyline>
@@ -390,6 +425,13 @@
                 dropdown.style.display = 'none';
             }
         });
+
+        // Handle organization change
+        function changeOrganization(value) {
+            if (value === 'add') {
+                window.location.href = '/organization-setup';
+            }
+        }
 
         // Handle keyboard shortcuts
         document.addEventListener('keydown', function(event) {

@@ -257,10 +257,10 @@
                 <p class="settings-section-description">Update your organization's information</p>
             </div>
 
-            <form>
+            <form id="organizationForm">
                 <div class="form-group">
                     <label class="form-label">Organization Name</label>
-                    <input type="text" class="form-input" value="Your Company Name">
+                    <input type="text" class="form-input" name="name" value="{{ organization.name if organization else '' }}">
                 </div>
 
                 <div class="form-row">
@@ -270,13 +270,13 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Company Size</label>
-                        <input type="text" class="form-input" value="50-100">
+                        <input type="text" class="form-input" name="size" value="{{ organization.size if organization else '' }}">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Business Address</label>
-                    <input type="text" class="form-input" value="123 Business Street">
+                    <input type="text" class="form-input" name="location" value="{{ organization.location if organization else '' }}">
                 </div>
 
                 <div class="form-row">
@@ -292,6 +292,10 @@
                         <label class="form-label">ZIP Code</label>
                         <input type="text" class="form-input" value="94105">
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -355,6 +359,40 @@
 
 {% block scripts %}
 <script>
+    // Organization form submission
+    const organizationForm = document.getElementById('organizationForm');
+    if (organizationForm) {
+        organizationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: organizationForm.querySelector('[name="name"]').value,
+                size: organizationForm.querySelector('[name="size"]').value,
+                location: organizationForm.querySelector('[name="location"]').value
+            };
+            
+            try {
+                const response = await fetch('/api/update-organization-settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Settings saved successfully!');
+                } else {
+                    throw new Error(data.error || 'Failed to save settings');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    }
+
     // Theme toggle functionality
     const themeToggle = document.getElementById('themeToggle');
     
