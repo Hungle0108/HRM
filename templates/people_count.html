@@ -152,8 +152,8 @@
         </svg>
     </div>
     
-    <h1 class="welcome-title">How many people work at your organization?</h1>
-    <p class="welcome-subtitle">This helps us customize your experience</p>
+    <h1 class="welcome-title" id="welcomeTitle"></h1>
+    <p class="welcome-subtitle" id="welcomeSubtitle"></p>
 
     <form id="peopleCountForm">
         <div class="size-options">
@@ -165,14 +165,25 @@
         </div>
         <div class="error-text" id="sizeError"></div>
         <div style="margin-top: 2rem;">
-            <button type="button" class="btn-back" onclick="window.location.href='/organization-setup'">Back</button>
-            <button type="submit" class="btn-continue">Finish setup</button>
+            <button type="button" class="btn-back" id="backButton" onclick="window.location.href='/organization-setup'"></button>
+            <button type="submit" class="btn-continue" id="finishButton"></button>
         </div>
     </form>
 </div>
 
+<script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Get saved language preference
+    const currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
+    const trans = translations[currentLanguage].peopleCount;
+
+    // Update text content
+    document.getElementById('welcomeTitle').textContent = trans.title;
+    document.getElementById('welcomeSubtitle').textContent = trans.subtitle;
+    document.getElementById('backButton').textContent = trans.back;
+    document.getElementById('finishButton').textContent = trans.finishSetup;
+
     const sizeButtons = document.querySelectorAll('.size-button');
     let selectedSize = '{{ size_data.size or "" }}';
 
@@ -220,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let isValid = true;
             
             if (!selectedSize) {
-                document.getElementById('sizeError').textContent = 'Please select number of employees';
+                document.getElementById('sizeError').textContent = trans.errorSize;
                 isValid = false;
             }
             
@@ -240,7 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const data = await response.json();
                     
                     if (response.ok) {
-                        // Redirect to homepage
                         window.location.href = '/';
                     } else {
                         throw new Error(data.error || 'Failed to update organization size');

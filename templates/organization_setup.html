@@ -29,17 +29,18 @@
         width: 120px;
         height: 120px;
         margin: 0 auto 2rem;
-        background: #f5f5f5;
+        background: #f8f9fa;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
-    .welcome-icon svg {
-        width: 60px;
-        height: 60px;
-        color: var(--primary-color);
+    .welcome-icon img {
+        width: 60%;
+        height: 60%;
+        object-fit: contain;
     }
 
     .welcome-title {
@@ -288,40 +289,54 @@
 {% block content %}
 <div class="organization-container">
     <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-        </svg>
+        <img src="{{ url_for('static', filename='images/building.png') }}" alt="Organization Setup">
     </div>
     
-    <h1 class="welcome-title">Organization Details</h1>
-    <p class="welcome-subtitle">These details will be used for any billing or invoicing</p>
+    <h1 class="welcome-title" id="welcomeTitle"></h1>
+    <p class="welcome-subtitle" id="welcomeSubtitle"></p>
 
     <form id="organizationSetupForm">
         <div class="form-group">
-            <label class="form-label">Organization Name <span class="required">*</span></label>
-            <input type="text" class="form-input" id="orgName" placeholder="Enter your organization name" value="{{ organization_data.name or '' }}" required>
+            <label class="form-label" id="orgNameLabel"><span class="required">*</span></label>
+            <input type="text" class="form-input" id="orgName" required>
             <div class="error-text" id="orgNameError"></div>
         </div>
 
         <div class="form-group">
-            <label class="form-label">Headquarters Location <span class="required">*</span></label>
+            <label class="form-label" id="locationLabel"><span class="required">*</span></label>
             <div class="location-selector">
-                <input type="text" class="form-input location-input" id="locationInput" placeholder="Start typing your location" value="{{ organization_data.location or '' }}" required>
+                <input type="text" class="form-input location-input" id="locationInput" required>
                 <div class="location-dropdown" id="locationDropdown"></div>
             </div>
             <div class="error-text" id="locationError"></div>
         </div>
 
-        <button type="button" class="btn-back" onclick="window.location.href='/complete-profile'">Back</button>
-        <button type="submit" class="btn-continue">Continue</button>
-        <div class="next-step">
-            Next step: People
-        </div>
+        <button type="button" class="btn-back" id="backButton" onclick="window.location.href='/complete-profile'"></button>
+        <button type="submit" class="btn-continue" id="continueButton"></button>
+        <div class="next-step" id="nextStep"></div>
     </form>
 </div>
 
+<script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Get saved language preference
+    const currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
+    const trans = translations[currentLanguage].organizationSetup;
+
+    // Update text content
+    document.getElementById('welcomeTitle').textContent = trans.title;
+    document.getElementById('welcomeSubtitle').textContent = trans.subtitle;
+    document.getElementById('orgNameLabel').textContent = trans.orgName;
+    document.getElementById('locationLabel').textContent = trans.location;
+    document.getElementById('backButton').textContent = trans.back;
+    document.getElementById('continueButton').textContent = trans.continue;
+    document.getElementById('nextStep').textContent = trans.nextStep;
+
+    // Update placeholders
+    document.getElementById('orgName').placeholder = trans.orgNamePlaceholder;
+    document.getElementById('locationInput').placeholder = trans.locationPlaceholder;
+
     const countries = [
         'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
         'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi',
@@ -453,12 +468,12 @@ document.addEventListener('DOMContentLoaded', function() {
             let isValid = true;
             
             if (!orgName.trim()) {
-                document.getElementById('orgNameError').textContent = 'Please enter organization name';
+                document.getElementById('orgNameError').textContent = trans.errorOrgName;
                 isValid = false;
             }
             
             if (!location) {
-                document.getElementById('locationError').textContent = 'Please select headquarters location';
+                document.getElementById('locationError').textContent = trans.errorLocation;
                 isValid = false;
             }
             

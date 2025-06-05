@@ -379,6 +379,10 @@ def organization_setup():
         return redirect('/login')
     
     user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
     if user.organization_id:
         return redirect('/dashboard')
 
@@ -392,7 +396,7 @@ def organization_setup():
         size_data = session.get('size_data')
         session['size_data'] = size_data
     
-    return render_template('organization_setup.html', organization_data=organization_data)
+    return render_template('organization_setup.html', organization_data=organization_data, user=user)
 
 @app.route('/api/setup-organization', methods=['POST'])
 def setup_organization():
@@ -438,13 +442,17 @@ def people_count():
         return redirect('/login')
     
     user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
     if user.organization_id:
         return redirect('/dashboard')
 
     # Get stored size data if it exists    
     size_data = session.get('size_data', {})
     
-    return render_template('people_count.html', size_data=size_data)
+    return render_template('people_count.html', size_data=size_data, user=user)
 
 @app.route('/api/update-organization-size', methods=['POST'])
 def update_organization_size():

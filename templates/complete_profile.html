@@ -467,23 +467,23 @@
         </svg>
     </div>
     
-    <h1 class="welcome-title">Welcome, {{ user.first_name }}!</h1>
-    <p class="welcome-subtitle">We just need a few details to complete your profile</p>
+    <h1 class="welcome-title" id="welcomeTitle"></h1>
+    <p class="welcome-subtitle" id="welcomeSubtitle"></p>
 
     <form id="completeProfileForm">
         <div class="form-group">
-            <label class="form-label">Citizenship <span class="required">*</span></label>
+            <label class="form-label" id="citizenshipLabel"><span class="required">*</span></label>
             <div class="dropdown-wrapper">
-                <input type="text" class="form-input" id="citizenshipInput" placeholder="Start typing your citizenship" value="{{ profile_data.citizenship or '' }}" required>
+                <input type="text" class="form-input" id="citizenshipInput" required>
                 <div class="dropdown-menu" id="citizenshipDropdown"></div>
             </div>
             <div class="error-text" id="citizenshipError"></div>
         </div>
 
         <div class="form-group">
-            <label class="form-label">Date of birth <span class="required">*</span></label>
+            <label class="form-label" id="dateLabel"><span class="required">*</span></label>
             <div class="date-input-wrapper">
-                <input type="text" class="form-input date-input" id="dateOfBirth" placeholder="Select your date of birth" value="{{ profile_data.date_of_birth or '' }}" readonly>
+                <input type="text" class="form-input date-input" id="dateOfBirth" readonly>
                 <button type="button" class="calendar-icon" id="calendarToggle">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -494,21 +494,20 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label">Phone number <span class="required">*</span></label>
+            <label class="form-label" id="phoneLabel"><span class="required">*</span></label>
             <div class="phone-input-group">
                 <input type="text" class="form-input dial-code" value="+84" readonly>
-                <input type="tel" class="form-input phone-number" id="phoneNumber" placeholder="Enter your phone number" value="{{ profile_data.phone_number or '' }}" required>
+                <input type="tel" class="form-input phone-number" id="phoneNumber" required>
             </div>
             <div class="error-text" id="phoneError"></div>
         </div>
 
-        <button type="submit" class="btn-continue">Continue</button>
-        <div class="next-step">
-            Next step: Your organization
-        </div>
+        <button type="submit" class="btn-continue" id="continueButton"></button>
+        <div class="next-step" id="nextStep"></div>
     </form>
 </div>
 
+<script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 <script>
     const countries = [
@@ -539,7 +538,23 @@
     ];
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
+    // Get saved language preference
+    const currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
+    const trans = translations[currentLanguage].completeProfile;
+
+    // Update text content
+    document.getElementById('welcomeTitle').textContent = trans.title.replace('{name}', '{{ user.first_name }}');
+    document.getElementById('welcomeSubtitle').textContent = trans.subtitle;
+    document.getElementById('citizenshipLabel').textContent = trans.citizenship;
+    document.getElementById('dateLabel').textContent = trans.dateOfBirth;
+    document.getElementById('phoneLabel').textContent = trans.phoneNumber;
+    document.getElementById('continueButton').textContent = trans.continue;
+    document.getElementById('nextStep').textContent = trans.nextStep;
+
+    // Update placeholders
+    document.getElementById('citizenshipInput').placeholder = trans.citizenshipPlaceholder;
+    document.getElementById('dateOfBirth').placeholder = trans.dateOfBirthPlaceholder;
+    document.getElementById('phoneNumber').placeholder = trans.phoneNumberPlaceholder;
 
     // Citizenship dropdown functionality
     const citizenshipInput = document.getElementById('citizenshipInput');
@@ -663,17 +678,17 @@ document.addEventListener('DOMContentLoaded', function() {
             let isValid = true;
             
             if (!citizenshipInput.value) {
-                document.getElementById('citizenshipError').textContent = 'Please select your citizenship';
+                document.getElementById('citizenshipError').textContent = trans.errorCitizenship;
                 isValid = false;
             }
             
             if (!dateInput.value) {
-                document.getElementById('dateError').textContent = 'Please enter your date of birth';
+                document.getElementById('dateError').textContent = trans.errorDate;
                 isValid = false;
             }
             
             if (!phoneInput.value || phoneInput.value.length !== 9) {
-                document.getElementById('phoneError').textContent = 'Please enter a valid 9-digit phone number';
+                document.getElementById('phoneError').textContent = trans.errorPhone;
                 isValid = false;
             }
             
@@ -694,7 +709,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const data = await response.json();
                     
                     if (response.ok) {
-                        // Redirect to organization setup or dashboard
                         window.location.href = '/organization-setup';
                     } else {
                         throw new Error(data.error || 'Failed to complete profile');

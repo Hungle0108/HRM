@@ -307,6 +307,18 @@
             background-color: #eee;
             margin: 0.5rem 0;
         }
+
+        .avatar-initials {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
     </style>
     {% block styles %}{% endblock %}
 </head>
@@ -479,6 +491,34 @@
 
         // Check login status when page loads
         checkLoginStatus();
+
+        function getInitials(user) {
+            if (user.preferred_name) {
+                // If preferred name exists, use only its first letter
+                return user.preferred_name.charAt(0).toUpperCase();
+            } else {
+                // Otherwise use first letter of first name and last name
+                return (user.first_name.charAt(0) + user.last_name.charAt(0)).toUpperCase();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePic = document.querySelector('.profile-pic');
+            if (profilePic) {
+                const user = {
+                    first_name: '{{ user.first_name }}',
+                    last_name: '{{ user.last_name }}',
+                    preferred_name: '{{ user.preferred_name or "" }}',
+                    profile_picture: '{{ user.profile_picture or "" }}'
+                };
+
+                if (!user.profile_picture) {
+                    // If no profile picture, create an initial-based avatar
+                    const initials = getInitials(user);
+                    profilePic.innerHTML = `<div class="avatar-initials">${initials}</div>`;
+                }
+            }
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>
