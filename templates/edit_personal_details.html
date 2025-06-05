@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Personal Details - HR Management System{% endblock %}
+
+{% block content %}
+<div class="edit-container">
+    <div class="edit-header">
+        <h1>Edit personal details</h1>
+        <div class="header-actions">
+            <button class="btn-cancel" onclick="window.location.href='/profile/settings'">Cancel</button>
+            <button class="btn-save" onclick="saveChanges()">Save</button>
+        </div>
+    </div>
+
+    <div class="edit-content">
+        <div class="section-title">Personal information</div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Legal first name</label>
+                <input type="text" id="firstName" class="form-input" value="{{ user.first_name }}" placeholder="Enter your legal first name">
+            </div>
+
+            <div class="form-group">
+                <label>Legal last name</label>
+                <input type="text" id="lastName" class="form-input" value="{{ user.last_name }}" placeholder="Enter your legal last name">
+            </div>
+
+            <div class="form-group">
+                <label>Preferred name (optional)</label>
+                <input type="text" id="preferredName" class="form-input" value="{{ user.preferred_name or '' }}" placeholder="Enter your preferred name">
+            </div>
+
+            <div class="form-group">
+                <label>Date of birth (DD/MM/YYYY)</label>
+                <input type="date" id="dateOfBirth" class="form-input" value="{{ user.date_of_birth or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label>I'm a citizen of</label>
+                <input type="text" id="citizenship" class="form-input" value="{{ user.citizenship or '' }}" placeholder="Select your citizenship">
+            </div>
+
+            <div class="form-group phone-group">
+                <label>Phone number</label>
+                <div class="phone-input-group">
+                    <input type="text" id="dialCode" class="form-input dial-code" value="+84" readonly>
+                    <input type="tel" id="phone" class="form-input phone-number" value="{{ user.phone or '' }}" placeholder="Enter your phone number">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-input" value="{{ user.email }}" readonly>
+                <div class="input-hint">To change your email, please contact support</div>
+            </div>
+
+            <div class="form-group">
+                <label>Country of tax residence</label>
+                <input type="text" id="taxResidence" class="form-input" value="{{ user.tax_residence or '' }}" placeholder="Select your tax residence">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .edit-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .edit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .edit-header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-cancel {
+        padding: 0.5rem 1rem;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        color: #666;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        padding: 0.5rem 1rem;
+        background: #000;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+        background: #f5f5f5;
+    }
+
+    .btn-save:hover {
+        background: #333;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-input {
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 0.95rem;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #000;
+    }
+
+    .input-hint {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .phone-group {
+        grid-column: span 2;
+    }
+
+    .phone-input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .dial-code {
+        width: 80px;
+    }
+
+    .phone-number {
+        flex: 1;
+    }
+</style>
+
+<script>
+async function saveChanges() {
+    const data = {
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        preferred_name: document.getElementById('preferredName').value,
+        date_of_birth: document.getElementById('dateOfBirth').value,
+        citizenship: document.getElementById('citizenship').value,
+        phone: document.getElementById('phone').value,
+        tax_residence: document.getElementById('taxResidence').value
+    };
+
+    try {
+        const response = await fetch('/api/update-personal-details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            window.location.href = '/profile/settings';
+        } else {
+            const errorData = await response.json();
+            alert(errorData.error || 'Failed to update personal details');
+        }
+    } catch (error) {
+        alert('An error occurred while saving changes');
+    }
+}
+</script>
+{% endblock %} 

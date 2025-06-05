@@ -382,8 +382,15 @@ def organization_setup():
     if user.organization_id:
         return redirect('/dashboard')
 
-    # Get stored organization data if it exists    
+    # Get stored organization data from session
     organization_data = session.get('organization_data', {})
+    
+    # If there's no organization data in session but we have size data,
+    # it means we're coming back from the people count page
+    if not organization_data and session.get('size_data'):
+        # Keep the size data in session
+        size_data = session.get('size_data')
+        session['size_data'] = size_data
     
     return render_template('organization_setup.html', organization_data=organization_data)
 
@@ -398,11 +405,26 @@ def setup_organization():
         return jsonify({'error': 'Missing required fields'}), 400
     
     try:
-        # Store organization data in session
-        session['organization_data'] = {
+        # Get existing organization data if any
+        existing_data = session.get('organization_data', {})
+        
+        # Update with new data
+        organization_data = {
             'name': data['organizationName'],
             'location': data['location']
         }
+        
+        # Preserve any additional data that might have been set
+        organization_data.update(existing_data)
+        
+        # Store updated data back in session
+        session['organization_data'] = organization_data
+        
+        # Preserve size data if it exists
+        if session.get('size_data'):
+            size_data = session.get('size_data')
+            session['size_data'] = size_data
+            
         return jsonify({
             'message': 'Organization data stored',
             'redirect': '/people-count'
@@ -532,6 +554,52 @@ def profile_settings():
         return redirect('/login')
     
     return render_template('profile_settings.html', user=user)
+
+@app.route('/profile/edit-personal-details')
+def edit_personal_details():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('edit_personal_details.html', user=user)
+
+@app.route('/api/update-personal-details', methods=['POST'])
+def update_personal_details():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    data = request.get_json()
+    
+    try:
+        # Update user fields
+        if 'first_name' in data:
+            user.first_name = data['first_name']
+        if 'last_name' in data:
+            user.last_name = data['last_name']
+        if 'preferred_name' in data:
+            user.preferred_name = data['preferred_name']
+        if 'date_of_birth' in data:
+            user.date_of_birth = data['date_of_birth']
+        if 'citizenship' in data:
+            user.citizenship = data['citizenship']
+        if 'phone' in data:
+            user.phone = data['phone']
+        if 'tax_residence' in data:
+            user.tax_residence = data['tax_residence']
+            
+        db.session.commit()
+        return jsonify({'message': 'Personal details updated successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update personal details'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
