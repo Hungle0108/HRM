@@ -157,15 +157,15 @@
 
     <form id="peopleCountForm">
         <div class="size-options">
-            <button type="button" class="size-button {% if size_data.size == '0-50' %}selected{% endif %}" data-value="0-50">0-50</button>
-            <button type="button" class="size-button {% if size_data.size == '50-100' %}selected{% endif %}" data-value="50-100">50-100</button>
-            <button type="button" class="size-button {% if size_data.size == '100-500' %}selected{% endif %}" data-value="100-500">100-500</button>
-            <button type="button" class="size-button {% if size_data.size == '500-1000' %}selected{% endif %}" data-value="500-1000">500-1000</button>
-            <button type="button" class="size-button {% if size_data.size == '1000+' %}selected{% endif %}" data-value="1000+">1000+</button>
+            <button type="button" class="size-button" data-value="0-50">0-50</button>
+            <button type="button" class="size-button" data-value="50-100">50-100</button>
+            <button type="button" class="size-button" data-value="100-500">100-500</button>
+            <button type="button" class="size-button" data-value="500-1000">500-1000</button>
+            <button type="button" class="size-button" data-value="1000+">1000+</button>
         </div>
         <div class="error-text" id="sizeError"></div>
         <div style="margin-top: 2rem;">
-            <button type="button" class="btn-back" id="backButton" onclick="window.location.href='/organization-setup'"></button>
+            <button type="button" class="btn-back" id="backButton"></button>
             <button type="submit" class="btn-continue" id="finishButton"></button>
         </div>
     </form>
@@ -185,36 +185,62 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('finishButton').textContent = trans.finishSetup;
 
     const sizeButtons = document.querySelectorAll('.size-button');
+    const backButton = document.getElementById('backButton');
     let selectedSize = '{{ size_data.size or "" }}';
 
-    sizeButtons.forEach(button => {
-        if (button.getAttribute('data-value') === selectedSize) {
-            button.classList.add('selected');
-        }
-        
-        button.addEventListener('click', async () => {
-            // Remove selected class from all buttons
-            sizeButtons.forEach(btn => btn.classList.remove('selected'));
-            // Add selected class to clicked button
-            button.classList.add('selected');
-            selectedSize = button.getAttribute('data-value');
-            document.getElementById('sizeError').textContent = '';
-
-            // Store the selection in session without submitting
-            try {
-                await fetch('/api/update-organization-size', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        size: selectedSize,
-                        isSubmitting: false
-                    }),
-                });
-            } catch (error) {
-                console.error('Failed to store size selection:', error);
+    // Initialize selected button if size data exists
+    if (selectedSize) {
+        sizeButtons.forEach(button => {
+            if (button.dataset.value === selectedSize) {
+                button.classList.add('selected');
             }
+        });
+    }
+
+    // Store form data in localStorage when it changes
+    function storeFormData() {
+        const formData = {
+            size: selectedSize
+        };
+        localStorage.setItem('peopleCountFormData', JSON.stringify(formData));
+    }
+
+    // Load form data from localStorage
+    function loadFormData() {
+        const storedData = localStorage.getItem('peopleCountFormData');
+        if (storedData) {
+            const formData = JSON.parse(storedData);
+            selectedSize = formData.size || selectedSize; // Use server data if no local data
+            if (selectedSize) {
+                sizeButtons.forEach(button => {
+                    if (button.dataset.value === selectedSize) {
+                        button.classList.add('selected');
+                    } else {
+                        button.classList.remove('selected');
+                    }
+                });
+            }
+        }
+    }
+
+    // Load stored data when page loads
+    loadFormData();
+
+    // Modify back button behavior
+    backButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Store current form data before navigating back
+        storeFormData();
+        window.location.href = '/organization-setup';
+    });
+
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            sizeButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedSize = button.dataset.value;
+            document.getElementById('sizeError').textContent = '';
+            storeFormData();
         });
     });
 
@@ -224,40 +250,39 @@ document.addEventListener('DOMContentLoaded', function() {
         peopleCountForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Reset error messages
-            document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
-            
-            // Validate inputs
-            let isValid = true;
+            // Reset error message
+            document.getElementById('sizeError').textContent = '';
             
             if (!selectedSize) {
                 document.getElementById('sizeError').textContent = trans.errorSize;
-                isValid = false;
+                return;
             }
             
-            if (isValid) {
-                try {
-                    const response = await fetch('/api/update-organization-size', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            size: selectedSize,
-                            isSubmitting: true
-                        }),
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (response.ok) {
-                        window.location.href = '/';
-                    } else {
-                        throw new Error(data.error || 'Failed to update organization size');
-                    }
-                } catch (error) {
-                    alert(error.message);
+            try {
+                const response = await fetch('/api/update-organization-size', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        size: selectedSize,
+                        isSubmitting: true
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Clear all stored form data before redirecting
+                    localStorage.removeItem('completeProfileFormData');
+                    localStorage.removeItem('orgSetupFormData');
+                    localStorage.removeItem('peopleCountFormData');
+                    window.location.href = '/dashboard';
+                } else {
+                    throw new Error(data.error || 'Failed to update organization size');
                 }
+            } catch (error) {
+                alert(error.message);
             }
         });
     }

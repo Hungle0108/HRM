@@ -474,7 +474,7 @@
         <div class="form-group">
             <label class="form-label" id="citizenshipLabel"><span class="required">*</span></label>
             <div class="dropdown-wrapper">
-                <input type="text" class="form-input" id="citizenshipInput" required>
+                <input type="text" class="form-input" id="citizenshipInput" value="{{ profile_data.citizenship or '' }}" required>
                 <div class="dropdown-menu" id="citizenshipDropdown"></div>
             </div>
             <div class="error-text" id="citizenshipError"></div>
@@ -483,7 +483,7 @@
         <div class="form-group">
             <label class="form-label" id="dateLabel"><span class="required">*</span></label>
             <div class="date-input-wrapper">
-                <input type="text" class="form-input date-input" id="dateOfBirth" readonly>
+                <input type="text" class="form-input date-input" id="dateOfBirth" value="{{ profile_data.date_of_birth or '' }}" readonly>
                 <button type="button" class="calendar-icon" id="calendarToggle">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -497,7 +497,7 @@
             <label class="form-label" id="phoneLabel"><span class="required">*</span></label>
             <div class="phone-input-group">
                 <input type="text" class="form-input dial-code" value="+84" readonly>
-                <input type="tel" class="form-input phone-number" id="phoneNumber" required>
+                <input type="tel" class="form-input phone-number" id="phoneNumber" value="{{ profile_data.phone_number or '' }}" required>
             </div>
             <div class="error-text" id="phoneError"></div>
         </div>
@@ -556,13 +556,45 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('dateOfBirth').placeholder = trans.dateOfBirthPlaceholder;
     document.getElementById('phoneNumber').placeholder = trans.phoneNumberPlaceholder;
 
-    // Citizenship dropdown functionality
+    // Get form elements once
+    const completeProfileForm = document.getElementById('completeProfileForm');
     const citizenshipInput = document.getElementById('citizenshipInput');
-    const citizenshipDropdown = document.getElementById('citizenshipDropdown');
+    const dateInput = document.getElementById('dateOfBirth');
+    const phoneInput = document.getElementById('phoneNumber');
     let selectedCountry = '';
 
-    console.log('Citizenship input:', citizenshipInput);
-    console.log('Citizenship dropdown:', citizenshipDropdown);
+    // Store form data in localStorage when it changes
+    function storeFormData() {
+        const formData = {
+            citizenship: citizenshipInput.value,
+            dateOfBirth: dateInput.value,
+            phoneNumber: phoneInput.value
+        };
+        localStorage.setItem('completeProfileFormData', JSON.stringify(formData));
+    }
+
+    // Load form data from localStorage
+    function loadFormData() {
+        const storedData = localStorage.getItem('completeProfileFormData');
+        if (storedData) {
+            const formData = JSON.parse(storedData);
+            citizenshipInput.value = formData.citizenship || '';
+            dateInput.value = formData.dateOfBirth || '';
+            phoneInput.value = formData.phoneNumber || '';
+            selectedCountry = formData.citizenship || '';
+        }
+    }
+
+    // Load stored data when page loads
+    loadFormData();
+
+    // Store data when inputs change
+    citizenshipInput.addEventListener('input', storeFormData);
+    dateInput.addEventListener('change', storeFormData);
+    phoneInput.addEventListener('input', storeFormData);
+
+    // Citizenship dropdown functionality
+    const citizenshipDropdown = document.getElementById('citizenshipDropdown');
 
     function filterCountries(searchText) {
         return countries.filter(country => 
@@ -577,11 +609,16 @@ document.addEventListener('DOMContentLoaded', function() {
             filteredCountries.forEach(country => {
                 const div = document.createElement('div');
                 div.className = 'dropdown-item';
+                if (country === selectedCountry) {
+                    div.classList.add('selected');
+                }
                 div.textContent = country;
                 div.addEventListener('click', () => {
                     citizenshipInput.value = country;
                     selectedCountry = country;
                     citizenshipDropdown.classList.remove('show');
+                    document.getElementById('citizenshipError').textContent = '';
+                    storeFormData(); // Store data when selecting from dropdown
                 });
                 citizenshipDropdown.appendChild(div);
             });
@@ -602,27 +639,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (citizenshipInput.value) {
                 const filteredCountries = filterCountries(citizenshipInput.value);
                 updateDropdown(filteredCountries);
+            } else {
+                updateDropdown(countries);
             }
         });
-    } else {
-        console.error('Citizenship input not found');
     }
 
     document.addEventListener('click', (e) => {
-        if (citizenshipInput && !citizenshipInput.contains(e.target) && citizenshipDropdown && !citizenshipDropdown.contains(e.target)) {
+        if (!citizenshipInput.contains(e.target) && !citizenshipDropdown.contains(e.target)) {
             citizenshipDropdown.classList.remove('show');
         }
     });
 
     // Date picker functionality
-    const dateInput = document.getElementById('dateOfBirth');
     const calendarToggle = document.getElementById('calendarToggle');
 
-    console.log('Date input:', dateInput);
-    console.log('Calendar toggle:', calendarToggle);
-
     if (dateInput && calendarToggle) {
-            const fp = flatpickr(dateInput, {
+        const fp = flatpickr(dateInput, {
             dateFormat: "Y-m-d",
             maxDate: new Date(),
             minDate: "1900-01-01",
@@ -632,23 +665,21 @@ document.addEventListener('DOMContentLoaded', function() {
             static: true,
             showMonths: 1,
             fixedHeight: true,
-            showOutsideDays: false
+            showOutsideDays: false,
+            onChange: function(selectedDates, dateStr) {
+                storeFormData(); // Store data when date changes
+            }
         });
 
         calendarToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (fp) {
-                    fp.toggle();
+            e.preventDefault();
+            if (fp) {
+                fp.toggle();
             }
         });
-    } else {
-        console.error('Date input or calendar toggle button not found.');
-        if (!dateInput) console.error('dateOfBirth element is missing.');
-        if (!calendarToggle) console.error('calendarToggle element is missing.');
     }
 
     // Phone number validation
-    const phoneInput = document.getElementById('phoneNumber');
     if (phoneInput) {
         phoneInput.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
@@ -660,13 +691,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Limit to 9 digits (since we removed the initial zero)
             e.target.value = value.slice(0, 9);
+            storeFormData(); // Store data when phone number changes
         });
-    } else {
-        console.error('Phone input not found');
     }
 
     // Form submission
-    const completeProfileForm = document.getElementById('completeProfileForm');
     if (completeProfileForm) {
         completeProfileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -709,6 +738,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const data = await response.json();
                     
                     if (response.ok) {
+                        // Clear stored form data before redirecting
+                        localStorage.removeItem('completeProfileFormData');
                         window.location.href = '/organization-setup';
                     } else {
                         throw new Error(data.error || 'Failed to complete profile');
@@ -718,8 +749,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    } else {
-        console.error('Complete profile form not found');
     }
 });
 

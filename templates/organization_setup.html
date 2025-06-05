@@ -298,20 +298,20 @@
     <form id="organizationSetupForm">
         <div class="form-group">
             <label class="form-label" id="orgNameLabel"><span class="required">*</span></label>
-            <input type="text" class="form-input" id="orgName" required>
+            <input type="text" class="form-input" id="orgName" value="{{ organization_data.name or '' }}" required>
             <div class="error-text" id="orgNameError"></div>
         </div>
 
         <div class="form-group">
             <label class="form-label" id="locationLabel"><span class="required">*</span></label>
             <div class="location-selector">
-                <input type="text" class="form-input location-input" id="locationInput" required>
+                <input type="text" class="form-input location-input" id="locationInput" value="{{ organization_data.location or '' }}" required>
                 <div class="location-dropdown" id="locationDropdown"></div>
             </div>
             <div class="error-text" id="locationError"></div>
         </div>
 
-        <button type="button" class="btn-back" id="backButton" onclick="window.location.href='/complete-profile'"></button>
+        <button type="button" class="btn-back" id="backButton"></button>
         <button type="submit" class="btn-continue" id="continueButton"></button>
         <div class="next-step" id="nextStep"></div>
     </form>
@@ -367,20 +367,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const locationInput = document.getElementById('locationInput');
     const locationDropdown = document.getElementById('locationDropdown');
     const orgNameInput = document.getElementById('orgName');
+    const backButton = document.getElementById('backButton');
     let selectedLocation = locationInput.value || '';
 
-    // Store form data in sessionStorage when it changes
+    // Store form data in localStorage when it changes
     function storeFormData() {
         const formData = {
             orgName: orgNameInput.value,
             location: locationInput.value
         };
-        sessionStorage.setItem('orgSetupFormData', JSON.stringify(formData));
+        localStorage.setItem('orgSetupFormData', JSON.stringify(formData));
     }
 
-    // Load form data from sessionStorage
+    // Load form data from localStorage
     function loadFormData() {
-        const storedData = sessionStorage.getItem('orgSetupFormData');
+        const storedData = localStorage.getItem('orgSetupFormData');
         if (storedData) {
             const formData = JSON.parse(storedData);
             orgNameInput.value = formData.orgName || '';
@@ -395,6 +396,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Store data when inputs change
     orgNameInput.addEventListener('input', storeFormData);
     locationInput.addEventListener('input', storeFormData);
+
+    // Modify back button behavior
+    backButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Store current form data before navigating back
+        storeFormData();
+        window.location.href = '/complete-profile';
+    });
 
     function filterCountries(searchText) {
         return countries.filter(country => 
@@ -494,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     if (response.ok) {
                         // Clear stored form data before redirecting
-                        sessionStorage.removeItem('orgSetupFormData');
+                        localStorage.removeItem('orgSetupFormData');
                         window.location.href = '/people-count';
                     } else {
                         throw new Error(data.error || 'Failed to setup organization');

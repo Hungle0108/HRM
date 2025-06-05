@@ -332,7 +332,7 @@ def verify_email():
     return jsonify({'message': 'Email exists'}), 200
 
 @app.route('/complete-profile')
-def complete_profile_page():
+def complete_profile():
     if 'user_id' not in session:
         return redirect('/login')
     
@@ -340,17 +340,17 @@ def complete_profile_page():
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
-    
+
     if user.profile_completed:
-        return redirect('/')
-        
-    # Get stored profile data if it exists
+        return redirect('/dashboard')
+
+    # Get stored profile data from session
     profile_data = session.get('profile_data', {})
-        
+    
     return render_template('complete_profile.html', user=user, profile_data=profile_data)
 
 @app.route('/api/complete-profile', methods=['POST'])
-def complete_profile():
+def submit_complete_profile():
     if 'user_id' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
 
@@ -389,13 +389,6 @@ def organization_setup():
     # Get stored organization data from session
     organization_data = session.get('organization_data', {})
     
-    # If there's no organization data in session but we have size data,
-    # it means we're coming back from the people count page
-    if not organization_data and session.get('size_data'):
-        # Keep the size data in session
-        size_data = session.get('size_data')
-        session['size_data'] = size_data
-    
     return render_template('organization_setup.html', organization_data=organization_data, user=user)
 
 @app.route('/api/setup-organization', methods=['POST'])
@@ -409,26 +402,12 @@ def setup_organization():
         return jsonify({'error': 'Missing required fields'}), 400
     
     try:
-        # Get existing organization data if any
-        existing_data = session.get('organization_data', {})
-        
-        # Update with new data
-        organization_data = {
+        # Store organization data in session
+        session['organization_data'] = {
             'name': data['organizationName'],
             'location': data['location']
         }
         
-        # Preserve any additional data that might have been set
-        organization_data.update(existing_data)
-        
-        # Store updated data back in session
-        session['organization_data'] = organization_data
-        
-        # Preserve size data if it exists
-        if session.get('size_data'):
-            size_data = session.get('size_data')
-            session['size_data'] = size_data
-            
         return jsonify({
             'message': 'Organization data stored',
             'redirect': '/people-count'
@@ -449,7 +428,7 @@ def people_count():
     if user.organization_id:
         return redirect('/dashboard')
 
-    # Get stored size data if it exists    
+    # Get stored size data from session
     size_data = session.get('size_data', {})
     
     return render_template('people_count.html', size_data=size_data, user=user)
@@ -608,6 +587,18 @@ def update_personal_details():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to update personal details'}), 500
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return redirect('/')
 
 if __name__ == '__main__':
     with app.app_context():
