@@ -600,6 +600,34 @@ def dashboard():
     
     return redirect('/')
 
+@app.route('/organization/edit')
+def edit_organization():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('edit_organization.html', user=user, organization=organization)
+
+@app.route('/financial-contact/edit')
+def edit_financial_contact():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('edit_financial_contact.html', user=user)
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running

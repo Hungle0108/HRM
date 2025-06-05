@@ -9,67 +9,13 @@
         max-width: 1200px;
         margin: 2rem auto;
         padding: 0 2rem;
-        display: flex;
-        gap: 2rem;
     }
 
-    .settings-sidebar {
-        width: 250px;
-        flex-shrink: 0;
-    }
-
-    .settings-menu {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        overflow: hidden;
-    }
-
-    .settings-menu-header {
-        padding: 1rem;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .settings-menu-title {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .settings-menu-items {
-        padding: 0.5rem 0;
-    }
-
-    .settings-menu-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        color: #333;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: all 0.2s;
-    }
-
-    .settings-menu-item:hover {
-        background-color: #f5f5f5;
-    }
-
-    .settings-menu-item.active {
-        background-color: #f0f0f0;
-        font-weight: 500;
-    }
-
-    .settings-content {
-        flex: 1;
+    .settings-section {
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         padding: 2rem;
-    }
-
-    .settings-section {
         margin-bottom: 2rem;
     }
 
@@ -77,280 +23,123 @@
         margin-bottom: 0;
     }
 
-    .settings-section-header {
-        margin-bottom: 1.5rem;
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
     }
 
-    .settings-section-title {
+    .section-title {
         font-size: 1.25rem;
         font-weight: 600;
-        color: #333;
-        margin-bottom: 0.5rem;
+        color: #1f2937;
+        margin: 0;
     }
 
-    .settings-section-description {
-        color: #666;
-        font-size: 0.9rem;
+    .edit-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.2s;
     }
 
-    .form-group {
+    .edit-button:hover {
+        color: #000;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .info-item {
         margin-bottom: 1.5rem;
     }
 
-    .form-group:last-child {
-        margin-bottom: 0;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #333;
+    .info-label {
+        font-size: 0.875rem;
+        color: #6b7280;
         margin-bottom: 0.5rem;
     }
 
-    .form-input {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        transition: border-color 0.2s;
+    .info-value {
+        font-size: 0.95rem;
+        color: #1f2937;
     }
 
-    .form-input:focus {
-        outline: none;
-        border-color: #999;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .form-row .form-group {
-        flex: 1;
-    }
-
-    .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: none;
-    }
-
-    .btn-primary {
-        background: #000;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #333;
-    }
-
-    .btn-outline {
-        background: white;
-        border: 1px solid #e0e0e0;
-        color: #333;
-    }
-
-    .btn-outline:hover {
-        border-color: #999;
-    }
-
-    .theme-toggle {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-
-    .theme-toggle-label {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #333;
-    }
-
-    .theme-toggle-description {
-        font-size: 0.85rem;
-        color: #666;
-    }
-
-    .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 24px;
-    }
-
-    .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 24px;
-    }
-
-    .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-
-    input:checked + .toggle-slider {
-        background-color: #000;
-    }
-
-    input:checked + .toggle-slider:before {
-        transform: translateX(26px);
+    .not-specified {
+        color: #9ca3af;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="settings-container">
-    <!-- Settings Sidebar -->
-    <div class="settings-sidebar">
-        <div class="settings-menu">
-            <div class="settings-menu-header">
-                <div class="settings-menu-title">Organization Settings</div>
+    <!-- Organization Details Section -->
+    <div class="settings-section">
+        <div class="section-header">
+            <h2 class="section-title">Organization Details</h2>
+            <button class="edit-button">Edit</button>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Organization Name</div>
+                <div class="info-value">{{ organization.name if organization and organization.name else 'Not specified' }}</div>
             </div>
-            <div class="settings-menu-items">
-                <a href="#" class="settings-menu-item active">Organization Details</a>
-                <a href="#" class="settings-menu-item">Financial Contact</a>
-                <a href="#" class="settings-menu-item">Billing</a>
-                <a href="#" class="settings-menu-item">Notifications</a>
-                <a href="#" class="settings-menu-item">Security</a>
-                <a href="#" class="settings-menu-item">API</a>
+            <div class="info-item">
+                <div class="info-label">Industry</div>
+                <div class="info-value not-specified">Not specified</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Company Size</div>
+                <div class="info-value">{{ organization.size if organization and organization.size else 'Not specified' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Business Address</div>
+                <div class="info-value">{{ organization.location if organization and organization.location else 'Not specified' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">City</div>
+                <div class="info-value not-specified">Not specified</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">State</div>
+                <div class="info-value not-specified">Not specified</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">ZIP Code</div>
+                <div class="info-value not-specified">Not specified</div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Content -->
-    <div class="settings-content">
-        <!-- Organization Details Section -->
-        <div class="settings-section">
-            <div class="settings-section-header">
-                <h2 class="settings-section-title">Organization Details</h2>
-                <p class="settings-section-description">Update your organization's information</p>
-            </div>
-
-            <form id="organizationForm">
-                <div class="form-group">
-                    <label class="form-label">Organization Name</label>
-                    <input type="text" class="form-input" name="name" value="{{ organization.name if organization else '' }}">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Industry</label>
-                        <input type="text" class="form-input" value="Technology">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Company Size</label>
-                        <input type="text" class="form-input" name="size" value="{{ organization.size if organization else '' }}">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Business Address</label>
-                    <input type="text" class="form-input" name="location" value="{{ organization.location if organization else '' }}">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">City</label>
-                        <input type="text" class="form-input" value="San Francisco">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">State</label>
-                        <input type="text" class="form-input" value="CA">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ZIP Code</label>
-                        <input type="text" class="form-input" value="94105">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
+    <!-- Financial Contact Section -->
+    <div class="settings-section">
+        <div class="section-header">
+            <h2 class="section-title">Financial Contact</h2>
+            <button class="edit-button">Edit</button>
         </div>
-
-        <!-- Financial Contact Section -->
-        <div class="settings-section">
-            <div class="settings-section-header">
-                <h2 class="settings-section-title">Financial Contact</h2>
-                <p class="settings-section-description">Who should receive financial updates and invoices</p>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">First Name</div>
+                <div class="info-value not-specified">Not specified</div>
             </div>
-
-            <form>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-input" value="John">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" class="form-input" value="Doe">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" value="john.doe@company.com">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" class="form-input" value="+1 (555) 123-4567">
-                </div>
-            </form>
-        </div>
-
-        <!-- Theme Settings Section -->
-        <div class="settings-section">
-            <div class="settings-section-header">
-                <h2 class="settings-section-title">Theme Settings</h2>
-                <p class="settings-section-description">Customize your interface appearance</p>
+            <div class="info-item">
+                <div class="info-label">Last Name</div>
+                <div class="info-value not-specified">Not specified</div>
             </div>
-
-            <div class="theme-toggle">
-                <div>
-                    <div class="theme-toggle-label">Dark Mode</div>
-                    <div class="theme-toggle-description">Use dark theme across your account</div>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="themeToggle">
-                    <span class="toggle-slider"></span>
-                </label>
+            <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value not-specified">Not specified</div>
             </div>
-
-            <div class="form-group">
-                <button class="btn btn-primary">Save Changes</button>
+            <div class="info-item">
+                <div class="info-label">Phone</div>
+                <div class="info-value not-specified">Not specified</div>
             </div>
         </div>
     </div>
@@ -359,58 +148,18 @@
 
 {% block scripts %}
 <script>
-    // Organization form submission
-    const organizationForm = document.getElementById('organizationForm');
-    if (organizationForm) {
-        organizationForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Handle edit button clicks
+    document.querySelectorAll('.edit-button').forEach(button => {
+        button.addEventListener('click', function() {
+            // Get the section title to determine which form to show
+            const sectionTitle = this.closest('.section-header').querySelector('.section-title').textContent;
             
-            const formData = {
-                name: organizationForm.querySelector('[name="name"]').value,
-                size: organizationForm.querySelector('[name="size"]').value,
-                location: organizationForm.querySelector('[name="location"]').value
-            };
-            
-            try {
-                const response = await fetch('/api/update-organization-settings', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    alert('Settings saved successfully!');
-                } else {
-                    throw new Error(data.error || 'Failed to save settings');
-                }
-            } catch (error) {
-                alert(error.message);
+            if (sectionTitle === 'Organization Details') {
+                window.location.href = '/organization/edit';
+            } else if (sectionTitle === 'Financial Contact') {
+                window.location.href = '/financial-contact/edit';
             }
         });
-    }
-
-    // Theme toggle functionality
-    const themeToggle = document.getElementById('themeToggle');
-    
-    themeToggle.addEventListener('change', function() {
-        if (this.checked) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-        }
     });
-
-    // Check saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        themeToggle.checked = true;
-        document.body.classList.add('dark-mode');
-    }
 </script>
 {% endblock %} 
