@@ -281,52 +281,52 @@
         <!-- Right Column - Stacked Sections -->
         <div class="right-column">
             <!-- Your Deel Account Section -->
-            <div class="settings-section">
-                <h2>Your Deel Account</h2>
-                <div class="details-grid">
-                    <div class="detail-item">
-                        <label>Account type</label>
-                        <div class="detail-value">Client</div>
-                    </div>
+        <div class="settings-section">
+            <h2>Your Deel Account</h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <label>Account type</label>
+                    <div class="detail-value">Client</div>
+                </div>
 
-                    <div class="detail-item">
-                        <label>Organization</label>
-                        <div class="detail-value">{{ organization.name if organization else 'Not specified' }}</div>
-                    </div>
+                <div class="detail-item">
+                    <label>Organization</label>
+                    <div class="detail-value">{{ organization.name if organization else 'Not specified' }}</div>
+                </div>
 
-                    <div class="detail-item wide">
-                        <label>Roles assigned to you</label>
-                        <div class="roles-list">
-                            <div class="role-item">
-                                <div class="role-title">Organization Admin</div>
-                                <div class="role-scope">Scope: organization</div>
-                            </div>
-                            <div class="role-item">
-                                <div class="role-title">Group Admin</div>
-                                <div class="role-scope">Scope: group • 1 group assigned</div>
-                            </div>
+                <div class="detail-item wide">
+                    <label>Roles assigned to you</label>
+                    <div class="roles-list">
+                        <div class="role-item">
+                            <div class="role-title">Organization Admin</div>
+                            <div class="role-scope">Scope: organization</div>
+                        </div>
+                        <div class="role-item">
+                            <div class="role-title">Group Admin</div>
+                            <div class="role-scope">Scope: group • 1 group assigned</div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- Default Currency Section -->
-            <div class="settings-section">
-                <h2>Default currency</h2>
-                <div class="currency-selector">
-                    <select class="form-select">
+        <div class="settings-section">
+            <h2>Default currency</h2>
+            <div class="currency-selector">
+                <select class="form-select">
                         <option value="USD">USD - US Dollar</option>
-                        <option value="VND">VND - Vietnamese Đồng</option>
-                        <option value="EUR">EUR - Euro</option>
-                    </select>
-                </div>
+                    <option value="VND">VND - Vietnamese Đồng</option>
+                    <option value="EUR">EUR - Euro</option>
+                </select>
             </div>
+        </div>
 
             <!-- Profile Photo Section -->
-            <div class="settings-section">
-                <h2>Profile photo</h2>
-                <p class="photo-description">Your photo will be visible to your clients and coworkers on Deel.</p>
-                <div class="profile-photo-upload">
+        <div class="settings-section">
+            <h2>Profile photo</h2>
+            <p class="photo-description">Your photo will be visible to your clients and coworkers on Deel.</p>
+            <div class="profile-photo-upload">
                     {% if user and user.avatar_url %}
                         <img src="{{ user.avatar_url }}" alt="Profile photo">
                     {% else %}

@@ -424,6 +424,35 @@
             border-color: #dc3545 !important;
             background-color: #fff9f9;
         }
+
+        .success-message {
+            display: none;
+            background-color: #d1e7dd;
+            color: #0f5132;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .forgot-password-wrapper {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+
+        .forgot-password {
+            color: #0d6efd;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -432,6 +461,7 @@
         <p class="subtitle">Fill out the form below.</p>
 
         <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
 
         <form>
             <div class="form-group">
@@ -479,8 +509,11 @@
                  data-locale="en">
             </div>
 
+            <div class="forgot-password-wrapper">
+                <a href="/reset-password" class="forgot-password">Forgot Password?</a>
+            </div>
+
             <div class="actions">
-                <a href="#" class="forgot-password">Forgot Password?</a>
                 <button type="submit" class="login-button">Log In</button>
             </div>
 
@@ -596,6 +629,16 @@
             const savedLanguage = localStorage.getItem('preferredLanguage');
             if (savedLanguage) {
                 updateLanguage(savedLanguage);
+            }
+
+            // Check for password reset success message
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            const successMessage = document.getElementById('successMessage');
+            
+            if (message === 'password-reset-success') {
+                successMessage.textContent = 'Your password has been reset successfully. Please log in with your new password.';
+                successMessage.classList.add('show');
             }
         });
 
