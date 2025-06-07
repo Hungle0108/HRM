@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const calendarToggle = document.getElementById('calendarToggle');
 
     if (dateInput && calendarToggle) {
-        const fp = flatpickr(dateInput, {
+            const fp = flatpickr(dateInput, {
             dateFormat: "Y-m-d",
             maxDate: new Date(),
             minDate: "1900-01-01",
@@ -672,9 +672,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         calendarToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (fp) {
-                fp.toggle();
+                e.preventDefault();
+                if (fp) {
+                    fp.toggle();
             }
         });
     }

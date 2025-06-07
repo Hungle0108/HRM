@@ -37,9 +37,12 @@ class User(db.Model):
     profile_completed = db.Column(db.Boolean, default=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
     organization = db.relationship('Organization')
+    avatar_url = db.Column(db.String(255))
 
     @property
     def name(self):
+        if self.preferred_name:
+            return self.preferred_name
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"
         return "None"
@@ -61,7 +64,8 @@ class User(db.Model):
             'department': self.department,
             'job_title': self.job_title,
             'seniority_level': self.seniority_level,
-            'organization_id': self.organization_id
+            'organization_id': self.organization_id,
+            'avatar_url': self.avatar_url
         }
 
 # Organization model
@@ -627,6 +631,76 @@ def edit_financial_contact():
         return redirect('/login')
     
     return render_template('edit_financial_contact.html', user=user)
+
+@app.route('/api/upload-avatar', methods=['POST'])
+def upload_avatar():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    if 'avatar' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+    
+    file = request.files['avatar']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    if not file.content_type.startswith('image/'):
+        return jsonify({'error': 'File must be an image'}), 400
+
+    try:
+        # Create uploads directory if it doesn't exist
+        upload_dir = os.path.join(app.root_path, 'static', 'uploads', 'avatars')
+        os.makedirs(upload_dir, exist_ok=True)
+
+        # Generate unique filename
+        filename = f"avatar_{session['user_id']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{os.path.splitext(file.filename)[1]}"
+        filepath = os.path.join(upload_dir, filename)
+
+        # Save the file
+        file.save(filepath)
+
+        # Update user's avatar_url in database
+        user = User.query.get(session['user_id'])
+        if user.avatar_url:
+            # Delete old avatar file if it exists
+            old_filepath = os.path.join(app.root_path, 'static', user.avatar_url.lstrip('/'))
+            if os.path.exists(old_filepath):
+                os.remove(old_filepath)
+
+        user.avatar_url = f"/static/uploads/avatars/{filename}"
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Avatar uploaded successfully',
+            'avatar_url': user.avatar_url
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to upload avatar'}), 500
+
+@app.route('/api/remove-avatar', methods=['POST'])
+def remove_avatar():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    try:
+        user = User.query.get(session['user_id'])
+        if user.avatar_url:
+            # Delete avatar file
+            filepath = os.path.join(app.root_path, 'static', user.avatar_url.lstrip('/'))
+            if os.path.exists(filepath):
+                os.remove(filepath)
+
+            # Clear avatar_url in database
+            user.avatar_url = None
+            db.session.commit()
+
+        return jsonify({'message': 'Avatar removed successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to remove avatar'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

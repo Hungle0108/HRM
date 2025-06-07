@@ -5,12 +5,100 @@
 {% block styles %}
 <style>
     .edit-details-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
         background: white;
         border-radius: 8px;
         padding: 2rem;
         margin: 2rem auto;
-        max-width: 800px;
+        max-width: 1200px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .details-section {
+        flex: 2;
+    }
+
+    .avatar-section {
+        text-align: center;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        height: fit-content;
+    }
+
+    .avatar-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: #e9ecef;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #adb5bd;
+        overflow: hidden;
+    }
+
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .avatar-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-actions {
+        display: none;
+    }
+
+    .avatar-actions.has-photo {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btn-upload {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .btn-upload:hover {
+        background: #333;
+    }
+
+    .btn-remove {
+        padding: 0.5rem 1rem;
+        background: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .btn-remove:hover {
+        background: #dc3545;
+        color: white;
     }
 
     .edit-details-title {
@@ -123,71 +211,122 @@
     .dropdown-item:hover {
         background: #f3f4f6;
     }
+
+    .phone-input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .phone-prefix {
+        width: 80px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .avatar-form {
+        margin-bottom: 1rem;
+    }
+
+    .avatar-actions-container {
+        margin-top: 1rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="edit-details-container">
-    <h2 class="edit-details-title">Edit personal details</h2>
-    
-    <form id="personalDetailsForm">
-        <div class="form-row">
+    <div class="details-section">
+        <h2 class="edit-details-title">Edit personal details</h2>
+        
+        <form id="personalDetailsForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Legal first name</label>
+                    <input type="text" class="form-input" id="firstName" value="{{ user.first_name }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Legal last name</label>
+                    <input type="text" class="form-input" id="lastName" value="{{ user.last_name }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Preferred name (optional)</label>
+                    <input type="text" class="form-input" id="preferredName" value="{{ user.preferred_name or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date of birth (DD/MM/YYYY)</label>
+                    <input type="date" class="form-input" id="dateOfBirth" value="{{ user.date_of_birth }}">
+                </div>
+            </div>
+
             <div class="form-group">
-                <label class="form-label">Legal first name</label>
-                <input type="text" class="form-input" id="firstName" value="{{ user.first_name }}">
+                <label class="form-label">I'm a citizen of</label>
+                <div class="dropdown-wrapper">
+                    <input type="text" class="form-input" id="citizenship" value="{{ user.citizenship }}" placeholder="Start typing your citizenship">
+                    <div class="dropdown-menu" id="citizenshipDropdown"></div>
+                </div>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Legal last name</label>
-                <input type="text" class="form-input" id="lastName" value="{{ user.last_name }}">
+                <label class="form-label">Phone number</label>
+                <div class="phone-input-group">
+                    <input type="text" class="form-input phone-prefix" value="+84" readonly>
+                    <input type="text" class="form-input" id="phone" value="{{ user.phone or '' }}" placeholder="Enter your phone number" pattern="[0-9]*" inputmode="numeric">
+                </div>
             </div>
-        </div>
 
-        <div class="form-row">
             <div class="form-group">
-                <label class="form-label">Preferred name (optional)</label>
-                <input type="text" class="form-input" id="preferredName" value="{{ user.preferred_name or '' }}">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" value="{{ user.email }}" readonly>
+                <div class="form-hint">To change your email, please contact support</div>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Date of birth (DD/MM/YYYY)</label>
-                <input type="date" class="form-input" id="dateOfBirth" value="{{ user.date_of_birth }}">
+                <label class="form-label">Country of tax residence</label>
+                <div class="dropdown-wrapper">
+                    <input type="text" class="form-input" id="taxResidence" value="{{ user.tax_residence or '' }}" placeholder="Start typing your tax residence">
+                    <div class="dropdown-menu" id="taxResidenceDropdown"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label class="form-label">I'm a citizen of</label>
-            <div class="dropdown-wrapper">
-                <input type="text" class="form-input" id="citizenship" value="{{ user.citizenship }}" placeholder="Start typing your citizenship">
-                <div class="dropdown-menu" id="citizenshipDropdown"></div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="window.location.href='/profile/settings'">Cancel</button>
+                <button type="submit" class="btn-save">Save</button>
             </div>
-        </div>
+        </form>
+    </div>
 
-        <div class="form-group">
-            <label class="form-label">Phone number</label>
-            <div style="display: flex; gap: 0.5rem;">
-                <input type="text" class="form-input" style="width: 80px;" value="+84" readonly>
-                <input type="tel" class="form-input" id="phone" value="{{ user.phone or '' }}" placeholder="Enter your phone number">
-            </div>
+    <div class="avatar-section">
+        <div class="avatar-preview" id="avatarPreview">
+            {% if user.avatar_url %}
+                <img src="{{ user.avatar_url }}" alt="Profile photo">
+            {% else %}
+                {{ user.first_name[0] if user.first_name else 'Q' }}
+            {% endif %}
         </div>
+        <h3 class="avatar-title">Make it easier for people to recognize you.</h3>
+        <p class="avatar-description">Your photo will be visible to your clients and coworkers on Deel.</p>
+        
+        <form id="avatarForm" class="avatar-form {% if user.avatar_url %}hidden{% endif %}" enctype="multipart/form-data">
+            <input type="file" id="avatarInput" accept="image/*" class="hidden">
+            <button type="button" class="btn-upload" onclick="document.getElementById('avatarInput').click()">
+                Add a photo
+            </button>
+        </form>
 
-        <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-input" value="{{ user.email }}" readonly>
-            <div class="form-hint">To change your email, please contact support</div>
+        <div class="avatar-actions {% if user.avatar_url %}has-photo{% endif %} avatar-actions-container" id="avatarActions">
+            <button type="button" class="btn-upload" onclick="document.getElementById('avatarInput').click()">
+                Update photo
+            </button>
+            <button type="button" class="btn-remove" onclick="removePhoto()">
+                Remove photo
+            </button>
         </div>
-
-        <div class="form-group">
-            <label class="form-label">Country of tax residence</label>
-            <div class="dropdown-wrapper">
-                <input type="text" class="form-input" id="taxResidence" value="{{ user.tax_residence or '' }}" placeholder="Start typing your tax residence">
-                <div class="dropdown-menu" id="taxResidenceDropdown"></div>
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <button type="button" class="btn-cancel" onclick="window.location.href='/profile/settings'">Cancel</button>
-            <button type="submit" class="btn-save">Save</button>
-        </div>
-    </form>
+    </div>
 </div>
 
 <script>
@@ -279,13 +418,17 @@ setupDropdown('taxResidence', 'taxResidenceDropdown');
 document.getElementById('personalDetailsForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    const phoneInput = document.getElementById('phone');
+    // Remove leading zeros and convert back to string
+    const phoneValue = String(parseInt(phoneInput.value || '0', 10));
+    
     const data = {
         first_name: document.getElementById('firstName').value,
         last_name: document.getElementById('lastName').value,
         preferred_name: document.getElementById('preferredName').value,
         date_of_birth: document.getElementById('dateOfBirth').value,
         citizenship: document.getElementById('citizenship').value,
-        phone: document.getElementById('phone').value,
+        phone: phoneValue,
         tax_residence: document.getElementById('taxResidence').value
     };
 
@@ -299,6 +442,21 @@ document.getElementById('personalDetailsForm').addEventListener('submit', async 
         });
 
         if (response.ok) {
+            // Get the current avatar URL from the preview image
+            const previewImg = document.querySelector('#avatarPreview img');
+            const avatarUrl = previewImg ? previewImg.src : null;
+
+            // Now sync the avatar with the taskbar
+            window.dispatchEvent(new CustomEvent('avatarUpdated', {
+                detail: { avatarUrl: avatarUrl }
+            }));
+
+            // Update all avatar instances
+            if (typeof updateAvatarDisplay === 'function') {
+                updateAvatarDisplay(avatarUrl);
+            }
+
+            // Redirect after syncing
             window.location.href = '/profile/settings';
         } else {
             const errorData = await response.json();
@@ -306,6 +464,79 @@ document.getElementById('personalDetailsForm').addEventListener('submit', async 
         }
     } catch (error) {
         alert('An error occurred while updating personal details');
+    }
+});
+
+// Add event handler for phone input to remove leading zeros on blur
+document.getElementById('phone').addEventListener('blur', function(e) {
+    if (this.value) {
+        // Remove leading zeros and update the input value
+        this.value = String(parseInt(this.value, 10));
+    }
+});
+
+document.getElementById('avatarInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+        const response = await fetch('/api/upload-avatar', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Update only the preview
+            const preview = document.getElementById('avatarPreview');
+            preview.innerHTML = `<img src="${data.avatar_url}" alt="Profile photo">`;
+            
+            // Update form display
+            document.getElementById('avatarForm').style.display = 'none';
+            document.getElementById('avatarActions').classList.add('has-photo');
+        } else {
+            const errorData = await response.json();
+            alert(errorData.error || 'Failed to upload photo');
+        }
+    } catch (error) {
+        alert('An error occurred while uploading the photo');
+    }
+});
+
+async function removePhoto() {
+    try {
+        const response = await fetch('/api/remove-avatar', {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            // Update only the preview
+            const preview = document.getElementById('avatarPreview');
+            preview.innerHTML = '{{ user.first_name[0] if user.first_name else "Q" }}';
+            
+            // Update form display
+            document.getElementById('avatarForm').style.display = 'block';
+            document.getElementById('avatarActions').classList.remove('has-photo');
+        } else {
+            const errorData = await response.json();
+            alert(errorData.error || 'Failed to remove photo');
+        }
+    } catch (error) {
+        alert('An error occurred while removing the photo');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Clear any stored avatar URL if user has no avatar
+    if (!('{{ user.avatar_url }}')) {
+        localStorage.removeItem('userAvatarUrl');
+        if (typeof updateAvatarDisplay === 'function') {
+            updateAvatarDisplay(null);
+        }
     }
 });
 </script>

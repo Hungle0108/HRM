@@ -212,9 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = JSON.parse(storedData);
             selectedSize = formData.size || selectedSize; // Use server data if no local data
             if (selectedSize) {
-                sizeButtons.forEach(button => {
+    sizeButtons.forEach(button => {
                     if (button.dataset.value === selectedSize) {
-                        button.classList.add('selected');
+            button.classList.add('selected');
                     } else {
                         button.classList.remove('selected');
                     }
@@ -258,31 +258,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            try {
-                const response = await fetch('/api/update-organization-size', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        size: selectedSize,
-                        isSubmitting: true
-                    }),
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
+                try {
+                    const response = await fetch('/api/update-organization-size', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            size: selectedSize,
+                            isSubmitting: true
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
                     // Clear all stored form data before redirecting
                     localStorage.removeItem('completeProfileFormData');
                     localStorage.removeItem('orgSetupFormData');
                     localStorage.removeItem('peopleCountFormData');
                     window.location.href = '/dashboard';
-                } else {
-                    throw new Error(data.error || 'Failed to update organization size');
-                }
-            } catch (error) {
-                alert(error.message);
+                    } else {
+                        throw new Error(data.error || 'Failed to update organization size');
+                    }
+                } catch (error) {
+                    alert(error.message);
             }
         });
     }
