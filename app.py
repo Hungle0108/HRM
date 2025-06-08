@@ -371,13 +371,13 @@ def complete_profile():
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
-
+    
     if user.profile_completed:
         return redirect('/dashboard')
-
+        
     # Get stored profile data from session
     profile_data = session.get('profile_data', {})
-    
+        
     return render_template('complete_profile.html', user=user, profile_data=profile_data)
 
 @app.route('/api/complete-profile', methods=['POST'])
