@@ -877,12 +877,12 @@ def reset_password_with_token(token):
         user = User.query.filter_by(reset_token=decoded_token).first()
         
         if not user or not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
-            return render_template('reset_password.html', error='Invalid or expired reset link. Please request a new one.')
+            return render_template('new_password.html', token=token, error='Invalid or expired reset link. Please request a new one.')
         
         return render_template('new_password.html', token=token)
     except Exception as e:
         logger.error(f"Error in reset_password_with_token: {str(e)}")
-        return render_template('reset_password.html', error='Invalid reset link format. Please request a new one.')
+        return render_template('new_password.html', token=token, error='Invalid reset link format. Please request a new one.')
 
 @app.route('/api/reset-password/<token>', methods=['POST'])
 def reset_password(token):
