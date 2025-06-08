@@ -424,13 +424,41 @@
                         <img src="{{ user.avatar_url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                     {% else %}
                         <div class="avatar-initials">
-                            {{ user.name[0] if user and user.name else 'G' }}
+                            {% if user %}
+                                {% if user.preferred_name %}
+                                    {{ user.preferred_name[0].upper() }}
+                                {% elif user.first_name and user.last_name %}
+                                    {{ (user.first_name[0] + user.last_name[0]).upper() }}
+                                {% elif user.first_name %}
+                                    {{ user.first_name[0].upper() }}
+                                {% elif user.email %}
+                                    {{ user.email[0].upper() }}
+                                {% else %}
+                                    U
+                                {% endif %}
+                            {% else %}
+                                G
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
                 <div id="profileDropdown" class="profile-dropdown" style="display: none;">
                     <div class="dropdown-header">
-                        <div class="user-name">{{ user.name if user else 'Guest' }}</div>
+                        <div class="user-name">
+                            {% if user %}
+                                {% if user.preferred_name %}
+                                    {{ user.preferred_name }}
+                                {% elif user.first_name and user.last_name %}
+                                    {{ user.first_name }} {{ user.last_name }}
+                                {% elif user.first_name %}
+                                    {{ user.first_name }}
+                                {% else %}
+                                    User
+                                {% endif %}
+                            {% else %}
+                                Guest
+                            {% endif %}
+                        </div>
                         <div class="user-email">{{ user.email if user else '' }}</div>
                     </div>
                     <div class="dropdown-content">
@@ -550,44 +578,35 @@
 
         function getInitials(user) {
             if (user.preferred_name) {
-                // If preferred name exists, use only its first letter
                 return user.preferred_name.charAt(0).toUpperCase();
-            } else {
-                // Otherwise use first letter of first name and last name
+            } else if (user.first_name && user.last_name) {
                 return (user.first_name.charAt(0) + user.last_name.charAt(0)).toUpperCase();
+            } else if (user.first_name) {
+                return user.first_name.charAt(0).toUpperCase();
+            } else if (user.email) {
+                return user.email.charAt(0).toUpperCase();
+            } else {
+                return 'U';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const profilePic = document.querySelector('.profile-pic');
-            if (profilePic) {
-                const user = {
-                    first_name: '{{ user.first_name }}',
-                    last_name: '{{ user.last_name }}',
-                    preferred_name: '{{ user.preferred_name or "" }}',
-                    profile_picture: '{{ user.profile_picture or "" }}'
-                };
-
-                if (!user.profile_picture) {
-                    // If no profile picture, create an initial-based avatar
-                    const initials = getInitials(user);
-                    profilePic.innerHTML = `<div class="avatar-initials">${initials}</div>`;
-                }
-            }
-        });
-
         // Function to update all avatar instances
         function updateAvatarDisplay(avatarUrl) {
-            // Clear any stored avatar URL if none is provided
-            if (!avatarUrl) {
-                localStorage.removeItem('userAvatarUrl');
+            // Update profile pic in navigation
+            const profilePic = document.querySelector('.profile-pic');
+            if (profilePic) {
+                if (avatarUrl) {
+                    profilePic.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">`;
+                } else {
+                    // If no avatar URL, the server-side template will handle the initials display
+                    location.reload(); // Refresh to let server-side template handle it properly
+                }
             }
 
-            // Update user-avatar elements
+            // Update other avatar containers if they exist
             const avatarContainers = document.querySelectorAll('.user-avatar');
             avatarContainers.forEach(container => {
                 if (avatarUrl) {
-                    // If there's an avatar URL, show the image
                     if (container.querySelector('img')) {
                         container.querySelector('img').src = avatarUrl;
                     } else {
@@ -598,45 +617,17 @@
                         container.appendChild(img);
                     }
                 } else {
-                    // If no avatar URL, show the initial
-                    const initial = '{{ user.first_name[0] if user.first_name else "Q" }}';
+                    // If no avatar URL, show the initial based on user data
+                    const initial = getInitials({
+                        first_name: '{{ user.first_name or "" }}',
+                        last_name: '{{ user.last_name or "" }}',
+                        preferred_name: '{{ user.preferred_name or "" }}',
+                        email: '{{ user.email or "" }}'
+                    });
                     container.innerHTML = initial;
                 }
             });
-
-            // Update profile-pic element in the taskbar
-            const profilePic = document.querySelector('.profile-pic');
-            if (profilePic) {
-                if (avatarUrl) {
-                    profilePic.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">`;
-                } else {
-                    const initials = getInitials({
-                        first_name: '{{ user.first_name }}',
-                        last_name: '{{ user.last_name }}',
-                        preferred_name: '{{ user.preferred_name or "" }}'
-                    });
-                    profilePic.innerHTML = `<div class="avatar-initials">${initials}</div>`;
-                }
-            }
-
-            // Store the avatar URL in localStorage for persistence
-            if (avatarUrl) {
-                localStorage.setItem('userAvatarUrl', avatarUrl);
-            }
         }
-
-        // Check localStorage on page load and update avatars if needed
-        document.addEventListener('DOMContentLoaded', function() {
-            const storedAvatarUrl = localStorage.getItem('userAvatarUrl');
-            // Only use stored URL if user actually has an avatar
-            if (storedAvatarUrl && '{{ user.avatar_url }}') {
-                updateAvatarDisplay(storedAvatarUrl);
-            } else {
-                // Clear stored URL and show default
-                localStorage.removeItem('userAvatarUrl');
-                updateAvatarDisplay(null);
-            }
-        });
 
         // Listen for avatar update events
         window.addEventListener('avatarUpdated', function(e) {

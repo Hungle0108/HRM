@@ -526,6 +526,25 @@
     </div>
 
     <script>
+        // Function to show messages (ensuring only one is visible at a time)
+        function showMessage(type, text) {
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Hide all messages first
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            
+            // Show the appropriate message
+            if (type === 'error') {
+                errorMessage.textContent = text;
+                errorMessage.classList.add('show');
+            } else if (type === 'success') {
+                successMessage.textContent = text;
+                successMessage.classList.add('show');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Check if user is already logged in
             fetch('/api/check-login')
@@ -543,22 +562,19 @@
                 
                 const email = document.getElementById('email');
                 const password = document.getElementById('password');
-                const errorMessage = document.getElementById('errorMessage');
 
                 // Reset error states
                 email.classList.remove('input-error');
                 password.classList.remove('input-error');
-                errorMessage.classList.remove('show');
 
                 // Check for empty fields before sending request
                 if (!email.value.trim() || !password.value.trim()) {
-                    errorMessage.textContent = translations[currentLanguage || 'en'].errorMissingFields;
-                    errorMessage.classList.add('show');
+                    showMessage('error', translations[currentLanguage || 'en'].errorMissingFields);
                     if (!email.value.trim()) email.classList.add('input-error');
                     if (!password.value.trim()) password.classList.add('input-error');
-                    errorMessage.classList.add('shake');
+                    document.getElementById('errorMessage').classList.add('shake');
                     setTimeout(() => {
-                        errorMessage.classList.remove('shake');
+                        document.getElementById('errorMessage').classList.remove('shake');
                     }, 650);
                     return;
                 }
@@ -579,33 +595,33 @@
                         window.location.href = '/';
                     } else {
                         // Show translated error message based on the error type
+                        let errorText;
                         if (data.error.includes('Please enter both')) {
-                            errorMessage.textContent = translations[currentLanguage || 'en'].errorMissingFields;
+                            errorText = translations[currentLanguage || 'en'].errorMissingFields;
                         } else if (data.error.includes('Incorrect')) {
-                            errorMessage.textContent = translations[currentLanguage || 'en'].errorIncorrectCredentials;
+                            errorText = translations[currentLanguage || 'en'].errorIncorrectCredentials;
                         } else {
-                            errorMessage.textContent = translations[currentLanguage || 'en'].errorGeneric;
+                            errorText = translations[currentLanguage || 'en'].errorGeneric;
                         }
-                        errorMessage.classList.add('show');
+                        showMessage('error', errorText);
                         
                         // Add shake effect and error styling to inputs
                         email.classList.add('input-error');
                         password.classList.add('input-error');
-                        errorMessage.classList.add('shake');
+                        document.getElementById('errorMessage').classList.add('shake');
                         
                         // Clear password field
                         password.value = '';
                         
                         // Remove shake class after animation completes
                         setTimeout(() => {
-                            errorMessage.classList.remove('shake');
+                            document.getElementById('errorMessage').classList.remove('shake');
                         }, 650);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    errorMessage.textContent = translations[currentLanguage || 'en'].errorGeneric;
-                    errorMessage.classList.add('show');
+                    showMessage('error', translations[currentLanguage || 'en'].errorGeneric);
                 });
             });
 
@@ -631,11 +647,9 @@
             // Check for password reset success message
             const urlParams = new URLSearchParams(window.location.search);
             const message = urlParams.get('message');
-            const successMessage = document.getElementById('successMessage');
             
             if (message === 'password-reset-success') {
-                successMessage.textContent = 'Your password has been reset successfully. Please log in with your new password.';
-                successMessage.classList.add('show');
+                showMessage('success', 'Your password has been reset successfully. Please log in with your new password.');
             }
         });
 
@@ -737,7 +751,7 @@
                 } else {
                     newErrorMessage = translations[lang].errorGeneric;
                 }
-                errorMessage.textContent = newErrorMessage;
+                showMessage('error', newErrorMessage);
             }
             
             // Update Google Sign-In button text

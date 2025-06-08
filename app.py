@@ -733,6 +733,11 @@ def remove_avatar():
 def reset_password_page():
     return render_template('reset_password.html')
 
+@app.route('/check-inbox')
+def check_inbox():
+    email = request.args.get('email', '')
+    return render_template('check_inbox.html', email=email)
+
 @app.route('/api/request-password-reset', methods=['POST'])
 def request_password_reset():
     try:
