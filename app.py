@@ -789,7 +789,7 @@ def request_password_reset():
         user = User.query.filter_by(email=email).first()
         if not user:
             logger.info(f"No user found with email: {email}")
-            return jsonify({'message': 'If your email is registered, you will receive reset instructions'}), 200
+            return jsonify({'error': 'Email does not exist'}), 404
 
         # Generate a secure token and encode it as URL-safe base64
         token = secrets.token_urlsafe(32)
