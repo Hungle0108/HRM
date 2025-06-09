@@ -657,6 +657,10 @@
                         let errorText;
                         if (data.error.includes('Please enter both')) {
                             errorText = translations[currentLanguage || 'en'].errorMissingFields;
+                        } else if (data.error.includes('Email does not exist')) {
+                            errorText = translations[currentLanguage || 'en'].errorEmailNotExist;
+                        } else if (data.error.includes('Incorrect password')) {
+                            errorText = translations[currentLanguage || 'en'].errorIncorrectPassword;
                         } else if (data.error.includes('Incorrect')) {
                             errorText = translations[currentLanguage || 'en'].errorIncorrectCredentials;
                         } else {
@@ -753,6 +757,8 @@
                 needAccount: 'Need to create account?',
                 signUp: 'Sign up',
                 errorMissingFields: 'Please enter both email and password',
+                errorEmailNotExist: 'Email does not exist',
+                errorIncorrectPassword: 'Incorrect password',
                 errorIncorrectCredentials: 'Incorrect email or password',
                 errorGeneric: 'An error occurred during login'
             },
@@ -772,6 +778,8 @@
                 needAccount: 'Bạn cần tạo tài khoản?',
                 signUp: 'Đăng ký',
                 errorMissingFields: 'Vui lòng nhập email và mật khẩu',
+                errorEmailNotExist: 'Email không tồn tại',
+                errorIncorrectPassword: 'Mật khẩu không đúng',
                 errorIncorrectCredentials: 'Email hoặc mật khẩu không đúng',
                 errorGeneric: 'Đã xảy ra lỗi khi đăng nhập'
             }
@@ -795,6 +803,10 @@
                 let newErrorMessage;
                 if (errorMessage.textContent.includes('enter both') || errorMessage.textContent.includes('nhập email')) {
                     newErrorMessage = translations[lang].errorMissingFields;
+                } else if (errorMessage.textContent.includes('does not exist') || errorMessage.textContent.includes('không tồn tại')) {
+                    newErrorMessage = translations[lang].errorEmailNotExist;
+                } else if (errorMessage.textContent.includes('Incorrect password') || errorMessage.textContent.includes('Mật khẩu không đúng')) {
+                    newErrorMessage = translations[lang].errorIncorrectPassword;
                 } else if (errorMessage.textContent.includes('Incorrect') || errorMessage.textContent.includes('không đúng')) {
                     newErrorMessage = translations[lang].errorIncorrectCredentials;
                 } else {

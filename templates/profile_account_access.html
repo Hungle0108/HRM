@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}Account Access - Profile Settings - HR Management System{% endblock %}
+
+{% block styles %}
+<style>
+    .settings-container {
+        max-width: 1200px;
+        margin: 1.5rem auto;
+        padding: 0 2rem;
+    }
+
+    .settings-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #333;
+    }
+
+    .settings-nav {
+        display: flex;
+        gap: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 1.5rem;
+    }
+
+    .settings-tab {
+        padding: 1rem;
+        color: #666;
+        text-decoration: none;
+        position: relative;
+    }
+
+    .settings-tab.active {
+        color: #000;
+        font-weight: 500;
+    }
+
+    .settings-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #000;
+    }
+
+    .settings-content {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .settings-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .section-header {
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        color: #333;
+    }
+
+    .section-description {
+        color: #666;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .feature-item {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 1.25rem 0;
+    }
+
+    .feature-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .feature-item:first-child {
+        padding-top: 0;
+    }
+
+    .feature-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-title {
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0;
+        color: #333;
+    }
+
+    .feature-description {
+        color: #666;
+        font-size: 0.875rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .setup-button {
+        background: #000;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .setup-button:hover {
+        background: #333;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+        font-size: 0.875rem;
+    }
+
+    .status-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+    }
+
+    .status-icon.enabled {
+        background: #22c55e;
+        color: white;
+    }
+
+    .trusted-devices-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-top: 0.5rem;
+    }
+
+    .trusted-devices-text {
+        color: #666;
+        font-size: 0.875rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .tfa-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .tfa-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .tfa-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        color: #333;
+    }
+
+    .tfa-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .tfa-status-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #22c55e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+    }
+
+    .tfa-method {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .tfa-method:last-child {
+        margin-bottom: 0;
+    }
+
+    .method-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .method-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .method-details h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .method-badge {
+        background: #007bff;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-left: 0.5rem;
+    }
+
+    .method-details p {
+        margin: 0;
+        color: #666;
+        font-size: 0.8125rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h1 class="settings-title">Profile settings</h1>
+    
+    <div class="settings-nav">
+        <a href="/profile/settings" class="settings-tab">Personal</a>
+        <a href="/profile/account-access" class="settings-tab active">Account access</a>
+        <a href="#" class="settings-tab">Notifications</a>
+    </div>
+
+    <div class="settings-content">
+        <!-- Left Column - Account Security -->
+        <div class="left-column">
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2 class="section-title">Account security</h2>
+                    <p class="section-description">Settings to help keep your account secure</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <div>
+                            <h3 class="feature-title">Change Password</h3>
+                            <p class="feature-description">Choose a unique password to protect your account</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <div>
+                            <h3 class="feature-title">Manage trusted devices</h3>
+                            <p class="feature-description">Manage devices allowed to access your account without 2FA.</p>
+                        </div>
+                    </div>
+                    <div class="trusted-devices-info">
+                        <p class="trusted-devices-text">Trusted devices: 0 • Renewal period: 1 Week</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-header">
+                        <div>
+                            <h3 class="feature-title">Displaying sensitive information</h3>
+                            <p class="feature-description">Hiding sensitive information such as your salary and invoices or expenses prevents other people from seeing them on your screen.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Two-Factor Authentication -->
+        <div class="right-column">
+            <div class="tfa-section">
+                <div class="tfa-header">
+                    <h2 class="tfa-title">Two-factor authentication (2FA)</h2>
+                    <div class="tfa-status">
+                        <div class="tfa-status-icon">✓</div>
+                        <span>2FA is enabled on your account via email verification.</span>
+                    </div>
+                </div>
+
+                <div class="tfa-method">
+                    <div class="method-info">
+                        <div class="method-icon">d.</div>
+                        <div class="method-details">
+                            <h4>Deel App<span class="method-badge">★ RECOMMENDED</span></h4>
+                        </div>
+                    </div>
+                    <button class="setup-button">Set up</button>
+                </div>
+
+                <div class="tfa-method">
+                    <div class="method-info">
+                        <div class="method-icon">🔒</div>
+                        <div class="method-details">
+                            <h4>Authenticator app</h4>
+                        </div>
+                    </div>
+                    <button class="setup-button">Set up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

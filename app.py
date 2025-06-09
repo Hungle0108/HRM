@@ -204,9 +204,15 @@ def login():
         user = User.query.filter_by(email=data['email']).first()
         print(f"Found user: {user}")  # Debug print
 
-        if not user or not check_password_hash(user.password, data['password']):
-            print("Invalid credentials")  # Debug print
-            return jsonify({'error': 'Incorrect email or password'}), 401
+        # Check if email exists first
+        if not user:
+            print("Email does not exist")  # Debug print
+            return jsonify({'error': 'Email does not exist'}), 404
+
+        # Then check password
+        if not check_password_hash(user.password, data['password']):
+            print("Invalid password")  # Debug print
+            return jsonify({'error': 'Incorrect password'}), 401
 
         # Clear and set new session
         session.clear()
@@ -572,6 +578,22 @@ def profile_settings():
         return redirect('/login')
     
     return render_template('profile_settings.html', user=user)
+
+@app.route('/profile/account-access')
+def profile_account_access():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('profile_account_access.html', user=user, organization=organization)
 
 @app.route('/profile/edit-personal-details')
 def edit_personal_details():
