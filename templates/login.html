@@ -453,6 +453,42 @@
         .forgot-password:hover {
             text-decoration: underline;
         }
+
+        /* Add login container error state styling */
+        .login-container.has-error {
+            background: white;
+        }
+
+        /* Enhanced error input styling with transition */
+        input[type="email"].error,
+        input[type="password"].error {
+            border: 2px solid #FF4D4F !important;
+            background-color: #FFF1F0 !important;
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        input[type="email"].error:focus,
+        input[type="password"].error:focus {
+            outline: none;
+            border: 2px solid #FF4D4F !important;
+            box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1) !important;
+        }
+
+        /* Enhanced error message styling */
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: #fde8e8;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            display: none;  /* Hidden by default */
+        }
+
+        .error-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -527,9 +563,20 @@
 
     <script>
         // Function to show messages (ensuring only one is visible at a time)
+        let messageTimer = null;
+        
         function showMessage(type, text) {
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
+            const loginContainer = document.querySelector('.login-container');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Clear any existing timer
+            if (messageTimer) {
+                clearTimeout(messageTimer);
+                messageTimer = null;
+            }
             
             // Hide all messages first
             errorMessage.classList.remove('show');
@@ -539,9 +586,31 @@
             if (type === 'error') {
                 errorMessage.textContent = text;
                 errorMessage.classList.add('show');
+                loginContainer.classList.add('has-error');
+                emailInput.classList.add('error');
+                passwordInput.classList.add('error');
+                
+                // Auto-hide error message and styling after 4 seconds
+                messageTimer = setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                    loginContainer.classList.remove('has-error');
+                    emailInput.classList.remove('error');
+                    passwordInput.classList.remove('error');
+                    messageTimer = null;
+                }, 4000);
             } else if (type === 'success') {
                 successMessage.textContent = text;
                 successMessage.classList.add('show');
+                // Remove error styling when showing success
+                loginContainer.classList.remove('has-error');
+                emailInput.classList.remove('error');
+                passwordInput.classList.remove('error');
+                
+                // Auto-hide success message after 4 seconds
+                messageTimer = setTimeout(() => {
+                    successMessage.classList.remove('show');
+                    messageTimer = null;
+                }, 4000);
             }
         }
 
@@ -563,19 +632,9 @@
                 const email = document.getElementById('email');
                 const password = document.getElementById('password');
 
-                // Reset error states
-                email.classList.remove('input-error');
-                password.classList.remove('input-error');
-
                 // Check for empty fields before sending request
                 if (!email.value.trim() || !password.value.trim()) {
                     showMessage('error', translations[currentLanguage || 'en'].errorMissingFields);
-                    if (!email.value.trim()) email.classList.add('input-error');
-                    if (!password.value.trim()) password.classList.add('input-error');
-                    document.getElementById('errorMessage').classList.add('shake');
-                    setTimeout(() => {
-                        document.getElementById('errorMessage').classList.remove('shake');
-                    }, 650);
                     return;
                 }
 
@@ -605,18 +664,8 @@
                         }
                         showMessage('error', errorText);
                         
-                        // Add shake effect and error styling to inputs
-                        email.classList.add('input-error');
-                        password.classList.add('input-error');
-                        document.getElementById('errorMessage').classList.add('shake');
-                        
                         // Clear password field
                         password.value = '';
-                        
-                        // Remove shake class after animation completes
-                        setTimeout(() => {
-                            document.getElementById('errorMessage').classList.remove('shake');
-                        }, 650);
                     }
                 })
                 .catch(error => {
