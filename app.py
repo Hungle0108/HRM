@@ -751,6 +751,60 @@ def remove_avatar():
         db.session.rollback()
         return jsonify({'error': 'Failed to remove avatar'}), 500
 
+@app.route('/api/change-password', methods=['POST'])
+def change_password():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    try:
+        data = request.get_json()
+        current_password = data.get('current_password')
+        new_password = data.get('new_password')
+        
+        if not current_password or not new_password:
+            return jsonify({'error': 'Both current and new passwords are required', 'field': 'general'}), 400
+        
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'error': 'User not found', 'field': 'general'}), 404
+        
+        # Verify current password
+        if not check_password_hash(user.password, current_password):
+            return jsonify({'error': 'Current password is incorrect', 'field': 'current_password'}), 400
+        
+        # Validate new password requirements
+        if len(new_password) < 10 or len(new_password) > 70:
+            return jsonify({'error': 'Password must be between 10 and 70 characters', 'field': 'new_password'}), 400
+        
+        if not any(c.isupper() for c in new_password):
+            return jsonify({'error': 'Password must contain at least one uppercase letter', 'field': 'new_password'}), 400
+        
+        if not any(c.islower() for c in new_password):
+            return jsonify({'error': 'Password must contain at least one lowercase letter', 'field': 'new_password'}), 400
+        
+        if not any(c.isdigit() for c in new_password):
+            return jsonify({'error': 'Password must contain at least one number', 'field': 'new_password'}), 400
+        
+        # Check for special characters
+        special_chars = "!@#$%^&*()_+-=[]{}|;':\",./<>?"
+        if not any(c in special_chars for c in new_password):
+            return jsonify({'error': 'Password must contain at least one special character', 'field': 'new_password'}), 400
+        
+        # Check if new password is the same as current password
+        if check_password_hash(user.password, new_password):
+            return jsonify({'error': 'New password must be different from your current password', 'field': 'new_password'}), 400
+        
+        # Update password
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+        
+        return jsonify({'message': 'Password changed successfully'}), 200
+        
+    except Exception as e:
+        logger.error(f"Error changing password: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': 'An error occurred while changing password', 'field': 'general'}), 500
+
 @app.route('/reset-password')
 def reset_password_page():
     return render_template('reset_password.html')

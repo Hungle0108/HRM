@@ -73,7 +73,7 @@
     }
 
     .section-header {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .section-title {
@@ -89,39 +89,68 @@
         margin: 0;
     }
 
-    .feature-item {
-        border-bottom: 1px solid #f0f0f0;
-        padding: 1.25rem 0;
-    }
-
-    .feature-item:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-
-    .feature-item:first-child {
-        padding-top: 0;
-    }
-
-    .feature-header {
+    /* Account Security Button Styles */
+    .security-buttons {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0.5rem;
+        flex-direction: column;
+        gap: 1rem;
     }
 
-    .feature-title {
+    .security-button {
+        display: block;
+        width: 100%;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+        text-align: left;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .security-button:last-child {
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .security-button:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .security-button-content {
+        width: 100%;
+        padding-left: 0;
+    }
+
+    .security-button-title {
         font-size: 1rem;
         font-weight: 500;
-        margin: 0;
+        margin: 0 0 0.5rem 0;
         color: #333;
+        line-height: 1.2;
     }
 
-    .feature-description {
+    .security-button-description {
         color: #666;
         font-size: 0.875rem;
         margin: 0;
         line-height: 1.4;
+    }
+
+    .security-button-meta {
+        color: #666;
+        font-size: 0.875rem;
+        margin: 0.5rem 0 0 0;
+        line-height: 1.4;
+    }
+
+    .security-button-arrow {
+        display: none;
     }
 
     .setup-button {
@@ -269,6 +298,228 @@
         color: #666;
         font-size: 0.8125rem;
     }
+
+    /* Change Password Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .change-password-modal {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 480px;
+        padding: 2rem;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+    }
+
+    .close-button:hover {
+        background: #f0f0f0;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #333;
+    }
+
+    .form-input::placeholder {
+        color: #999;
+    }
+
+    .password-requirements {
+        margin: 1.5rem 0;
+    }
+
+    .requirement-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.75rem;
+    }
+
+    .requirement-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .requirement-icon {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #dc3545;
+        flex-shrink: 0;
+    }
+
+    .requirement-icon.valid {
+        background: #28a745;
+    }
+
+    .requirement-text {
+        color: #666;
+    }
+
+    .requirement-text.valid {
+        color: #333;
+    }
+
+    .change-password-submit {
+        width: 100%;
+        background: #f5f5f5;
+        color: #999;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: not-allowed;
+        transition: all 0.2s;
+    }
+
+    .change-password-submit.enabled {
+        background: #000;
+        color: white;
+        cursor: pointer;
+    }
+
+    .change-password-submit.enabled:hover {
+        background: #333;
+    }
+
+    .forgot-password-link {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .forgot-password-link a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .forgot-password-link a:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        padding: 12px;
+        background-color: #fde8e8;
+        border: 1px solid #fecaca;
+        border-radius: 6px;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .success-message {
+        color: #0f5132;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        padding: 12px;
+        background-color: #d1e7dd;
+        border: 1px solid #a3cfbb;
+        border-radius: 6px;
+        display: none;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    /* Add shake animation for error */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+        animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    /* Enhanced error input styling with transition */
+    .form-input.error {
+        border: 2px solid #FF4D4F !important;
+        background-color: #FFF1F0 !important;
+        animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    .form-input.error:focus {
+        outline: none;
+        border: 2px solid #FF4D4F !important;
+        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1) !important;
+    }
+
+    /* Add modal error state styling */
+    .change-password-modal.has-error {
+        background: white;
+    }
 </style>
 {% endblock %}
 
@@ -291,34 +542,31 @@
                     <p class="section-description">Settings to help keep your account secure</p>
                 </div>
 
-                <div class="feature-item">
-                    <div class="feature-header">
-                        <div>
-                            <h3 class="feature-title">Change Password</h3>
-                            <p class="feature-description">Choose a unique password to protect your account</p>
+                <div class="security-buttons">
+                    <!-- Change Password Button -->
+                    <button class="security-button" onclick="openChangePasswordModal()">
+                        <div class="security-button-content">
+                            <h3 class="security-button-title">Change Password</h3>
+                            <p class="security-button-description">Choose a unique password to protect your account</p>
                         </div>
-                    </div>
-                </div>
+                    </button>
 
-                <div class="feature-item">
-                    <div class="feature-header">
-                        <div>
-                            <h3 class="feature-title">Manage trusted devices</h3>
-                            <p class="feature-description">Manage devices allowed to access your account without 2FA.</p>
+                    <!-- Manage Trusted Devices Button -->
+                    <button class="security-button" onclick="manageTrustedDevices()">
+                        <div class="security-button-content">
+                            <h3 class="security-button-title">Manage trusted devices</h3>
+                            <p class="security-button-description">Manage devices allowed to access your account without 2FA</p>
+                            <p class="security-button-meta">Trusted devices: 0 • Renewal period: 1 Week</p>
                         </div>
-                    </div>
-                    <div class="trusted-devices-info">
-                        <p class="trusted-devices-text">Trusted devices: 0 • Renewal period: 1 Week</p>
-                    </div>
-                </div>
+                    </button>
 
-                <div class="feature-item">
-                    <div class="feature-header">
-                        <div>
-                            <h3 class="feature-title">Displaying sensitive information</h3>
-                            <p class="feature-description">Hiding sensitive information such as your salary and invoices or expenses prevents other people from seeing them on your screen.</p>
+                    <!-- Display Sensitive Information Button -->
+                    <button class="security-button" onclick="displaySensitiveInfo()">
+                        <div class="security-button-content">
+                            <h3 class="security-button-title">Displaying sensitive information</h3>
+                            <p class="security-button-description">Hiding sensitive information such as your salary and invoices or expenses prevents other people from seeing them on your screen</p>
                         </div>
-                    </div>
+                    </button>
                 </div>
             </div>
         </div>
@@ -357,4 +605,290 @@
         </div>
     </div>
 </div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="changePasswordModal">
+    <div class="change-password-modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Change password</h2>
+            <button class="close-button" onclick="closeChangePasswordModal()">×</button>
+        </div>
+        
+        <form id="changePasswordForm">
+            <div class="form-group">
+                <input type="password" id="currentPassword" class="form-input" placeholder="Current password" required>
+                <div class="error-message" id="currentPasswordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" id="newPassword" class="form-input" placeholder="New password" required>
+                <div class="error-message" id="newPasswordError"></div>
+            </div>
+            
+            <div class="password-requirements">
+                <div class="requirement-title">Your new password must contain</div>
+                <div class="requirement-item">
+                    <div class="requirement-icon" id="lengthIcon"></div>
+                    <span class="requirement-text" id="lengthText">Between 10 and 70 characters</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-icon" id="uppercaseIcon"></div>
+                    <span class="requirement-text" id="uppercaseText">An uppercase character</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-icon" id="lowercaseIcon"></div>
+                    <span class="requirement-text" id="lowercaseText">A lowercase character</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-icon" id="numberIcon"></div>
+                    <span class="requirement-text" id="numberText">A number</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-icon" id="specialIcon"></div>
+                    <span class="requirement-text" id="specialText">A special character</span>
+                </div>
+                <div class="requirement-item">
+                    <div class="requirement-icon" id="differentIcon"></div>
+                    <span class="requirement-text" id="differentText">Must not be the same as your previous passwords</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="change-password-submit" id="submitButton" disabled>Change password</button>
+            <div class="success-message" id="successMessage"></div>
+        </form>
+        
+        <div class="forgot-password-link">
+            <span>Forgot your password? <a href="/reset-password">Click here to reset it</a></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let passwordRequirements = {
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        special: false,
+        different: true // Assume true initially
+    };
+
+    let messageTimer = null;
+
+    function showMessage(type, text, field = null) {
+        const currentPasswordError = document.getElementById('currentPasswordError');
+        const newPasswordError = document.getElementById('newPasswordError');
+        const successMessage = document.getElementById('successMessage');
+        const modal = document.querySelector('.change-password-modal');
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        
+        // Clear any existing timer
+        if (messageTimer) {
+            clearTimeout(messageTimer);
+            messageTimer = null;
+        }
+        
+        // Hide all messages first
+        currentPasswordError.classList.remove('show');
+        newPasswordError.classList.remove('show');
+        successMessage.classList.remove('show');
+        
+        // Remove error styling
+        modal.classList.remove('has-error');
+        currentPasswordInput.classList.remove('error');
+        newPasswordInput.classList.remove('error');
+        
+        if (type === 'error') {
+            modal.classList.add('has-error');
+            
+            if (field === 'current_password') {
+                currentPasswordError.textContent = text;
+                currentPasswordError.classList.add('show');
+                currentPasswordInput.classList.add('error');
+                
+                // Auto-hide error message and styling after 4 seconds
+                messageTimer = setTimeout(() => {
+                    currentPasswordError.classList.remove('show');
+                    modal.classList.remove('has-error');
+                    currentPasswordInput.classList.remove('error');
+                    messageTimer = null;
+                }, 4000);
+            } else {
+                newPasswordError.textContent = text;
+                newPasswordError.classList.add('show');
+                newPasswordInput.classList.add('error');
+                
+                // Auto-hide error message and styling after 4 seconds
+                messageTimer = setTimeout(() => {
+                    newPasswordError.classList.remove('show');
+                    modal.classList.remove('has-error');
+                    newPasswordInput.classList.remove('error');
+                    messageTimer = null;
+                }, 4000);
+            }
+        } else if (type === 'success') {
+            successMessage.textContent = text;
+            successMessage.classList.add('show');
+            
+            // Auto-hide success message after 4 seconds
+            messageTimer = setTimeout(() => {
+                successMessage.classList.remove('show');
+                messageTimer = null;
+            }, 4000);
+        }
+    }
+
+    function openChangePasswordModal() {
+        document.getElementById('changePasswordModal').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeChangePasswordModal() {
+        document.getElementById('changePasswordModal').classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        // Clear any existing timer
+        if (messageTimer) {
+            clearTimeout(messageTimer);
+            messageTimer = null;
+        }
+        
+        // Reset form
+        document.getElementById('changePasswordForm').reset();
+        resetRequirements();
+        updateSubmitButton();
+        
+        // Clear error messages and styling
+        const modal = document.querySelector('.change-password-modal');
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        
+        document.getElementById('currentPasswordError').classList.remove('show');
+        document.getElementById('newPasswordError').classList.remove('show');
+        document.getElementById('successMessage').classList.remove('show');
+        
+        modal.classList.remove('has-error');
+        currentPasswordInput.classList.remove('error');
+        newPasswordInput.classList.remove('error');
+    }
+
+    function resetRequirements() {
+        passwordRequirements = {
+            length: false,
+            uppercase: false,
+            lowercase: false,
+            number: false,
+            special: false,
+            different: true
+        };
+        updateRequirementIcons();
+    }
+
+    function updateRequirementIcons() {
+        const requirements = ['length', 'uppercase', 'lowercase', 'number', 'special', 'different'];
+        
+        requirements.forEach(req => {
+            const icon = document.getElementById(req + 'Icon');
+            const text = document.getElementById(req + 'Text');
+            
+            if (passwordRequirements[req]) {
+                icon.classList.add('valid');
+                text.classList.add('valid');
+            } else {
+                icon.classList.remove('valid');
+                text.classList.remove('valid');
+            }
+        });
+    }
+
+    function validatePassword(password) {
+        passwordRequirements.length = password.length >= 10 && password.length <= 70;
+        passwordRequirements.uppercase = /[A-Z]/.test(password);
+        passwordRequirements.lowercase = /[a-z]/.test(password);
+        passwordRequirements.number = /\d/.test(password);
+        passwordRequirements.special = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        
+        updateRequirementIcons();
+    }
+
+    function updateSubmitButton() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const submitButton = document.getElementById('submitButton');
+        
+        const allRequirementsMet = Object.values(passwordRequirements).every(req => req);
+        const formComplete = currentPassword.length > 0 && newPassword.length > 0;
+        
+        if (allRequirementsMet && formComplete) {
+            submitButton.classList.add('enabled');
+            submitButton.disabled = false;
+        } else {
+            submitButton.classList.remove('enabled');
+            submitButton.disabled = true;
+        }
+    }
+
+    // Placeholder functions for other buttons
+    function manageTrustedDevices() {
+        alert('Manage trusted devices functionality will be implemented soon!');
+    }
+
+    function displaySensitiveInfo() {
+        alert('Display sensitive information settings will be implemented soon!');
+    }
+
+    // Event listeners
+    document.getElementById('newPassword').addEventListener('input', function() {
+        validatePassword(this.value);
+        updateSubmitButton();
+    });
+
+    document.getElementById('currentPassword').addEventListener('input', function() {
+        updateSubmitButton();
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeChangePasswordModal();
+        }
+    });
+
+    // Handle form submission
+    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        
+        try {
+            const response = await fetch('/api/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showMessage('success', 'Password changed successfully!');
+                
+                // Close modal after 2 seconds
+                setTimeout(() => {
+                    closeChangePasswordModal();
+                }, 2000);
+            } else {
+                showMessage('error', data.error, data.field);
+            }
+        } catch (error) {
+            showMessage('error', 'An error occurred. Please try again.', 'new_password');
+        }
+    });
+</script>
 {% endblock %} 

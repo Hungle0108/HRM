@@ -455,6 +455,52 @@
         justify-content: space-between;
         width: 100%;
     }
+
+    /* Flatpickr custom styling for disabled future navigation */
+    .flatpickr-calendar .flatpickr-next-month.disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    .flatpickr-calendar .flatpickr-prev-month.disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month.disabled:hover,
+    .flatpickr-calendar .flatpickr-prev-month.disabled:hover {
+        background: transparent;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month.disabled svg,
+    .flatpickr-calendar .flatpickr-prev-month.disabled svg {
+        color: #ccc;
+    }
+
+    /* Add subtle visual feedback for disabled buttons */
+    .flatpickr-calendar .flatpickr-next-month.disabled::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+    }
+
+    .flatpickr-calendar .flatpickr-prev-month.disabled::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
@@ -646,7 +692,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.addEventListener('click', (e) => {
-        if (!citizenshipInput.contains(e.target) && !citizenshipDropdown.contains(e.target)) {
+        if (citizenshipInput && citizenshipDropdown && 
+            !citizenshipInput.contains(e.target) && !citizenshipDropdown.contains(e.target)) {
             citizenshipDropdown.classList.remove('show');
         }
     });
@@ -655,7 +702,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const calendarToggle = document.getElementById('calendarToggle');
 
     if (dateInput && calendarToggle) {
-            const fp = flatpickr(dateInput, {
+        const fp = flatpickr(dateInput, {
             dateFormat: "Y-m-d",
             maxDate: new Date(),
             minDate: "1900-01-01",
@@ -668,13 +715,86 @@ document.addEventListener('DOMContentLoaded', function() {
             showOutsideDays: false,
             onChange: function(selectedDates, dateStr) {
                 storeFormData(); // Store data when date changes
+            },
+            onMonthChange: function(selectedDates, dateStr, instance) {
+                // Check and disable navigation buttons after month change
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                }, 10);
+            },
+            onOpen: function(selectedDates, dateStr, instance) {
+                // Check and disable navigation buttons when calendar opens
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                }, 10);
             }
         });
 
+        // Function to check and disable future navigation
+        function checkAndDisableNavigation(instance) {
+            const calendar = instance.calendarContainer;
+            const nextButton = calendar.querySelector('.flatpickr-next-month');
+            const prevButton = calendar.querySelector('.flatpickr-prev-month');
+            
+            if (nextButton && prevButton) {
+                const currentMonth = instance.currentMonth;
+                const currentYear = instance.currentYear;
+                const today = new Date();
+                const nextMonth = new Date(currentYear, currentMonth + 1, 1);
+                const prevMonth = new Date(currentYear, currentMonth - 1, 1);
+                
+                // Disable next button if next month is in the future
+                if (nextMonth > today) {
+                    nextButton.classList.add('disabled');
+                    nextButton.style.pointerEvents = 'none';
+                } else {
+                    nextButton.classList.remove('disabled');
+                    nextButton.style.pointerEvents = 'auto';
+                }
+                
+                // Handle previous button (should still work for past months)
+                if (prevMonth < new Date(1900, 0, 1)) {
+                    prevButton.classList.add('disabled');
+                    prevButton.style.pointerEvents = 'none';
+                } else {
+                    prevButton.classList.remove('disabled');
+                    prevButton.style.pointerEvents = 'auto';
+                }
+            }
+        }
+
+        // Override the default click handlers to respect our disabled state
+        const originalNextMonth = fp.nextMonth;
+        const originalPrevMonth = fp.prevMonth;
+        
+        fp.nextMonth = function() {
+            const calendar = fp.calendarContainer;
+            const nextButton = calendar.querySelector('.flatpickr-next-month');
+            
+            if (!nextButton.classList.contains('disabled')) {
+                originalNextMonth.call(fp);
+                setTimeout(() => {
+                    checkAndDisableNavigation(fp);
+                }, 10);
+            }
+        };
+        
+        fp.prevMonth = function() {
+            const calendar = fp.calendarContainer;
+            const prevButton = calendar.querySelector('.flatpickr-prev-month');
+            
+            if (!prevButton.classList.contains('disabled')) {
+                originalPrevMonth.call(fp);
+                setTimeout(() => {
+                    checkAndDisableNavigation(fp);
+                }, 10);
+            }
+        };
+
         calendarToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (fp) {
-                    fp.toggle();
+            e.preventDefault();
+            if (fp) {
+                fp.toggle();
             }
         });
     }
