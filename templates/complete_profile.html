@@ -287,6 +287,15 @@
         font-weight: 500;
         padding: 0;
         position: relative;
+        min-width: 140px;
+        justify-content: flex-start;
+    }
+
+    .flatpickr-current-month .numInputWrapper {
+        display: inline-block;
+        width: 60px;
+        position: relative;
+        vertical-align: baseline;
     }
 
     /* Month and Year display */
@@ -294,6 +303,161 @@
         margin-right: 4px;
         pointer-events: none;
         cursor: default;
+    }
+
+    .cur-year {
+        pointer-events: none;
+        cursor: default;
+        display: inline-block;
+        width: 60px;
+        text-align: left;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0;
+    }
+
+    /* Custom year dropdown button */
+    .year-dropdown-btn {
+        margin-left: 4px;
+        padding: 2px 4px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 3px;
+        transition: background-color 0.2s;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .year-dropdown-btn:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .year-dropdown-btn.active {
+        background-color: rgba(0, 0, 0, 0.15);
+    }
+
+    /* Year selection grid - now inside the calendar */
+    .year-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: white;
+        border-radius: 8px;
+        z-index: 1000;
+        padding: 20px;
+        display: none;
+        overflow-y: auto;
+        overflow-x: hidden; /* Prevent horizontal scrollbar */
+        box-sizing: border-box; /* Include padding in size calculation */
+        contain: layout style; /* Contain layout to prevent overflow */
+    }
+
+    .year-grid.show {
+        display: block;
+    }
+
+    .year-grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        width: 100%; /* Ensure it fits within container */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+
+    .year-option {
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        background: #f8f9fa;
+        box-sizing: border-box; /* Include padding and border in width */
+        min-width: 0; /* Allow items to shrink if needed */
+    }
+
+    .year-option:hover {
+        background-color: #e9ecef;
+        border-color: #d1d5db;
+        transform: translateY(-1px);
+    }
+
+    .year-option.selected {
+        background-color: #000;
+        color: white;
+        border-color: #000;
+    }
+
+    .year-option.disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        background-color: #f9f9f9;
+        color: #ccc;
+    }
+
+    .year-option.disabled:hover {
+        background-color: #f9f9f9;
+        border-color: transparent;
+        transform: none;
+    }
+
+    /* Hide calendar content when year grid is shown */
+    .flatpickr-calendar.year-mode .flatpickr-days,
+    .flatpickr-calendar.year-mode .flatpickr-weekdays {
+        display: none;
+    }
+
+    /* Maintain original calendar size in year mode */
+    .flatpickr-calendar.year-mode {
+        min-height: 380px !important; /* Increased to match original calendar height */
+        height: 380px !important; /* Fixed height to prevent shrinking */
+        width: 340px !important; /* Maintain original width */
+        overflow: hidden !important; /* Prevent any content from extending beyond bounds */
+        position: relative !important; /* Ensure proper positioning context */
+    }
+
+    .flatpickr-calendar.year-mode .year-grid {
+        display: block;
+        position: absolute;
+        top: 70px; /* Start below the header */
+        left: 20px;
+        right: 20px;
+        bottom: 30px; /* More margin from bottom to prevent overflow */
+        height: calc(100% - 100px); /* Reduced height to ensure containment */
+        overflow-x: hidden; /* Prevent horizontal scrollbar */
+        overflow-y: auto; /* Allow vertical scrolling only */
+        box-sizing: border-box; /* Include padding in size calculation */
+    }
+
+    /* Hide default year navigation arrows */
+    .flatpickr-current-month .numInputWrapper::after,
+    .flatpickr-current-month .numInputWrapper::before {
+        display: none !important;
+    }
+
+    .flatpickr-current-month .arrowUp,
+    .flatpickr-current-month .arrowDown {
+        display: none !important;
+    }
+
+    /* Ensure the current month container has stable positioning */
+    .flatpickr-current-month {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        padding: 0;
+        position: relative;
+        /* Prevent the container from changing size */
+        min-width: 140px; /* Increased to accommodate month + year */
+        justify-content: flex-start;
     }
 
     /* Navigation arrows container */
@@ -353,6 +517,12 @@
         pointer-events: none !important;
         cursor: default !important;
         padding: 0;
+        width: 60px !important;
+        text-align: left !important;
+        font-variant-numeric: tabular-nums !important;
+        letter-spacing: 0 !important;
+        margin: 0 !important;
+        display: inline-block !important;
     }
 
     /* Weekday headers */
@@ -457,49 +627,47 @@
     }
 
     /* Flatpickr custom styling for disabled future navigation */
-    .flatpickr-calendar .flatpickr-next-month.disabled {
-        opacity: 0.3;
-        pointer-events: none;
-        cursor: not-allowed;
-    }
-
+    .flatpickr-calendar .flatpickr-next-month.disabled,
     .flatpickr-calendar .flatpickr-prev-month.disabled {
-        opacity: 0.3;
-        pointer-events: none;
-        cursor: not-allowed;
+        opacity: 0.3 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+        filter: grayscale(100%) !important;
+        /* Keep the button visible but clearly disabled */
+        display: flex !important;
+        visibility: visible !important;
     }
 
     .flatpickr-calendar .flatpickr-next-month.disabled:hover,
     .flatpickr-calendar .flatpickr-prev-month.disabled:hover {
-        background: transparent;
+        background: transparent !important;
+        opacity: 0.3 !important;
     }
 
     .flatpickr-calendar .flatpickr-next-month.disabled svg,
     .flatpickr-calendar .flatpickr-prev-month.disabled svg {
-        color: #ccc;
+        color: #ccc !important;
+        opacity: 0.5 !important;
     }
 
-    /* Add subtle visual feedback for disabled buttons */
-    .flatpickr-calendar .flatpickr-next-month.disabled::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-    }
-
+    /* Remove the overlay styling since we want the button to remain visible */
+    .flatpickr-calendar .flatpickr-next-month.disabled::after,
     .flatpickr-calendar .flatpickr-prev-month.disabled::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
+        display: none !important;
+    }
+
+    /* Ensure enabled buttons are fully functional */
+    .flatpickr-calendar .flatpickr-next-month:not(.disabled),
+    .flatpickr-calendar .flatpickr-prev-month:not(.disabled) {
+        opacity: 1 !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        filter: none !important;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month:not(.disabled):hover,
+    .flatpickr-calendar .flatpickr-prev-month:not(.disabled):hover {
+        background: rgba(0, 0, 0, 0.1) !important;
     }
 </style>
 {% endblock %}
@@ -692,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.addEventListener('click', (e) => {
-        if (citizenshipInput && citizenshipDropdown && 
+        if (citizenshipInput && citizenshipDropdown && e.target &&
             !citizenshipInput.contains(e.target) && !citizenshipDropdown.contains(e.target)) {
             citizenshipDropdown.classList.remove('show');
         }
@@ -704,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dateInput && calendarToggle) {
         const fp = flatpickr(dateInput, {
             dateFormat: "Y-m-d",
-            maxDate: new Date(),
+            maxDate: new Date(2025, 5, 10), // June 10, 2025 (month is 0-indexed) - for date selection only
             minDate: "1900-01-01",
             defaultDate: null,
             clickOpens: true,
@@ -713,6 +881,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showMonths: 1,
             fixedHeight: true,
             showOutsideDays: false,
+            disableMobile: true, // Ensure our custom navigation works
             onChange: function(selectedDates, dateStr) {
                 storeFormData(); // Store data when date changes
             },
@@ -720,18 +889,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Check and disable navigation buttons after month change
                 setTimeout(() => {
                     checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance); // Re-setup year dropdown after month change
+                }, 10);
+            },
+            onYearChange: function(selectedDates, dateStr, instance) {
+                // Check and disable navigation buttons after year change
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance); // Re-setup year dropdown after year change
                 }, 10);
             },
             onOpen: function(selectedDates, dateStr, instance) {
                 // Check and disable navigation buttons when calendar opens
                 setTimeout(() => {
                     checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance); // Setup year dropdown when calendar opens
+                }, 10);
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                // Check and disable navigation buttons when calendar is ready
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance); // Setup year dropdown when calendar is ready
                 }, 10);
             }
         });
 
+        // Initial check after flatpickr is created
+        setTimeout(() => {
+            checkAndDisableNavigation(fp);
+            setupYearDropdown(fp); // Setup year dropdown initially
+        }, 50);
+
         // Function to check and disable future navigation
         function checkAndDisableNavigation(instance) {
+            if (!instance || !instance.calendarContainer) return;
+            
             const calendar = instance.calendarContainer;
             const nextButton = calendar.querySelector('.flatpickr-next-month');
             const prevButton = calendar.querySelector('.flatpickr-prev-month');
@@ -739,26 +932,56 @@ document.addEventListener('DOMContentLoaded', function() {
             if (nextButton && prevButton) {
                 const currentMonth = instance.currentMonth;
                 const currentYear = instance.currentYear;
-                const today = new Date();
+                
+                // Current date is June 10, 2025
+                const today = new Date(2025, 5, 10); // Month is 0-indexed, so 5 = June
+                
+                // Calculate the first day of the next month that would be shown
                 const nextMonth = new Date(currentYear, currentMonth + 1, 1);
+                
+                // Calculate the first day of the previous month that would be shown
                 const prevMonth = new Date(currentYear, currentMonth - 1, 1);
                 
-                // Disable next button if next month is in the future
+                // Debug logging
+                console.log('Current calendar view:', currentYear, currentMonth + 1); // +1 for human readable month
+                console.log('Next month would be:', nextMonth);
+                console.log('Today is:', today);
+                console.log('Is next month in future?', nextMonth > today);
+                
+                // Always keep the button visible, but disable functionality and obscure appearance for future months
                 if (nextMonth > today) {
+                    console.log('Disabling next button (making it obscured but visible)');
                     nextButton.classList.add('disabled');
-                    nextButton.style.pointerEvents = 'none';
+                    // Make button visually obscured but still visible
+                    nextButton.style.opacity = '0.3';
+                    nextButton.style.cursor = 'not-allowed';
+                    nextButton.style.pointerEvents = 'none'; // Prevent clicking
+                    // Add a subtle filter to make it more obviously disabled
+                    nextButton.style.filter = 'grayscale(100%)';
                 } else {
+                    console.log('Enabling next button (fully functional and visible)');
                     nextButton.classList.remove('disabled');
-                    nextButton.style.pointerEvents = 'auto';
+                    // Make button fully visible and functional
+                    nextButton.style.opacity = '1';
+                    nextButton.style.cursor = 'pointer';
+                    nextButton.style.pointerEvents = 'auto'; // Allow clicking
+                    nextButton.style.filter = 'none'; // Remove any filters
                 }
                 
-                // Handle previous button (should still work for past months)
-                if (prevMonth < new Date(1900, 0, 1)) {
+                // Handle previous button (should work until we reach the minimum date: January 1900)
+                const minDate = new Date(1900, 0, 1);
+                if (prevMonth < minDate) {
                     prevButton.classList.add('disabled');
+                    prevButton.style.opacity = '0.3';
+                    prevButton.style.cursor = 'not-allowed';
                     prevButton.style.pointerEvents = 'none';
+                    prevButton.style.filter = 'grayscale(100%)';
                 } else {
                     prevButton.classList.remove('disabled');
+                    prevButton.style.opacity = '1';
+                    prevButton.style.cursor = 'pointer';
                     prevButton.style.pointerEvents = 'auto';
+                    prevButton.style.filter = 'none';
                 }
             }
         }
@@ -768,10 +991,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const originalPrevMonth = fp.prevMonth;
         
         fp.nextMonth = function() {
+            if (!fp.calendarContainer) return;
+            
             const calendar = fp.calendarContainer;
             const nextButton = calendar.querySelector('.flatpickr-next-month');
             
-            if (!nextButton.classList.contains('disabled')) {
+            if (nextButton && !nextButton.classList.contains('disabled')) {
                 originalNextMonth.call(fp);
                 setTimeout(() => {
                     checkAndDisableNavigation(fp);
@@ -780,10 +1005,12 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         fp.prevMonth = function() {
+            if (!fp.calendarContainer) return;
+            
             const calendar = fp.calendarContainer;
             const prevButton = calendar.querySelector('.flatpickr-prev-month');
             
-            if (!prevButton.classList.contains('disabled')) {
+            if (prevButton && !prevButton.classList.contains('disabled')) {
                 originalPrevMonth.call(fp);
                 setTimeout(() => {
                     checkAndDisableNavigation(fp);
@@ -869,6 +1096,113 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+    }
+
+    // Function to setup year dropdown functionality
+    function setupYearDropdown(instance) {
+        if (!instance || !instance.calendarContainer) return;
+        
+        const calendar = instance.calendarContainer;
+        const currentMonthContainer = calendar.querySelector('.flatpickr-current-month');
+        
+        if (!currentMonthContainer) return;
+        
+        // Remove existing year dropdown if it exists
+        const existingDropdownBtn = currentMonthContainer.querySelector('.year-dropdown-btn');
+        const existingYearGrid = calendar.querySelector('.year-grid');
+        if (existingDropdownBtn) existingDropdownBtn.remove();
+        if (existingYearGrid) existingYearGrid.remove();
+        
+        // Create year dropdown button
+        const yearDropdownBtn = document.createElement('button');
+        yearDropdownBtn.className = 'year-dropdown-btn';
+        yearDropdownBtn.innerHTML = '▼'; // Down arrow
+        yearDropdownBtn.type = 'button';
+        
+        // Create year grid container
+        const yearGrid = document.createElement('div');
+        yearGrid.className = 'year-grid';
+        
+        const yearGridContainer = document.createElement('div');
+        yearGridContainer.className = 'year-grid-container';
+        
+        // Generate years from 1900 to 2025
+        const currentYear = instance.currentYear;
+        const maxYear = 2025;
+        const minYear = 1900;
+        
+        for (let year = maxYear; year >= minYear; year--) {
+            const yearOption = document.createElement('div');
+            yearOption.className = 'year-option';
+            yearOption.textContent = year;
+            
+            if (year === currentYear) {
+                yearOption.classList.add('selected');
+            }
+            
+            // Disable future years beyond 2025
+            if (year > maxYear) {
+                yearOption.classList.add('disabled');
+            } else {
+                yearOption.addEventListener('click', () => {
+                    instance.changeYear(year);
+                    // Exit year mode and return to calendar
+                    calendar.classList.remove('year-mode');
+                    yearDropdownBtn.classList.remove('active');
+                    yearDropdownBtn.innerHTML = '▼'; // Reset to down arrow
+                });
+            }
+            
+            yearGridContainer.appendChild(yearOption);
+        }
+        
+        yearGrid.appendChild(yearGridContainer);
+        
+        // Add click handler for dropdown button
+        yearDropdownBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isYearMode = calendar.classList.contains('year-mode');
+            
+            if (isYearMode) {
+                // Exit year mode, show calendar
+                calendar.classList.remove('year-mode');
+                yearDropdownBtn.classList.remove('active');
+                yearDropdownBtn.innerHTML = '▼'; // Down arrow
+            } else {
+                // Enter year mode, hide calendar days and show year grid
+                calendar.classList.add('year-mode');
+                yearDropdownBtn.classList.add('active');
+                yearDropdownBtn.innerHTML = '▲'; // Up arrow
+                
+                // Update selected year in grid
+                const yearOptions = yearGrid.querySelectorAll('.year-option');
+                yearOptions.forEach(option => {
+                    option.classList.remove('selected');
+                    if (parseInt(option.textContent) === instance.currentYear) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                // Scroll to selected year
+                setTimeout(() => {
+                    const selectedOption = yearGrid.querySelector('.year-option.selected');
+                    if (selectedOption) {
+                        selectedOption.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                }, 10);
+            }
+        });
+        
+        // Close year mode when clicking outside the calendar (handled by flatpickr)
+        // But we don't want to close when clicking inside the year grid
+        
+        // Append dropdown button after the year
+        currentMonthContainer.appendChild(yearDropdownBtn);
+        
+        // Insert year grid as the last child of calendar container
+        calendar.appendChild(yearGrid);
     }
 });
 
