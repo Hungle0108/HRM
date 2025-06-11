@@ -35,12 +35,14 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
-    .welcome-icon svg {
+    .welcome-icon img {
         width: 60px;
         height: 60px;
-        color: var(--primary-color);
+        object-fit: contain;
+        transition: all 0.2s;
     }
 
     .welcome-title {
@@ -148,17 +150,20 @@
         align-items: center;
         justify-content: center;
         color: #6b7280;
-        transition: color 0.2s;
+        transition: all 0.2s;
         z-index: 1;
     }
 
     .calendar-icon:hover {
-        color: #000;
+        opacity: 0.8;
+        transform: translateY(-50%) scale(1.05);
     }
 
-    .calendar-icon svg {
+    .calendar-icon img {
         width: 20px;
         height: 20px;
+        object-fit: contain;
+        transition: all 0.2s;
     }
 
     .dropdown-wrapper {
@@ -271,7 +276,7 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 30px;
-        padding: 0 10px;
+        padding: 0 5px;
     }
 
     .flatpickr-month {
@@ -288,7 +293,7 @@
         padding: 0;
         position: relative;
         /* Prevent the container from changing size */
-        min-width: 180px; /* Increased from 140px to accommodate longer month names */
+        min-width: 220px; /* Increased from 180px to accommodate longer month names like December */
         justify-content: flex-start;
     }
 
@@ -304,21 +309,74 @@
         margin-right: 4px;
         pointer-events: none;
         cursor: default;
+        min-width: 100px; /* Ensure minimum space for month names */
+        white-space: nowrap; /* Prevent text wrapping */
+        overflow: visible; /* Ensure text isn't clipped */
     }
 
     .cur-year {
         pointer-events: none;
         cursor: default;
         display: inline-block;
-        width: 60px;
+        width: 50px; /* Reduced from 60px to save space */
         text-align: left;
         font-variant-numeric: tabular-nums;
         letter-spacing: 0;
     }
 
+    /* HIGHEST SPECIFICITY OVERRIDES FOR MONTH DISPLAY */
+    .flatpickr-calendar .flatpickr-months .flatpickr-current-month,
+    .flatpickr-calendar .flatpickr-current-month {
+        min-width: 250px !important; /* Increased even more to ensure space */
+        width: auto !important; /* Allow it to expand as needed */
+        max-width: none !important; /* Remove any max-width restrictions */
+        flex-shrink: 0 !important; /* Prevent shrinking */
+        overflow: visible !important; /* Ensure text isn't clipped */
+    }
+
+    .flatpickr-calendar .flatpickr-months .flatpickr-current-month .cur-month,
+    .flatpickr-calendar .flatpickr-current-month .cur-month,
+    .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-calendar .cur-month {
+        min-width: 120px !important; /* Ensure enough space for "December" */
+        width: auto !important; /* Allow auto-sizing */
+        max-width: none !important; /* Remove restrictions */
+        white-space: nowrap !important; /* Never wrap text */
+        overflow: visible !important; /* Never clip text */
+        text-overflow: clip !important; /* Don't add ellipsis */
+        margin-right: 8px !important; /* Add more spacing */
+        flex-shrink: 0 !important; /* Prevent shrinking */
+        display: inline-block !important; /* Ensure proper display */
+    }
+
+    .flatpickr-calendar .flatpickr-months .flatpickr-current-month .cur-year,
+    .flatpickr-calendar .flatpickr-current-month .cur-year,
+    .flatpickr-calendar .cur-year,
+    .flatpickr-calendar .numInput.cur-year {
+        width: 50px !important; /* Fixed width for year */
+        min-width: 50px !important; /* Minimum width */
+        max-width: 50px !important; /* Maximum width */
+        margin-left: 4px !important; /* Add spacing */
+        flex-shrink: 0 !important; /* Prevent shrinking */
+    }
+
+    /* Ensure the header section has enough space */
+    .flatpickr-calendar .flatpickr-months {
+        padding: 0 3px !important; /* Reduce side padding to give more internal space */
+        min-height: 40px !important; /* Ensure adequate height */
+        width: 100% !important; /* Full width */
+        overflow: visible !important; /* Allow content to overflow if needed */
+    }
+
+    /* Reduce year dropdown button margin to save space */
+    .flatpickr-calendar .year-dropdown-btn {
+        margin-left: 1px !important; /* Minimal margin */
+        flex-shrink: 0 !important; /* Don't shrink */
+    }
+
     /* Custom year dropdown button */
     .year-dropdown-btn {
-        margin-left: 4px;
+        margin-left: 2px; /* Reduced from 4px to save space */
         padding: 2px 4px;
         background: none;
         border: none;
@@ -412,7 +470,10 @@
     /* Hide calendar content when year grid is shown */
     .flatpickr-calendar.year-mode .flatpickr-days,
     .flatpickr-calendar.year-mode .flatpickr-weekdays {
-        display: none;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        /* Keep display: block to preserve space */
     }
 
     /* Hide month navigation buttons in year mode */
@@ -422,17 +483,34 @@
         visibility: hidden !important;
     }
 
+    /* Force hide with maximum specificity - this will override any other styles */
+    .flatpickr-calendar.year-mode .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-calendar.year-mode .flatpickr-months .flatpickr-next-month,
+    .flatpickr-calendar.year-mode .flatpickr-prev-month,
+    .flatpickr-calendar.year-mode .flatpickr-next-month {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
     /* Maintain original calendar size in year mode */
     .flatpickr-calendar.year-mode {
-        min-height: 300px !important; /* Fixed smaller height */
-        height: 300px !important; /* Fixed height to prevent strange expansion */
-        width: 300px !important; /* Fixed square dimensions */
-        max-height: none !important; /* Allow natural expansion */
-        max-width: none !important; /* Allow natural expansion */
+        min-height: 400px !important; /* Ensure adequate height for year grid */
+        height: 400px !important; /* Fixed height for consistent display */
+        max-height: 400px !important; /* Force exact height */
+        width: 360px !important; /* Fixed square dimensions */
+        max-width: 360px !important; /* Force exact width */
         overflow: visible !important; /* Allow popup to float freely */
         position: absolute !important; /* Allow floating outside container */
         resize: none !important; /* Prevent any resizing */
         z-index: 9999 !important; /* Ensure it appears above everything */
+        box-sizing: border-box !important; /* Include padding in dimensions */
     }
 
     /* Remove auto-sizing override to allow natural floating */
@@ -450,9 +528,9 @@
         right: 15px !important; /* Margins */
         bottom: 15px !important; /* Bottom margin */
         width: calc(100% - 30px) !important; /* Fixed width calculation */
-        height: calc(100% - 75px) !important; /* Fixed height calculation */
-        max-width: 270px !important; /* Ensure containment */
-        max-height: 225px !important; /* Ensure containment */
+        height: 325px !important; /* Fixed height instead of percentage */
+        max-width: 330px !important; /* Ensure containment */
+        max-height: 325px !important; /* Match the fixed height */
         overflow-x: hidden !important; /* Prevent horizontal scrollbar */
         overflow-y: auto !important; /* Allow vertical scrolling only */
         box-sizing: border-box !important; /* Include padding in size calculation */
@@ -683,10 +761,7 @@
 {% block content %}
 <div class="profile-container">
     <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
+        <img src="{{ url_for('static', filename='images/user.png') }}" alt="User">
     </div>
     
     <h1 class="welcome-title" id="welcomeTitle"></h1>
@@ -707,9 +782,7 @@
             <div class="date-input-wrapper">
                 <input type="text" class="form-input date-input" id="dateOfBirth" value="{{ profile_data.date_of_birth or '' }}" readonly>
                 <button type="button" class="calendar-icon" id="calendarToggle">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
                 </button>
             </div>
             <div class="error-text" id="dateError"></div>
@@ -887,7 +960,7 @@ document.addEventListener('DOMContentLoaded', function() {
             allowInput: false,
             static: false, // Allow popup to float freely outside container
             showMonths: 1,
-            fixedHeight: true,
+            fixedHeight: false, // Disable to prevent interference with year mode height
             showOutsideDays: false,
             disableMobile: true, // Ensure our custom navigation works
             onChange: function(selectedDates, dateStr) {
