@@ -154,6 +154,22 @@ def signup_page():
         return redirect('/')
     return render_template('signup.html')
 
+@app.route('/members')
+def members():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('members.html', user=user, organization=organization)
+
 # API endpoints
 @app.route('/api/register', methods=['POST'])
 def register():

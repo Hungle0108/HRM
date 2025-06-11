@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Member - HRM{% endblock %}
+
+{% block content %}
+<style>
+    .main-content {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .add-member-btn {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .add-member-btn:hover {
+        background: #333;
+        transform: translateY(-1px);
+    }
+
+    .filters-section {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .search-input {
+        padding: 0.75rem 1rem;
+        padding-left: 2.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: white;
+        width: 280px;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #666;
+    }
+
+    .search-wrapper {
+        position: relative;
+    }
+
+    .search-wrapper .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-wrapper .search-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .filter-dropdown {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        font-size: 0.9rem;
+        color: #333;
+        cursor: pointer;
+        min-width: 140px;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    .filter-dropdown:focus {
+        outline: none;
+        border-color: #666;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-left: auto;
+    }
+
+    .action-btn {
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        font-size: 0.9rem;
+        color: #333;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .action-btn:hover {
+        background: #f5f5f5;
+    }
+
+    .view-toggle {
+        display: flex;
+        background: #f5f5f5;
+        border-radius: 8px;
+        padding: 0.25rem;
+    }
+
+    .view-btn {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        color: #666;
+        transition: all 0.2s;
+    }
+
+    .view-btn.active {
+        background: white;
+        color: #333;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filter-info {
+        background: #e8f4f8;
+        border: 1px solid #b3d9e8;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #2c5aa0;
+    }
+
+    .filter-info a {
+        color: #2c5aa0;
+        text-decoration: underline;
+        font-weight: 500;
+    }
+
+    .members-count {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    .members-table {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        display: grid;
+        grid-template-columns: 2.5fr 1fr 1.2fr 1fr 1fr 80px;
+        gap: 1rem;
+        align-items: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .member-row {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: grid;
+        grid-template-columns: 2.5fr 1fr 1.2fr 1fr 1fr 80px;
+        gap: 1rem;
+        align-items: center;
+        transition: background-color 0.2s;
+    }
+
+    .member-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .member-row:last-child {
+        border-bottom: none;
+    }
+
+    .member-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f0f2f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #666;
+        font-size: 0.9rem;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .member-details h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+        line-height: 1.2;
+    }
+
+    .member-details p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.85rem;
+        color: #666;
+        line-height: 1.2;
+    }
+
+    .country-flag {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .flag-icon {
+        width: 20px;
+        height: 14px;
+        border-radius: 2px;
+        background: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        flex-shrink: 0;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+    }
+
+    .status-draft {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    .status-active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .more-actions {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+    }
+
+    .more-actions:hover {
+        background: #f0f0f0;
+    }
+
+    .vietnam-flag {
+        background: linear-gradient(to bottom, #ff0000 50%, #ffff00 50%);
+        position: relative;
+    }
+
+    .vietnam-flag::after {
+        content: "⭐";
+        color: #ffff00;
+        font-size: 0.6rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-shadow: 0 0 1px #ff0000;
+    }
+
+    .info-icon {
+        color: #2c5aa0;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .filters-section {
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons {
+            margin-left: 0;
+            margin-top: 0.75rem;
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>
+
+<div class="main-content">
+    <div class="page-header">
+        <h1 class="page-title">Member</h1>
+        <button class="add-member-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Add people
+        </button>
+    </div>
+
+    <div class="filters-section">
+        <div class="search-wrapper">
+            <div class="search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+            </div>
+            <input type="text" class="search-input" placeholder="Search by worker ID">
+        </div>
+        
+        <select class="filter-dropdown">
+            <option>Worker status ⚠️</option>
+            <option>Active</option>
+            <option>Draft</option>
+            <option>Inactive</option>
+        </select>
+        
+        <select class="filter-dropdown">
+            <option>Worker type</option>
+            <option>Employee</option>
+            <option>Contractor</option>
+        </select>
+        
+        <select class="filter-dropdown">
+            <option>Job title</option>
+            <option>Software Engineer</option>
+            <option>Manager</option>
+        </select>
+        
+        <div class="action-buttons">
+            <button class="action-btn">View as report</button>
+            <button class="action-btn">Configure columns</button>
+            <button class="more-actions">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="12" cy="5" r="1"/>
+                    <circle cx="12" cy="19" r="1"/>
+                </svg>
+            </button>
+            <div class="view-toggle">
+                <button class="view-btn active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M3 12h18M3 18h18"/>
+                    </svg>
+                </button>
+                <button class="view-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-info">
+        <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        <span>You selected one or several groups</span>
+        <span style="margin-left: 0.5rem;">You can only see the workers from the group selected in the top navigation. <a href="#">Change selection</a></span>
+    </div>
+
+    <div class="members-count">Total 1 person</div>
+
+    <div class="members-table">
+        <div class="table-header">
+            <div>Person</div>
+            <div>Country</div>
+            <div>Worker type</div>
+            <div>Worker status</div>
+            <div>Start date</div>
+            <div></div>
+        </div>
+        
+        <div class="member-row">
+            <div class="member-info">
+                <div class="member-avatar">UE</div>
+                <div class="member-details">
+                    <h4>Unassigned Employee</h4>
+                    <p>C++ Software Engineer</p>
+                </div>
+            </div>
+            <div class="country-flag">
+                <div class="flag-icon vietnam-flag"></div>
+                Vietnam
+            </div>
+            <div>EOR employee</div>
+            <div>
+                <span class="status-badge status-draft">DRAFT</span>
+            </div>
+            <div>Jun 13th 2025</div>
+            <div>
+                <button class="more-actions">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="12" cy="5" r="1"/>
+                        <circle cx="12" cy="19" r="1"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
