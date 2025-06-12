@@ -326,6 +326,12 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully', 'redirect': '/login'}), 200
 
+@app.route('/logout', methods=['GET'])
+def logout_get():
+    # Clear the session
+    session.clear()
+    return redirect('/login')
+
 @app.route('/api/check-login', methods=['GET'])
 def check_login():
     if 'user_id' not in session:

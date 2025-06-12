@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Account - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: #fff;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .required::after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 4px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        /* Steps sidebar */
+        .steps {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .steps-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .steps-list {
+            list-style: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            color: #666;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .step-item.active {
+            color: #333;
+        }
+
+        .step-item.active .step-number {
+            background: #333;
+            color: #fff;
+        }
+
+        .help-support {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .help-support:hover {
+            background: #e9ecef;
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #eee;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            color: #333;
+        }
+
+        .btn-continue {
+            background: #333;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-continue:hover {
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main>
+            <h1>Add account</h1>
+            <p class="subtitle">Add an available account of your new employee</p>
+
+            <form id="employeeForm">
+                <section>
+                    <h2 class="section-title">Team information</h2>
+                    <div class="form-group">
+                        <label class="form-label required">Group</label>
+                        <select class="form-select" required>
+                            <option value="">Select a group</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="sales">Sales</option>
+                            <option value="hr">Human Resources</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="section-title">Employee personal details</h2>
+                    <div class="form-group">
+                        <label class="form-label required">Personal email</label>
+                        <input type="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Legal first name</label>
+                        <input type="text" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Legal last name</label>
+                        <input type="text" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Work email address (optional)</label>
+                        <input type="email" class="form-input">
+                    </div>
+                </section>
+            </form>
+        </main>
+
+        <aside>
+            <div class="steps">
+                <h3 class="steps-title">Steps</h3>
+                <ol class="steps-list">
+                    <li class="step-item active">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Personal details</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Job details</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Compensation and dates</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Compliance</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Benefits and extras</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Review</div>
+                    </li>
+                </ol>
+
+                <div class="help-support">
+                    Help and support
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="navigation">
+        <button type="button" class="btn btn-back" onclick="window.location.href='/add-people'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back
+        </button>
+        <button type="submit" class="btn btn-continue" form="employeeForm">Continue</button>
+    </div>
+
+    <script>
+        document.getElementById('employeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (this.checkValidity()) {
+                // Proceed to next step
+                alert('Form submitted! This would proceed to step 2.');
+                // window.location.href = '/add-contractor/step-2';
+            } else {
+                // Trigger browser's default validation UI
+                this.reportValidity();
+            }
+        });
+    </script>
+</body>
+</html> 
