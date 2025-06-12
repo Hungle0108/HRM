@@ -170,6 +170,30 @@ def members():
     
     return render_template('members.html', user=user, organization=organization)
 
+@app.route('/add-people')
+def add_people():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('add_people.html', user=user)
+
+@app.route('/add-employee')
+def add_employee():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('add_employee.html', user=user)
+
 # API endpoints
 @app.route('/api/register', methods=['POST'])
 def register():

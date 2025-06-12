@@ -3,6 +3,7 @@
 {% block title %}Edit Personal Details - HR Management System{% endblock %}
 
 {% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
 <style>
     .edit-details-container {
         display: grid;
@@ -140,6 +141,405 @@
         box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     }
 
+    /* Date input wrapper and calendar icon styles */
+    .date-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .date-input {
+        padding-right: 50px !important;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .date-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .calendar-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        transition: all 0.2s;
+        z-index: 1;
+    }
+
+    .calendar-icon:hover {
+        opacity: 0.8;
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    .calendar-icon img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+        transition: all 0.2s;
+    }
+
+    /* Custom Flatpickr Styles */
+    .flatpickr-calendar {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        width: 360px !important;
+        padding: 20px;
+        border: none !important;
+    }
+
+    .flatpickr-months {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        padding: 0 5px;
+        position: relative;
+    }
+
+    .flatpickr-month {
+        display: flex;
+        align-items: center;
+        width: auto;
+    }
+
+    .flatpickr-current-month {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        min-width: 250px !important;
+        width: auto !important;
+        max-width: none !important;
+        flex-shrink: 0 !important;
+        overflow: visible !important;
+        justify-content: flex-start;
+        order: 1;
+    }
+
+    /* HIGHEST SPECIFICITY OVERRIDES FOR MONTH DISPLAY */
+    .flatpickr-calendar .flatpickr-months .flatpickr-current-month,
+    .flatpickr-calendar .flatpickr-current-month {
+        min-width: 250px !important; /* Increased even more to ensure space */
+        width: auto !important; /* Allow it to expand as needed */
+        max-width: none !important; /* Remove any max-width restrictions */
+        flex-shrink: 0 !important; /* Prevent shrinking */
+        overflow: visible !important; /* Ensure text isn't clipped */
+    }
+
+    .flatpickr-calendar .flatpickr-months .flatpickr-current-month .cur-month,
+    .flatpickr-calendar .flatpickr-current-month .cur-month,
+    .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-calendar .cur-month {
+        min-width: 120px !important; /* Ensure enough space for "December" */
+        width: auto !important; /* Allow auto-sizing */
+        max-width: none !important; /* Remove restrictions */
+        white-space: nowrap !important; /* Never wrap text */
+        overflow: visible !important; /* Never clip text */
+        text-overflow: clip !important; /* Don't add ellipsis */
+        margin-right: 8px !important; /* Add more spacing */
+        flex-shrink: 0 !important; /* Prevent shrinking */
+        display: inline-block !important; /* Ensure proper display */
+    }
+
+    .flatpickr-calendar .flatpickr-months .flatpickr-current-month .cur-year,
+    .flatpickr-calendar .flatpickr-current-month .cur-year,
+    .flatpickr-calendar .cur-year,
+    .flatpickr-calendar .numInput.cur-year {
+        width: 50px !important; /* Fixed width for year */
+        min-width: 50px !important; /* Minimum width */
+        max-width: 50px !important; /* Maximum width */
+        margin-left: 4px !important; /* Add spacing */
+        flex-shrink: 0 !important; /* Prevent shrinking */
+    }
+
+    /* Ensure the header section has enough space */
+    .flatpickr-calendar .flatpickr-months {
+        padding: 0 3px !important; /* Reduce side padding to give more internal space */
+        min-height: 40px !important; /* Ensure adequate height */
+        width: 100% !important; /* Full width */
+        overflow: visible !important; /* Allow content to overflow if needed */
+    }
+
+    /* Reduce year dropdown button margin to save space */
+    .flatpickr-calendar .year-dropdown-btn {
+        margin-left: 1px !important; /* Minimal margin */
+        flex-shrink: 0 !important; /* Don't shrink */
+    }
+
+    /* Navigation buttons positioning and styling */
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+        position: static;
+        height: 32px;
+        width: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 8px;
+        order: 2;
+    }
+
+    .flatpickr-months .flatpickr-prev-month svg,
+    .flatpickr-months .flatpickr-next-month svg {
+        width: 20px;
+        height: 20px;
+        fill: none !important;
+        stroke: #000;
+        stroke-width: 2;
+    }
+
+    .cur-month {
+        min-width: 120px !important;
+        width: auto !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+        margin-right: 8px !important;
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .cur-year {
+        width: 50px !important;
+        margin-left: 4px !important;
+        pointer-events: none;
+        cursor: default;
+        text-align: left;
+    }
+
+    .year-dropdown-btn {
+        margin-left: 2px;
+        padding: 2px 4px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+        font-size: 12px;
+        color: #666;
+        transition: background-color 0.2s;
+    }
+
+    .year-dropdown-btn:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .year-dropdown-btn.active {
+        background-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .year-grid {
+        position: absolute;
+        top: 60px !important;
+        left: 15px !important;
+        right: 15px !important;
+        bottom: 15px !important;
+        background: white;
+        z-index: 1000;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: none;
+        box-sizing: border-box;
+    }
+
+    .year-grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .year-option {
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        background: #f8f9fa;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        box-sizing: border-box;
+        min-width: 0;
+    }
+
+    .year-option:hover {
+        background-color: #e9ecef;
+        border-color: #d1d5db;
+        transform: translateY(-1px);
+    }
+
+    .year-option.selected {
+        background-color: #000;
+        color: white;
+        border-color: #000;
+    }
+
+    .flatpickr-calendar.year-mode .flatpickr-days,
+    .flatpickr-calendar.year-mode .flatpickr-weekdays {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    .flatpickr-calendar.year-mode .flatpickr-prev-month,
+    .flatpickr-calendar.year-mode .flatpickr-next-month {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Force hide with maximum specificity - this will override any other styles */
+    .flatpickr-calendar.year-mode .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-calendar.year-mode .flatpickr-months .flatpickr-next-month,
+    .flatpickr-calendar.year-mode .flatpickr-prev-month,
+    .flatpickr-calendar.year-mode .flatpickr-next-month {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .flatpickr-calendar.year-mode {
+        min-height: 400px !important;
+        height: 400px !important;
+        max-height: 400px !important;
+        width: 360px !important;
+        max-width: 360px !important;
+    }
+
+    .flatpickr-calendar.year-mode .year-grid {
+        display: block !important;
+    }
+
+    .flatpickr-weekdays {
+        margin: 0 0 15px 0;
+        padding: 15px 0 0 0;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        border-top: 1px solid #eee;
+    }
+
+    .flatpickr-weekdaycontainer {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 2px;
+    }
+
+    .flatpickr-weekday {
+        font-size: 14px;
+        font-weight: 500;
+        color: #000;
+        opacity: 0.7;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 0;
+        margin: 0;
+        min-width: 40px;
+    }
+
+    .flatpickr-day {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+        border-radius: 50%;
+        margin: 2px 0;
+        color: #000;
+        opacity: 0.7;
+        border: none;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        flex: 0 0 40px;
+    }
+
+    .flatpickr-day:hover {
+        background: #e2e2e2;
+        opacity: 1;
+    }
+
+    .flatpickr-day.selected {
+        background: #000;
+        color: #fff;
+        opacity: 1;
+    }
+
+    .flatpickr-day.prevMonthDay,
+    .flatpickr-day.nextMonthDay {
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month.disabled,
+    .flatpickr-calendar .flatpickr-prev-month.disabled {
+        opacity: 0.3 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+        filter: grayscale(100%) !important;
+        /* Keep the button visible but clearly disabled */
+        display: flex !important;
+        visibility: visible !important;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month.disabled:hover,
+    .flatpickr-calendar .flatpickr-prev-month.disabled:hover {
+        background: transparent !important;
+        opacity: 0.3 !important;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month.disabled svg,
+    .flatpickr-calendar .flatpickr-prev-month.disabled svg {
+        color: #ccc !important;
+        opacity: 0.5 !important;
+    }
+
+    /* Remove the overlay styling since we want the button to remain visible */
+    .flatpickr-calendar .flatpickr-next-month.disabled::after,
+    .flatpickr-calendar .flatpickr-prev-month.disabled::after {
+        display: none !important;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month:not(.disabled),
+    .flatpickr-calendar .flatpickr-prev-month:not(.disabled) {
+        opacity: 1 !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        filter: none !important;
+    }
+
+    .flatpickr-calendar .flatpickr-next-month:not(.disabled):hover,
+    .flatpickr-calendar .flatpickr-prev-month:not(.disabled):hover {
+        background: rgba(0, 0, 0, 0.1) !important;
+    }
+
     .form-actions {
         display: flex;
         justify-content: flex-end;
@@ -232,6 +632,45 @@
     .avatar-actions-container {
         margin-top: 1rem;
     }
+
+    /* Hide any remaining toggle indicators */
+    .numInputWrapper::after,
+    .flatpickr-current-month .cur-month::after,
+    .flatpickr-current-month .flatpickr-monthDropdown-months::after,
+    .flatpickr-current-month select::after,
+    .flatpickr-current-month select::-ms-expand {
+        display: none !important;
+    }
+
+    .flatpickr-current-month select,
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .numInput.cur-year {
+        background: transparent !important;
+        border: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        pointer-events: none !important;
+        cursor: default !important;
+        padding: 0;
+        width: 60px !important;
+        text-align: left !important;
+        font-variant-numeric: tabular-nums !important;
+        letter-spacing: 0 !important;
+        margin: 0 !important;
+        display: inline-block !important;
+    }
+
+    /* Hide default year navigation arrows */
+    .flatpickr-current-month .numInputWrapper::after,
+    .flatpickr-current-month .numInputWrapper::before {
+        display: none !important;
+    }
+
+    .flatpickr-current-month .arrowUp,
+    .flatpickr-current-month .arrowDown {
+        display: none !important;
+    }
 </style>
 {% endblock %}
 
@@ -259,7 +698,12 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Date of birth (DD/MM/YYYY)</label>
-                    <input type="date" class="form-input" id="dateOfBirth" value="{{ user.date_of_birth }}">
+                    <div class="date-input-wrapper">
+                        <input type="text" class="form-input date-input" id="dateOfBirth" value="{{ user.date_of_birth or '' }}" readonly>
+                        <button type="button" class="calendar-icon" id="calendarToggle">
+                            <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -415,6 +859,233 @@ function setupDropdown(inputId, dropdownId) {
 setupDropdown('citizenship', 'citizenshipDropdown');
 setupDropdown('taxResidence', 'taxResidenceDropdown');
 
+// Initialize date picker with calendar icon
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('dateOfBirth');
+    const calendarToggle = document.getElementById('calendarToggle');
+
+    if (dateInput && calendarToggle) {
+        const fp = flatpickr(dateInput, {
+            dateFormat: "Y-m-d",
+            maxDate: new Date(),
+            minDate: "1900-01-01",
+            defaultDate: dateInput.value || null,
+            clickOpens: false,
+            allowInput: false,
+            static: false,
+            showMonths: 1,
+            disableMobile: true,
+            onMonthChange: function(selectedDates, dateStr, instance) {
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance);
+                }, 10);
+            },
+            onYearChange: function(selectedDates, dateStr, instance) {
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance);
+                }, 10);
+            },
+            onOpen: function(selectedDates, dateStr, instance) {
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance);
+                }, 10);
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+                setTimeout(() => {
+                    checkAndDisableNavigation(instance);
+                    setupYearDropdown(instance);
+                }, 10);
+            }
+        });
+
+        // Function to check and disable future navigation
+        function checkAndDisableNavigation(instance) {
+            if (!instance || !instance.calendarContainer) return;
+            
+            const calendar = instance.calendarContainer;
+            const nextButton = calendar.querySelector('.flatpickr-next-month');
+            const prevButton = calendar.querySelector('.flatpickr-prev-month');
+            
+            if (nextButton && prevButton) {
+                const currentMonth = instance.currentMonth;
+                const currentYear = instance.currentYear;
+                const today = new Date();
+                const nextMonth = new Date(currentYear, currentMonth + 1, 1);
+                const prevMonth = new Date(currentYear, currentMonth - 1, 1);
+                
+                if (nextMonth > today) {
+                    nextButton.classList.add('disabled');
+                    nextButton.style.opacity = '0.3';
+                    nextButton.style.cursor = 'not-allowed';
+                    nextButton.style.pointerEvents = 'none';
+                } else {
+                    nextButton.classList.remove('disabled');
+                    nextButton.style.opacity = '1';
+                    nextButton.style.cursor = 'pointer';
+                    nextButton.style.pointerEvents = 'auto';
+                }
+                
+                const minDate = new Date(1900, 0, 1);
+                if (prevMonth < minDate) {
+                    prevButton.classList.add('disabled');
+                    prevButton.style.opacity = '0.3';
+                    prevButton.style.cursor = 'not-allowed';
+                    prevButton.style.pointerEvents = 'none';
+                } else {
+                    prevButton.classList.remove('disabled');
+                    prevButton.style.opacity = '1';
+                    prevButton.style.cursor = 'pointer';
+                    prevButton.style.pointerEvents = 'auto';
+                }
+            }
+        }
+
+        // Function to setup year dropdown functionality
+        function setupYearDropdown(instance) {
+            if (!instance || !instance.calendarContainer) return;
+            
+            const calendar = instance.calendarContainer;
+            const currentMonthContainer = calendar.querySelector('.flatpickr-current-month');
+            
+            if (!currentMonthContainer) return;
+            
+            const existingDropdownBtn = currentMonthContainer.querySelector('.year-dropdown-btn');
+            const existingYearGrid = calendar.querySelector('.year-grid');
+            if (existingDropdownBtn) existingDropdownBtn.remove();
+            if (existingYearGrid) existingYearGrid.remove();
+            
+            const yearDropdownBtn = document.createElement('button');
+            yearDropdownBtn.className = 'year-dropdown-btn';
+            yearDropdownBtn.innerHTML = '▼';
+            yearDropdownBtn.type = 'button';
+            
+            const yearGrid = document.createElement('div');
+            yearGrid.className = 'year-grid';
+            
+            const yearGridContainer = document.createElement('div');
+            yearGridContainer.className = 'year-grid-container';
+            
+            const currentYear = instance.currentYear;
+            const maxYear = new Date().getFullYear();
+            const minYear = 1900;
+            
+            for (let year = maxYear; year >= minYear; year--) {
+                const yearOption = document.createElement('div');
+                yearOption.className = 'year-option';
+                yearOption.textContent = year;
+                
+                if (year === currentYear) {
+                    yearOption.classList.add('selected');
+                }
+                
+                yearOption.addEventListener('click', () => {
+                    instance.changeYear(year);
+                    calendar.classList.remove('year-mode');
+                    yearDropdownBtn.classList.remove('active');
+                    yearDropdownBtn.innerHTML = '▼';
+                });
+                
+                yearGridContainer.appendChild(yearOption);
+            }
+            
+            yearGrid.appendChild(yearGridContainer);
+            
+            yearDropdownBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isYearMode = calendar.classList.contains('year-mode');
+                
+                if (isYearMode) {
+                    calendar.classList.remove('year-mode');
+                    yearDropdownBtn.classList.remove('active');
+                    yearDropdownBtn.innerHTML = '▼';
+                } else {
+                    calendar.classList.add('year-mode');
+                    yearDropdownBtn.classList.add('active');
+                    yearDropdownBtn.innerHTML = '▲';
+                    
+                    const yearOptions = yearGrid.querySelectorAll('.year-option');
+                    yearOptions.forEach(option => {
+                        option.classList.remove('selected');
+                        if (parseInt(option.textContent) === instance.currentYear) {
+                            option.classList.add('selected');
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        const selectedOption = yearGrid.querySelector('.year-option.selected');
+                        if (selectedOption) {
+                            selectedOption.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                        }
+                    }, 10);
+                }
+            });
+            
+            currentMonthContainer.appendChild(yearDropdownBtn);
+            calendar.appendChild(yearGrid);
+        }
+
+        // Override the default click handlers to respect our disabled state
+        const originalNextMonth = fp.nextMonth;
+        const originalPrevMonth = fp.prevMonth;
+        
+        fp.nextMonth = function() {
+            if (!fp.calendarContainer) return;
+            
+            const calendar = fp.calendarContainer;
+            const nextButton = calendar.querySelector('.flatpickr-next-month');
+            
+            if (nextButton && !nextButton.classList.contains('disabled')) {
+                originalNextMonth.call(fp);
+                setTimeout(() => {
+                    checkAndDisableNavigation(fp);
+                    setupYearDropdown(fp);
+                }, 10);
+            }
+        };
+        
+        fp.prevMonth = function() {
+            if (!fp.calendarContainer) return;
+            
+            const calendar = fp.calendarContainer;
+            const prevButton = calendar.querySelector('.flatpickr-prev-month');
+            
+            if (prevButton && !prevButton.classList.contains('disabled')) {
+                originalPrevMonth.call(fp);
+                setTimeout(() => {
+                    checkAndDisableNavigation(fp);
+                    setupYearDropdown(fp);
+                }, 10);
+            }
+        };
+
+        // Calendar icon click handler
+        calendarToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fp.toggle();
+        });
+
+        // Initial setup
+        setTimeout(() => {
+            checkAndDisableNavigation(fp);
+            setupYearDropdown(fp);
+        }, 50);
+    }
+
+    // Clear any stored avatar URL if user has no avatar
+    if (!('{{ user.avatar_url }}')) {
+        localStorage.removeItem('userAvatarUrl');
+        if (typeof updateAvatarDisplay === 'function') {
+            updateAvatarDisplay(null);
+        }
+    }
+});
+
 document.getElementById('personalDetailsForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -529,15 +1200,6 @@ async function removePhoto() {
         alert('An error occurred while removing the photo');
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Clear any stored avatar URL if user has no avatar
-    if (!('{{ user.avatar_url }}')) {
-        localStorage.removeItem('userAvatarUrl');
-        if (typeof updateAvatarDisplay === 'function') {
-            updateAvatarDisplay(null);
-        }
-    }
-});
 </script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 {% endblock %} 
