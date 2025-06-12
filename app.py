@@ -194,6 +194,18 @@ def add_employee():
     
     return render_template('add_employee.html', user=user)
 
+@app.route('/add-contractor')
+def add_contractor():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('add_contractor.html', user=user)
+
 # API endpoints
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -606,6 +618,10 @@ def inject_organization():
             organization = Organization.query.get(user.organization_id)
             return {'organization': organization}
     return {'organization': None}
+
+@app.route('/profile')
+def profile():
+    return redirect('/profile/settings')
 
 @app.route('/profile/settings')
 def profile_settings():
@@ -1039,6 +1055,18 @@ def reset_password(token):
     except Exception as e:
         logger.error(f"Error in reset_password: {str(e)}")
         return jsonify({'error': 'Invalid reset link format'}), 400
+
+@app.route('/language-settings')
+def language_settings():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('language_settings.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():
