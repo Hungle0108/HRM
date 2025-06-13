@@ -32,6 +32,11 @@
             justify-content: flex-start;
             align-items: center;
             padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
         .top-bar-content {
@@ -70,6 +75,7 @@
             display: flex;
             justify-content: flex-start;
             padding-left: calc(50% - 470px);
+            margin-top: 80px;
         }
 
         .page-header-content {
@@ -97,7 +103,7 @@
             background: white;
             justify-content: center;
             align-items: flex-start;
-            padding: 20px 40px 40px 40px;
+            padding: 20px 40px 120px 40px;
             gap: 60px;
         }
 
@@ -281,6 +287,11 @@
             justify-content: flex-start;
             align-items: center;
             padding-left: calc(50% - 460px);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
         .bottom-nav-content {
@@ -306,6 +317,16 @@
 
         .btn-back:hover {
             color: #495057;
+        }
+
+        .btn-back.disabled {
+            color: #d6d8db;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn-back.disabled:hover {
+            color: #d6d8db;
         }
 
         .btn-continue {
@@ -375,6 +396,52 @@
             .form-group.full-width {
                 grid-column: span 1;
             }
+        }
+
+        .dropdown-wrapper {
+            position: relative;
+            width: 100%;
+            display: block;
+        }
+        .dropdown-wrapper .form-input {
+            width: 100% !important;
+            min-width: 0;
+            box-sizing: border-box;
+            display: block;
+        }
+        #employeeCitizenshipInput,
+        #employeeResidenceInput {
+            width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            display: block !important;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: #1f2937;
+        }
+        .dropdown-item:hover {
+            background: #f3f4f6;
         }
     </style>
 </head>
@@ -465,6 +532,27 @@
                                 <input type="email" class="form-input">
                             </div>
                         </div>
+
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Employee's citizenship (optional)</label>
+                                <div class="dropdown-wrapper">
+                                    <input type="text" class="form-input" id="employeeCitizenshipInput" autocomplete="off">
+                                    <div class="dropdown-menu" id="employeeCitizenshipDropdown"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label required">Country of residence</label>
+                                <div class="dropdown-wrapper">
+                                    <input type="text" class="form-input" id="employeeResidenceInput" autocomplete="off" required>
+                                    <div class="dropdown-menu" id="employeeResidenceDropdown"></div>
+                                </div>
+                                <small style="color: #6c757d;">Country the employee will be working from</small>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -514,7 +602,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <button type="button" class="btn-back" onclick="window.location.href='/add-people'">
+                <button type="button" class="btn-back disabled" id="backButton" onclick="goToPreviousStep()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -528,7 +616,110 @@
     <script>
     // Track which fields have been interacted with
     const interactedFields = new Set();
+    
+    // Track current step (1 = Personal details, 2 = Job details, etc.)
+    let currentStep = 1;
+    const totalSteps = 6;
 
+    // Function to save form data to sessionStorage
+    function saveFormData() {
+        const formData = {
+            group: document.querySelector('select[class="form-select"]').value,
+            personalEmail: document.querySelector('input[type="email"]').value,
+            firstName: document.querySelectorAll('input[type="text"]')[0].value,
+            lastName: document.querySelectorAll('input[type="text"]')[1].value,
+            workEmail: document.querySelectorAll('input[type="email"]')[1].value,
+            citizenship: document.getElementById('employeeCitizenshipInput').value,
+            residence: document.getElementById('employeeResidenceInput').value
+        };
+        sessionStorage.setItem('employeeFormStep1', JSON.stringify(formData));
+        
+        // Show auto-save indicator (if you want to add visual feedback)
+        console.log('Form data auto-saved');
+    }
+
+    // Function to restore form data from sessionStorage
+    function restoreFormData() {
+        const savedData = sessionStorage.getItem('employeeFormStep1');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            
+            // Restore form values
+            if (formData.group) document.querySelector('select[class="form-select"]').value = formData.group;
+            if (formData.personalEmail) document.querySelector('input[type="email"]').value = formData.personalEmail;
+            if (formData.firstName) document.querySelectorAll('input[type="text"]')[0].value = formData.firstName;
+            if (formData.lastName) document.querySelectorAll('input[type="text"]')[1].value = formData.lastName;
+            if (formData.workEmail) document.querySelectorAll('input[type="email"]')[1].value = formData.workEmail;
+            if (formData.citizenship) document.getElementById('employeeCitizenshipInput').value = formData.citizenship;
+            if (formData.residence) document.getElementById('employeeResidenceInput').value = formData.residence;
+        }
+    }
+
+    // Function to clear all form data from sessionStorage
+    function clearAllFormData() {
+        sessionStorage.removeItem('employeeFormStep1');
+        sessionStorage.removeItem('employeeFormStep2');
+        sessionStorage.removeItem('employeeFormStep3');
+        // Add more steps as they are created
+        console.log('All form data cleared');
+    }
+
+    // Function to update back button state
+    function updateBackButtonState() {
+        const backButton = document.getElementById('backButton');
+        if (currentStep === 1) {
+            backButton.classList.add('disabled');
+            backButton.disabled = true;
+        } else {
+            backButton.classList.remove('disabled');
+            backButton.disabled = false;
+        }
+    }
+
+    // Function to go to previous step
+    function goToPreviousStep() {
+        if (currentStep > 1) {
+            // Save current form data before navigating
+            saveFormData();
+            // Here you would implement the logic to go to the previous step
+            // For now, we'll just update the step counter
+            currentStep--;
+            updateBackButtonState();
+            console.log('Going to step:', currentStep);
+            // You can add actual navigation logic here
+            // Example: window.location.href = '/add-employee/step-' + currentStep;
+        }
+    }
+
+    // Initialize back button state and restore form data
+    updateBackButtonState();
+    restoreFormData();
+
+    // Save form data whenever inputs change (with debouncing to avoid excessive saves)
+    let saveTimeout;
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('input, select')) {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveFormData, 300); // Save after 300ms of no input
+        }
+    });
+
+    // Also save immediately on change for select elements
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('select')) {
+            saveFormData();
+        }
+    });
+
+    // Clear form data when user closes the form
+    window.addEventListener('beforeunload', function(e) {
+        // Only clear if user is navigating away from the form process
+        if (!window.location.href.includes('/add-employee')) {
+            clearAllFormData();
+        }
+    });
+
+    // Form submission
     document.getElementById('employee-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -546,14 +737,20 @@
         });
         
         if (isValid) {
+            // Save form data before proceeding
+            saveFormData();
             // Proceed to next step
-            alert('Form submitted! This would proceed to step 2.');
-            // window.location.href = '/add-employee/step-2';
+            window.location.href = '/add-employee-step2';
         }
     });
 
     // Add hover and blur event listeners to required fields
     document.querySelectorAll('[required]').forEach(input => {
+        // Skip dropdown inputs - they should only show errors on form submission
+        if (input.id === 'employeeCitizenshipInput' || input.id === 'employeeResidenceInput') {
+            return;
+        }
+        
         let hasBeenHovered = false;
 
         input.addEventListener('mouseenter', function() {
@@ -593,6 +790,79 @@
             errorMsg.style.display = 'none';
         }
     }
+
+    const countries = [
+      'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
+      'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi',
+      'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic',
+      'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic',
+      'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia',
+      'Fiji', 'Finland', 'France',
+      'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana',
+      'Haiti', 'Honduras', 'Hungary',
+      'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Ivory Coast',
+      'Jamaica', 'Japan', 'Jordan',
+      'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan',
+      'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg',
+      'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar',
+      'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia', 'Norway',
+      'Oman',
+      'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal',
+      'Qatar',
+      'Romania', 'Russia', 'Rwanda',
+      'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria',
+      'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu',
+      'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan',
+      'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam',
+      'Yemen',
+      'Zambia', 'Zimbabwe'
+    ];
+    function setupCountryDropdown(inputId, dropdownId) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      function filterCountries(searchText) {
+        return countries.filter(country =>
+          country.toLowerCase().includes(searchText.toLowerCase())
+        );
+      }
+      function updateDropdown(filteredCountries) {
+        dropdown.innerHTML = '';
+        if (filteredCountries.length > 0) {
+          filteredCountries.forEach(country => {
+            const div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = country;
+            div.addEventListener('click', () => {
+              input.value = country;
+              dropdown.classList.remove('show');
+            });
+            dropdown.appendChild(div);
+          });
+          dropdown.classList.add('show');
+        } else {
+          dropdown.classList.remove('show');
+        }
+      }
+      input.addEventListener('input', (e) => {
+        const searchText = e.target.value;
+        const filteredCountries = filterCountries(searchText);
+        updateDropdown(filteredCountries);
+      });
+      input.addEventListener('focus', () => {
+        if (input.value) {
+          updateDropdown(filterCountries(input.value));
+        } else {
+          updateDropdown(countries);
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+    setupCountryDropdown('employeeCitizenshipInput', 'employeeCitizenshipDropdown');
+    setupCountryDropdown('employeeResidenceInput', 'employeeResidenceDropdown');
     </script>
 </body>
 </html> 
