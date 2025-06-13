@@ -320,9 +320,8 @@
             border-top: 1px solid #e9ecef;
             padding: 24px 40px;
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
-            padding-left: calc(50% - 460px);
             position: fixed;
             bottom: 0;
             left: 0;
@@ -331,7 +330,6 @@
         }
 
         .bottom-nav-content {
-            max-width: 930px;
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -430,7 +428,7 @@
                     <div class="saved-icon">✓</div>
                     SAVED
                 </div>
-                <button class="close-btn" onclick="window.location.href='/add-people'">&times;</button>
+                <!-- Close button removed -->
             </div>
         </div>
 
@@ -604,12 +602,10 @@
 
     // Function to go to previous step
     function goToPreviousStep() {
-        if (currentStep > 1) {
-            // Save current form data before navigating
-            saveFormData();
-            // Navigate back to step 1
-            window.location.href = '/add-employee';
-        }
+        // Save current form data before navigating
+        saveFormData();
+        // Navigate back to step 1
+        window.location.href = '/add-employee';
     }
 
     // Function to toggle help section
