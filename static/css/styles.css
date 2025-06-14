@@ -1,0 +1,302 @@
+/* Dropdown styles */
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    min-width: 280px;
+    max-width: 380px;
+    z-index: 1000;
+    padding: 8px 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    max-height: 600px;
+}
+
+.dropdown-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 8px;
+    background: #fafafa;
+}
+
+.dropdown-header-name {
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+    line-height: 1.3;
+}
+
+.dropdown-header-email {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #374151;
+    text-decoration: none;
+    gap: 14px;
+    position: relative;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin: 0 8px;
+    border-radius: 8px;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+.dropdown-item svg {
+    width: 20px;
+    height: 20px;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.dropdown-item:hover svg {
+    color: #374151;
+}
+
+.dropdown-item span {
+    flex-grow: 1;
+}
+
+.dropdown-item .chevron-right {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    right: 16px;
+    color: #9ca3af;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #f0f0f0;
+    margin: 8px 0;
+}
+
+/* Slide transition */
+.slide-container {
+    position: fixed;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    display: flex;
+    width: 240px !important;
+}
+
+.slide-container .dropdown-content {
+    position: relative;
+    top: 0;
+    left: 0;
+    box-shadow: none;
+    width: 100%;
+    min-width: 240px;
+    padding: 0;
+}
+
+.slide-container .language-settings {
+    width: 100%;
+    min-width: 240px;
+    background: white;
+    flex-shrink: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    padding: 0;
+}
+
+.slide-container .language-settings .container {
+    padding: 0;
+    max-width: none;
+}
+
+.slide-container .header {
+    padding: 12px 16px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.slide-container .back-button {
+    padding: 0;
+    margin-right: 12px;
+}
+
+.slide-container .page-title {
+    font-size: 0.9375rem;
+}
+
+.slide-container .info-box {
+    margin: 16px;
+    padding: 12px;
+    border-radius: 6px;
+    background: #f8f0ff;
+}
+
+.slide-container .info-title {
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+
+.slide-container .info-text {
+    font-size: 0.8125rem;
+    margin-bottom: 12px;
+}
+
+.slide-container .feedback-button {
+    font-size: 0.8125rem;
+    padding: 6px 12px;
+}
+
+.slide-container .settings-group {
+    margin: 16px;
+}
+
+.slide-container .settings-label {
+    font-size: 0.8125rem;
+    margin-bottom: 4px;
+}
+
+.slide-container .settings-select {
+    font-size: 0.875rem;
+    padding: 8px 12px;
+}
+
+.slide-container.slide-left .dropdown-content {
+    transform: translateX(-100%);
+}
+
+.slide-container.slide-left .language-settings {
+    transform: translateX(0);
+}
+
+/* Animation for page transition */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.language-settings {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Language settings view in dropdown */
+.language-view {
+    padding: 0 !important;
+    min-height: 350px;
+    background: white;
+    width: 360px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.language-view .dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
+    background: white;
+}
+
+.language-view .back-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.language-view .back-button:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.language-view .page-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.language-view .settings-box {
+    margin: 16px 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.language-view .settings-box:last-child {
+    margin-bottom: 20px;
+}
+
+.language-view .settings-group {
+    margin: 0;
+}
+
+.language-view .settings-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #374151;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.language-view .settings-select {
+    width: 100%;
+    padding: 16px 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: #1f2937;
+    background: white;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 18px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.language-view .settings-select:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.language-view .settings-select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.language-view .settings-select option {
+    padding: 12px;
+    font-size: 0.95rem;
+    color: #1f2937;
+} 

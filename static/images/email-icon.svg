@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="60" cy="60" r="60" fill="#E7F1FF"/>
+ 
+    <!-- Envelope -->
+    <rect x="30" y="40" width="60" height="40" rx="4" fill="#0D6EFD" opacity="0.9"/>
+    <path d="M30 44L58.9282 62.4645C59.5786 62.8839 60.4214 62.8839 61.0718 62.4645L90 44" stroke="white" stroke-width="3"/>
+</svg> 

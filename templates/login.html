@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <!-- Add Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: white;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: none;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;  /* Center the container */
+        }
+
+        h1 {
+            font-size: 36px;  /* Increased from 32px */
+            margin-bottom: 12px;
+            color: #000;
+            font-weight: 700;  /* Made bolder */
+            width: 100%;
+            text-align: center;  /* Centered the text */
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            padding-right: 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 20px;
+            height: 44px;
+            box-sizing: border-box;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 44px;
+            max-height: 44px;
+            display: block;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .continue-with {
+            text-align: center;
+            margin: 24px 0;
+            color: #666;
+            font-size: 14px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .continue-with::before,
+        .continue-with::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .continue-with span {
+            padding: 0 5px;
+            background: white;
+            white-space: nowrap;
+        }
+
+        .gmail-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;  /* Add space below Google button */
+        }
+
+        .gmail-button:hover {
+            background: #f0f0f0;
+            border-color: #999;
+            transform: translateY(-1px);
+        }
+
+        .gmail-button:active {
+            transform: translateY(1px);
+        }
+
+        .gmail-button img {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            gap: 16px;  /* Add gap between buttons */
+        }
+
+        .forgot-password {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 12px 24px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 48%;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            background: #f5f5f5;
+            border-color: #999;
+            transform: translateY(-1px);
+        }
+
+        .forgot-password:active {
+            transform: translateY(1px);
+        }
+
+        .login-button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 48%;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .login-button:active {
+            transform: translateY(1px);
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;  /* Center the language buttons */
+        }
+
+        .language-button {
+            padding: 8px 16px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: #000;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+        }
+
+        .language-button:hover {
+            transform: translateY(-1px);
+            border-color: #999;
+        }
+
+        .language-button:active {
+            transform: translateY(1px);
+        }
+
+        .language-button.active {
+            background: #000;
+            color: white;
+            border: none;
+        }
+
+        .language-button:not(.active) {
+            background: white;
+        }
+
+        .language-button:not(.active):hover {
+            background: #f8f8f8;
+        }
+
+        .signup-prompt {
+            text-align: center;
+            margin-top: 24px;
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;  /* Space between text and link */
+        }
+
+        .signup-link {
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .signup-link:hover {
+            color: #333;
+            text-decoration: underline;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .password-field-wrapper {
+            position: relative;
+            width: 100%;
+            height: 44px;
+            display: block;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: color 0.2s ease;
+            z-index: 2;
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            color: #666;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+        }
+
+        .password-toggle:hover {
+            color: #333;
+        }
+
+        .password-toggle:focus {
+            outline: none;
+        }
+
+        /* Custom Google Sign-In Button Styles */
+        .g_id_signin {
+            width: 100% !important;
+            margin-bottom: 20px;
+            max-width: 450px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        .g_id_signin > div {
+            width: 100% !important;
+            background: rgb(245, 245, 245) !important;  /* Light gray background */
+            border: none !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            height: 40px !important;
+            overflow: hidden !important;
+        }
+
+        .g_id_signin > div:hover {
+            background: rgb(240, 240, 240) !important;  /* Slightly darker on hover */
+        }
+
+        .g_id_signin > div > div {
+            position: relative !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding-left: 48px !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+
+        .g_id_signin > div > div > span {
+            text-align: center !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            color: #444 !important;  /* Darker text color */
+        }
+
+        .g_id_signin iframe {
+            position: absolute !important;
+            left: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+        }
+
+        /* Remove all borders and set background */
+        .g_id_signin *,
+        .g_id_signin *::before,
+        .g_id_signin *::after,
+        .g_id_signin > div[role="button"] {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Override any default styles */
+        .nsm7Bb-HzV7m-LgbsSe,
+        .nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+
+        /* Add error message styling */
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: #fde8e8;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            display: none;  /* Hidden by default */
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Add shake animation for error */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Add red border for invalid inputs */
+        .input-error {
+            border-color: #dc3545 !important;
+            background-color: #fff9f9;
+        }
+
+        .success-message {
+            display: none;
+            background-color: #d1e7dd;
+            color: #0f5132;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .forgot-password-wrapper {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+
+        .forgot-password {
+            color: #0d6efd;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        /* Add login container error state styling */
+        .login-container.has-error {
+            background: white;
+        }
+
+        /* Enhanced error input styling with transition */
+        input[type="email"].error,
+        input[type="password"].error {
+            border: 2px solid #FF4D4F !important;
+            background-color: #FFF1F0 !important;
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        input[type="email"].error:focus,
+        input[type="password"].error:focus {
+            outline: none;
+            border: 2px solid #FF4D4F !important;
+            box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1) !important;
+        }
+
+        /* Enhanced error message styling */
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: #fde8e8;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            display: none;  /* Hidden by default */
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <p class="subtitle">Fill out the form below.</p>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+                <p class="helper-text">Use your registered email.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-field-wrapper">
+                    <input type="password" id="password" placeholder="Enter your password">
+                    <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">
+                        <img src="{{ url_for('static', filename='images/eye.png') }}" alt="Show password" id="passwordToggleIcon">
+                    </button>
+                </div>
+                <p class="helper-text">Make sure your password is secure.</p>
+            </div>
+
+            <div class="continue-with"><span>Continue with</span></div>
+            
+            <!-- Google Sign-In button configuration -->
+            <div id="g_id_onload"
+                 data-client_id="36720020978-877sp06tqf0tslnhembg2jvd3hr8aleo.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-login_uri="http://localhost:8000/surface.html"
+                 data-auto_prompt="false"
+                 data-callback="handleGoogleSignIn"
+                 data-locale="en"
+                 data-use_fedcm_for_prompt="false">
+            </div>
+            
+            <div class="g_id_signin gmail-button"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="filled_white"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-width="550"
+                 data-logo_alignment="left"
+                 data-locale="en">
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="login-button">Log In</button>
+                <a href="/reset-password" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <div class="signup-prompt">
+                Need to create account? <a href="/signup" class="signup-link">Sign up</a>
+            </div>
+
+            <div class="language-selector">
+                <button class="language-button" id="vn-btn">Tiếng Việt</button>
+                <button class="language-button active" id="en-btn">English</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Function to show messages (ensuring only one is visible at a time)
+        let messageTimer = null;
+        
+        function showMessage(type, text) {
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const loginContainer = document.querySelector('.login-container');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Clear any existing timer
+            if (messageTimer) {
+                clearTimeout(messageTimer);
+                messageTimer = null;
+            }
+            
+            // Hide all messages first
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            
+            // Show the appropriate message
+            if (type === 'error') {
+                errorMessage.textContent = text;
+                errorMessage.classList.add('show');
+                loginContainer.classList.add('has-error');
+                emailInput.classList.add('error');
+                passwordInput.classList.add('error');
+                
+                // Auto-hide error message and styling after 4 seconds
+                messageTimer = setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                    loginContainer.classList.remove('has-error');
+                    emailInput.classList.remove('error');
+                    passwordInput.classList.remove('error');
+                    messageTimer = null;
+                }, 4000);
+            } else if (type === 'success') {
+                successMessage.textContent = text;
+                successMessage.classList.add('show');
+                // Remove error styling when showing success
+                loginContainer.classList.remove('has-error');
+                emailInput.classList.remove('error');
+                passwordInput.classList.remove('error');
+                
+                // Auto-hide success message after 4 seconds
+                messageTimer = setTimeout(() => {
+                    successMessage.classList.remove('show');
+                    messageTimer = null;
+                }, 4000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            fetch('/api/check-login')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Logged in') {
+                        window.location.href = '/';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            // Handle form submission
+            document.querySelector('form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email');
+                const password = document.getElementById('password');
+
+                // Check for empty fields before sending request
+                if (!email.value.trim() || !password.value.trim()) {
+                    showMessage('error', translations[currentLanguage || 'en'].errorMissingFields);
+                    return;
+                }
+
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email.value.trim(),
+                        password: password.value.trim()
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Login successful') {
+                        window.location.href = '/';
+                    } else {
+                        // Show translated error message based on the error type
+                        let errorText;
+                        if (data.error.includes('Please enter both')) {
+                            errorText = translations[currentLanguage || 'en'].errorMissingFields;
+                        } else if (data.error.includes('Email does not exist')) {
+                            errorText = translations[currentLanguage || 'en'].errorEmailNotExist;
+                        } else if (data.error.includes('Incorrect password')) {
+                            errorText = translations[currentLanguage || 'en'].errorIncorrectPassword;
+                        } else if (data.error.includes('Incorrect')) {
+                            errorText = translations[currentLanguage || 'en'].errorIncorrectCredentials;
+                        } else {
+                            errorText = translations[currentLanguage || 'en'].errorGeneric;
+                        }
+                        showMessage('error', errorText);
+                        
+                        // Clear password field
+                        password.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('error', translations[currentLanguage || 'en'].errorGeneric);
+                });
+            });
+
+            // Language button click handlers
+            document.getElementById('vn-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Vietnamese button clicked');
+                updateLanguage('vi');
+            });
+
+            document.getElementById('en-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('English button clicked');
+                updateLanguage('en');
+            });
+
+            // Load saved language preference
+            const savedLanguage = localStorage.getItem('preferredLanguage');
+            if (savedLanguage) {
+                updateLanguage(savedLanguage);
+            }
+
+            // Check for password reset success message
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            
+            if (message === 'password-reset-success') {
+                showMessage('success', 'Your password has been reset successfully. Please log in with your new password.');
+            }
+        });
+
+        // Google Sign-In handling function
+        function handleGoogleSignIn(response) {
+            const credential = response.credential;
+            const decodedToken = JSON.parse(atob(credential.split('.')[1]));
+            
+            fetch('/api/google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: decodedToken.email,
+                    name: decodedToken.name
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Google login failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Redirect to homepage on successful login
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred during Google Sign-In');
+            });
+        }
+
+        // Language translations
+        const translations = {
+            en: {
+                title: 'Login',
+                subtitle: 'Fill out the form below.',
+                email: 'Email',
+                emailPlaceholder: 'Enter your email',
+                emailHelper: 'Use your registered email.',
+                password: 'Password',
+                passwordPlaceholder: 'Enter your password',
+                passwordHelper: 'Make sure your password is secure.',
+                continueWith: 'Continue with',
+                loginWithGmail: 'Sign in with Google',
+                forgotPassword: 'Forgot Password?',
+                loginButton: 'Log In',
+                needAccount: 'Need to create account?',
+                signUp: 'Sign up',
+                errorMissingFields: 'Please enter both email and password',
+                errorEmailNotExist: 'Email does not exist',
+                errorIncorrectPassword: 'Incorrect password',
+                errorIncorrectCredentials: 'Incorrect email or password',
+                errorGeneric: 'An error occurred during login'
+            },
+            vi: {
+                title: 'Đăng nhập',
+                subtitle: 'Chào mừng trở lại!',
+                email: 'Email',
+                emailPlaceholder: 'Nhập email của bạn',
+                emailHelper: 'Sử dụng email đã đăng ký.',
+                password: 'Mật khẩu',
+                passwordPlaceholder: 'Nhập mật khẩu của bạn',
+                passwordHelper: 'Đảm bảo mật khẩu của bạn an toàn.',
+                continueWith: 'Tiếp tục với',
+                loginWithGmail: 'Đăng nhập bằng Google',
+                forgotPassword: 'Quên mật khẩu?',
+                loginButton: 'Đăng nhập',
+                needAccount: 'Bạn cần tạo tài khoản?',
+                signUp: 'Đăng ký',
+                errorMissingFields: 'Vui lòng nhập email và mật khẩu',
+                errorEmailNotExist: 'Email không tồn tại',
+                errorIncorrectPassword: 'Mật khẩu không đúng',
+                errorIncorrectCredentials: 'Email hoặc mật khẩu không đúng',
+                errorGeneric: 'Đã xảy ra lỗi khi đăng nhập'
+            }
+        };
+
+        // Add currentLanguage variable to track the current language
+        let currentLanguage = localStorage.getItem('preferredLanguage') || 'en';
+
+        // Function to update all text content
+        function updateLanguage(lang) {
+            console.log('Changing language to:', lang);
+            
+            // Save language preference and current language
+            localStorage.setItem('preferredLanguage', lang);
+            currentLanguage = lang;
+            
+            // Update error message if it's currently shown
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage.classList.contains('show')) {
+                // Try to determine which error message to show based on current content
+                let newErrorMessage;
+                if (errorMessage.textContent.includes('enter both') || errorMessage.textContent.includes('nhập email')) {
+                    newErrorMessage = translations[lang].errorMissingFields;
+                } else if (errorMessage.textContent.includes('does not exist') || errorMessage.textContent.includes('không tồn tại')) {
+                    newErrorMessage = translations[lang].errorEmailNotExist;
+                } else if (errorMessage.textContent.includes('Incorrect password') || errorMessage.textContent.includes('Mật khẩu không đúng')) {
+                    newErrorMessage = translations[lang].errorIncorrectPassword;
+                } else if (errorMessage.textContent.includes('Incorrect') || errorMessage.textContent.includes('không đúng')) {
+                    newErrorMessage = translations[lang].errorIncorrectCredentials;
+                } else {
+                    newErrorMessage = translations[lang].errorGeneric;
+                }
+                showMessage('error', newErrorMessage);
+            }
+            
+            // Update Google Sign-In button text
+            const googleButton = document.querySelector('.g_id_signin');
+            if (googleButton && window.google && window.google.accounts) {
+                try {
+                    // First destroy the existing button
+                    google.accounts.id.cancel();
+                    
+                    // Remove the existing button content
+                    googleButton.innerHTML = '';
+                    
+                    // Force English language for Google Sign-In
+                    document.documentElement.setAttribute('lang', 'en');
+                    
+                    // Reinitialize Google Sign-In with new language
+                    google.accounts.id.initialize({
+                        client_id: '36720020978-877sp06tqf0tslnhembg2jvd3hr8aleo.apps.googleusercontent.com',
+                        callback: handleGoogleSignIn,
+                        auto_prompt: false,
+                        ux_mode: 'popup',
+                        locale: 'en'  // Force English
+                    });
+                    
+                    // Render the button with new language
+                    google.accounts.id.renderButton(
+                        googleButton,
+                        {
+                            type: 'standard',
+                            theme: 'filled_white',
+                            size: 'large',
+                            text: 'signin_with',
+                            width: 550,
+                            logo_alignment: 'left',
+                            locale: 'en'  // Force English
+                        }
+                    );
+                } catch (error) {
+                    console.error('Error updating Google button:', error);
+                }
+            }
+            
+            // Update title and subtitle
+            const title = document.querySelector('h1');
+            const subtitle = document.querySelector('.subtitle');
+            title.textContent = translations[lang].title;
+            subtitle.textContent = translations[lang].subtitle;
+            
+            // Update email field
+            const emailLabel = document.querySelector('label[for="email"]');
+            const emailInput = document.getElementById('email');
+            const emailHelper = document.querySelector('#email').nextElementSibling;
+            emailLabel.textContent = translations[lang].email;
+            emailInput.placeholder = translations[lang].emailPlaceholder;
+            emailHelper.textContent = translations[lang].emailHelper;
+            
+            // Update password field
+            const passwordLabel = document.querySelector('label[for="password"]');
+            const passwordInput = document.getElementById('password');
+            const passwordHelper = document.querySelector('.password-field-wrapper').nextElementSibling;
+            passwordLabel.textContent = translations[lang].password;
+            passwordInput.placeholder = translations[lang].passwordPlaceholder;
+            passwordHelper.textContent = translations[lang].passwordHelper;
+            
+            // Update continue with text
+            const continueWith = document.querySelector('.continue-with');
+            continueWith.textContent = translations[lang].continueWith;
+            
+            // Update action buttons
+            const forgotPassword = document.querySelector('.forgot-password');
+            const loginButton = document.querySelector('.login-button');
+            forgotPassword.textContent = translations[lang].forgotPassword;
+            loginButton.textContent = translations[lang].loginButton;
+            
+            // Update signup section
+            const signupPrompt = document.querySelector('.signup-prompt');
+            signupPrompt.innerHTML = `${translations[lang].needAccount} <a href="/signup" class="signup-link">${translations[lang].signUp}</a>`;
+
+            // Update button states
+            document.getElementById('vn-btn').classList.toggle('active', lang === 'vi');
+            document.getElementById('en-btn').classList.toggle('active', lang === 'en');
+        }
+
+        // Password toggle function
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.style.opacity = '1';
+                toggleIcon.alt = 'Hide password';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.style.opacity = '0.6';
+                toggleIcon.alt = 'Show password';
+            }
+        }
+    </script>
+</body>
+</html>

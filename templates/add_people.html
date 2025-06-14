@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Add People - HR Management System{% endblock %}
+
+{% block styles %}
+<style>
+    .add-people-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 1rem;
+        letter-spacing: -0.025em;
+    }
+
+    .page-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .info-icon {
+        width: 18px;
+        height: 18px;
+        background: #6b7280;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .options-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .options-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .option-card {
+        background: #ffffff;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: left;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .option-card:hover {
+        border-color: #d1d5db;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .option-card:hover .option-arrow {
+        transform: translateX(4px);
+        color: #374151;
+    }
+
+    .option-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 28px;
+        position: relative;
+    }
+
+    .option-icon.employee {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1e40af;
+    }
+
+    .option-icon.contractor {
+        background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%);
+        color: #7c3aed;
+    }
+
+    .option-icon.person {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #16a34a;
+    }
+
+    .option-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .option-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+
+    .option-description {
+        font-size: 0.95rem;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+    }
+
+    .learn-more {
+        color: #2563eb;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .learn-more:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    .learn-more .info-icon {
+        width: 14px;
+        height: 14px;
+        font-size: 9px;
+        background: #2563eb;
+    }
+
+    .option-arrow {
+        width: 24px;
+        height: 24px;
+        color: #9ca3af;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .add-people-container {
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+        }
+
+        .option-card {
+            padding: 1.5rem;
+            gap: 1rem;
+        }
+
+        .option-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
+        }
+
+        .option-title {
+            font-size: 1.125rem;
+        }
+
+        .option-description {
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .option-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+
+        .option-content {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="add-people-container">
+    <div class="page-header">
+        <h1 class="page-title">Add people</h1>
+        
+        <div class="page-subtitle">
+            What method of adding would you like to choose?
+            <div class="info-icon">i</div>
+        </div>
+    </div>
+
+    <div class="options-container">
+        <div class="options-grid">
+            <a href="/add-employee" class="option-card">
+                <div class="option-icon employee">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <rect x="6" y="7" width="4" height="3" rx="1" fill="currentColor"/>
+                        <line x1="6" y1="13" x2="10" y2="13" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="12" y1="8" x2="18" y2="8" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="12" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="option-content">
+                    <div class="option-title">Create account</div>
+                    <div class="option-description">Create an account for your new employee</div>
+                    <span class="learn-more">
+                        Learn More
+                        <div class="info-icon">i</div>
+                    </span>
+                </div>
+                <svg class="option-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <a href="/add-contractor" class="option-card">
+                <div class="option-icon contractor">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M8 8H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 12H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 16H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="option-content">
+                    <div class="option-title">Add account</div>
+                    <div class="option-description">Add an available account of your new employee</div>
+                    <span class="learn-more">
+                        Learn More
+                        <div class="info-icon">i</div>
+                    </span>
+                </div>
+                <svg class="option-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

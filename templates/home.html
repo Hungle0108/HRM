@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Home - HR Management System{% endblock %}
+
+{% block styles %}
+<style>
+    /* Main Content Styles */
+    .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    .upcoming-tasks {
+        margin-bottom: 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .section-subtitle {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-outline {
+        border: 1px solid #e0e0e0;
+        background: white;
+        color: #333;
+    }
+
+    .btn-dark {
+        background: #000;
+        color: white;
+        border: none;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-icon.red {
+        background: #ffebee;
+    }
+
+    .card-icon.blue {
+        background: #e3f2fd;
+    }
+
+    .card-icon.green {
+        background: #e8f5e9;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-subtitle {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .task-status {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #4caf50;
+    }
+
+    .task-date {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Main Content -->
+<div class="container">
+    <!-- Upcoming Tasks Section -->
+    <div class="upcoming-tasks">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Upcoming Tasks</h2>
+                <p class="section-subtitle">Stay on top of your responsibilities</p>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-outline">Add Task</button>
+                <button class="btn btn-dark">View All Tasks</button>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Performance Reviews Card -->
+            <div class="card">
+                <div class="card-icon red">
+                    <span style="font-size: 1.5rem;">17</span>
+                </div>
+                <h3 class="card-title">Performance Reviews</h3>
+                <p class="card-subtitle">All teams</p>
+                <p class="task-date">Due Next Week</p>
+            </div>
+
+            <!-- Salary Review Card -->
+            <div class="card">
+                <div class="card-icon blue">
+                    <span style="font-size: 1.5rem;">📈</span>
+                </div>
+                <h3 class="card-title">Salary Review</h3>
+                <p class="card-subtitle">All employees</p>
+                <p class="task-date">Due Next Month</p>
+            </div>
+
+            <!-- Onboarding Card -->
+            <div class="card">
+                <div class="card-icon green">
+                    <span style="font-size: 1.5rem;">✓</span>
+                </div>
+                <h3 class="card-title">Onboarding New Employees</h3>
+                <p class="task-status">Ongoing</p>
+                <p class="task-date">Start date: Monday</p>
+            </div>
+
+            <!-- Team Building Card -->
+            <div class="card">
+                <div class="card-icon blue">
+                    <span style="font-size: 1.5rem;">🎉</span>
+                </div>
+                <h3 class="card-title">Team Team-Building Event</h3>
+                <p class="task-status">In Two Days</p>
+                <p class="task-date">Be there!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Management Section -->
+    <div class="task-management">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Task Management</h2>
+                <p class="section-subtitle">Stay on top of your tasks</p>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-outline">Manage Tasks</button>
+                <button class="btn btn-dark">Add New Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
