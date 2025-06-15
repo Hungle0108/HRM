@@ -43,7 +43,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -441,6 +441,24 @@
         .dropdown-item:hover {
             background: #f3f4f6;
         }
+
+        .saved-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .saved-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -448,7 +466,11 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-content">
-                <!-- Close button removed -->
+                <div class="saved-indicator">
+                    <div class="saved-icon">✓</div>
+                    SAVED
+                </div>
+                <button class="close-btn">&times;</button>
             </div>
         </div>
 

@@ -218,6 +218,42 @@ def add_employee_step3():
     
     return render_template('add_employee_step3.html', user=user)
 
+@app.route('/add-employee-step4')
+def add_employee_step4():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('add_employee_step4.html', user=user)
+
+@app.route('/add-employee-step5')
+def add_employee_step5():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('add_employee_step5.html', user=user)
+
+@app.route('/add-employee-step6')
+def add_employee_step6():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('add_employee_step6.html', user=user)
+
 @app.route('/add-contractor')
 def add_contractor():
     if 'user_id' not in session:

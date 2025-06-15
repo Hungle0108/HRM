@@ -575,6 +575,97 @@
             height: 12px;
         }
 
+        /* Styles for new sections */
+        .date-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .date-input-wrapper:focus-within {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+        }
+
+        .date-input {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .date-input:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .calendar-icon:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .learn-more-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .learn-more-link:hover {
+            text-decoration: underline;
+        }
+
+        .payment-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .payment-info .info-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            color: #6c757d;
+        }
+
+        .payment-info .info-content {
+            flex: 1;
+        }
+
+        .payment-info .info-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
         @media (max-width: 1024px) {
             .main-container {
                 flex-direction: column;
@@ -771,6 +862,78 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Agreement details section -->
+                    <div class="form-section">
+                        <h3 class="section-title">Agreement details</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Agreement start date (DD/MM/YYYY) <span class="required">*</span></label>
+                                <div class="date-input-wrapper">
+                                    <input type="text" class="form-input date-input" id="agreementStartDate" placeholder="15/06/2025" readonly>
+                                    <button type="button" class="calendar-icon" onclick="openDatePicker('agreementStartDate')">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- On-Target payments section -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3 class="section-title">On-Target payments</h3>
+                            <button type="button" class="create-schedule-btn" onclick="addOnTargetPayment()">
+                                Add
+                            </button>
+                        </div>
+                        
+                        <p class="section-description">Add additional on-target payment that will be included within the contract. <a href="#" class="learn-more-link">Learn more</a></p>
+                        
+                        <div class="payment-info">
+                            <div class="info-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4M12 8h.01"/>
+                                </svg>
+                            </div>
+                            <div class="info-content">
+                                <p class="info-text">No on-target payment yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Employment terms section -->
+                    <div class="form-section">
+                        <h3 class="section-title">Employment terms</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" id="indefinite" name="employment_terms" value="indefinite" checked>
+                                        <label for="indefinite" class="radio-label">
+                                            <span class="radio-circle"></span>
+                                            <span class="radio-text">Indefinite</span>
+                                        </label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" id="definite" name="employment_terms" value="definite">
+                                        <label for="definite" class="radio-label">
+                                            <span class="radio-circle"></span>
+                                            <span class="radio-text">Definite</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
 
@@ -847,7 +1010,9 @@
             currency: document.querySelectorAll('.form-select')[0].value,
             paymentPeriod: document.querySelectorAll('.form-select')[1].value,
             employmentType: document.querySelector('input[name="employment_type"]:checked')?.value || 'fulltime',
-            workSchedule: document.querySelector('.schedule-select').value
+            workSchedule: document.querySelector('.schedule-select').value,
+            agreementStartDate: document.getElementById('agreementStartDate').value,
+            employmentTerms: document.querySelector('input[name="employment_terms"]:checked')?.value || 'indefinite'
         };
         sessionStorage.setItem('employeeFormStep3', JSON.stringify(formData));
         
@@ -870,6 +1035,11 @@
                 if (radioButton) radioButton.checked = true;
             }
             if (formData.workSchedule) document.querySelector('.schedule-select').value = formData.workSchedule;
+            if (formData.agreementStartDate) document.getElementById('agreementStartDate').value = formData.agreementStartDate;
+            if (formData.employmentTerms) {
+                const termsRadio = document.querySelector(`input[name="employment_terms"][value="${formData.employmentTerms}"]`);
+                if (termsRadio) termsRadio.checked = true;
+            }
         }
     }
 
@@ -902,6 +1072,46 @@
             clearAllFormData();
             window.location.href = '/add-people';
         }
+    }
+
+    // Function to open date picker
+    function openDatePicker(inputId) {
+        const input = document.getElementById(inputId);
+        
+        // Create a temporary date input to trigger the native date picker
+        const tempDateInput = document.createElement('input');
+        tempDateInput.type = 'date';
+        tempDateInput.style.position = 'absolute';
+        tempDateInput.style.left = '-9999px';
+        tempDateInput.style.opacity = '0';
+        
+        // Convert DD/MM/YYYY to YYYY-MM-DD for date input
+        if (input.value) {
+            const parts = input.value.split('/');
+            if (parts.length === 3) {
+                tempDateInput.value = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+        }
+        
+        document.body.appendChild(tempDateInput);
+        
+        tempDateInput.addEventListener('change', function() {
+            if (this.value) {
+                // Convert YYYY-MM-DD back to DD/MM/YYYY
+                const dateParts = this.value.split('-');
+                input.value = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                saveFormData(); // Auto-save after date change
+            }
+            document.body.removeChild(this);
+        });
+        
+        // Show the date picker
+        tempDateInput.showPicker ? tempDateInput.showPicker() : tempDateInput.click();
+    }
+
+    // Function to add on-target payment
+    function addOnTargetPayment() {
+        alert('Add on-target payment functionality would be implemented here. This would open a modal or form to add payment details.');
     }
 
     // Initialize form data restoration
@@ -939,8 +1149,7 @@
         saveFormData();
         
         // Proceed to next step (step 4)
-        alert('Form submitted! This would proceed to step 4.');
-        // window.location.href = '/add-employee/step-4';
+        window.location.href = '/add-employee-step4';
     });
 
     // Add event handlers for create schedule buttons

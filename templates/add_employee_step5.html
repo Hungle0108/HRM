@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add person - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .saved-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .saved-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: white;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        .help-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .help-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .help-content {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .help-content.show {
+            display: block;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .delete-draft-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .benefit-section {
+            margin-bottom: 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 24px;
+            background: white;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .section-info {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-icon svg {
+            width: 16px;
+            height: 16px;
+            color: #666;
+        }
+
+        .section-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .add-button {
+            background: none;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .add-button:hover {
+            border-color: #ced4da;
+            background: #f8f9fa;
+        }
+
+        .learn-more-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .learn-more-link:hover {
+            text-decoration: underline;
+        }
+
+        .bottom-navigation {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 0;
+            transition: color 0.2s;
+        }
+
+        .btn-back:hover {
+            color: #495057;
+        }
+
+        .btn-continue {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-continue:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        .btn-continue:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: -1;
+                padding: 20px 40px;
+            }
+
+            .content-area {
+                padding: 20px 40px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 16px 20px;
+            }
+
+            .page-header {
+                padding: 24px 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .sidebar {
+                padding: 20px;
+            }
+
+            .bottom-navigation {
+                padding: 20px;
+            }
+
+            .benefit-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <div class="saved-indicator">
+                    <div class="saved-icon">✓</div>
+                    SAVED
+                </div>
+                <button class="close-btn">&times;</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Add person</h1>
+                <p class="page-subtitle">Onboard your direct employee</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="employee-form-step5">
+                    <!-- Equipment Section -->
+                    <div class="benefit-section">
+                        <div class="section-header">
+                            <div class="section-info">
+                                <h3 class="section-title">
+                                    <div class="section-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                            <line x1="8" y1="21" x2="16" y2="21"/>
+                                            <line x1="12" y1="17" x2="12" y2="21"/>
+                                        </svg>
+                                    </div>
+                                    Equipment
+                                </h3>
+                                <p class="section-description">
+                                    Choose the right tools for your team. You can lease equipment through our partner or provide your own equipment and keep track of it for seamless work experiences. Enhance productivity with the choice that suits you best.
+                                </p>
+                                <a href="#" class="learn-more-link">Learn more</a>
+                            </div>
+                            <button type="button" class="add-button" onclick="addEquipment()">Add</button>
+                        </div>
+                        
+                        <div style="margin-top: 16px; padding: 16px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <div class="section-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1;">
+                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem; color: #1a1a1a;">Streamline IT operations with Deel IT</p>
+                            </div>
+                            <a href="#" class="learn-more-link">Learn more</a>
+                        </div>
+                    </div>
+
+                    <!-- Coworking Space Section -->
+                    <div class="benefit-section">
+                        <div class="section-header">
+                            <div class="section-info">
+                                <h3 class="section-title">
+                                    <div class="section-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 21h18"/>
+                                            <path d="M5 21V7l8-4v18"/>
+                                            <path d="M19 21V11l-6-4"/>
+                                        </svg>
+                                    </div>
+                                    Coworking space membership
+                                </h3>
+                                <p class="section-description">
+                                    Request monthly access to WeWork. Explore available WeWork locations <a href="#" class="learn-more-link">here</a>.
+                                </p>
+                                <a href="#" class="learn-more-link">Learn more</a>
+                            </div>
+                            <button type="button" class="add-button" onclick="addCoworkingSpace()">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Equity Section -->
+                    <div class="benefit-section">
+                        <div class="section-header">
+                            <div class="section-info">
+                                <h3 class="section-title">
+                                    <div class="section-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="3"/>
+                                            <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                                        </svg>
+                                    </div>
+                                    Equity
+                                </h3>
+                                <p class="section-description">
+                                    Track your team member's equity information on Deel. Please be aware that establishing an international stock option plan, and making stock option grants typically requires legal counsel and approval from the company board of directors. A separate form of contract should be signed and prepared off platform to grant equity.
+                                </p>
+                                <a href="#" class="learn-more-link">Learn more</a>
+                            </div>
+                            <button type="button" class="add-button" onclick="addEquity()">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Background Check Section -->
+                    <div class="benefit-section">
+                        <div class="section-header">
+                            <div class="section-info">
+                                <h3 class="section-title">
+                                    <div class="section-icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 1a3 3 0 0 0-3 3c0 1.657 1.343 3 3 3s3-1.343 3-3a3 3 0 0 0-3-3z"/>
+                                            <path d="M12 8a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z"/>
+                                            <path d="M8 21v-1a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v1"/>
+                                        </svg>
+                                    </div>
+                                    Background Check
+                                </h3>
+                                <p class="section-description">
+                                    Confirm a new team member's background for peace of mind and a smooth onboarding process.
+                                </p>
+                                <a href="#" class="learn-more-link">Learn more</a>
+                            </div>
+                            <button type="button" class="add-button" onclick="addBackgroundCheck()">Add</button>
+                        </div>
+                        
+                        <div style="margin-top: 16px; padding: 16px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px;">
+                            <div class="section-icon" style="margin-top: 2px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            </div>
+                            <div style="flex: 1;">
+                                <p style="font-weight: 600; margin: 0 0 4px 0; font-size: 0.9rem; color: #1a1a1a;">
+                                    <span style="color: #007bff;">AI insight:</span> Other organizations in Vietnam have requested Softcheck for contracts in Vietnam.
+                                </p>
+                            </div>
+                            <button type="button" class="add-button" onclick="addSoftcheck()" style="margin: 0; padding: 6px 12px; font-size: 0.8rem;">Add</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 class="sidebar-title">Steps</h3>
+                
+                <ol class="steps-list">
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-text">Personal details</div>
+                    </li>
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-text">Job details</div>
+                    </li>
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-text">Compensation and dates</div>
+                    </li>
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-text">Compliance</div>
+                    </li>
+                    <li class="step-item active">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Benefits and extras</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Review</div>
+                    </li>
+                </ol>
+
+                <div class="help-section">
+                    <div class="help-title" onclick="toggleHelp()">
+                        Help and support
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
+                    <div class="help-content" id="helpContent">
+                        <p class="help-text">This form is automatically saved.</p>
+                        <p class="help-text">This form was saved to your drafts. If you no longer need it, you can delete it.</p>
+                        <button class="delete-draft-btn" onclick="deleteDraft()">Delete draft</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <button type="button" class="btn-back" id="backButton" onclick="goToPreviousStep()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </button>
+                <button type="submit" class="btn-continue" form="employee-form-step5">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Track current step (5 for Benefits and extras)
+    let currentStep = 5;
+    const totalSteps = 6;
+
+    // Function to save form data to sessionStorage
+    function saveFormData() {
+        const formData = {
+            equipment: [],
+            coworkingSpace: [],
+            equity: []
+        };
+        sessionStorage.setItem('employeeFormStep5', JSON.stringify(formData));
+        
+        // Show auto-save indicator
+        console.log('Step 5 form data auto-saved');
+    }
+
+    // Function to restore form data from sessionStorage
+    function restoreFormData() {
+        const savedData = sessionStorage.getItem('employeeFormStep5');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            // Restore any saved benefit selections
+            console.log('Restored step 5 data:', formData);
+        }
+    }
+
+    // Function to clear all form data from sessionStorage
+    function clearAllFormData() {
+        sessionStorage.removeItem('employeeFormStep1');
+        sessionStorage.removeItem('employeeFormStep2');
+        sessionStorage.removeItem('employeeFormStep3');
+        sessionStorage.removeItem('employeeFormStep4');
+        sessionStorage.removeItem('employeeFormStep5');
+        console.log('All form data cleared');
+    }
+
+    // Function to go to previous step
+    function goToPreviousStep() {
+        // Save current form data before navigating
+        saveFormData();
+        // Navigate back to step 4
+        window.location.href = '/add-employee-step4';
+    }
+
+    // Function to toggle help section
+    function toggleHelp() {
+        const helpContent = document.getElementById('helpContent');
+        helpContent.classList.toggle('show');
+    }
+
+    // Function to delete draft
+    function deleteDraft() {
+        if (confirm('Are you sure you want to delete this draft? All entered information will be lost.')) {
+            clearAllFormData();
+            window.location.href = '/add-people';
+        }
+    }
+
+    // Functions for adding benefits
+    function addEquipment() {
+        alert('Add equipment functionality would be implemented here. This would open a modal or form to select equipment options.');
+    }
+
+    function addCoworkingSpace() {
+        alert('Add coworking space functionality would be implemented here. This would show WeWork locations and membership options.');
+    }
+
+    function addEquity() {
+        alert('Add equity functionality would be implemented here. This would open a form for equity information and stock options.');
+    }
+
+    function addBackgroundCheck() {
+        alert('Add background check functionality would be implemented here. This would open a form for background check services and verification options.');
+    }
+
+    function addSoftcheck() {
+        alert('Add Softcheck functionality would be implemented here. This would open a form to request Softcheck services for Vietnam contracts.');
+    }
+
+    // Initialize form data restoration
+    restoreFormData();
+
+    // Save form data when needed
+    saveFormData();
+
+    // Clear form data when user closes the form
+    window.addEventListener('beforeunload', function(e) {
+        // Only clear if user is navigating away from the form process
+        if (!window.location.href.includes('/add-employee')) {
+            clearAllFormData();
+        }
+    });
+
+    // Form submission
+    document.getElementById('employee-form-step5').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Save form data before proceeding
+        saveFormData();
+        
+        // Proceed to next step (step 6)
+        window.location.href = '/add-employee-step6';
+    });
+    </script>
+</body>
+</html> 
