@@ -1,89 +1,515 @@
 {% extends "base.html" %}
 
-{% block title %}Settings - HR Management System{% endblock %}
+{% block title %}Organization settings - HR Management System{% endblock %}
 
 {% block styles %}
 <style>
-    /* Settings Page Styles */
-    .settings-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 2rem;
+    /* Reset and base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
+    body {
+        background: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* Main container */
+    .settings-layout {
+        display: flex;
+        min-height: calc(100vh - 80px); /* Adjust for top navigation */
+        margin-top: 80px; /* Space for top navigation */
+    }
+
+    /* Sidebar styles */
+    .settings-sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        padding: 24px 0 32px 0;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        height: auto;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        border-radius: 0 0 12px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .sidebar-header {
+        padding: 0 24px 20px 24px;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 14px;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: #f8f9fa;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #80bdff;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 16px;
+    }
+
+    /* Navigation sections */
+    .nav-section {
+        margin-bottom: 24px;
+    }
+
+    .nav-section:last-child {
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 24px 8px 24px;
+        margin-bottom: 6px;
+        position: relative;
+        background: none !important;
+        background-image: none !important;
+    }
+
+    /* Comprehensive dropdown arrow removal for section titles */
+    .section-title,
+    .nav-section .section-title,
+    div[class*="section-title"] {
+        background: none !important;
+        background-image: none !important;
+        background-size: 0 !important;
+        background-repeat: no-repeat !important;
+        background-position: 0 !important;
+        position: relative !important;
+        padding-right: 24px !important;
+    }
+
+    .section-title::after,
+    .section-title::before,
+    .nav-section .section-title::after,
+    .nav-section .section-title::before,
+    div[class*="section-title"]::after,
+    div[class*="section-title"]::before {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        border: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    /* Remove any inherited dropdown styling */
+    .nav-section {
+        position: relative;
+    }
+
+    .nav-section > .section-title {
+        display: block !important;
+        cursor: default !important;
+        pointer-events: auto !important;
+        text-align: left !important;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .nav-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .nav-item.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .nav-item-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-icon {
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.7;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-item:hover .nav-icon,
+    .nav-item.active .nav-icon {
+        opacity: 1;
+    }
+
+    .dropdown-arrow {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+        color: #6c757d;
+        stroke-width: 2;
+        stroke: currentColor;
+        fill: none;
+    }
+
+    .nav-item.expandable.expanded .dropdown-arrow {
+        transform: rotate(180deg);
+        color: #495057;
+    }
+
+    .nav-item.expandable:hover .dropdown-arrow {
+        color: #495057;
+    }
+
+    /* Ensure dropdown arrows are properly positioned */
+    .nav-item.expandable {
+        position: relative;
+    }
+
+    .nav-item.expandable .dropdown-arrow {
+        margin-left: auto;
+        transform-origin: center;
+    }
+
+    /* Sub-items */
+    .nav-subitems {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-subitems.expanded {
+        max-height: 200px;
+    }
+
+    .nav-subitem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 56px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-subitem:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .nav-subitem.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 500;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    /* Main content area */
+    .settings-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 32px 40px;
+    }
+
+    .content-header {
+        margin-bottom: 32px;
+    }
+
+    .content-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .content-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    /* Settings sections */
     .settings-section {
         background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        padding: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .settings-section:last-child {
-        margin-bottom: 0;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 24px;
+        margin-bottom: 24px;
     }
 
     .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f1f3f4;
     }
 
-    .section-title {
-        font-size: 1.25rem;
+    .section-name {
+        font-size: 1.125rem;
         font-weight: 600;
-        color: #1f2937;
-        margin: 0;
+        color: #1a1a1a;
     }
 
     .edit-button {
-        padding: 0.5rem 1rem;
+        padding: 8px 16px;
         font-size: 0.875rem;
-        color: #6b7280;
+        color: #6c757d;
         background: none;
-        border: none;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
         cursor: pointer;
-        transition: color 0.2s;
+        transition: all 0.2s;
+        font-weight: 500;
     }
 
     .edit-button:hover {
-        color: #000;
+        color: #495057;
+        border-color: #adb5bd;
+        background: #f8f9fa;
     }
 
     .info-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
+        gap: 24px;
     }
 
     .info-item {
-        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
     }
 
     .info-label {
-        font-size: 0.875rem;
-        color: #6b7280;
-        margin-bottom: 0.5rem;
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 8px;
     }
 
     .info-value {
-        font-size: 0.95rem;
-        color: #1f2937;
+        font-size: 0.875rem;
+        color: #1a1a1a;
+        font-weight: 500;
     }
 
     .not-specified {
         color: #9ca3af;
+        font-style: italic;
+    }
+
+    /* Icons */
+    .icon-organization {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'/%3e%3c/svg%3e");
+    }
+
+    .icon-security {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'/%3e%3c/svg%3e");
+    }
+
+    .icon-dollar {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1'/%3e%3c/svg%3e");
+    }
+
+    .icon-people {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z'/%3e%3c/svg%3e");
+    }
+
+    .icon-settings {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'/%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/%3e%3c/svg%3e");
+    }
+
+    .icon-customize {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3e%3c/svg%3e");
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+        .settings-sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .settings-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .settings-content {
+            margin-left: 0;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="settings-container">
+<div class="settings-layout">
+    <!-- Sidebar -->
+    <div class="settings-sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">Organization settings</h1>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <nav class="settings-nav">
+            <!-- Organization & security section -->
+            <div class="nav-section">
+                <div class="section-title">Organization & security</div>
+                
+                <div class="nav-item expandable expanded" data-section="organization">
+                    <div class="nav-item-content">
+                        <div class="nav-icon icon-organization"></div>
+                        <span>Organization</span>
+                    </div>
+                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="nav-subitems expanded" data-parent="organization">
+                    <div class="nav-subitem">Analytics</div>
+                    <div class="nav-subitem">Billing & payments</div>
+                    <div class="nav-subitem">Custom branding</div>
+                    <div class="nav-subitem">Entities</div>
+                    <div class="nav-subitem">Groups</div>
+                    <div class="nav-subitem">Org chart and structure</div>
+                    <div class="nav-subitem active">Organization details</div>
+                </div>
+
+                <div class="nav-item expandable" data-section="security">
+                    <div class="nav-item-content">
+                        <div class="nav-icon icon-security"></div>
+                        <span>Security</span>
+                    </div>
+                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="nav-subitems" data-parent="security">
+                    <div class="nav-subitem">Access control</div>
+                    <div class="nav-subitem">Authentication</div>
+                </div>
+            </div>
+
+            <!-- Payroll section -->
+            <div class="nav-section">
+                <div class="section-title">Payroll</div>
+                
+                <div class="nav-item" data-section="expenses">
+                    <div class="nav-item-content">
+                        <div class="nav-icon icon-dollar"></div>
+                        <span>Expenses & adjustments</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Human Resources section -->
+            <div class="nav-section">
+                <div class="section-title">Human Resources</div>
+                
+                <div class="nav-item expandable" data-section="hr-settings">
+                    <div class="nav-item-content">
+                        <div class="nav-icon icon-people"></div>
+                        <span>Settings</span>
+                    </div>
+                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="nav-subitems" data-parent="hr-settings">
+                    <div class="nav-subitem">Employee settings</div>
+                    <div class="nav-subitem">Time tracking</div>
+                </div>
+
+                <div class="nav-item expandable" data-section="customization">
+                    <div class="nav-item-content">
+                        <div class="nav-icon icon-customize"></div>
+                        <span>Customization</span>
+                    </div>
+                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="nav-subitems" data-parent="customization">
+                    <div class="nav-subitem">Custom fields</div>
+                    <div class="nav-subitem">Templates</div>
+                </div>
+            </div>
+
+            <!-- Services section -->
+            <div class="nav-section">
+                <div class="section-title">Services</div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="settings-content">
+        <div class="content-header">
+            <h2 class="content-title">Organization Details</h2>
+            <p class="content-subtitle">Manage your organization's basic information and settings</p>
+        </div>
+
     <!-- Organization Details Section -->
     <div class="settings-section">
         <div class="section-header">
-            <h2 class="section-title">Organization Details</h2>
+                <h3 class="section-name">Basic Information</h3>
             <button class="edit-button">Edit</button>
         </div>
         <div class="info-grid">
@@ -114,14 +540,18 @@
             <div class="info-item">
                 <div class="info-label">ZIP Code</div>
                 <div class="info-value not-specified">Not specified</div>
-            </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Country</div>
+                    <div class="info-value not-specified">Not specified</div>
+                </div>
         </div>
     </div>
 
     <!-- Financial Contact Section -->
         <div class="settings-section">
         <div class="section-header">
-            <h2 class="section-title">Financial Contact</h2>
+                <h3 class="section-name">Financial Contact</h3>
             <button class="edit-button">Edit</button>
         </div>
         <div class="info-grid">
@@ -134,12 +564,13 @@
                 <div class="info-value not-specified">Not specified</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Email</div>
+                    <div class="info-label">Email Address</div>
                 <div class="info-value not-specified">Not specified</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Phone</div>
+                    <div class="info-label">Phone Number</div>
                 <div class="info-value not-specified">Not specified</div>
+                </div>
             </div>
         </div>
     </div>
@@ -148,18 +579,80 @@
 
 {% block scripts %}
 <script>
+    // Handle expandable navigation items
+    document.querySelectorAll('.nav-item.expandable').forEach(item => {
+        item.addEventListener('click', function() {
+            const section = this.getAttribute('data-section');
+            const subitems = document.querySelector(`[data-parent="${section}"]`);
+            
+            if (subitems) {
+                const isExpanded = this.classList.contains('expanded');
+                
+                // Close all other expanded items
+                document.querySelectorAll('.nav-item.expandable.expanded').forEach(expandedItem => {
+                    if (expandedItem !== this) {
+                        expandedItem.classList.remove('expanded');
+                        const otherSubitems = document.querySelector(`[data-parent="${expandedItem.getAttribute('data-section')}"]`);
+                        if (otherSubitems) {
+                            otherSubitems.classList.remove('expanded');
+                        }
+                    }
+                });
+                
+                // Toggle current item
+                if (isExpanded) {
+                    this.classList.remove('expanded');
+                    subitems.classList.remove('expanded');
+                } else {
+                    this.classList.add('expanded');
+                    subitems.classList.add('expanded');
+                }
+            }
+        });
+    });
+
+    // Handle subitem clicks
+    document.querySelectorAll('.nav-subitem').forEach(subitem => {
+        subitem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Remove active class from all subitems
+            document.querySelectorAll('.nav-subitem').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked subitem
+            this.classList.add('active');
+        });
+    });
+
     // Handle edit button clicks
     document.querySelectorAll('.edit-button').forEach(button => {
         button.addEventListener('click', function() {
-            // Get the section title to determine which form to show
-            const sectionTitle = this.closest('.section-header').querySelector('.section-title').textContent;
+            // Get the section name to determine which form to show
+            const sectionName = this.closest('.section-header').querySelector('.section-name').textContent;
             
-            if (sectionTitle === 'Organization Details') {
+            if (sectionName === 'Basic Information') {
                 window.location.href = '/organization/edit';
-            } else if (sectionTitle === 'Financial Contact') {
+            } else if (sectionName === 'Financial Contact') {
                 window.location.href = '/financial-contact/edit';
             }
         });
     });
+
+    // Search functionality
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const navItems = document.querySelectorAll('.nav-item, .nav-subitem');
+            
+            navItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                const shouldShow = text.includes(searchTerm);
+                item.style.display = shouldShow ? 'flex' : 'none';
+            });
+        });
+    }
 </script>
 {% endblock %} 
