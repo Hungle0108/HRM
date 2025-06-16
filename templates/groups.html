@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Organization settings - HR Management System{% endblock %}
+{% block title %}Groups - HR Management System{% endblock %}
 
 {% block styles %}
 <style>
@@ -19,8 +19,8 @@
     /* Main container */
     .settings-layout {
         display: flex;
-        min-height: calc(100vh - 80px); /* Adjust for top navigation */
-        margin-top: 80px; /* Space for top navigation */
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
     }
 
     /* Sidebar styles */
@@ -98,50 +98,6 @@
         letter-spacing: 0.5px;
         padding: 0 24px 8px 24px;
         margin-bottom: 6px;
-        position: relative;
-        background: none !important;
-        background-image: none !important;
-    }
-
-    /* Comprehensive dropdown arrow removal for section titles */
-    .section-title,
-    .nav-section .section-title,
-    div[class*="section-title"] {
-        background: none !important;
-        background-image: none !important;
-        background-size: 0 !important;
-        background-repeat: no-repeat !important;
-        background-position: 0 !important;
-        position: relative !important;
-        padding-right: 24px !important;
-    }
-
-    .section-title::after,
-    .section-title::before,
-    .nav-section .section-title::after,
-    .nav-section .section-title::before,
-    div[class*="section-title"]::after,
-    div[class*="section-title"]::before {
-        display: none !important;
-        content: none !important;
-        background: none !important;
-        border: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-    }
-
-    /* Remove any inherited dropdown styling */
-    .nav-section {
-        position: relative;
-    }
-
-    .nav-section > .section-title {
-        display: block !important;
-        cursor: default !important;
-        pointer-events: auto !important;
-        text-align: left !important;
     }
 
     .nav-item {
@@ -212,7 +168,6 @@
         color: #495057;
     }
 
-    /* Ensure dropdown arrows are properly positioned */
     .nav-item.expandable {
         position: relative;
     }
@@ -277,79 +232,273 @@
     .content-subtitle {
         color: #6c757d;
         font-size: 0.875rem;
-    }
-
-    /* Settings sections */
-    .settings-section {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        padding: 24px;
         margin-bottom: 24px;
     }
 
-    .section-header {
+    /* Tabs */
+    .tabs-container {
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 24px;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 32px;
+    }
+
+    .tab {
+        padding: 12px 0;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .tab:hover {
+        color: #495057;
+    }
+
+    .tab.active {
+        color: #1a1a1a;
+        border-bottom-color: #1a1a1a;
+    }
+
+    .tab .new-badge {
+        background: #6366f1;
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Groups controls */
+    .groups-controls {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f1f3f4;
     }
 
-    .section-name {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1a1a1a;
+    .controls-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
 
-    .edit-button {
-        padding: 8px 16px;
-        font-size: 0.875rem;
-        color: #6c757d;
-        background: none;
+    .groups-search {
+        position: relative;
+        width: 250px;
+    }
+
+    .groups-search input {
+        width: 100%;
+        padding: 8px 16px 8px 40px;
         border: 1px solid #e9ecef;
         border-radius: 6px;
-        cursor: pointer;
+        font-size: 0.875rem;
+        background: white;
         transition: all 0.2s;
-        font-weight: 500;
     }
 
-    .edit-button:hover {
+    .groups-search input:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .groups-search .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
         color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
         border-color: #adb5bd;
         background: #f8f9fa;
     }
 
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-    }
-
-    .info-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .info-label {
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 12px;
         font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge.active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .create-group-btn {
+        padding: 10px 16px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .create-group-btn:hover {
+        background: #333;
+    }
+
+    .expand-btn {
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-left: 8px;
+    }
+
+    .expand-btn:hover {
+        border-color: #adb5bd;
+        background: #f8f9fa;
+    }
+
+    /* Table */
+    .groups-table-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .groups-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .groups-table th {
+        background: #f8f9fa;
+        padding: 16px 20px;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 600;
         color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        font-weight: 600;
-        margin-bottom: 8px;
+        border-bottom: 1px solid #e9ecef;
     }
 
-    .info-value {
+    .groups-table td {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f3f4;
         font-size: 0.875rem;
-        color: #1a1a1a;
-        font-weight: 500;
+        color: #495057;
     }
 
-    .not-specified {
-        color: #9ca3af;
-        font-style: italic;
+    .groups-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .groups-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .group-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .group-icon {
+        width: 32px;
+        height: 32px;
+        background: #f0f0f0;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .group-details h4 {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 2px;
+    }
+
+    .group-details p {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .table-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 4px;
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+        color: #495057;
+        background: #f8f9fa;
+    }
+
+    /* Item count */
+    .item-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 16px;
     }
 
     /* Icons */
@@ -369,12 +518,13 @@
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z'/%3e%3c/svg%3e");
     }
 
-    .icon-settings {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'/%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/%3e%3c/svg%3e");
-    }
-
     .icon-customize {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3e%3c/svg%3e");
+    }
+
+    /* Navigation adjustments */
+    .settings-nav {
+        padding-bottom: 16px;
     }
 
     /* Responsive design */
@@ -394,12 +544,7 @@
         }
     }
 
-    /* Ensure proper spacing for all navigation sections */
-    .settings-nav {
-        padding-bottom: 16px;
-    }
-
-    /* Improve scrollbar styling */
+    /* Scrollbar styling */
     .settings-sidebar::-webkit-scrollbar {
         width: 6px;
     }
@@ -451,9 +596,9 @@
                     <div class="nav-subitem">Billing & payments</div>
                     <div class="nav-subitem">Custom branding</div>
                     <div class="nav-subitem">Entities</div>
-                    <div class="nav-subitem">Groups</div>
+                    <div class="nav-subitem active">Offices</div>
                     <div class="nav-subitem">Org chart and structure</div>
-                    <div class="nav-subitem active">Organization details</div>
+                    <div class="nav-subitem">Organization details</div>
                 </div>
 
                 <div class="nav-item expandable" data-section="security">
@@ -521,76 +666,76 @@
     <!-- Main Content -->
     <div class="settings-content">
         <div class="content-header">
-            <h2 class="content-title">Organization Details</h2>
-            <p class="content-subtitle">Manage your organization's basic information and settings</p>
+            <h2 class="content-title">Offices</h2>
+            <p class="content-subtitle">Define working offices that reflect the organization's structure.</p>
         </div>
 
-    <!-- Organization Details Section -->
-    <div class="settings-section">
-        <div class="section-header">
-                <h3 class="section-name">Basic Information</h3>
-            <button class="edit-button">Edit</button>
-        </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Organization Name</div>
-                <div class="info-value">{{ organization.name if organization and organization.name else 'Not specified' }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Industry</div>
-                <div class="info-value not-specified">Not specified</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Company Size</div>
-                <div class="info-value">{{ organization.size if organization and organization.size else 'Not specified' }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Business Address</div>
-                <div class="info-value">{{ organization.location if organization and organization.location else 'Not specified' }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">City</div>
-                <div class="info-value not-specified">Not specified</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">State</div>
-                <div class="info-value not-specified">Not specified</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">ZIP Code</div>
-                <div class="info-value not-specified">Not specified</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Country</div>
-                <div class="info-value not-specified">Not specified</div>
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active">Offices</div>
             </div>
         </div>
-    </div>
 
-    <!-- Financial Contact Section -->
-        <div class="settings-section">
-        <div class="section-header">
-                <h3 class="section-name">Financial Contact</h3>
-            <button class="edit-button">Edit</button>
-        </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">First Name</div>
-                <div class="info-value not-specified">Not specified</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Last Name</div>
-                <div class="info-value not-specified">Not specified</div>
-            </div>
-            <div class="info-item">
-                    <div class="info-label">Email Address</div>
-                <div class="info-value not-specified">Not specified</div>
-            </div>
-            <div class="info-item">
-                    <div class="info-label">Phone Number</div>
-                <div class="info-value not-specified">Not specified</div>
+        <!-- Groups Controls -->
+        <div class="groups-controls">
+            <div class="controls-left">
+                <div class="groups-search">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <button class="filter-btn">
+                        Status
+                        <span class="status-badge active">
+                            <span class="status-dot"></span>
+                        </span>
+                        ▼
+                    </button>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <button class="filter-btn">
+                        Admins
+                        ▼
+                    </button>
                 </div>
             </div>
+            
+            <div class="controls-right">
+                <button class="create-group-btn">Create office</button>
+                <button class="expand-btn">⚏</button>
+            </div>
+        </div>
+
+        <!-- Item Count -->
+        <div class="item-count">Total 0 items</div>
+
+        <!-- Groups Table -->
+        <div class="groups-table-container">
+            <table class="groups-table">
+                <thead>
+                    <tr>
+                        <th>Office</th>
+                        <th>Status</th>
+                        <th>Admins assigned</th>
+                        <th>Contracts</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <div style="font-size: 2rem;">🏢</div>
+                                <div style="font-weight: 500;">No offices created yet</div>
+                                <div style="font-size: 0.875rem;">Create your first office to get started</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -635,13 +780,6 @@
         subitem.addEventListener('click', function(e) {
             e.stopPropagation();
             
-            // Handle navigation based on text content
-            const itemText = this.textContent.trim();
-            if (itemText === 'Groups') {
-                window.location.href = '/groups';
-                return;
-            }
-            
             // Remove active class from all subitems
             document.querySelectorAll('.nav-subitem').forEach(item => {
                 item.classList.remove('active');
@@ -652,24 +790,43 @@
         });
     });
 
-    // Handle edit button clicks
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.addEventListener('click', function() {
-            // Get the section name to determine which form to show
-            const sectionName = this.closest('.section-header').querySelector('.section-name').textContent;
-            
-            if (sectionName === 'Basic Information') {
-                window.location.href = '/organization/edit';
-            } else if (sectionName === 'Financial Contact') {
-                window.location.href = '/financial-contact/edit';
-            }
+    // Handle tab clicks
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
         });
     });
 
-    // Search functionality
-    const searchInput = document.querySelector('.search-input');
+    // Handle search functionality
+    const searchInput = document.querySelector('.groups-search input');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            // Add search functionality here if needed
+            console.log('Search term:', searchTerm);
+        });
+    }
+
+    // Handle filter dropdown clicks
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Add dropdown functionality here
+            console.log('Filter clicked:', this.textContent.trim());
+        });
+    });
+
+    // Handle create office button
+    document.querySelector('.create-group-btn')?.addEventListener('click', function() {
+        window.location.href = '/create-office';
+    });
+
+    // Sidebar search functionality
+    const sidebarSearch = document.querySelector('.search-input');
+    if (sidebarSearch) {
+        sidebarSearch.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             const navItems = document.querySelectorAll('.nav-item, .nav-subitem');
             

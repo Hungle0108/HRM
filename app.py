@@ -426,6 +426,54 @@ def settings():
     
     return render_template('settings.html', user=user, organization=organization)
 
+@app.route('/groups')
+def groups():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('groups.html', user=user, organization=organization)
+
+@app.route('/create-office')
+def create_office():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('create_office.html', user=user, organization=organization)
+
+@app.route('/create-office-step2')
+def create_office_step2():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('create_office_step2.html', user=user, organization=organization)
+
 @app.route('/api/signup', methods=['POST'])
 def signup():
     data = request.get_json()

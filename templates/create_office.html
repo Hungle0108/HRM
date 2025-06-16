@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create office - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: white;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .form-input.error:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .form-label.error {
+            color: #dc3545;
+        }
+
+        .error-message {
+            display: none;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 8px;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        .error-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .char-count {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        /* Radio options */
+        .options-group {
+            margin-bottom: 48px;
+        }
+
+        .options-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .option:hover {
+            border-color: #adb5bd;
+            background: #f8f9fa;
+        }
+
+        .option.selected {
+            border-color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        .option input[type="radio"] {
+            margin: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 50%;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .option input[type="radio"]:checked {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+        }
+
+        .option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-description {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+
+        .new-badge {
+            background: #6366f1;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Bottom navigation */
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
+        }
+
+        .btn-continue {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-continue:hover {
+            background: #333;
+        }
+
+        .btn-continue:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="window.location.href='/groups'">✕</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Create office</h1>
+                <p class="page-subtitle">For {{ organization.name if organization else 'CATSKY' }}</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="office-form">
+                    <div class="form-group">
+                        <label for="officeName" class="form-label">Office name</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="officeName" 
+                                class="form-input" 
+                                placeholder="Office name"
+                                maxlength="48"
+                                required
+                            >
+                            <span class="char-count">0/48</span>
+                        </div>
+                        <div class="error-message">
+                            <svg class="error-icon" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                            </svg>
+                            Office name is required
+                        </div>
+                    </div>
+
+                    <div class="options-group">
+                        <div class="options-title">How would you like to set up the office's settings?</div>
+                        
+                        <label class="option selected">
+                            <input type="radio" name="setupMethod" value="manual" checked>
+                            <div class="option-content">
+                                <div class="option-title">Configure manually</div>
+                                <div class="option-description">Manually configure payment methods, approval rules, and assign admins.</div>
+                            </div>
+                        </label>
+
+                        <label class="option">
+                            <input type="radio" name="setupMethod" value="replicate">
+                            <div class="option-content">
+                                <div class="option-title">
+                                    Replicate existing office settings
+                                    <span class="new-badge">NEW</span>
+                                </div>
+                                <div class="option-description">Select an office and replicate its settings, including admin roles, rules, and payment approvals.</div>
+                            </div>
+                        </label>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 class="sidebar-title">Create office workflow</h3>
+                <ol class="steps-list">
+                    <li class="step-item active">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Define office settings</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Select admins</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Assign roles & review</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <div class="step-info">Step 1 of 3<br>Next step: Select admins</div>
+                <button type="submit" class="btn-continue" id="continueBtn" form="office-form" disabled>Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track which fields have been interacted with
+        const interactedFields = new Set();
+        
+        // Character counter
+        const officeNameInput = document.getElementById('officeName');
+        const charCount = document.querySelector('.char-count');
+        const continueBtn = document.getElementById('continueBtn');
+        const officeLabel = document.querySelector('.form-label');
+        const errorMessage = document.querySelector('.error-message');
+
+        officeNameInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = `${length}/48`;
+            
+            // Enable/disable continue button based on input
+            continueBtn.disabled = length === 0;
+            
+            // Hide error if user starts typing
+            if (interactedFields.has(this) && this.value.trim()) {
+                hideFieldError(this);
+            }
+        });
+
+        // Add hover and blur validation
+        let hasBeenHovered = false;
+
+        officeNameInput.addEventListener('mouseenter', function() {
+            hasBeenHovered = true;
+        });
+
+        officeNameInput.addEventListener('blur', function() {
+            if (hasBeenHovered && !this.value.trim()) {
+                interactedFields.add(this);
+                showFieldError(this);
+            }
+        });
+
+        function showFieldError(field) {
+            field.classList.add('error');
+            officeLabel.classList.add('error');
+            errorMessage.classList.add('show');
+        }
+
+        function hideFieldError(field) {
+            field.classList.remove('error');
+            officeLabel.classList.remove('error');
+            errorMessage.classList.remove('show');
+        }
+
+        // Radio button handling
+        const radioButtons = document.querySelectorAll('input[name="setupMethod"]');
+        const options = document.querySelectorAll('.option');
+
+        radioButtons.forEach((radio, index) => {
+            radio.addEventListener('change', function() {
+                options.forEach(opt => opt.classList.remove('selected'));
+                if (this.checked) {
+                    options[index].classList.add('selected');
+                }
+            });
+        });
+
+        // Option click handling
+        options.forEach((option, index) => {
+            option.addEventListener('click', function() {
+                radioButtons[index].checked = true;
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Form submission
+        document.getElementById('office-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate required fields
+            if (!officeNameInput.value.trim()) {
+                showFieldError(officeNameInput);
+                return;
+            }
+            
+            if (!continueBtn.disabled) {
+                const officeName = officeNameInput.value.trim();
+                const setupMethod = document.querySelector('input[name="setupMethod"]:checked').value;
+                
+                // Store data in session storage for next step
+                sessionStorage.setItem('officeData', JSON.stringify({
+                    name: officeName,
+                    setupMethod: setupMethod,
+                    step: 1
+                }));
+                
+                // Navigate to next step
+                window.location.href = '/create-office-step2';
+            }
+        });
+    </script>
+</body>
+</html> 
