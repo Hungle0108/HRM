@@ -474,6 +474,22 @@ def create_office_step2():
     
     return render_template('create_office_step2.html', user=user, organization=organization)
 
+@app.route('/create-office-step3')
+def create_office_step3():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('create_office_step3.html', user=user, organization=organization)
+
 @app.route('/api/signup', methods=['POST'])
 def signup():
     data = request.get_json()

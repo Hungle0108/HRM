@@ -155,6 +155,7 @@
         cursor: pointer;
         font-size: 0.875rem;
         font-weight: 500;
+        min-height: 44px;
     }
 
     .nav-item:hover {
@@ -172,6 +173,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        flex: 1;
     }
 
     .nav-icon {
@@ -195,31 +197,24 @@
     .dropdown-arrow {
         width: 16px;
         height: 16px;
-        transition: transform 0.3s ease;
         flex-shrink: 0;
-        color: #6c757d;
-        stroke-width: 2;
-        stroke: currentColor;
-        fill: none;
+        display: flex;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
     }
 
     .nav-item.expandable.expanded .dropdown-arrow {
-        transform: rotate(180deg);
-        color: #495057;
+        opacity: 1;
     }
 
     .nav-item.expandable:hover .dropdown-arrow {
-        color: #495057;
+        opacity: 1;
     }
 
     /* Ensure dropdown arrows are properly positioned */
     .nav-item.expandable {
         position: relative;
-    }
-
-    .nav-item.expandable .dropdown-arrow {
-        margin-left: auto;
-        transform-origin: center;
+        align-items: center;
     }
 
     /* Sub-items */
@@ -437,16 +432,14 @@
             <div class="nav-section">
                 <div class="section-title">Organization & security</div>
                 
-                <div class="nav-item expandable expanded" data-section="organization">
+                <div class="nav-item expandable" data-section="organization">
                     <div class="nav-item-content">
                         <div class="nav-icon icon-organization"></div>
                         <span>Organization</span>
                     </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    <img class="dropdown-arrow" src="/static/images/angle-small-down.png" alt="Dropdown Arrow">
                 </div>
-                <div class="nav-subitems expanded" data-parent="organization">
+                <div class="nav-subitems" data-parent="organization">
                     <div class="nav-subitem">Analytics</div>
                     <div class="nav-subitem">Billing & payments</div>
                     <div class="nav-subitem">Custom branding</div>
@@ -461,9 +454,7 @@
                         <div class="nav-icon icon-security"></div>
                         <span>Security</span>
                     </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    <img class="dropdown-arrow" src="/static/images/angle-small-down.png" alt="Dropdown Arrow">
                 </div>
                 <div class="nav-subitems" data-parent="security">
                     <div class="nav-subitem">Access control</div>
@@ -492,9 +483,7 @@
                         <div class="nav-icon icon-people"></div>
                         <span>Settings</span>
                     </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    <img class="dropdown-arrow" src="/static/images/angle-small-down.png" alt="Dropdown Arrow">
                 </div>
                 <div class="nav-subitems" data-parent="hr-settings">
                     <div class="nav-subitem">Employee settings</div>
@@ -506,9 +495,7 @@
                         <div class="nav-icon icon-customize"></div>
                         <span>Customization</span>
                     </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    <img class="dropdown-arrow" src="/static/images/angle-small-down.png" alt="Dropdown Arrow">
                 </div>
                 <div class="nav-subitems" data-parent="customization">
                     <div class="nav-subitem">Custom fields</div>
@@ -603,6 +590,7 @@
         item.addEventListener('click', function() {
             const section = this.getAttribute('data-section');
             const subitems = document.querySelector(`[data-parent="${section}"]`);
+            const arrow = this.querySelector('.dropdown-arrow');
             
             if (subitems) {
                 const isExpanded = this.classList.contains('expanded');
@@ -612,8 +600,12 @@
                     if (expandedItem !== this) {
                         expandedItem.classList.remove('expanded');
                         const otherSubitems = document.querySelector(`[data-parent="${expandedItem.getAttribute('data-section')}"]`);
+                        const otherArrow = expandedItem.querySelector('.dropdown-arrow');
                         if (otherSubitems) {
                             otherSubitems.classList.remove('expanded');
+                        }
+                        if (otherArrow) {
+                            otherArrow.src = '/static/images/angle-small-down.png';
                         }
                     }
                 });
@@ -622,9 +614,15 @@
                 if (isExpanded) {
                     this.classList.remove('expanded');
                     subitems.classList.remove('expanded');
+                    if (arrow) {
+                        arrow.src = '/static/images/angle-small-down.png';
+                    }
                 } else {
                     this.classList.add('expanded');
                     subitems.classList.add('expanded');
+                    if (arrow) {
+                        arrow.src = '/static/images/angle-small-up.png';
+                    }
                 }
             }
         });
