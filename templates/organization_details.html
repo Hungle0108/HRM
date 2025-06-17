@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Organization Details - HR Management System{% endblock %}
+
+{% block styles %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="settings-layout">
+    <!-- Sidebar -->
+    {% include 'org_settings_sidebar.html' %}
+    <!-- Main Content -->
+    <div class="settings-content">
+        <div class="content-header">
+            <h2 class="content-title">Organization Details</h2>
+            <p class="content-subtitle">Manage your organization's basic information and settings</p>
+        </div>
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active">Organization Details</div>
+            </div>
+        </div>
+        <!-- Controls (search/filter) -->
+        <div class="groups-controls">
+            <div class="controls-left">
+                <div class="groups-search">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="filter-dropdown">
+                    <button class="filter-btn">Status ▼</button>
+                </div>
+            </div>
+            <div class="controls-right">
+                <button class="edit-button">Edit</button>
+            </div>
+        </div>
+        <!-- Organization Details Card/Table -->
+        <div class="groups-table-container">
+            <table class="groups-table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Organization Name</td><td>{{ organization.name if organization and organization.name else 'Not specified' }}</td></tr>
+                    <tr><td>Industry</td><td>Not specified</td></tr>
+                    <tr><td>Company Size</td><td>{{ organization.size if organization and organization.size else 'Not specified' }}</td></tr>
+                    <tr><td>Business Address</td><td>{{ organization.location if organization and organization.location else 'Not specified' }}</td></tr>
+                    <tr><td>City</td><td>Not specified</td></tr>
+                    <tr><td>State</td><td>Not specified</td></tr>
+                    <tr><td>ZIP Code</td><td>Not specified</td></tr>
+                    <tr><td>Country</td><td>Not specified</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Financial Contact Card/Table -->
+        <div class="groups-table-container" style="margin-top: 32px;">
+            <table class="groups-table">
+                <thead>
+                    <tr>
+                        <th>Financial Contact Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>First Name</td><td>Not specified</td></tr>
+                    <tr><td>Last Name</td><td>Not specified</td></tr>
+                    <tr><td>Email Address</td><td>Not specified</td></tr>
+                    <tr><td>Phone Number</td><td>Not specified</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %} 

@@ -151,18 +151,17 @@
     .dropdown-arrow {
         width: 16px;
         height: 16px;
+        margin-left: 8px;
+        align-self: center;
+        vertical-align: middle;
+        display: flex;
         transition: transform 0.3s ease;
-        flex-shrink: 0;
-        color: #6c757d;
-        stroke-width: 2;
-        stroke: currentColor;
-        fill: none;
+        transform-origin: 50% 50%;
     }
 
-    .nav-item.expandable.expanded .dropdown-arrow {
-        transform: rotate(180deg);
-        color: #495057;
-    }
+    .dropdown-arrow .arrow-up { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-down { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-up { display: inline; }
 
     .nav-item.expandable:hover .dropdown-arrow {
         color: #495057;
@@ -173,8 +172,7 @@
     }
 
     .nav-item.expandable .dropdown-arrow {
-        margin-left: auto;
-        transform-origin: center;
+        transition: transform 0.3s ease;
     }
 
     /* Sub-items */
@@ -209,6 +207,19 @@
         color: #1a1a1a;
         font-weight: 500;
         border-right: 2px solid #1a1a1a;
+    }
+
+    .settings-sidebar .nav-subitem a {
+        color: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .settings-sidebar .nav-subitem a:hover,
+    .settings-sidebar .nav-subitem.active a {
+        color: #1a1a1a;
+        text-decoration: none;
     }
 
     /* Main content area */
@@ -562,118 +573,32 @@
     .settings-sidebar::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
     }
+
+    .dropdown-arrow img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="settings-layout">
     <!-- Sidebar -->
-    <div class="settings-sidebar">
-        <div class="sidebar-header">
-            <h1 class="sidebar-title">Organization settings</h1>
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search">
-                <span class="search-icon">🔍</span>
-            </div>
-        </div>
-
-        <nav class="settings-nav">
-            <!-- Organization & security section -->
-            <div class="nav-section">
-                <div class="section-title">Organization & security</div>
-                
-                <div class="nav-item expandable expanded" data-section="organization">
-                    <div class="nav-item-content">
-                        <div class="nav-icon icon-organization"></div>
-                        <span>Organization</span>
-                    </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div class="nav-subitems expanded" data-parent="organization">
-                    <div class="nav-subitem">Analytics</div>
-                    <div class="nav-subitem">Billing & payments</div>
-                    <div class="nav-subitem">Custom branding</div>
-                    <div class="nav-subitem">Entities</div>
-                    <div class="nav-subitem active">Offices</div>
-                    <div class="nav-subitem">Org chart and structure</div>
-                    <div class="nav-subitem">Organization details</div>
-                </div>
-
-                <div class="nav-item expandable" data-section="security">
-                    <div class="nav-item-content">
-                        <div class="nav-icon icon-security"></div>
-                        <span>Security</span>
-                    </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div class="nav-subitems" data-parent="security">
-                    <div class="nav-subitem">Access control</div>
-                    <div class="nav-subitem">Authentication</div>
-                </div>
-            </div>
-
-            <!-- Payroll section -->
-            <div class="nav-section">
-                <div class="section-title">Payroll</div>
-                
-                <div class="nav-item" data-section="expenses">
-                    <div class="nav-item-content">
-                        <div class="nav-icon icon-dollar"></div>
-                        <span>Expenses & adjustments</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Human Resources section -->
-            <div class="nav-section">
-                <div class="section-title">Human Resources</div>
-                
-                <div class="nav-item expandable" data-section="hr-settings">
-                    <div class="nav-item-content">
-                        <div class="nav-icon icon-people"></div>
-                        <span>Settings</span>
-                    </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div class="nav-subitems" data-parent="hr-settings">
-                    <div class="nav-subitem">Employee settings</div>
-                    <div class="nav-subitem">Time tracking</div>
-                </div>
-
-                <div class="nav-item expandable" data-section="customization">
-                    <div class="nav-item-content">
-                        <div class="nav-icon icon-customize"></div>
-                        <span>Customization</span>
-                    </div>
-                    <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div class="nav-subitems" data-parent="customization">
-                    <div class="nav-subitem">Custom fields</div>
-                    <div class="nav-subitem">Templates</div>
-                </div>
-            </div>
-        </nav>
-    </div>
-
+    {% include 'org_settings_sidebar.html' %}
     <!-- Main Content -->
     <div class="settings-content">
         <div class="content-header">
-            <h2 class="content-title">Offices</h2>
-            <p class="content-subtitle">Define working offices that reflect the organization's structure.</p>
+            <h2 class="content-title">Groups</h2>
+            <p class="content-subtitle">Define working groups that reflect the organization's structure.</p>
         </div>
 
         <!-- Tabs -->
         <div class="tabs-container">
             <div class="tabs">
-                <div class="tab active">Offices</div>
+                <div class="tab active">Groups</div>
             </div>
         </div>
 
@@ -704,7 +629,7 @@
             </div>
             
             <div class="controls-right">
-                <button class="create-group-btn">Create office</button>
+                <button class="create-group-btn">Create group</button>
                 <button class="expand-btn">⚏</button>
             </div>
         </div>
@@ -717,7 +642,7 @@
             <table class="groups-table">
                 <thead>
                     <tr>
-                        <th>Office</th>
+                        <th>Group</th>
                         <th>Status</th>
                         <th>Admins assigned</th>
                         <th>Contracts</th>
@@ -729,8 +654,8 @@
                         <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                                 <div style="font-size: 2rem;">🏢</div>
-                                <div style="font-weight: 500;">No offices created yet</div>
-                                <div style="font-size: 0.875rem;">Create your first office to get started</div>
+                                <div style="font-weight: 500;">No groups created yet</div>
+                                <div style="font-size: 0.875rem;">Create your first group to get started</div>
                             </div>
                         </td>
                     </tr>
@@ -743,11 +668,38 @@
 
 {% block scripts %}
 <script>
+    // Restore expanded state from localStorage and expand for active page
+    document.addEventListener('DOMContentLoaded', function() {
+        const expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
+        expandedSections.forEach(section => {
+            const navItem = document.querySelector('.nav-item.expandable[data-section="' + section + '"]');
+            const subitems = document.querySelector('.nav-subitems[data-parent="' + section + '"]');
+            if (navItem && subitems) {
+                navItem.classList.add('expanded');
+                subitems.classList.add('expanded');
+            }
+        });
+        // Always expand the parent section of the active subitem
+        const activeSubitem = document.querySelector('.nav-subitem.active');
+        if (activeSubitem) {
+            const parentSection = activeSubitem.parentElement.getAttribute('data-parent');
+            if (parentSection) {
+                const navItem = document.querySelector('.nav-item.expandable[data-section="' + parentSection + '"]');
+                const subitems = document.querySelector('.nav-subitems[data-parent="' + parentSection + '"]');
+                if (navItem && subitems) {
+                    navItem.classList.add('expanded');
+                    subitems.classList.add('expanded');
+                }
+            }
+        }
+    });
+
     // Handle expandable navigation items
     document.querySelectorAll('.nav-item.expandable').forEach(item => {
         item.addEventListener('click', function() {
             const section = this.getAttribute('data-section');
             const subitems = document.querySelector(`[data-parent="${section}"]`);
+            let expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
             
             if (subitems) {
                 const isExpanded = this.classList.contains('expanded');
@@ -760,6 +712,9 @@
                         if (otherSubitems) {
                             otherSubitems.classList.remove('expanded');
                         }
+                        // Remove from expandedSections
+                        const idx = expandedSections.indexOf(expandedItem.getAttribute('data-section'));
+                        if (idx !== -1) expandedSections.splice(idx, 1);
                     }
                 });
                 
@@ -767,10 +722,30 @@
                 if (isExpanded) {
                     this.classList.remove('expanded');
                     subitems.classList.remove('expanded');
+                    // Remove from expandedSections
+                    const idx = expandedSections.indexOf(section);
+                    if (idx !== -1) expandedSections.splice(idx, 1);
                 } else {
                     this.classList.add('expanded');
                     subitems.classList.add('expanded');
+                    // Add to expandedSections
+                    if (!expandedSections.includes(section)) expandedSections.push(section);
                 }
+                // Save to localStorage
+                localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
+
+                // Force arrow update
+                document.querySelectorAll('.nav-item.expandable').forEach(item => {
+                    const arrowDown = item.querySelector('.arrow-down');
+                    const arrowUp = item.querySelector('.arrow-up');
+                    if (item.classList.contains('expanded')) {
+                        if (arrowDown) arrowDown.style.display = 'none';
+                        if (arrowUp) arrowUp.style.display = 'inline';
+                    } else {
+                        if (arrowDown) arrowDown.style.display = 'inline';
+                        if (arrowUp) arrowUp.style.display = 'none';
+                    }
+                });
             }
         });
     });
@@ -818,7 +793,7 @@
         });
     });
 
-    // Handle create office button
+    // Handle create group button
     document.querySelector('.create-group-btn')?.addEventListener('click', function() {
         window.location.href = '/create-office';
     });
@@ -837,5 +812,20 @@
             });
         });
     }
+
+    // Also force arrow update on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.nav-item.expandable').forEach(item => {
+            const arrowDown = item.querySelector('.arrow-down');
+            const arrowUp = item.querySelector('.arrow-up');
+            if (item.classList.contains('expanded')) {
+                if (arrowDown) arrowDown.style.display = 'none';
+                if (arrowUp) arrowUp.style.display = 'inline';
+            } else {
+                if (arrowDown) arrowDown.style.display = 'inline';
+                if (arrowUp) arrowUp.style.display = 'none';
+            }
+        });
+    });
 </script>
 {% endblock %} 

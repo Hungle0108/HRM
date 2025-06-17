@@ -1,0 +1,90 @@
+<div class="settings-sidebar">
+    <div class="sidebar-header">
+        <h1 class="sidebar-title">Organization settings</h1>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search">
+            <span class="search-icon">🔍</span>
+        </div>
+    </div>
+    <nav class="settings-nav">
+        <!-- Organization & security section -->
+        <div class="nav-section">
+            <div class="section-title">Organization & security</div>
+            <div class="nav-item expandable" data-section="organization">
+                <div class="nav-item-content">
+                    <div class="nav-icon icon-organization"></div>
+                    <span>Organization</span>
+                    <span class="dropdown-arrow">
+                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
+                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
+                    </span>
+                </div>
+            </div>
+            <div class="nav-subitems" data-parent="organization">
+                <div class="nav-subitem{% if active_page == 'analytics' %} active{% endif %}"><a href="#">Analytics</a></div>
+                <div class="nav-subitem{% if active_page == 'billing' %} active{% endif %}"><a href="#">Billing & payments</a></div>
+                <div class="nav-subitem{% if active_page == 'branding' %} active{% endif %}"><a href="#">Custom branding</a></div>
+                <div class="nav-subitem{% if active_page == 'entities' %} active{% endif %}"><a href="/settings/entities" style="color:inherit;text-decoration:none;">Entities</a></div>
+                <div class="nav-subitem{% if active_page == 'groups' %} active{% endif %}"><a href="/groups" style="color:inherit;text-decoration:none;">Groups</a></div>
+                <div class="nav-subitem{% if active_page == 'org_chart' %} active{% endif %}"><a href="#">Org chart and structure</a></div>
+                <div class="nav-subitem{% if active_page == 'organization_details' %} active{% endif %}"><a href="/settings" style="color:inherit;text-decoration:none;">Organization details</a></div>
+            </div>
+            <div class="nav-item expandable" data-section="security">
+                <div class="nav-item-content">
+                    <div class="nav-icon icon-security"></div>
+                    <span>Security</span>
+                    <span class="dropdown-arrow">
+                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
+                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
+                    </span>
+                </div>
+            </div>
+            <div class="nav-subitems" data-parent="security">
+                <div class="nav-subitem">Access control</div>
+                <div class="nav-subitem">Authentication</div>
+            </div>
+        </div>
+        <!-- Payroll section -->
+        <div class="nav-section">
+            <div class="section-title">Payroll</div>
+            <div class="nav-item" data-section="expenses">
+                <div class="nav-item-content">
+                    <div class="nav-icon icon-dollar"></div>
+                    <span>Expenses & adjustments</span>
+                </div>
+            </div>
+        </div>
+        <!-- Human Resources section -->
+        <div class="nav-section">
+            <div class="section-title">Human Resources</div>
+            <div class="nav-item expandable" data-section="hr-settings">
+                <div class="nav-item-content">
+                    <div class="nav-icon icon-people"></div>
+                    <span>Settings</span>
+                    <span class="dropdown-arrow">
+                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
+                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
+                    </span>
+                </div>
+            </div>
+            <div class="nav-subitems" data-parent="hr-settings">
+                <div class="nav-subitem">Employee settings</div>
+                <div class="nav-subitem">Time tracking</div>
+            </div>
+            <div class="nav-item expandable" data-section="customization">
+                <div class="nav-item-content">
+                    <div class="nav-icon icon-customize"></div>
+                    <span>Customization</span>
+                    <span class="dropdown-arrow">
+                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
+                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
+                    </span>
+                </div>
+            </div>
+            <div class="nav-subitems" data-parent="customization">
+                <div class="nav-subitem">Custom fields</div>
+                <div class="nav-subitem">Templates</div>
+            </div>
+        </div>
+    </nav>
+</div> 

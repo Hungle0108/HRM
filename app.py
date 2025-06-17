@@ -414,33 +414,27 @@ def check_login():
 def settings():
     if 'user_id' not in session:
         return redirect('/login')
-    
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
-    
     organization = None
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
-    
-    return render_template('settings.html', user=user, organization=organization)
+    return render_template('organization_details.html', user=user, organization=organization, active_page='organization_details')
 
 @app.route('/groups')
 def groups():
     if 'user_id' not in session:
         return redirect('/login')
-    
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
-    
     organization = None
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
-    
-    return render_template('groups.html', user=user, organization=organization)
+    return render_template('groups.html', user=user, organization=organization, active_page='groups')
 
 @app.route('/create-office')
 def create_office():
@@ -1197,6 +1191,19 @@ def language_settings():
         return redirect('/login')
     
     return render_template('language_settings.html', user=user)
+
+@app.route('/settings/entities')
+def settings_entities():
+    if 'user_id' not in session:
+        return redirect('/login')
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    return render_template('entities.html', user=user, organization=organization, active_page='entities')
 
 if __name__ == '__main__':
     with app.app_context():
