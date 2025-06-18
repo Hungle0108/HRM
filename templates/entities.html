@@ -1,1 +1,605 @@
- 
+{% extends "base.html" %}
+
+{% block title %}Entities - HR Management System{% endblock %}
+
+{% block styles %}
+<style>
+    /* Reset and base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* Main container */
+    .settings-layout {
+        display: flex;
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+    }
+
+    /* Sidebar styles */
+    .settings-sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        padding: 24px 0 32px 0;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        border-radius: 0 0 12px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .sidebar-header {
+        padding: 0 24px 20px 24px;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 14px;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: #f8f9fa;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #80bdff;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 16px;
+    }
+
+    /* Navigation sections */
+    .nav-section {
+        margin-bottom: 24px;
+    }
+
+    .nav-section:last-child {
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 24px 8px 24px;
+        margin-bottom: 6px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .nav-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .nav-item.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .nav-item-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-icon {
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.7;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-item:hover .nav-icon,
+    .nav-item.active .nav-icon {
+        opacity: 1;
+    }
+
+    .dropdown-arrow {
+        width: 16px;
+        height: 16px;
+        margin-left: 8px;
+        align-self: center;
+        vertical-align: middle;
+        display: flex;
+        transition: transform 0.3s ease;
+        transform-origin: 50% 50%;
+    }
+
+    .dropdown-arrow .arrow-up { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-down { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-up { display: inline; }
+
+    .nav-item.expandable:hover .dropdown-arrow {
+        color: #495057;
+    }
+
+    .nav-item.expandable {
+        position: relative;
+    }
+
+    .nav-item.expandable .dropdown-arrow {
+        transition: transform 0.3s ease;
+    }
+
+    /* Sub-items */
+    .nav-subitems {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-subitems.expanded {
+        max-height: 500px;
+    }
+
+    .nav-subitem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 56px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-subitem:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .nav-subitem.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 500;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .settings-sidebar .nav-subitem a {
+        color: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .settings-sidebar .nav-subitem a:hover,
+    .settings-sidebar .nav-subitem.active a {
+        color: #1a1a1a;
+        text-decoration: none;
+    }
+
+    /* Main content area */
+    .settings-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 32px 40px;
+    }
+
+    .content-header {
+        margin-bottom: 32px;
+    }
+
+    .content-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .content-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+    }
+
+    /* Tabs */
+    .tabs-container {
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 24px;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 32px;
+    }
+
+    .tab {
+        padding: 12px 0;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .tab:hover {
+        color: #495057;
+    }
+
+    .tab.active {
+        color: #1a1a1a;
+        font-weight: 600;
+        border-bottom-color: #1a1a1a;
+    }
+
+    /* Controls section */
+    .groups-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .controls-left {
+        display: flex;
+        gap: 16px;
+    }
+
+    .groups-search {
+        position: relative;
+    }
+
+    .groups-search input {
+        padding: 8px 16px 8px 40px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        width: 240px;
+        background: white;
+    }
+
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: white;
+        color: #495057;
+        font-size: 0.875rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #22c55e;
+    }
+
+    .status-badge.active .status-dot {
+        background-color: #22c55e;
+    }
+
+    .controls-right {
+        display: flex;
+        gap: 12px;
+    }
+
+    .create-entity-btn {
+        padding: 8px 16px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .create-entity-btn:hover {
+        background: #333;
+    }
+
+    .expand-btn {
+        padding: 8px 12px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: white;
+        color: #495057;
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    /* Item count */
+    .item-count {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 16px;
+    }
+
+    /* Table styles */
+    .groups-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 24px;
+    }
+
+    .groups-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .groups-table th,
+    .groups-table td {
+        padding: 16px 24px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .groups-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+
+    .groups-table td {
+        color: #1a1a1a;
+        font-size: 0.875rem;
+    }
+
+    .groups-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .entity-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        margin-right: 12px;
+        vertical-align: middle;
+    }
+
+    .entity-name {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+    }
+
+    .entity-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .entity-status.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .entity-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 4px 8px;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        background: white;
+        color: #6c757d;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .action-btn:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+        .settings-sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            height: calc(100vh - 80px);
+        }
+
+        .settings-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .settings-content {
+            margin-left: 0;
+        }
+    }
+
+    /* Scrollbar styling */
+    .settings-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    .dropdown-arrow img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    /* Icons */
+    .icon-organization {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'/%3e%3c/svg%3e");
+    }
+
+    .icon-security {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'/%3e%3c/svg%3e");
+    }
+
+    .icon-dollar {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1'/%3e%3c/svg%3e");
+    }
+
+    .icon-people {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z'/%3e%3c/svg%3e");
+    }
+
+    .icon-customize {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3e%3c/svg%3e");
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-layout">
+    <!-- Sidebar -->
+    {% include 'org_settings_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="settings-content">
+        <div class="content-header">
+            <h2 class="content-title">Entities</h2>
+            <p class="content-subtitle">Manage the entities that are part of your organization.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active">Entities</div>
+            </div>
+        </div>
+
+        <!-- Entities Controls -->
+        <div class="groups-controls">
+            <div class="controls-left">
+                <div class="groups-search">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <button class="filter-btn">
+                        Status
+                        <span class="status-badge active">
+                            <span class="status-dot"></span>
+                        </span>
+                        ▼
+                    </button>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <button class="filter-btn">
+                        Type
+                        ▼
+                    </button>
+                </div>
+            </div>
+            
+            <div class="controls-right">
+                <button class="create-entity-btn">Create entity</button>
+                <button class="expand-btn">⚏</button>
+            </div>
+        </div>
+
+        <!-- Item Count -->
+        <div class="item-count">Total 0 items</div>
+
+        <!-- Entities Table -->
+        <div class="groups-table-container">
+            <table class="groups-table">
+                <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                        <th>Employees</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- No entities to display -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

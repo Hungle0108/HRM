@@ -252,6 +252,11 @@
             margin-bottom: 4px;
         }
 
+        .group-info-right {
+            display: flex;
+            align-items: center;
+        }
+
         .group-status {
             font-size: 0.875rem;
             color: #6c757d;
@@ -303,12 +308,14 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 12px;
+            min-height: 40px;
         }
 
         .admin-role-left {
             display: flex;
             align-items: center;
             gap: 12px;
+            height: 100%;
         }
 
         .admin-role-icon {
@@ -363,6 +370,74 @@
 
         .edit-btn:hover {
             color: #495057;
+        }
+
+        .dropdown-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dropdown-btn:hover {
+            color: #495057;
+            background: #f8f9fa;
+        }
+
+        /* Admin dropdown content */
+        .admin-dropdown-content {
+            margin-top: 16px;
+            border-top: 1px solid #e9ecef;
+            padding-top: 16px;
+        }
+
+        .admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .admin-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e1bee7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #4a148c;
+        }
+
+        .admin-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .admin-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .admin-email {
+            font-size: 0.75rem;
+            color: #6c757d;
         }
 
         /* Bottom navigation */
@@ -467,7 +542,6 @@
                     <!-- Step Header -->
                     <div class="step-header">
                         <h2 class="step-title">
-                            <span class="step-number-badge">3</span>
                             Assign roles & review
                         </h2>
                     </div>
@@ -479,8 +553,10 @@
                                 <div class="group-icon">👥</div>
                                 <div class="group-details">
                                     <div class="group-name">kotifdfdsfaf</div>
-                                    <div class="group-status">No admins selected</div>
                                 </div>
+                            </div>
+                            <div class="group-info-right">
+                                <div class="group-status">No admins selected</div>
                             </div>
                         </div>
                     </div>
@@ -490,7 +566,7 @@
                         <div class="warning-message">
                             <div class="warning-icon">ℹ️</div>
                             <div class="warning-text">
-                                At least one group admin must be assigned before the group can be created.
+                                Organization admins can manage this group. If no specific group admins are assigned, organization admins will have administrative access.
                             </div>
                         </div>
                     </div>
@@ -504,12 +580,23 @@
                                     <div class="admin-role-title">Organization admins</div>
                                 </div>
                                 <div class="admin-role-right">
-                                    <select class="role-select">
-                                        <option value="">Group Admin</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="member">Member</option>
-                                    </select>
-                                    <button type="button" class="edit-btn">✏️</button>
+                                    <button type="button" class="dropdown-btn" id="dropdownBtn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Dropdown Content -->
+                            <div class="admin-dropdown-content" id="adminDropdown" style="display: none;">
+                                <div class="admin-list">
+                                    <div class="admin-item">
+                                        <div class="admin-avatar">PD</div>
+                                        <div class="admin-info">
+                                            <div class="admin-name">Phu Dang</div>
+                                            <div class="admin-email">duyphudang2007@gmail.com</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -559,33 +646,40 @@
         document.getElementById('office-form-step3').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get existing office data
+            // Get the group name from step 1 data or current form
             const existingData = JSON.parse(sessionStorage.getItem('officeData') || '{}');
+            const groupName = existingData.officeName || document.querySelector('.group-name').textContent;
             
-            // Get role selections
-            const roleSelections = {};
-            document.querySelectorAll('.role-select').forEach(select => {
-                const adminType = select.closest('.admin-role-card').querySelector('.admin-role-title').textContent;
-                roleSelections[adminType] = select.value;
+            if (!groupName) {
+                alert('Group name is required');
+                return;
+            }
+            
+            // Submit group data to API
+            fetch('/api/create-group', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    groupName: groupName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Clear session storage
+                    sessionStorage.removeItem('officeData');
+                    alert('Group created successfully!');
+                    window.location.href = '/groups';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while creating the group');
             });
-            
-            // Update with step 3 data
-            const finalData = {
-                ...existingData,
-                step: 3,
-                roleAssignments: roleSelections,
-                completed: true
-            };
-            
-            // Store final data
-            sessionStorage.setItem('officeData', JSON.stringify(finalData));
-            
-            // Here you would submit the data to your backend
-            console.log('Final office data:', finalData);
-            
-            // Show success message or redirect
-            alert('Office created successfully!');
-            window.location.href = '/groups';
         });
 
         // Role selection change handlers
@@ -607,18 +701,10 @@
         // Function to update the Add group button state
         function updateAddGroupButton() {
             const addGroupBtn = document.getElementById('addGroupBtn');
-            const roleSelects = document.querySelectorAll('.role-select');
-            let hasAdminRole = false;
             
-            // Check if at least one admin role is assigned
-            roleSelects.forEach(select => {
-                if (select.value && (select.value === 'admin' || select.value === '')) {
-                    hasAdminRole = true;
-                }
-            });
-            
-            // Enable/disable button based on admin role assignment
-            addGroupBtn.disabled = !hasAdminRole;
+            // Always enable the button since organization admins are available
+            // Organization admins can manage the group even if no specific group admins are assigned
+            addGroupBtn.disabled = false;
         }
 
         // Initialize the page
@@ -634,11 +720,10 @@
                 }
             }
             
-            // Update admin status based on previous selections
+            // Keep admin status as "No admins selected" since no group admins were selected
+            // The selectedAdmins from step 2 are organization admins, not group admins
             const adminStatus = document.querySelector('.group-status');
-            if (officeData.selectedAdmins && officeData.selectedAdmins.length > 0) {
-                adminStatus.textContent = `${officeData.selectedAdmins.length} admin(s) selected`;
-            }
+            adminStatus.textContent = "No admins selected";
             
             // Initial button state check
             updateAddGroupButton();
@@ -646,6 +731,22 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Dropdown toggle functionality
+        document.getElementById('dropdownBtn').addEventListener('click', function() {
+            const dropdown = document.getElementById('adminDropdown');
+            const isVisible = dropdown.style.display !== 'none';
+            
+            if (isVisible) {
+                dropdown.style.display = 'none';
+                // Rotate arrow back to down position
+                this.querySelector('svg').style.transform = 'rotate(0deg)';
+            } else {
+                dropdown.style.display = 'block';
+                // Rotate arrow to up position
+                this.querySelector('svg').style.transform = 'rotate(180deg)';
+            }
+        });
     </script>
 </body>
 </html> 

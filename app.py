@@ -105,6 +105,7 @@ class Organization(db.Model):
     logo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     users = db.relationship('User', backref='org', lazy=True)
+    groups = db.relationship('Group', backref='organization', lazy=True)
 
     def to_dict(self):
         return {
@@ -114,6 +115,31 @@ class Organization(db.Model):
             'size': self.size,
             'location': self.location,
             'logo_url': self.logo_url
+        }
+
+# Group model
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    status = db.Column(db.String(20), default='ACTIVE')
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    admin_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    contracts_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    admin_user = db.relationship('User', backref='administered_groups')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'status': self.status,
+            'organization_id': self.organization_id,
+            'admin_user_id': self.admin_user_id,
+            'contracts_count': self.contracts_count,
+            'admin_name': self.admin_user.name if self.admin_user else None,
+            'admin_email': self.admin_user.email if self.admin_user else None
         }
 
 # Create database tables
@@ -432,9 +458,12 @@ def groups():
         session.pop('user_id', None)
         return redirect('/login')
     organization = None
+    user_groups = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
-    return render_template('groups.html', user=user, organization=organization, active_page='groups')
+        # Get all groups for this organization
+        user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
+    return render_template('groups.html', user=user, organization=organization, groups=user_groups, active_page='groups')
 
 @app.route('/create-office')
 def create_office():
@@ -483,6 +512,44 @@ def create_office_step3():
         organization = Organization.query.get(user.organization_id)
     
     return render_template('create_office_step3.html', user=user, organization=organization)
+
+@app.route('/api/create-group', methods=['POST'])
+def create_group():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User not found or no organization'}), 400
+    
+    data = request.get_json()
+    group_name = data.get('groupName')
+    
+    if not group_name:
+        return jsonify({'error': 'Group name is required'}), 400
+    
+    try:
+        # Create new group with the user as the admin
+        new_group = Group(
+            name=group_name,
+            status='ACTIVE',
+            organization_id=user.organization_id,
+            admin_user_id=user.id,
+            contracts_count=0
+        )
+        
+        db.session.add(new_group)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Group created successfully',
+            'group': new_group.to_dict(),
+            'redirect': '/groups'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to create group'}), 500
 
 @app.route('/api/signup', methods=['POST'])
 def signup():

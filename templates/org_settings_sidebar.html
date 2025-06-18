@@ -1,7 +1,8 @@
 <div class="settings-sidebar">
     <div class="sidebar-header">
         <h1 class="sidebar-title">Organization settings</h1>
-        <div class="search-container">
+        <div class="search-container"> 
+        
             <input type="text" class="search-input" placeholder="Search">
             <span class="search-icon">🔍</span>
         </div>
@@ -87,4 +88,203 @@
             </div>
         </div>
     </nav>
-</div> 
+</div>
+
+<script>
+(function() {
+    // Ensure this script only runs once
+    if (window.orgSidebarInitialized) return;
+    window.orgSidebarInitialized = true;
+
+    // Restore expanded state from localStorage and expand for active page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Use requestAnimationFrame to ensure DOM is fully rendered before state changes
+        requestAnimationFrame(() => {
+            // First, prevent any ongoing transitions by forcing immediate state
+            const allSubitems = document.querySelectorAll('.nav-subitems');
+            const allExpandable = document.querySelectorAll('.nav-item.expandable');
+            
+            // Temporarily set all subitems to no animation
+            allSubitems.forEach(item => {
+                item.style.transition = 'none';
+                item.style.maxHeight = '0px';
+                item.classList.remove('expanded');
+            });
+            
+            // Reset all expandable items
+            allExpandable.forEach(item => {
+                item.classList.remove('expanded');
+            });
+            
+            // Force a reflow to ensure styles are applied
+            document.body.offsetHeight;
+            
+            // Now set the correct initial state
+            const expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
+            expandedSections.forEach(section => {
+                const navItem = document.querySelector('.nav-item.expandable[data-section="' + section + '"]');
+                const subitems = document.querySelector('.nav-subitems[data-parent="' + section + '"]');
+                if (navItem && subitems) {
+                    navItem.classList.add('expanded');
+                    subitems.classList.add('expanded');
+                    subitems.style.maxHeight = '500px';
+                }
+            });
+            
+            // Always expand the parent section of the active subitem
+            const activeSubitem = document.querySelector('.nav-subitem.active');
+            if (activeSubitem) {
+                const parentSection = activeSubitem.parentElement.getAttribute('data-parent');
+                if (parentSection) {
+                    const navItem = document.querySelector('.nav-item.expandable[data-section="' + parentSection + '"]');
+                    const subitems = document.querySelector('.nav-subitems[data-parent="' + parentSection + '"]');
+                    if (navItem && subitems) {
+                        navItem.classList.add('expanded');
+                        subitems.classList.add('expanded');
+                        subitems.style.maxHeight = '500px';
+                        
+                        // Also add to localStorage if not already there
+                        let expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
+                        if (!expandedSections.includes(parentSection)) {
+                            expandedSections.push(parentSection);
+                            localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
+                        }
+                    }
+                }
+            }
+            
+            // Force arrow update
+            updateAllArrows();
+            
+            // Re-enable transitions after the state is set
+            requestAnimationFrame(() => {
+                allSubitems.forEach(item => {
+                    item.style.transition = '';
+                });
+            });
+        });
+    });
+
+    // Handle expandable navigation items - use direct event listeners instead of delegation
+    function setupExpandableItems() {
+        document.querySelectorAll('.nav-item.expandable').forEach(expandableItem => {
+            // Remove any existing listeners to prevent duplicates
+            expandableItem.removeEventListener('click', handleExpandableClick);
+            expandableItem.addEventListener('click', handleExpandableClick);
+        });
+    }
+
+    function handleExpandableClick(e) {
+        // Check if the click is on a link or inside a link
+        if (e.target.tagName === 'A' || e.target.closest('a')) {
+            return; // Allow normal link navigation
+        }
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const expandableItem = this;
+        const section = expandableItem.getAttribute('data-section');
+        const subitems = document.querySelector(`[data-parent="${section}"]`);
+        let expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
+        
+        if (subitems) {
+            const isExpanded = expandableItem.classList.contains('expanded');
+            
+            // Toggle current item without closing others
+            if (isExpanded) {
+                expandableItem.classList.remove('expanded');
+                subitems.classList.remove('expanded');
+                // Remove from expandedSections
+                const idx = expandedSections.indexOf(section);
+                if (idx !== -1) expandedSections.splice(idx, 1);
+            } else {
+                expandableItem.classList.add('expanded');
+                subitems.classList.add('expanded');
+                // Add to expandedSections
+                if (!expandedSections.includes(section)) expandedSections.push(section);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
+            
+            // Force arrow update
+            updateAllArrows();
+        }
+    }
+
+    // Handle subitem clicks - use direct event listeners
+    function setupSubItems() {
+        document.querySelectorAll('.nav-subitem').forEach(subitem => {
+            // Remove any existing listeners to prevent duplicates
+            subitem.removeEventListener('click', handleSubitemClick);
+            subitem.addEventListener('click', handleSubitemClick);
+        });
+    }
+
+    function handleSubitemClick(e) {
+        const subitem = this;
+        const link = subitem.querySelector('a');
+        
+        // If there's a link inside the subitem, navigate to it
+        if (link && link.href && link.href !== window.location.href + '#') {
+            // Allow the browser's default link behavior
+            window.location.href = link.href;
+            return;
+        }
+        
+        // Only handle non-link subitems
+        e.stopPropagation();
+        
+        // Remove active class from all subitems
+        document.querySelectorAll('.nav-subitem').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Add active class to clicked subitem
+        subitem.classList.add('active');
+    }
+
+    // Sidebar search functionality
+    document.addEventListener('input', function(e) {
+        if (!e.target.classList.contains('search-input')) return;
+        
+        const searchTerm = e.target.value.toLowerCase();
+        const navItems = document.querySelectorAll('.nav-item, .nav-subitem');
+        
+        navItems.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            const shouldShow = text.includes(searchTerm);
+            item.style.display = shouldShow ? 'flex' : 'none';
+        });
+    });
+
+    // Function to update all arrow states
+    function updateAllArrows() {
+        document.querySelectorAll('.nav-item.expandable').forEach(item => {
+            const arrowDown = item.querySelector('.arrow-down');
+            const arrowUp = item.querySelector('.arrow-up');
+            if (item.classList.contains('expanded')) {
+                if (arrowDown) arrowDown.style.display = 'none';
+                if (arrowUp) arrowUp.style.display = 'inline';
+            } else {
+                if (arrowDown) arrowDown.style.display = 'inline';
+                if (arrowUp) arrowUp.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize event listeners when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupExpandableItems();
+            setupSubItems();
+            updateAllArrows();
+        });
+    } else {
+        setupExpandableItems();
+        setupSubItems();
+        updateAllArrows();
+    }
+})();
+</script> 
