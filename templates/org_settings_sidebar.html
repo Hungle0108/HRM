@@ -145,6 +145,11 @@
 .nav-item.expandable:hover {
     background-color: rgba(0, 0, 0, 0.05);
 }
+
+/* Helper class to disable animations during page load */
+.settings-sidebar.no-transition .nav-subitems {
+    transition: none !important;
+}
 </style>
 
 <script>
@@ -154,7 +159,13 @@
     window.orgSidebarInitialized = true;
 
     function initializeSidebar() {
-        console.log('Initializing organization sidebar...');
+        console.log('Initializing organization sidebar with no-transition fix...');
+        
+        const sidebar = document.querySelector('.settings-sidebar');
+        if (!sidebar) return;
+
+        // Add class to disable all transitions during setup
+        sidebar.classList.add('no-transition');
         
         // Check if this is the first visit to organization settings in this session
         const isFirstVisit = !sessionStorage.getItem('orgSettingsVisited');
@@ -214,6 +225,18 @@
                 }
             });
         });
+
+        // Force browser to apply the styles before re-enabling transitions
+        // Reading an element's offsetHeight is a common way to trigger a reflow
+        document.body.offsetHeight;
+
+        // Re-enable transitions after the browser has painted the initial state
+        setTimeout(() => {
+            if (sidebar) {
+                sidebar.classList.remove('no-transition');
+                console.log('Sidebar transitions re-enabled.');
+            }
+        }, 0); // A small delay ensures the initial state is rendered
     }
 
     function collapseAllDropdowns() {
@@ -274,12 +297,12 @@
         }
     }
 
-    // Initialize when DOM is ready
+    // Initialize when DOM is ready, without artificial delay
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializeSidebar);
     } else {
-        // DOM is already loaded
-        setTimeout(initializeSidebar, 100);
+        // DOM is already loaded, run immediately
+        initializeSidebar();
     }
 })();
 

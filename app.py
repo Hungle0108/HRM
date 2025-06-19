@@ -1292,6 +1292,19 @@ def org_chart():
         organization = Organization.query.get(user.organization_id)
     return render_template('org_chart.html', user=user, organization=organization, active_page='org_chart')
 
+@app.route('/settings/create-structure')
+def create_structure():
+    if 'user_id' not in session:
+        return redirect('/login')
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    return render_template('create_structure.html', user=user, organization=organization)
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running
