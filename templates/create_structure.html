@@ -25,7 +25,7 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
@@ -43,7 +43,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -70,7 +70,7 @@
         }
 
         .page-header {
-            background: white;
+            background: #f8f9fa;
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -100,7 +100,7 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 20px 40px 120px 40px;
@@ -162,7 +162,12 @@
 
         /* Form styles */
         .section {
-            margin-bottom: 40px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .section-title {
@@ -276,7 +281,7 @@
 
         /* Structure builder */
         .structure-section {
-            margin-top: 40px;
+            /* margin-top removed since section class handles spacing */
         }
 
         .structure-instruction {
@@ -291,15 +296,10 @@
             align-items: center;
             gap: 12px;
             margin-bottom: 12px;
-            padding: 12px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background: #f8f9fa;
         }
 
         .structure-item.nested {
             margin-left: 40px;
-            background: white;
         }
 
         .drag-handle {
@@ -309,34 +309,91 @@
 
         .level-input {
             flex: 1;
-            padding: 8px 12px;
+            padding: 12px 40px 12px 16px;
             border: 1px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 0.875rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             background: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .level-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
         .level-input.error {
             border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .level-input.error::placeholder {
+            color: #dc3545;
+            opacity: 0.7;
+        }
+
+        /* Input container for positioning warning icon */
+        .input-container {
+            position: relative;
+            flex: 1;
+        }
+
+        .warning-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .level-input.error ~ .warning-icon {
+            opacity: 1;
+        }
+
+        /* Error message for structure items */
+        .structure-error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 8px;
+            margin-left: 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .structure-item.has-error .structure-error-message {
+            opacity: 1;
         }
 
         .structure-actions {
             display: flex;
-            gap: 8px;
+            gap: 12px;
+            align-items: center;
         }
 
         .action-btn {
-            background: none;
-            border: none;
-            padding: 6px;
-            border-radius: 4px;
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 8px;
+            border-radius: 6px;
             cursor: pointer;
             color: #6c757d;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
         }
 
         .action-btn:hover {
-            background: #e9ecef;
+            background: #f8f9fa;
+            border-color: #d1d5db;
             color: #495057;
         }
 
@@ -357,6 +414,12 @@
         .add-btn:hover {
             border-color: #6c757d;
             background: #e9ecef;
+        }
+
+        .add-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
         }
 
         /* Bottom navigation */
@@ -428,7 +491,6 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-content">
-                <div class="logo">deel.</div>
                 <button class="close-btn" onclick="window.location.href='/settings/org-chart'">✕</button>
             </div>
         </div>
@@ -484,60 +546,31 @@
                         <p class="structure-instruction">Use the + icon to add an item to this structure. The arrow allows you to add a subitem within the item.</p>
                         
                         <div id="structure-items">
+                            <!-- Default first item -->
                             <div class="structure-item" data-level="1">
-                                <span class="drag-handle">⋮⋮</span>
-                                <span style="font-size: 0.875rem; color: #6c757d; margin-right: 8px;">Level 1 item</span>
-                                <input type="text" class="level-input" placeholder="" value="fdsa">
+                                <div class="input-container">
+                                    <input type="text" class="level-input" placeholder="Level 1 item">
+                                    <img src="/static/images/diamond-exclamation (4).png" class="warning-icon" alt="Warning">
+                                </div>
                                 <div class="structure-actions">
-                                    <button type="button" class="action-btn delete-btn" title="Delete">
+                                    <button type="button" class="action-btn delete-btn" title="Delete item">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
                                         </svg>
                                     </button>
-                                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
+                                    <button type="button" class="action-btn add-same-btn" title="Add same level item">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M12 5v14M5 12h14"/>
                                         </svg>
                                     </button>
-                                    <button type="button" class="action-btn move-btn" title="Move">
+                                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M7 7l10 10M7 17L17 7"/>
                                         </svg>
                                     </button>
                                 </div>
+                                <div class="structure-error-message">Item name is required</div>
                             </div>
-
-                            <div class="structure-item nested" data-level="2">
-                                <span class="drag-handle">⋮⋮</span>
-                                <span style="font-size: 0.875rem; color: #6c757d; margin-right: 8px;">Level 2 item</span>
-                                <input type="text" class="level-input error" placeholder="">
-                                <div class="structure-actions">
-                                    <button type="button" class="action-btn delete-btn" title="Delete">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M12 5v14M5 12h14"/>
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="action-btn move-btn" title="Move">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M7 7l10 10M7 17L17 7"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 16px; margin-left: 0;">
-                            <button type="button" class="add-btn" id="addTopLevelBtn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 5v14M5 12h14"/>
-                                </svg>
-                                Add item
-                            </button>
                         </div>
                     </div>
                 </form>
@@ -545,17 +578,7 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <div class="help-section">
-                    <div class="help-title">
-                        <svg class="help-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
-                            <point cx="12" cy="17" r="1"/>
-                        </svg>
-                        Need help?
-                    </div>
-                    <a href="#" class="help-link">Learn more on configuring org structures</a>
-                </div>
+                <!-- Help section removed -->
             </div>
         </div>
 
@@ -574,7 +597,7 @@
     </div>
 
     <script>
-        let itemCounter = 3;
+        let itemCounter = 1;
 
         // Structure name validation
         const structureNameInput = document.getElementById('structureName');
@@ -609,36 +632,59 @@
             const levelInputs = document.querySelectorAll('.level-input');
             let allLevelsFilled = true;
 
-            levelInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    allLevelsFilled = false;
-                    input.classList.add('error');
-                } else {
-                    input.classList.remove('error');
-                }
-            });
-
-            createBtn.disabled = !structureName || !allLevelsFilled;
+            // Only validate level inputs if they exist, but don't add error styling automatically
+            if (levelInputs.length > 0) {
+                levelInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        allLevelsFilled = false;
+                        // Don't add error class automatically - only when user submits or blurs
+                    }
+                });
+                
+                // If there are items, they must all be filled
+                createBtn.disabled = !structureName || !allLevelsFilled;
+            } else {
+                // If no items yet, just require structure name
+                createBtn.disabled = !structureName;
+            }
         }
 
-        // Level input validation
+        // Level input validation - only add error styling on blur or input after blur
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('level-input')) {
+                const structureItem = e.target.closest('.structure-item');
+                // Remove error styling when user starts typing
+                if (e.target.value.trim()) {
+                    e.target.classList.remove('error');
+                    structureItem.classList.remove('has-error');
+                }
                 validateForm();
             }
         });
 
-        // Add top level item
-        document.getElementById('addTopLevelBtn').addEventListener('click', function() {
-            addStructureItem(1);
-        });
+        // Add blur event for level inputs to show error if empty
+        document.addEventListener('blur', function(e) {
+            if (e.target.classList.contains('level-input')) {
+                const structureItem = e.target.closest('.structure-item');
+                if (!e.target.value.trim()) {
+                    e.target.classList.add('error');
+                    structureItem.classList.add('has-error');
+                }
+            }
+        }, true);
 
-        // Add subitem functionality
+        // Add subitem functionality and same level functionality
         document.addEventListener('click', function(e) {
             if (e.target.closest('.add-sub-btn')) {
                 const item = e.target.closest('.structure-item');
                 const currentLevel = parseInt(item.dataset.level);
                 addStructureItem(currentLevel + 1, item);
+            }
+
+            if (e.target.closest('.add-same-btn')) {
+                const item = e.target.closest('.structure-item');
+                const currentLevel = parseInt(item.dataset.level);
+                addStructureItem(currentLevel, item);
             }
 
             if (e.target.closest('.delete-btn')) {
@@ -655,26 +701,28 @@
             newItem.dataset.level = level;
             
             newItem.innerHTML = `
-                <span class="drag-handle">⋮⋮</span>
-                <span style="font-size: 0.875rem; color: #6c757d; margin-right: 8px;">Level ${level} item</span>
-                <input type="text" class="level-input" placeholder="">
+                <div class="input-container">
+                    <input type="text" class="level-input" placeholder="Level ${level} item">
+                    <img src="/static/images/diamond-exclamation (4).png" class="warning-icon" alt="Warning">
+                </div>
                 <div class="structure-actions">
-                    <button type="button" class="action-btn delete-btn" title="Delete">
+                    <button type="button" class="action-btn delete-btn" title="Delete item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
                         </svg>
                     </button>
-                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
+                    <button type="button" class="action-btn add-same-btn" title="Add same level item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 5v14M5 12h14"/>
                         </svg>
                     </button>
-                    <button type="button" class="action-btn move-btn" title="Move">
+                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M7 7l10 10M7 17L17 7"/>
                         </svg>
                     </button>
                 </div>
+                <div class="structure-error-message">Item name is required</div>
             `;
 
             if (afterItem) {
@@ -702,8 +750,10 @@
             let isValid = true;
 
             levelInputs.forEach(input => {
+                const structureItem = input.closest('.structure-item');
                 if (!input.value.trim()) {
                     input.classList.add('error');
+                    structureItem.classList.add('has-error');
                     isValid = false;
                 }
             });
