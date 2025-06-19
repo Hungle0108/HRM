@@ -27,7 +27,7 @@
                 <div class="nav-subitem{% if active_page == 'branding' %} active{% endif %}"><a href="#">Custom branding</a></div>
                 <div class="nav-subitem{% if active_page == 'entities' %} active{% endif %}"><a href="/settings/entities" style="color:inherit;text-decoration:none;">Entities</a></div>
                 <div class="nav-subitem{% if active_page == 'groups' %} active{% endif %}"><a href="/groups" style="color:inherit;text-decoration:none;">Groups</a></div>
-                <div class="nav-subitem{% if active_page == 'org_chart' %} active{% endif %}"><a href="#">Org chart and structure</a></div>
+                <div class="nav-subitem{% if active_page == 'org_chart' %} active{% endif %}"><a href="/settings/org-chart" style="color:inherit;text-decoration:none;">Org chart and structure</a></div>
                 <div class="nav-subitem{% if active_page == 'organization_details' %} active{% endif %}"><a href="/settings" style="color:inherit;text-decoration:none;">Organization details</a></div>
             </div>
             <div class="nav-item expandable" data-section="security">
@@ -90,201 +90,208 @@
     </nav>
 </div>
 
+<style>
+/* Dropdown arrow styles */
+.dropdown-arrow {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-arrow img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.dropdown-arrow .arrow-up {
+    display: none;
+}
+
+.nav-item.expandable.expanded .dropdown-arrow .arrow-down {
+    display: none;
+}
+
+.nav-item.expandable.expanded .dropdown-arrow .arrow-up {
+    display: inline;
+}
+
+/* Subitems animation */
+.nav-subitems {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: transparent;
+}
+
+.nav-subitems.expanded {
+    max-height: 500px;
+    transition: max-height 0.3s ease-in;
+}
+
+/* Expandable items */
+.nav-item.expandable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.nav-item.expandable .nav-item-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-item.expandable:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+</style>
+
 <script>
 (function() {
-    // Ensure this script only runs once
+    // Prevent multiple initialization
     if (window.orgSidebarInitialized) return;
     window.orgSidebarInitialized = true;
 
-    // Restore expanded state from localStorage and expand for active page
-    document.addEventListener('DOMContentLoaded', function() {
-        // Use requestAnimationFrame to ensure DOM is fully rendered before state changes
-        requestAnimationFrame(() => {
-            // First, prevent any ongoing transitions by forcing immediate state
-            const allSubitems = document.querySelectorAll('.nav-subitems');
-            const allExpandable = document.querySelectorAll('.nav-item.expandable');
-            
-            // Temporarily set all subitems to no animation
-            allSubitems.forEach(item => {
-                item.style.transition = 'none';
-                item.style.maxHeight = '0px';
-                item.classList.remove('expanded');
+    function initializeSidebar() {
+        console.log('Initializing organization sidebar...');
+        
+        // Check if this is the first visit to organization settings in this session
+        const isFirstVisit = !sessionStorage.getItem('orgSettingsVisited');
+        
+        if (isFirstVisit) {
+            // First visit - collapse all dropdowns
+            collapseAllDropdowns();
+            // Mark that user has visited organization settings
+            sessionStorage.setItem('orgSettingsVisited', 'true');
+            console.log('First visit to organization settings - all dropdowns collapsed');
+        } else {
+            // Not first visit - restore previous state and expand active parent
+            restoreExpandedState();
+            expandActiveParent();
+            console.log('Returning to organization settings - restoring previous state');
+        }
+        
+        // Get all expandable items
+        const expandableItems = document.querySelectorAll('.nav-item.expandable');
+        
+        expandableItems.forEach(item => {
+            // Remove any existing event listeners
+            const newItem = item.cloneNode(true);
+            item.parentNode.replaceChild(newItem, item);
+        });
+
+        // Re-select after cloning
+        const freshExpandableItems = document.querySelectorAll('.nav-item.expandable');
+        
+        freshExpandableItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Dropdown clicked:', this.getAttribute('data-section'));
+                
+                const section = this.getAttribute('data-section');
+                const subitems = document.querySelector(`[data-parent="${section}"]`);
+                
+                if (subitems) {
+                    const isExpanded = this.classList.contains('expanded');
+                    
+                    if (isExpanded) {
+                        // Collapse
+                        this.classList.remove('expanded');
+                        subitems.classList.remove('expanded');
+                        console.log('Collapsing:', section);
+                    } else {
+                        // Expand
+                        this.classList.add('expanded');
+                        subitems.classList.add('expanded');
+                        console.log('Expanding:', section);
+                    }
+                    
+                    // Save state to localStorage
+                    saveExpandedState();
+                }
             });
-            
-            // Reset all expandable items
-            allExpandable.forEach(item => {
-                item.classList.remove('expanded');
-            });
-            
-            // Force a reflow to ensure styles are applied
-            document.body.offsetHeight;
-            
-            // Now set the correct initial state
+        });
+    }
+
+    function collapseAllDropdowns() {
+        // Remove expanded class from all expandable items
+        document.querySelectorAll('.nav-item.expandable').forEach(item => {
+            item.classList.remove('expanded');
+        });
+        
+        // Remove expanded class from all subitems
+        document.querySelectorAll('.nav-subitems').forEach(item => {
+            item.classList.remove('expanded');
+        });
+        
+        // Clear any previous localStorage state for fresh start
+        localStorage.removeItem('sidebarExpandedSections');
+        
+        console.log('All dropdowns collapsed - clean slate for first visit');
+    }
+
+    function saveExpandedState() {
+        const expandedSections = [];
+        document.querySelectorAll('.nav-item.expandable.expanded').forEach(item => {
+            expandedSections.push(item.getAttribute('data-section'));
+        });
+        localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
+    }
+
+    function restoreExpandedState() {
+        try {
             const expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
             expandedSections.forEach(section => {
-                const navItem = document.querySelector('.nav-item.expandable[data-section="' + section + '"]');
-                const subitems = document.querySelector('.nav-subitems[data-parent="' + section + '"]');
+                const navItem = document.querySelector(`.nav-item.expandable[data-section="${section}"]`);
+                const subitems = document.querySelector(`[data-parent="${section}"]`);
                 if (navItem && subitems) {
                     navItem.classList.add('expanded');
                     subitems.classList.add('expanded');
-                    subitems.style.maxHeight = '500px';
                 }
             });
-            
-            // Always expand the parent section of the active subitem
-            const activeSubitem = document.querySelector('.nav-subitem.active');
-            if (activeSubitem) {
-                const parentSection = activeSubitem.parentElement.getAttribute('data-parent');
-                if (parentSection) {
-                    const navItem = document.querySelector('.nav-item.expandable[data-section="' + parentSection + '"]');
-                    const subitems = document.querySelector('.nav-subitems[data-parent="' + parentSection + '"]');
-                    if (navItem && subitems) {
-                        navItem.classList.add('expanded');
-                        subitems.classList.add('expanded');
-                        subitems.style.maxHeight = '500px';
-                        
-                        // Also add to localStorage if not already there
-                        let expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
-                        if (!expandedSections.includes(parentSection)) {
-                            expandedSections.push(parentSection);
-                            localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
-                        }
-                    }
+        } catch (e) {
+            console.error('Error restoring expanded state:', e);
+        }
+    }
+
+    function expandActiveParent() {
+        const activeSubitem = document.querySelector('.nav-subitem.active');
+        if (activeSubitem) {
+            const parentSection = activeSubitem.parentElement.getAttribute('data-parent');
+            if (parentSection) {
+                const navItem = document.querySelector(`.nav-item.expandable[data-section="${parentSection}"]`);
+                const subitems = document.querySelector(`[data-parent="${parentSection}"]`);
+                if (navItem && subitems) {
+                    navItem.classList.add('expanded');
+                    subitems.classList.add('expanded');
+                    saveExpandedState();
+                    console.log('Expanded parent section for active page:', parentSection);
                 }
             }
-            
-            // Force arrow update
-            updateAllArrows();
-            
-            // Re-enable transitions after the state is set
-            requestAnimationFrame(() => {
-                allSubitems.forEach(item => {
-                    item.style.transition = '';
-                });
-            });
-        });
-    });
-
-    // Handle expandable navigation items - use direct event listeners instead of delegation
-    function setupExpandableItems() {
-        document.querySelectorAll('.nav-item.expandable').forEach(expandableItem => {
-            // Remove any existing listeners to prevent duplicates
-            expandableItem.removeEventListener('click', handleExpandableClick);
-            expandableItem.addEventListener('click', handleExpandableClick);
-        });
-    }
-
-    function handleExpandableClick(e) {
-        // Check if the click is on a link or inside a link
-        if (e.target.tagName === 'A' || e.target.closest('a')) {
-            return; // Allow normal link navigation
-        }
-        
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const expandableItem = this;
-        const section = expandableItem.getAttribute('data-section');
-        const subitems = document.querySelector(`[data-parent="${section}"]`);
-        let expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
-        
-        if (subitems) {
-            const isExpanded = expandableItem.classList.contains('expanded');
-            
-            // Toggle current item without closing others
-            if (isExpanded) {
-                expandableItem.classList.remove('expanded');
-                subitems.classList.remove('expanded');
-                // Remove from expandedSections
-                const idx = expandedSections.indexOf(section);
-                if (idx !== -1) expandedSections.splice(idx, 1);
-            } else {
-                expandableItem.classList.add('expanded');
-                subitems.classList.add('expanded');
-                // Add to expandedSections
-                if (!expandedSections.includes(section)) expandedSections.push(section);
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
-            
-            // Force arrow update
-            updateAllArrows();
         }
     }
 
-    // Handle subitem clicks - use direct event listeners
-    function setupSubItems() {
-        document.querySelectorAll('.nav-subitem').forEach(subitem => {
-            // Remove any existing listeners to prevent duplicates
-            subitem.removeEventListener('click', handleSubitemClick);
-            subitem.addEventListener('click', handleSubitemClick);
-        });
-    }
-
-    function handleSubitemClick(e) {
-        const subitem = this;
-        const link = subitem.querySelector('a');
-        
-        // If there's a link inside the subitem, navigate to it
-        if (link && link.href && link.href !== window.location.href + '#') {
-            // Allow the browser's default link behavior
-            window.location.href = link.href;
-            return;
-        }
-        
-        // Only handle non-link subitems
-        e.stopPropagation();
-        
-        // Remove active class from all subitems
-        document.querySelectorAll('.nav-subitem').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // Add active class to clicked subitem
-        subitem.classList.add('active');
-    }
-
-    // Sidebar search functionality
-    document.addEventListener('input', function(e) {
-        if (!e.target.classList.contains('search-input')) return;
-        
-        const searchTerm = e.target.value.toLowerCase();
-        const navItems = document.querySelectorAll('.nav-item, .nav-subitem');
-        
-        navItems.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            const shouldShow = text.includes(searchTerm);
-            item.style.display = shouldShow ? 'flex' : 'none';
-        });
-    });
-
-    // Function to update all arrow states
-    function updateAllArrows() {
-        document.querySelectorAll('.nav-item.expandable').forEach(item => {
-            const arrowDown = item.querySelector('.arrow-down');
-            const arrowUp = item.querySelector('.arrow-up');
-            if (item.classList.contains('expanded')) {
-                if (arrowDown) arrowDown.style.display = 'none';
-                if (arrowUp) arrowUp.style.display = 'inline';
-            } else {
-                if (arrowDown) arrowDown.style.display = 'inline';
-                if (arrowUp) arrowUp.style.display = 'none';
-            }
-        });
-    }
-
-    // Initialize event listeners when DOM is ready
+    // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setupExpandableItems();
-            setupSubItems();
-            updateAllArrows();
-        });
+        document.addEventListener('DOMContentLoaded', initializeSidebar);
     } else {
-        setupExpandableItems();
-        setupSubItems();
-        updateAllArrows();
+        // DOM is already loaded
+        setTimeout(initializeSidebar, 100);
     }
 })();
+
+// Reset the session flag when user navigates away from organization settings
+// This will be triggered when they go to other sections of the app
+window.addEventListener('beforeunload', function() {
+    // Check if the next page is still within organization settings
+    // If not, we could clear the session flag, but we'll let it persist
+    // until the browser session ends naturally
+});
+
+// Alternative approach: Reset when user visits non-org-settings pages
+// You could add this to your main navigation or other pages:
+// sessionStorage.removeItem('orgSettingsVisited');
 </script> 

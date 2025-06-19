@@ -1571,6 +1571,27 @@
             }, 150);
         }
     </script>
+    
+    <!-- Reset organization settings session flag for non-settings pages -->
+    <script>
+        // Reset the organization settings visited flag when on non-settings pages
+        // This ensures that when users return to organization settings, dropdowns are collapsed
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const isOrgSettingsPage = currentPath.includes('/settings') || 
+                                    currentPath.includes('/groups') || 
+                                    currentPath === '/settings' ||
+                                    currentPath === '/settings/entities' ||
+                                    currentPath === '/settings/org-chart';
+            
+            // If not on an organization settings page, reset the session flag
+            if (!isOrgSettingsPage) {
+                sessionStorage.removeItem('orgSettingsVisited');
+                console.log('Reset org settings session flag - user on non-settings page:', currentPath);
+            }
+        });
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html> 

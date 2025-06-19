@@ -648,7 +648,7 @@
             
             // Get the group name from step 1 data or current form
             const existingData = JSON.parse(sessionStorage.getItem('officeData') || '{}');
-            const groupName = existingData.officeName || document.querySelector('.group-name').textContent;
+            const groupName = existingData.name || document.querySelector('.group-name').textContent;
             
             if (!groupName) {
                 alert('Group name is required');
@@ -672,8 +672,7 @@
                 } else {
                     // Clear session storage
                     sessionStorage.removeItem('officeData');
-                    alert('Group created successfully!');
-                    window.location.href = '/groups';
+            window.location.href = '/groups';
                 }
             })
             .catch(error => {
@@ -712,11 +711,11 @@
             // Load any existing data from previous steps
             const officeData = JSON.parse(sessionStorage.getItem('officeData') || '{}');
             
-            // Update group name if available
-            if (officeData.officeName) {
+            // Update group name if available - use 'name' property from step 1
+            if (officeData.name) {
                 const groupNameElement = document.querySelector('.group-name');
                 if (groupNameElement) {
-                    groupNameElement.textContent = officeData.officeName;
+                    groupNameElement.textContent = officeData.name;
                 }
             }
             

@@ -1276,6 +1276,31 @@
         // Initialize the form state
         updateAllCheckbox();
 
+        // Initialize form with existing data when page loads
+        function initializeFormStep2() {
+            const existingData = JSON.parse(sessionStorage.getItem('officeData') || '{}');
+            
+            if (existingData.selectedAdmins && Array.isArray(existingData.selectedAdmins)) {
+                // Restore selected admin checkboxes
+                existingData.selectedAdmins.forEach(adminId => {
+                    const checkbox = document.getElementById(adminId);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        const box = checkbox.closest('.admin-selection-box');
+                        if (box) {
+                            box.classList.add('selected');
+                        }
+                    }
+                });
+                
+                // Update "All" checkbox state based on restored selections
+                updateAllCheckbox();
+            }
+        }
+
+        // Initialize form when page loads
+        document.addEventListener('DOMContentLoaded', initializeFormStep2);
+
         // Sample data - replace this with actual data from your backend
         const existingWorkers = [
             // Uncomment these if you have workers to display:

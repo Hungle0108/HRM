@@ -218,7 +218,14 @@ def add_employee():
         session.pop('user_id', None)
         return redirect('/login')
     
-    return render_template('add_employee.html', user=user)
+    organization = None
+    user_groups = []
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+        # Get all groups for this organization
+        user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
+    
+    return render_template('add_employee.html', user=user, organization=organization, groups=user_groups)
 
 @app.route('/add-employee-step2')
 def add_employee_step2():
@@ -1271,6 +1278,19 @@ def settings_entities():
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
     return render_template('entities.html', user=user, organization=organization, active_page='entities')
+
+@app.route('/settings/org-chart')
+def org_chart():
+    if 'user_id' not in session:
+        return redirect('/login')
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    return render_template('org_chart.html', user=user, organization=organization, active_page='org_chart')
 
 if __name__ == '__main__':
     with app.app_context():

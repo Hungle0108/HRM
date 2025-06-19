@@ -1,0 +1,548 @@
+{% extends "base.html" %}
+
+{% block title %}Org chart and structure - HR Management System{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Main container */
+    .settings-layout {
+        display: flex;
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+    }
+
+    /* Sidebar styles */
+    .settings-sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        padding: 24px 0 32px 0;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        border-radius: 0 0 12px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .sidebar-header {
+        padding: 0 24px 20px 24px;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 14px;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: #f8f9fa;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #80bdff;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 16px;
+    }
+
+    /* Navigation sections */
+    .nav-section {
+        margin-bottom: 24px;
+    }
+
+    .nav-section:last-child {
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 24px 8px 24px;
+        margin-bottom: 6px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .nav-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .nav-item.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .nav-item-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-icon {
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.7;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-item:hover .nav-icon,
+    .nav-item.active .nav-icon {
+        opacity: 1;
+    }
+
+    .dropdown-arrow {
+        width: 16px;
+        height: 16px;
+        margin-left: 8px;
+        align-self: center;
+        vertical-align: middle;
+        display: flex;
+        transition: transform 0.3s ease;
+        transform-origin: 50% 50%;
+    }
+
+    .dropdown-arrow img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .dropdown-arrow .arrow-up { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-down { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-up { display: inline; }
+
+    .nav-item.expandable:hover .dropdown-arrow {
+        color: #495057;
+    }
+
+    .nav-item.expandable {
+        position: relative;
+    }
+
+    .nav-item.expandable .dropdown-arrow {
+        transition: transform 0.3s ease;
+    }
+
+    /* Sub-items */
+    .nav-subitems {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-subitems.expanded {
+        max-height: 500px;
+    }
+
+    .nav-subitem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 56px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-subitem:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .nav-subitem.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 500;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .settings-sidebar .nav-subitem a {
+        color: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .settings-sidebar .nav-subitem a:hover,
+    .settings-sidebar .nav-subitem.active a {
+        color: #1a1a1a;
+        text-decoration: none;
+    }
+
+    /* Main content area */
+    .settings-content {
+        flex: 1;
+        padding: 32px;
+        margin-left: 280px;
+        background: #f8f9fa;
+    }
+
+    .content-header {
+        margin-bottom: 24px;
+    }
+
+    .content-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .content-subtitle {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+     /* Sub-navigation tabs */
+    .sub-tabs {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid #e9ecef;
+    }
+     .sub-tab {
+        padding: 8px 0;
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+    }
+     .sub-tab:hover {
+        color: #495057;
+    }
+     .sub-tab.active {
+        color: #1a1a1a;
+        border-bottom-color: #1a1a1a;
+    }
+     /* Controls */
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+     .controls-left {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+     .search-control {
+        position: relative;
+    }
+     .search-control input {
+        width: 280px;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: white;
+        transition: all 0.2s;
+    }
+     .search-control input:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+     .search-control .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 16px;
+    }
+     .controls-right {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+     .create-structure-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+     .create-structure-btn:hover {
+        background: #333;
+    }
+     .expand-btn {
+        padding: 10px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        font-size: 16px;
+        color: #6c757d;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+     .expand-btn:hover {
+        border-color: #d1d5db;
+        background: #f8f9fa;
+    }
+     /* Item count */
+    .item-count {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 16px;
+    }
+     /* Table */
+    .org-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+     .org-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+     .org-table th,
+    .org-table td {
+        padding: 16px 24px;
+        text-align: left;
+        border-bottom: 1px solid #f1f3f4;
+    }
+     .org-table th {
+        background: #f8f9fa;
+        font-weight: 500;
+        color: #374151;
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+    }
+     .org-table td {
+        font-size: 0.875rem;
+        color: #1f2937;
+    }
+     .org-table tbody tr:hover {
+        background: #f9fafb;
+    }
+     .org-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+     .table-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+     .view-org-chart-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: white;
+        color: #374151;
+        text-decoration: none;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+     .view-org-chart-link:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+        text-decoration: none;
+        color: #374151;
+    }
+     .edit-btn {
+        padding: 6px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: white;
+        color: #374151;
+        text-decoration: none;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+     .edit-btn:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-layout">
+    <!-- Sidebar -->
+    {% include 'org_settings_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="settings-content">
+        <div class="content-header">
+            <h2 class="content-title">Org chart and structure</h2>
+            <p class="content-subtitle">Configure worker relationships, team hierarchy and organizational structure</p>
+        </div>
+
+        <!-- Sub-navigation tabs -->
+        <div class="sub-tabs">
+            <div class="sub-tab">Visibility</div>
+            <div class="sub-tab">Worker relations</div>
+            <div class="sub-tab active">Org structures</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="controls-left">
+                <div class="search-control">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+            
+            <div class="controls-right">
+                <button class="create-structure-btn">Create new structure</button>
+                <button class="expand-btn">
+                    <img src="/static/images/expand.png" alt="Expand" width="16" height="16">
+                </button>
+            </div>
+        </div>
+
+        <!-- Item Count -->
+        <div class="item-count">Total 0 items</div>
+
+        <!-- Org Structure Table -->
+        <div class="org-table-container">
+            <table class="org-table">
+                <thead>
+                    <tr>
+                        <th>Structure</th>
+                        <th>Units</th>
+                        <th>Roles</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- No data yet -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.querySelector('.search-control input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.org-table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const shouldShow = text.includes(searchTerm);
+                row.style.display = shouldShow ? 'table-row' : 'none';
+            });
+        });
+    }
+
+    // Create new structure button
+    const createBtn = document.querySelector('.create-structure-btn');
+    if (createBtn) {
+        createBtn.addEventListener('click', function() {
+            alert('Create new structure functionality would be implemented here');
+        });
+    }
+
+    // View org chart buttons
+    const viewOrgChartBtns = document.querySelectorAll('.view-org-chart-link');
+    viewOrgChartBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('View org chart functionality would be implemented here');
+        });
+    });
+
+    // Edit buttons
+    const editBtns = document.querySelectorAll('.edit-btn');
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            alert('Edit structure functionality would be implemented here');
+        });
+    });
+
+    // Sub-tab navigation
+    const subTabs = document.querySelectorAll('.sub-tab');
+    subTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            subTabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Here you would typically load different content based on the tab
+            if (this.textContent === 'Visibility') {
+                alert('Visibility tab functionality would be implemented here');
+            } else if (this.textContent === 'Worker relations') {
+                alert('Worker relations tab functionality would be implemented here');
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

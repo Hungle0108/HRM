@@ -784,6 +784,134 @@
             object-fit: contain;
             transition: all 0.2s;
         }
+
+        /* Group Dropdown Styles */
+        .group-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .group-dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .group-dropdown-selected {
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .group-dropdown-selected:hover {
+            border-color: #adb5bd;
+        }
+
+        .group-dropdown-selected.active {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .group-dropdown-text {
+            font-size: 0.95rem;
+            color: #495057;
+            flex: 1;
+        }
+
+        .group-dropdown-text.selected {
+            color: #1a1a1a;
+        }
+
+        .group-dropdown-arrow {
+            transition: transform 0.2s;
+        }
+
+        .group-dropdown-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .group-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            display: none;
+            margin-top: 4px;
+        }
+
+        .group-dropdown-menu.show {
+            display: block;
+        }
+
+        .group-dropdown-item {
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+            color: #202124;
+            background: white;
+        }
+
+        .group-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .group-dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .group-dropdown-item.selected {
+            background: #f5f5f5;
+            color: #1a1a1a;
+            position: relative;
+        }
+
+        .group-dropdown-item.selected::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background-image: url('{{ url_for("static", filename="images/check-circle.png") }}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .group-dropdown-item.selected::before {
+            display: none;
+        }
+
+        .group-dropdown-empty {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #5f6368;
+            font-size: 0.9rem;
+        }
+
+        .empty-icon {
+            font-size: 20px;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -798,14 +926,33 @@
                         
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label required">Office</label>
-                                <select class="form-select" required>
-                                    <option value="" disabled selected hidden></option>
-                                    <option value="engineering">Engineering</option>
-                                    <option value="marketing">Marketing</option>
-                                    <option value="sales">Sales</option>
-                                    <option value="hr">Human Resources</option>
-                                </select>
+                                <label class="form-label required">Group</label>
+                                <div class="group-dropdown-wrapper">
+                                    <div class="group-dropdown-container" id="groupDropdownContainer">
+                                        <div class="group-dropdown-selected" id="groupDropdownSelected">
+                                            <span class="group-dropdown-text" id="groupDropdownText">Select a group</span>
+                                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="group-dropdown-arrow" id="groupDropdownArrow" style="width: 16px; height: 16px;">
+                            </div>
+                                        <div class="group-dropdown-menu" id="groupDropdownMenu">
+                                            {% if groups %}
+                                                {% for group in groups %}
+                                                <div class="group-dropdown-item" data-value="{{ group.id }}" data-name="{{ group.name }}">
+                                                    {{ group.name }}
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="group-dropdown-empty">
+                                                    <span class="empty-icon">📁</span>
+                                                    <div>
+                                                        <div>No groups found</div>
+                                                        <div style="font-size: 0.8rem; color: #9aa0a6; margin-top: 4px;">Create a group first to assign employees</div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="selectedGroupId" name="groupId" required>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -974,8 +1121,9 @@
 
     // Function to save form data to sessionStorage
     function saveFormData() {
+        const selectedGroupId = document.getElementById('selectedGroupId')?.value || '';
         const formData = {
-            group: document.querySelector('select[class="form-select"]').value,
+            selectedGroupId: selectedGroupId,
             personalEmail: document.querySelector('input[type="email"]').value,
             firstName: document.querySelectorAll('input[type="text"]')[0].value,
             lastName: document.querySelectorAll('input[type="text"]')[1].value,
@@ -997,8 +1145,7 @@
         if (savedData) {
             const formData = JSON.parse(savedData);
             
-            // Restore form values
-            if (formData.group) document.querySelector('select[class="form-select"]').value = formData.group;
+            // Restore form values (group will be restored in initializeGroupDropdown)
             if (formData.personalEmail) document.querySelector('input[type="email"]').value = formData.personalEmail;
             if (formData.firstName) document.querySelectorAll('input[type="text"]')[0].value = formData.firstName;
             if (formData.lastName) document.querySelectorAll('input[type="text"]')[1].value = formData.lastName;
@@ -1018,6 +1165,101 @@
 
     // Initialize form data restoration
     restoreFormData();
+
+    // Group Dropdown Functionality
+    function initializeGroupDropdown() {
+        const dropdownSelected = document.getElementById('groupDropdownSelected');
+        const dropdownMenu = document.getElementById('groupDropdownMenu');
+        const dropdownText = document.getElementById('groupDropdownText');
+        const dropdownArrow = document.getElementById('groupDropdownArrow');
+        const hiddenInput = document.getElementById('selectedGroupId');
+        
+        if (!dropdownSelected || !dropdownMenu) return;
+
+        // Toggle dropdown menu
+        dropdownSelected.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        });
+
+        // Handle group selection
+        const groupItems = document.querySelectorAll('.group-dropdown-item');
+        groupItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const groupId = this.getAttribute('data-value');
+                const groupName = this.getAttribute('data-name');
+                
+                // Remove selected class from all items
+                groupItems.forEach(i => i.classList.remove('selected'));
+                
+                // Add selected class to clicked item
+                this.classList.add('selected');
+                
+                // Update display and hidden input
+                dropdownText.textContent = groupName;
+                dropdownText.classList.add('selected');
+                hiddenInput.value = groupId;
+                
+                // Save form data
+                saveFormData();
+                
+                // Close dropdown
+                closeDropdown();
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            closeDropdown();
+        });
+
+        // Prevent dropdown from closing when clicking inside menu
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        function openDropdown() {
+            dropdownMenu.classList.add('show');
+            dropdownSelected.classList.add('active');
+            dropdownArrow.classList.add('rotated');
+        }
+
+        function closeDropdown() {
+            dropdownMenu.classList.remove('show');
+            dropdownSelected.classList.remove('active');
+            dropdownArrow.classList.remove('rotated');
+        }
+
+        // Restore selected group if exists
+        const savedData = sessionStorage.getItem('employeeFormData');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            if (formData.selectedGroupId) {
+                const selectedItem = document.querySelector(`[data-value="${formData.selectedGroupId}"]`);
+                if (selectedItem) {
+                    const groupName = selectedItem.getAttribute('data-name');
+                    dropdownText.textContent = groupName;
+                    dropdownText.classList.add('selected');
+                    hiddenInput.value = formData.selectedGroupId;
+                    
+                    // Add selected class to the item
+                    selectedItem.classList.add('selected');
+                }
+            }
+        }
+    }
+
+    // Initialize group dropdown when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializeGroupDropdown);
 
     // Auto-save form data when inputs change
     document.querySelectorAll('input, select').forEach(input => {
