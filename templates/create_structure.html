@@ -186,6 +186,7 @@
 
         .form-group {
             margin-bottom: 32px;
+            position: relative;
         }
 
         .form-label {
@@ -210,6 +211,7 @@
             font-size: 0.95rem;
             background: white;
             transition: all 0.2s;
+            position: relative;
         }
 
         .form-input:focus {
@@ -220,7 +222,12 @@
 
         .form-input.error {
             border-color: #dc3545;
-            background-color: #fff5f5;
+            background-color: white;
+            padding-right: 45px;
+        }
+
+        .form-input.error::placeholder {
+            color: #dc3545;
         }
 
         .form-input.error:focus {
@@ -279,11 +286,23 @@
             line-height: 1.4;
         }
 
-        /* Structure builder */
-        .structure-section {
-            /* margin-top removed since section class handles spacing */
+        .structure-name-error-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
         }
 
+        .form-input.error + .structure-name-error-icon {
+            opacity: 1;
+        }
+
+        /* Structure builder */
         .structure-instruction {
             font-size: 0.875rem;
             color: #6c757d;
@@ -292,14 +311,17 @@
         }
 
         .structure-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
             margin-bottom: 12px;
         }
 
         .structure-item.nested {
-            margin-left: 40px;
+            /* This rule is now redundant */
+        }
+
+        .structure-item-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .drag-handle {
@@ -309,13 +331,13 @@
 
         .level-input {
             flex: 1;
-            padding: 12px 40px 12px 16px;
+            padding: 12px 16px;
             border: 1px solid #e9ecef;
             border-radius: 8px;
             font-size: 0.95rem;
             background: white;
             transition: all 0.2s;
-            position: relative;
+            width: 100%;
         }
 
         .level-input:focus {
@@ -327,11 +349,11 @@
         .level-input.error {
             border-color: #dc3545;
             color: #dc3545;
+            padding-right: 40px;
         }
 
         .level-input.error::placeholder {
             color: #dc3545;
-            opacity: 0.7;
         }
 
         /* Input container for positioning warning icon */
@@ -345,14 +367,14 @@
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
         }
 
-        .level-input.error ~ .warning-icon {
+        .structure-item.has-error .warning-icon {
             opacity: 1;
         }
 
@@ -484,6 +506,22 @@
             color: #6c757d;
             cursor: not-allowed;
         }
+
+        .form-group .error-icon-field {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .form-input.error + .error-icon-field {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -514,22 +552,15 @@
                         <p class="section-description">An org structure lets you group and view your workforce on the platform. You can create as many structures as needed.</p>
                         
                         <div class="form-group">
-                            <label for="structureName" class="form-label required">Structure name</label>
                             <input 
                                 type="text" 
+                                name="structureName" 
                                 id="structureName" 
                                 class="form-input" 
-                                placeholder=""
+                                placeholder="Structure name"
                                 required
                             >
-                            <div class="form-helper">For example: Departments, verticals, teams, sections, or squads.</div>
-                            <div class="error-message">
-                                <svg class="error-icon" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-                                </svg>
-                                Item name is required
-                            </div>
+                            <img src="/static/images/diamond-exclamation (4).png" class="structure-name-error-icon" alt="Warning">
                         </div>
 
                         <div class="checkbox-group">
@@ -548,28 +579,26 @@
                         <div id="structure-items">
                             <!-- Default first item -->
                             <div class="structure-item" data-level="1">
-                                <div class="input-container">
-                                    <input type="text" class="level-input" placeholder="Level 1 item">
-                                    <img src="/static/images/diamond-exclamation (4).png" class="warning-icon" alt="Warning">
+                                <div class="structure-item-row">
+                                    <div class="input-container">
+                                        <input type="text" class="level-input" placeholder="Level 1 item">
+                                        <img src="/static/images/diamond-exclamation (4).png" class="warning-icon" alt="Warning">
+                                    </div>
+                                    <div class="structure-actions">
+                                        <button type="button" class="action-btn delete-btn" title="Delete item">
+                                            <img src="/static/images/trash-bold.png" alt="Delete" width="16" height="16">
+                                        </button>
+                                        <button type="button" class="action-btn add-same-btn" title="Add same level item">
+                                            <img src="/static/images/plus.png" alt="Add item" width="16" height="16">
+                                        </button>
+                                        <button type="button" class="action-btn add-sub-btn" title="Add subitem">
+                                            <img src="/static/images/arrow-turn-down-right.png" alt="Add subitem" width="16" height="16">
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="structure-actions">
-                                    <button type="button" class="action-btn delete-btn" title="Delete item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="action-btn add-same-btn" title="Add same level item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M12 5v14M5 12h14"/>
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M7 7l10 10M7 17L17 7"/>
-                                        </svg>
-                                    </button>
+                                <div class="structure-error-message">
+                                    Item name is required
                                 </div>
-                                <div class="structure-error-message">Item name is required</div>
                             </div>
                         </div>
                     </div>
@@ -602,7 +631,6 @@
         // Structure name validation
         const structureNameInput = document.getElementById('structureName');
         const createBtn = document.getElementById('createBtn');
-        const errorMessage = document.querySelector('.error-message');
 
         structureNameInput.addEventListener('input', function() {
             validateForm();
@@ -619,12 +647,10 @@
 
         function showFieldError(field) {
             field.classList.add('error');
-            errorMessage.classList.add('show');
         }
 
         function hideFieldError(field) {
             field.classList.remove('error');
-            errorMessage.classList.remove('show');
         }
 
         function validateForm() {
@@ -669,6 +695,9 @@
                 if (!e.target.value.trim()) {
                     e.target.classList.add('error');
                     structureItem.classList.add('has-error');
+                } else {
+                    e.target.classList.remove('error');
+                    structureItem.classList.remove('has-error');
                 }
             }
         }, true);
@@ -697,32 +726,31 @@
         function addStructureItem(level, afterItem = null) {
             const container = document.getElementById('structure-items');
             const newItem = document.createElement('div');
-            newItem.className = `structure-item ${level > 1 ? 'nested' : ''}`;
+            newItem.className = 'structure-item';
             newItem.dataset.level = level;
+            newItem.style.marginLeft = `${(level - 1) * 40}px`;
             
             newItem.innerHTML = `
-                <div class="input-container">
-                    <input type="text" class="level-input" placeholder="Level ${level} item">
-                    <img src="/static/images/diamond-exclamation (4).png" class="warning-icon" alt="Warning">
+                <div class="structure-item-row">
+                    <div class="input-container">
+                        <input type="text" class="level-input" placeholder="Level ${level} item">
+                        <img src="/static/images/diamond-exclamation (4).png" class="warning-icon" alt="Warning">
+                    </div>
+                    <div class="structure-actions">
+                        <button type="button" class="action-btn delete-btn" title="Delete item">
+                            <img src="/static/images/trash-bold.png" alt="Delete" width="16" height="16">
+                        </button>
+                        <button type="button" class="action-btn add-same-btn" title="Add same level item">
+                            <img src="/static/images/plus.png" alt="Add item" width="16" height="16">
+                        </button>
+                        <button type="button" class="action-btn add-sub-btn" title="Add subitem">
+                            <img src="/static/images/arrow-turn-down-right.png" alt="Add subitem" width="16" height="16">
+                        </button>
+                    </div>
                 </div>
-                <div class="structure-actions">
-                    <button type="button" class="action-btn delete-btn" title="Delete item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                        </svg>
-                    </button>
-                    <button type="button" class="action-btn add-same-btn" title="Add same level item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                    </button>
-                    <button type="button" class="action-btn add-sub-btn" title="Add subitem">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 7l10 10M7 17L17 7"/>
-                        </svg>
-                    </button>
+                <div class="structure-error-message">
+                    Item name is required
                 </div>
-                <div class="structure-error-message">Item name is required</div>
             `;
 
             if (afterItem) {
@@ -737,7 +765,7 @@
         }
 
         // Form submission
-        document.getElementById('structure-form').addEventListener('submit', function(e) {
+        document.getElementById('structure-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const structureName = structureNameInput.value.trim();
@@ -777,11 +805,31 @@
                 });
             });
 
-            console.log('Structure data:', structureData);
+            console.log('Submitting structure data:', structureData);
             
-            // Here you would typically send the data to the server
-            alert('Structure created successfully!');
-            window.location.href = '/settings/org-chart';
+            try {
+                const response = await fetch('/api/create-structure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(structureData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Structure created successfully!');
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    }
+                } else {
+                    alert(`Error: ${result.error || 'Failed to create structure'}`);
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('An unexpected error occurred. Please try again.');
+            }
         });
 
         // Initial validation

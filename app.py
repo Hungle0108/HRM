@@ -142,6 +142,27 @@ class Group(db.Model):
             'admin_email': self.admin_user.email if self.admin_user else None
         }
 
+# Organization Structure Model
+class OrgStructure(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    allow_multiple_assignments = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    organization = db.relationship('Organization', backref='structures')
+    items = db.relationship('StructureItem', backref='structure', lazy='dynamic', cascade="all, delete-orphan")
+
+# Structure Item Model
+class StructureItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    level = db.Column(db.Integer, nullable=False)
+    structure_id = db.Column(db.Integer, db.ForeignKey('org_structure.id'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('structure_item.id'))
+    
+    children = db.relationship('StructureItem', backref=db.backref('parent', remote_side=[id]), cascade="all, delete-orphan")
+
 # Create database tables
 def init_db():
     with app.app_context():
@@ -1304,6 +1325,67 @@ def create_structure():
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
     return render_template('create_structure.html', user=user, organization=organization)
+
+@app.route('/api/create-structure', methods=['POST'])
+def api_create_structure():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User or organization not found'}), 400
+
+    data = request.get_json()
+    structure_name = data.get('name')
+    allow_multiple = data.get('allowMultiple')
+    items = data.get('items', [])
+
+    if not structure_name or not items:
+        return jsonify({'error': 'Structure name and at least one item are required'}), 400
+
+    try:
+        # Create the main structure
+        new_structure = OrgStructure(
+            name=structure_name,
+            organization_id=user.organization_id,
+            allow_multiple_assignments=allow_multiple
+        )
+        db.session.add(new_structure)
+        db.session.flush()  # Flush to get the new_structure.id for items
+
+        parent_stack = []  # Stack to keep track of parent items by level
+
+        for item_data in items:
+            level = item_data['level']
+            item_name = item_data['name']
+
+            # Find the correct parent for the current item
+            while parent_stack and parent_stack[-1]['level'] >= level:
+                parent_stack.pop()
+
+            parent_id = parent_stack[-1]['item'].id if parent_stack else None
+
+            # Create the new structure item
+            new_item = StructureItem(
+                name=item_name,
+                level=level,
+                structure_id=new_structure.id,
+                parent_id=parent_id
+            )
+            db.session.add(new_item)
+            db.session.flush() # Flush to get the new_item.id
+
+            # Push the current item to the stack for potential children
+            parent_stack.append({'level': level, 'item': new_item})
+
+        db.session.commit()
+        return jsonify({'message': 'Structure created successfully', 'redirect': '/settings/org-chart'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating structure: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': 'Failed to create structure'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
