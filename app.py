@@ -241,12 +241,15 @@ def add_employee():
     
     organization = None
     user_groups = []
+    structures = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
         # Get all groups for this organization
         user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
+        # Get all structures for this organization
+        structures = OrgStructure.query.filter_by(organization_id=user.organization_id).all()
     
-    return render_template('add_employee.html', user=user, organization=organization, groups=user_groups)
+    return render_template('add_employee.html', user=user, organization=organization, groups=user_groups, structures=structures)
 
 @app.route('/add-employee-step2')
 def add_employee_step2():
@@ -1309,9 +1312,12 @@ def org_chart():
         session.pop('user_id', None)
         return redirect('/login')
     organization = None
+    structures = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
-    return render_template('org_chart.html', user=user, organization=organization, active_page='org_chart')
+        # Fetch all structures for this organization
+        structures = OrgStructure.query.filter_by(organization_id=user.organization_id).all()
+    return render_template('org_chart.html', user=user, organization=organization, structures=structures, active_page='org_chart')
 
 @app.route('/settings/create-structure')
 def create_structure():

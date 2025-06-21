@@ -79,7 +79,7 @@
         }
 
         .page-header-content {
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
             text-align: left;
         }
@@ -101,63 +101,16 @@
             flex: 1;
             display: flex;
             background: #f8f9fa;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: flex-start;
             padding: 20px 40px 120px 40px;
-            gap: 60px;
+            padding-left: calc(50% - 470px);
         }
 
         .content-area {
             flex: 0 0 auto;
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
-        }
-
-        .sidebar {
-            flex: 0 0 auto;
-            width: 280px;
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 30px 25px;
-            height: fit-content;
-        }
-
-        .sidebar-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 16px;
-        }
-
-        .help-section {
-            margin-bottom: 30px;
-        }
-
-        .help-icon {
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            color: #6c757d;
-        }
-
-        .help-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-
-        .help-link {
-            color: #0066cc;
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-
-        .help-link:hover {
-            text-decoration: underline;
         }
 
         /* Form styles */
@@ -216,8 +169,8 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
         }
 
         .form-input.error {
@@ -232,7 +185,7 @@
 
         .form-input.error:focus {
             border-color: #dc3545;
-            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
         }
 
         .form-helper {
@@ -312,6 +265,22 @@
 
         .structure-item {
             margin-bottom: 12px;
+            position: relative;
+        }
+
+        /* Remove old pseudo-element approach and use actual line elements */
+        .tree-line-horizontal {
+            position: absolute;
+            height: 1px;
+            background: #d1d5db;
+            z-index: 1;
+        }
+
+        .tree-line-vertical {
+            position: absolute;
+            width: 1px;
+            background: #d1d5db;
+            z-index: 1;
         }
 
         .structure-item.nested {
@@ -322,6 +291,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            position: relative;
+            z-index: 2;
         }
 
         .drag-handle {
@@ -342,8 +313,8 @@
 
         .level-input:focus {
             outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
         }
 
         .level-input.error {
@@ -352,8 +323,17 @@
             padding-right: 40px;
         }
 
+        .level-input.error:hover {
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+
         .level-input.error::placeholder {
             color: #dc3545;
+        }
+
+        .level-input.error:hover::placeholder {
+            color: #6c757d;
         }
 
         /* Input container for positioning warning icon */
@@ -378,18 +358,18 @@
             opacity: 1;
         }
 
-        /* Error message for structure items */
+        /* Error message for structure items - only visible when needed */
         .structure-error-message {
             color: #dc3545;
             font-size: 0.875rem;
             margin-top: 8px;
             margin-left: 0;
-            opacity: 0;
-            transition: opacity 0.2s;
+            display: none; /* Hidden by default */
+            transition: all 0.2s;
         }
 
         .structure-item.has-error .structure-error-message {
-            opacity: 1;
+            display: block; /* Only visible when there's an error */
         }
 
         .structure-actions {
@@ -522,6 +502,53 @@
         .form-input.error + .error-icon-field {
             opacity: 1;
         }
+
+        /* Bottom notification styles */
+        .bottom-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bottom-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notification-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: #ff6b6b;
+        }
+
+        .notification-text {
+            flex: 1;
+        }
+
+        /* Also add hover effect for structure name input */
+        .form-input.error:hover {
+            border-color: #1a1a1a;
+        }
+
+        .form-input.error:hover::placeholder {
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -604,11 +631,6 @@
                     </div>
                 </form>
             </div>
-
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Help section removed -->
-            </div>
         </div>
 
         <!-- Bottom Navigation -->
@@ -622,6 +644,17 @@
                 </a>
                 <button type="submit" class="btn-create" id="createBtn" form="structure-form">Create structure</button>
             </div>
+        </div>
+    </div>
+
+    <div class="bottom-notification">
+        <div class="notification-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div class="notification-text">
+            Can't delete the only item in the list
         </div>
     </div>
 
@@ -713,15 +746,158 @@
             if (e.target.closest('.add-same-btn')) {
                 const item = e.target.closest('.structure-item');
                 const currentLevel = parseInt(item.dataset.level);
-                addStructureItem(currentLevel, item);
+                // Find the correct position for same-level items
+                const insertAfter = findLastSubitem(item, currentLevel);
+                addStructureItem(currentLevel, insertAfter);
             }
 
             if (e.target.closest('.delete-btn')) {
                 const item = e.target.closest('.structure-item');
-                item.remove();
+                const itemLevel = parseInt(item.dataset.level);
+                
+                // Check if this is the only item left
+                const allItems = document.querySelectorAll('.structure-item');
+                if (allItems.length === 1) {
+                    // Show notification instead of deleting
+                    showBottomNotification("Can't delete the only item in the list");
+                    return;
+                }
+                
+                // Collect all subitems that need to be deleted
+                const itemsToDelete = [item];
+                let nextItem = item.nextElementSibling;
+                
+                // Find all subitems (higher level numbers) that follow this item
+                while (nextItem && nextItem.classList.contains('structure-item')) {
+                    const nextLevel = parseInt(nextItem.dataset.level);
+                    
+                    if (nextLevel > itemLevel) {
+                        // This is a subitem, add it to deletion list
+                        itemsToDelete.push(nextItem);
+                        nextItem = nextItem.nextElementSibling;
+                    } else {
+                        // Same level or higher, stop here
+                        break;
+                    }
+                }
+                
+                // Delete all collected items
+                itemsToDelete.forEach(itemToDelete => {
+                    itemToDelete.remove();
+                });
+                
+                updateConnectingLines(); // Update lines after removal
                 validateForm();
             }
         });
+
+        // Function to update connecting lines for all structure items
+        function updateConnectingLines() {
+            const container = document.getElementById('structure-items');
+            const items = document.querySelectorAll('.structure-item');
+            
+            // Remove all existing line elements
+            const existingLines = container.querySelectorAll('.tree-line-horizontal, .tree-line-vertical');
+            existingLines.forEach(line => line.remove());
+            
+            // Remove old CSS classes
+            items.forEach(item => {
+                item.classList.remove('has-vertical-line', 'has-half-vertical-line');
+            });
+            
+            if (items.length === 0) return;
+            
+            // Create lines for each item
+            items.forEach((item, index) => {
+                const level = parseInt(item.dataset.level);
+                
+                if (level === 1) return; // Level 1 items don't need connecting lines
+                
+                const itemRect = item.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // Calculate relative position within container
+                const itemTop = item.offsetTop;
+                const itemLeft = item.offsetLeft;
+                
+                // Create horizontal line (connector from parent to this item)
+                const horizontalLine = document.createElement('div');
+                horizontalLine.className = 'tree-line-horizontal';
+                horizontalLine.style.left = (itemLeft - 20) + 'px';
+                horizontalLine.style.top = (itemTop + 22) + 'px'; // Middle of input box
+                horizontalLine.style.width = '20px';
+                container.appendChild(horizontalLine);
+                
+                // Create vertical line if needed
+                const needsVerticalLine = checkNeedsVerticalLine(items, index);
+                if (needsVerticalLine.hasLine) {
+                    const verticalLine = document.createElement('div');
+                    verticalLine.className = 'tree-line-vertical';
+                    verticalLine.style.left = (itemLeft - 20) + 'px';
+                    verticalLine.style.top = itemTop + 'px';
+                    verticalLine.style.height = needsVerticalLine.height + 'px';
+                    container.appendChild(verticalLine);
+                }
+            });
+        }
+        
+        // Helper function to determine if an item needs a vertical line and its height
+        function checkNeedsVerticalLine(items, currentIndex) {
+            const currentItem = items[currentIndex];
+            const currentLevel = parseInt(currentItem.dataset.level);
+            
+            if (currentLevel === 1) return { hasLine: false, height: 0 };
+            
+            let hasNextSibling = false;
+            let lineEndIndex = currentIndex;
+            
+            // Find the extent of the vertical line by looking for siblings at the same level
+            for (let i = currentIndex + 1; i < items.length; i++) {
+                const itemLevel = parseInt(items[i].dataset.level);
+                
+                if (itemLevel === currentLevel) {
+                    hasNextSibling = true;
+                    lineEndIndex = i;
+                    break;
+                } else if (itemLevel < currentLevel) {
+                    break; // Higher level reached, stop
+                }
+                // Continue for deeper levels (itemLevel > currentLevel)
+            }
+            
+            if (hasNextSibling) {
+                // There's a sibling at the same level, create a full line to connect to it
+                const endItem = items[lineEndIndex];
+                const startTop = currentItem.offsetTop;
+                const endTop = endItem.offsetTop;
+                return { hasLine: true, height: endTop - startTop + 22 };
+            } else {
+                // No siblings at the same level, just create a half line to the middle of current item
+                return { hasLine: true, height: 22 };
+            }
+        }
+
+        // Function to find the last subitem of a given item (needed for same-level insertion)
+        function findLastSubitem(item, itemLevel) {
+            let currentItem = item;
+            let nextItem = currentItem.nextElementSibling;
+            
+            // Keep looking for the last subitem by checking following elements
+            while (nextItem && nextItem.classList.contains('structure-item')) {
+                const nextLevel = parseInt(nextItem.dataset.level);
+                
+                // If we find an item at the same level or higher, we've gone too far
+                if (nextLevel <= itemLevel) {
+                    break;
+                }
+                
+                // This item is a subitem, so continue
+                currentItem = nextItem;
+                nextItem = currentItem.nextElementSibling;
+            }
+            
+            return currentItem;
+        }
 
         function addStructureItem(level, afterItem = null) {
             const container = document.getElementById('structure-items');
@@ -761,6 +937,7 @@
 
             // Focus on the new input
             newItem.querySelector('.level-input').focus();
+            updateConnectingLines(); // Update connecting lines after adding item
             validateForm();
         }
 
@@ -819,7 +996,6 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert('Structure created successfully!');
                     if (result.redirect) {
                         window.location.href = result.redirect;
                     }
@@ -834,6 +1010,26 @@
 
         // Initial validation
         validateForm();
+        
+        // Set up initial connecting lines
+        updateConnectingLines();
+
+        // Function to show bottom notification
+        function showBottomNotification(message) {
+            const notification = document.querySelector('.bottom-notification');
+            const notificationText = notification.querySelector('.notification-text');
+            
+            // Update the message
+            notificationText.textContent = message;
+            
+            // Show the notification
+            notification.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
     </script>
 </body>
 </html> 

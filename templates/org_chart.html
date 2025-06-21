@@ -488,7 +488,7 @@
         </div>
 
         <!-- Item Count -->
-        <div class="item-count">Total 0 items</div>
+        <div class="item-count">Total {{ structures|length }} items</div>
 
         <!-- Org Structure Table -->
         <div class="org-table-container">
@@ -502,7 +502,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- No data yet -->
+                    {% for structure in structures %}
+                    <tr>
+                        <td>{{ structure.name }}</td>
+                        <td>{{ structure.items.count() }}</td>
+                        <td>0</td>  <!-- Placeholder for roles count -->
+                        <td>
+                            <div class="table-actions">
+                                <a href="#" class="view-org-chart-link">
+                                    View org chart
+                                    <span>↗</span>
+                                </a>
+                                <button class="edit-btn">Edit</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #6c757d; padding: 40px;">
+                            No structures created yet. <a href="/settings/create-structure" style="color: #007bff;">Create your first structure</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

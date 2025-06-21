@@ -198,7 +198,12 @@
         }
 
         .form-section {
-            margin-bottom: 40px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .section-title {
@@ -832,7 +837,7 @@
         }
 
         .group-dropdown-arrow.rotated {
-            transform: rotate(180deg);
+            /* transform: rotate(180deg); */
         }
 
         .group-dropdown-menu {
@@ -912,6 +917,194 @@
             font-size: 20px;
             opacity: 0.6;
         }
+
+        .structure-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .structure-name-item {
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
+        .no-structures-message {
+            font-size: 0.95rem;
+            color: #6c757d;
+            padding: 14px 0;
+        }
+
+        .position-selection-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .position-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .position-dropdown-selected {
+            padding: 0 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            height: 50px; /* Set a fixed height */
+        }
+
+        .position-dropdown-selected.has-selection {
+            /* No padding change needed with fixed height */
+        }
+
+        .position-dropdown-label {
+            position: absolute;
+            top: 6px;
+            left: 16px;
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        .position-dropdown-label.no-transition {
+            transition: none !important;
+        }
+
+        .position-dropdown-label.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .position-dropdown-text {
+            font-size: 0.95rem;
+            color: #6c757d;
+            transition: opacity 0.2s ease-out;
+        }
+
+        .position-dropdown-selected.has-selection .position-dropdown-text:not(.selected) {
+            opacity: 0;
+        }
+
+        .position-dropdown-text.no-transition {
+            transition: none !important;
+        }
+
+        .position-dropdown-text.selected {
+            color: #1a1a1a;
+        }
+
+        .position-dropdown-arrow {
+            transition: transform 0.2s;
+            width: 16px; 
+            height: 16px;
+        }
+
+        .position-dropdown-delete {
+            width: 16px;
+            height: 16px;
+            background-image: url('{{ url_for("static", filename="images/cross-small.png") }}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            margin-right: 8px;
+            display: none;
+        }
+
+        .position-dropdown-delete:hover {
+            opacity: 1;
+        }
+
+        .position-dropdown-delete.show {
+            display: block;
+        }
+
+        .position-dropdown-arrow.rotated {
+            /* transform: rotate(180deg); */
+        }
+
+        .position-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            display: none;
+            margin-top: 4px;
+        }
+
+        .position-dropdown-menu.show-above {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .position-dropdown-menu.show {
+            display: block;
+        }
+
+        .position-dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+            color: #202124;
+            background: white;
+        }
+
+        .position-dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .position-dropdown-item.selected {
+            background: #f1f3f5;
+            font-weight: 500;
+        }
+
+        .position-dropdown-empty {
+            padding: 16px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Position level indentation */
+        .position-level-1 { padding-left: 16px; }
+        .position-level-2 { padding-left: 36px; }
+        .position-level-3 { padding-left: 56px; }
+        .position-level-4 { padding-left: 76px; }
+        .position-level-5 { padding-left: 96px; }
+
+        .position-dropdown-selected:hover {
+            border-color: #adb5bd;
+        }
+
+        .position-dropdown-selected.active {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -926,13 +1119,12 @@
                         
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label required">Group</label>
                                 <div class="group-dropdown-wrapper">
                                     <div class="group-dropdown-container" id="groupDropdownContainer">
                                         <div class="group-dropdown-selected" id="groupDropdownSelected">
-                                            <span class="group-dropdown-text" id="groupDropdownText">Select a group</span>
+                                            <span class="group-dropdown-text" id="groupDropdownText">Group *</span>
                                             <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="group-dropdown-arrow" id="groupDropdownArrow" style="width: 16px; height: 16px;">
-                            </div>
+                                        </div>
                                         <div class="group-dropdown-menu" id="groupDropdownMenu">
                                             {% if groups %}
                                                 {% for group in groups %}
@@ -962,8 +1154,7 @@
                         
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label required">Personal email</label>
-                                <input type="email" class="form-input" required>
+                                <input type="email" class="form-input" placeholder="Personal email *" required>
                                 <div class="error-message" style="display: none;">
                                     <svg class="error-icon" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
@@ -975,8 +1166,7 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label required">Legal first name</label>
-                                <input type="text" class="form-input" required>
+                                <input type="text" class="form-input" placeholder="Legal first name *" required>
                                 <div class="error-message" style="display: none;">
                                     <svg class="error-icon" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
@@ -988,8 +1178,7 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label required">Legal last name</label>
-                                <input type="text" class="form-input" required>
+                                <input type="text" class="form-input" placeholder="Legal last name *" required>
                                 <div class="error-message" style="display: none;">
                                     <svg class="error-icon" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
@@ -1001,9 +1190,8 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label">Date of birth</label>
                                 <div class="date-input-wrapper">
-                                    <input type="text" class="form-input date-input" id="dateOfBirth" placeholder="Select date of birth" readonly>
+                                    <input type="text" class="form-input date-input" id="dateOfBirth" placeholder="Date of birth" readonly>
                                     <button type="button" class="calendar-icon" id="calendarToggle">
                                         <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
                                     </button>
@@ -1013,9 +1201,8 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label">Gender</label>
                                 <select class="form-select" id="genderSelect">
-                                    <option value="" disabled selected hidden></option>
+                                    <option value="" disabled selected hidden>Gender</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
@@ -1025,16 +1212,14 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label">Work email address (optional)</label>
-                                <input type="email" class="form-input">
+                                <input type="email" class="form-input" placeholder="Work email address (optional)">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label">Employee's citizenship (optional)</label>
                                 <div class="dropdown-wrapper">
-                                    <input type="text" class="form-input" id="employeeCitizenshipInput" autocomplete="off">
+                                    <input type="text" class="form-input" id="employeeCitizenshipInput" placeholder="Employee's citizenship (optional)" autocomplete="off">
                                     <div class="dropdown-menu" id="employeeCitizenshipDropdown"></div>
                                 </div>
                             </div>
@@ -1042,13 +1227,44 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label required">Country of residence</label>
                                 <div class="dropdown-wrapper">
-                                    <input type="text" class="form-input" id="employeeResidenceInput" autocomplete="off" required>
+                                    <input type="text" class="form-input" id="employeeResidenceInput" placeholder="Country of residence *" autocomplete="off" required>
                                     <div class="dropdown-menu" id="employeeResidenceDropdown"></div>
                                 </div>
                                 <small style="color: #6c757d;">Country the employee will be working from</small>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Organization position</h3>
+                        <div class="position-selection-container">
+                            {% if structures %}
+                                {% for structure in structures %}
+                                    <div class="position-dropdown-wrapper" data-structure-id="{{ structure.id }}">
+                                        <div class="position-dropdown-selected">
+                                            <div class="position-dropdown-label">{{ structure.name }} (optional)</div>
+                                            <span class="position-dropdown-text">{{ structure.name }} (optional)</span>
+                                            <div style="display: flex; align-items: center;">
+                                                <div class="position-dropdown-delete"></div>
+                                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="position-dropdown-arrow">
+                                            </div>
+                                        </div>
+                                        <div class="position-dropdown-menu">
+                                            {% for item in structure.items %}
+                                                <div class="position-dropdown-item position-level-{{ item.level }}" data-value="{{ item.id }}">
+                                                    {{ item.name }}
+                                                </div>
+                                            {% else %}
+                                                 <div class="position-dropdown-empty">No positions in this structure.</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <input type="hidden" name="structure_position_id" id="structurePositionId">
+                            {% else %}
+                                <p class="no-structures-message">No organizational structures have been created yet.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </form>
@@ -1124,6 +1340,7 @@
         const selectedGroupId = document.getElementById('selectedGroupId')?.value || '';
         const formData = {
             selectedGroupId: selectedGroupId,
+            structurePositionId: document.getElementById('structurePositionId')?.value || '',
             personalEmail: document.querySelector('input[type="email"]').value,
             firstName: document.querySelectorAll('input[type="text"]')[0].value,
             lastName: document.querySelectorAll('input[type="text"]')[1].value,
@@ -1145,7 +1362,28 @@
         if (savedData) {
             const formData = JSON.parse(savedData);
             
-            // Restore form values (group will be restored in initializeGroupDropdown)
+            if (formData.structurePositionId) {
+                const hiddenInput = document.getElementById('structurePositionId');
+                hiddenInput.value = formData.structurePositionId;
+                
+                const selectedItem = document.querySelector(`.position-dropdown-item[data-value="${formData.structurePositionId}"]`);
+                if (selectedItem) {
+                    const wrapper = selectedItem.closest('.position-dropdown-wrapper');
+                    const text = wrapper.querySelector('.position-dropdown-text');
+                    const label = wrapper.querySelector('.position-dropdown-label');
+                    const selected = wrapper.querySelector('.position-dropdown-selected');
+                    const deleteBtn = wrapper.querySelector('.position-dropdown-delete');
+                    
+                    text.textContent = selectedItem.textContent.trim();
+                    text.classList.add('selected');
+                    selected.classList.add('has-selection');
+                    label.classList.add('show');
+                    deleteBtn.classList.add('show');
+                    selectedItem.classList.add('selected');
+                }
+            }
+
+            // Restore other form values
             if (formData.personalEmail) document.querySelector('input[type="email"]').value = formData.personalEmail;
             if (formData.firstName) document.querySelectorAll('input[type="text"]')[0].value = formData.firstName;
             if (formData.lastName) document.querySelectorAll('input[type="text"]')[1].value = formData.lastName;
@@ -1260,6 +1498,7 @@
 
     // Initialize group dropdown when DOM is loaded
     document.addEventListener('DOMContentLoaded', initializeGroupDropdown);
+    document.addEventListener('DOMContentLoaded', initializePositionDropdowns);
 
     // Auto-save form data when inputs change
     document.querySelectorAll('input, select').forEach(input => {
@@ -1696,6 +1935,204 @@
       });
         });
     });
+
+    function initializePositionDropdowns() {
+        const dropdownWrappers = document.querySelectorAll('.position-dropdown-wrapper');
+        const hiddenInput = document.getElementById('structurePositionId');
+
+        dropdownWrappers.forEach(wrapper => {
+            const selected = wrapper.querySelector('.position-dropdown-selected');
+            const menu = wrapper.querySelector('.position-dropdown-menu');
+            const text = wrapper.querySelector('.position-dropdown-text');
+            const label = wrapper.querySelector('.position-dropdown-label');
+            const arrow = wrapper.querySelector('.position-dropdown-arrow');
+            const deleteBtn = wrapper.querySelector('.position-dropdown-delete');
+            
+            // Store original text
+            text.dataset.originalText = text.textContent;
+
+            selected.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isCurrentlyOpen = menu.classList.contains('show');
+                
+                if (!isCurrentlyOpen) {
+                    // Opening: Close all other dropdowns first
+                    closeAllPositionDropdowns();
+                    
+                    // Position the dropdown smartly
+                    positionDropdown(wrapper, menu);
+                    menu.classList.add('show');
+                    selected.classList.add('active');
+                    
+                    // Show floating label only on first opening (when no selection exists and label is not already shown)
+                    if (!text.classList.contains('selected') && !label.classList.contains('show')) {
+                        // This triggers both animations at the same time for a cross-fade effect
+                        selected.classList.add('has-selection');
+                        label.classList.add('show');
+
+                        // After animation, set the content to a space to prepare for item selection text
+                        setTimeout(() => {
+                           if (!text.classList.contains('selected')) {
+                                text.innerHTML = '&nbsp;';
+                           }
+                        }, 200);
+                    }
+                } else {
+                    // Closing: Just close this dropdown without changing text/label state
+                    menu.classList.remove('show', 'show-above');
+                    selected.classList.remove('active');
+                }
+            });
+
+            // Delete button functionality
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // Instantly clear the selection
+                label.classList.add('no-transition');
+                text.classList.add('no-transition');
+
+                label.classList.remove('show');
+                deleteBtn.classList.remove('show');
+                text.textContent = text.dataset.originalText;
+                text.classList.remove('selected');
+                selected.classList.remove('has-selection');
+                
+                // Re-enable transitions
+                setTimeout(() => {
+                    label.classList.remove('no-transition');
+                    text.classList.remove('no-transition');
+                }, 50);
+                
+                // Clear the hidden input if this was the selected structure
+                const currentSelectedItem = wrapper.querySelector('.position-dropdown-item.selected');
+                if (currentSelectedItem && hiddenInput.value === currentSelectedItem.dataset.value) {
+                    hiddenInput.value = '';
+                }
+                
+                // Remove selection highlight from menu items
+                wrapper.querySelectorAll('.position-dropdown-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                saveFormData();
+            });
+
+            menu.querySelectorAll('.position-dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // Set the main hidden input
+                    hiddenInput.value = item.dataset.value;
+                    
+                    // Reset all other dropdown texts and remove selection highlights
+                    dropdownWrappers.forEach(w => {
+                        const w_text = w.querySelector('.position-dropdown-text');
+                        const w_label = w.querySelector('.position-dropdown-label');
+                        const w_selected = w.querySelector('.position-dropdown-selected');
+                        const w_deleteBtn = w.querySelector('.position-dropdown-delete');
+                        w_text.textContent = w_text.dataset.originalText;
+                        w_text.classList.remove('selected');
+                        w_selected.classList.remove('has-selection');
+                        w_label.classList.remove('show');
+                        w_deleteBtn.classList.remove('show');
+                        w.querySelector('.position-dropdown-menu').querySelectorAll('.position-dropdown-item').forEach(i => i.classList.remove('selected'));
+                    });
+
+                    // Update the current dropdown
+                    text.textContent = item.textContent.trim();
+                    text.classList.add('selected');
+                    selected.classList.add('has-selection');
+                    label.classList.add('show');
+                    deleteBtn.classList.add('show');
+                    item.classList.add('selected');
+                    
+                    closeAllPositionDropdowns();
+                    saveFormData();
+                });
+            });
+        });
+
+        function positionDropdown(wrapper, menu) {
+            // Reset positioning classes
+            menu.classList.remove('show-above');
+            
+            // Get dimensions
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // Height of the bottom taskbar (approximate)
+            const taskbarHeight = 80; // Adjust based on your taskbar height
+            
+            // Calculate space below and above
+            const spaceBelow = viewportHeight - wrapperRect.bottom - taskbarHeight;
+            const spaceAbove = wrapperRect.top;
+            
+            // Dropdown max height from CSS
+            const dropdownMaxHeight = 250;
+            
+            // Check if dropdown would fit below without interfering with taskbar
+            if (spaceBelow >= Math.min(dropdownMaxHeight, 150)) {
+                // Position below (default)
+                menu.classList.remove('show-above');
+            } else if (spaceAbove >= Math.min(dropdownMaxHeight, 150)) {
+                // Position above
+                menu.classList.add('show-above');
+            } else {
+                // Not enough space in either direction, default to below
+                menu.classList.remove('show-above');
+            }
+        }
+
+        function closeAllPositionDropdowns() {
+            document.querySelectorAll('.position-dropdown-wrapper').forEach(w => {
+                const menu = w.querySelector('.position-dropdown-menu');
+                const selected = w.querySelector('.position-dropdown-selected');
+                const label = w.querySelector('.position-dropdown-label');
+                const text = w.querySelector('.position-dropdown-text');
+                
+                menu.classList.remove('show', 'show-above');
+                selected.classList.remove('active');
+                
+                // Hide floating label only if no actual selection has been made AND label is currently visible
+                if (!text.classList.contains('selected') && label.classList.contains('show')) {
+                    // Temporarily disable the transition for an instant effect
+                    label.classList.add('no-transition');
+                    text.classList.add('no-transition');
+                    
+                    // Instantly hide and reset the state
+                    label.classList.remove('show');
+                    text.textContent = text.dataset.originalText;
+                    selected.classList.remove('has-selection');
+
+                    // Re-enable the transition shortly after, so it works next time
+                    setTimeout(() => {
+                        label.classList.remove('no-transition');
+                        text.classList.remove('no-transition');
+                    }, 50);
+                }
+            });
+        }
+
+        document.addEventListener('click', () => {
+            // Only close dropdowns if there are any open menus or temporary floating labels
+            const hasOpenDropdowns = document.querySelector('.position-dropdown-menu.show');
+            const hasTemporaryLabels = document.querySelector('.position-dropdown-label.show') && 
+                                      !document.querySelector('.position-dropdown-text.selected');
+            
+            if (hasOpenDropdowns || hasTemporaryLabels) {
+                closeAllPositionDropdowns();
+            }
+        });
+
+        // Reposition dropdowns on window resize
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.position-dropdown-menu.show').forEach(menu => {
+                const wrapper = menu.closest('.position-dropdown-wrapper');
+                positionDropdown(wrapper, menu);
+            });
+        });
+    }
     </script>
 </body>
 </html> 
