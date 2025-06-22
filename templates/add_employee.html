@@ -837,7 +837,7 @@
         }
 
         .group-dropdown-arrow.rotated {
-            /* transform: rotate(180deg); */
+            transform: rotate(180deg);
         }
 
         .group-dropdown-menu {
@@ -1036,7 +1036,7 @@
         }
 
         .position-dropdown-arrow.rotated {
-            /* transform: rotate(180deg); */
+            transform: rotate(180deg);
         }
 
         .position-dropdown-menu {
@@ -1124,7 +1124,7 @@
                                         <div class="group-dropdown-selected" id="groupDropdownSelected">
                                             <span class="group-dropdown-text" id="groupDropdownText">Group *</span>
                                             <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="group-dropdown-arrow" id="groupDropdownArrow" style="width: 16px; height: 16px;">
-                                        </div>
+                            </div>
                                         <div class="group-dropdown-menu" id="groupDropdownMenu">
                                             {% if groups %}
                                                 {% for group in groups %}
@@ -1963,6 +1963,7 @@
                     positionDropdown(wrapper, menu);
                     menu.classList.add('show');
                     selected.classList.add('active');
+                    arrow.classList.add('rotated');
                     
                     // Show floating label only on first opening (when no selection exists and label is not already shown)
                     if (!text.classList.contains('selected') && !label.classList.contains('show')) {
@@ -1981,6 +1982,25 @@
                     // Closing: Just close this dropdown without changing text/label state
                     menu.classList.remove('show', 'show-above');
                     selected.classList.remove('active');
+                    arrow.classList.remove('rotated');
+                    
+                    // If there's a floating label visible (no selection made), hide it instantly without transition
+                    if (!text.classList.contains('selected') && label.classList.contains('show')) {
+                        // Disable transitions temporarily
+                        label.classList.add('no-transition');
+                        text.classList.add('no-transition');
+                        
+                        // Instantly hide and reset the state
+                        label.classList.remove('show');
+                        text.textContent = text.dataset.originalText;
+                        selected.classList.remove('has-selection');
+
+                        // Re-enable transitions after a brief delay
+                        setTimeout(() => {
+                            label.classList.remove('no-transition');
+                            text.classList.remove('no-transition');
+                        }, 50);
+                    }
                 }
             });
 
@@ -2090,9 +2110,11 @@
                 const selected = w.querySelector('.position-dropdown-selected');
                 const label = w.querySelector('.position-dropdown-label');
                 const text = w.querySelector('.position-dropdown-text');
+                const arrow = w.querySelector('.position-dropdown-arrow');
                 
                 menu.classList.remove('show', 'show-above');
                 selected.classList.remove('active');
+                arrow.classList.remove('rotated');
                 
                 // Hide floating label only if no actual selection has been made AND label is currently visible
                 if (!text.classList.contains('selected') && label.classList.contains('show')) {
