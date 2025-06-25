@@ -436,45 +436,6 @@
         margin-top: 4px;
     }
 
-    /* Shift forecast section */
-    .shift-forecast-section {
-        background: white;
-        border-radius: 12px;
-        padding: 32px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        border: 1px solid #e9ecef;
-    }
-
-    .forecast-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 24px;
-    }
-
-    .forecast-policy {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 0;
-    }
-
-    .policy-label {
-        font-size: 0.875rem;
-        color: #495057;
-    }
-
-    .policy-value {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #1a73e8;
-        text-decoration: none;
-    }
-
-    .policy-value:hover {
-        text-decoration: underline;
-    }
-
     /* Icons */
     .icon-organization {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'/%3e%3c/svg%3e");
@@ -554,41 +515,6 @@
             <button class="assign-schedules-btn">Assign schedules in bulk</button>
         </div>
 
-        <!-- Top sections grid -->
-        <div class="content-grid">
-            <!-- Overtime submission enablement -->
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-info">
-                        <h3 class="section-name">Overtime submission enablement for salaried workers</h3>
-                        <p class="section-description">Enable time tracking for salaried employees to effectively monitor and manage overtime hours</p>
-                    </div>
-                    <a href="#" class="create-btn">Create</a>
-                </div>
-                
-                <div class="empty-state">
-                    <div class="empty-state-icon">ℹ️</div>
-                    <div class="empty-state-text">No overtime submission policies created yet</div>
-                </div>
-            </div>
-
-            <!-- Time submission methods -->
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-info">
-                        <h3 class="section-name">Time submission methods</h3>
-                        <p class="section-description">Manage the methods workers use to track and submit their worked hours</p>
-                    </div>
-                    <a href="#" class="create-btn">Create</a>
-                </div>
-                
-                <div class="empty-state">
-                    <div class="empty-state-icon">ℹ️</div>
-                    <div class="empty-state-text">You don't have any time submission policies yet</div>
-                </div>
-            </div>
-        </div>
-
         <!-- Work schedules section -->
         <div class="work-schedules-section">
             <div class="schedules-header">
@@ -597,69 +523,12 @@
                     <p class="section-description">Manage weekly fixed schedules for your hourly and salaried workers</p>
                 </div>
                 <div class="schedules-help">
-                    <div class="help-icon">ℹ️</div>
-                    <a href="#" class="create-btn">Create</a>
+                    <a href="/create-schedule" class="create-btn">Create</a>
                 </div>
             </div>
 
             <div class="schedules-grid">
-                <!-- Schedule card 1 -->
-                <div class="schedule-card">
-                    <div class="schedule-header">
-                        <div>
-                            <a href="#" class="schedule-name">Default VN FT schedule - 40h</a>
-                            <div class="schedule-subtitle">1 COUNTRY</div>
-                        </div>
-                        <div>
-                            <div class="schedule-hours">40 hours</div>
-                            <div class="schedule-days">Mon, Tue, Wed, Thu, Fri</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Schedule card 2 -->
-                <div class="schedule-card">
-                    <div class="schedule-header">
-                        <div>
-                            <a href="#" class="schedule-name">EOR Default VN FT schedule - 40 - Hourly</a>
-                            <div class="schedule-subtitle">1 COUNTRY</div>
-                        </div>
-                        <div>
-                            <div class="schedule-hours">40 hours</div>
-                            <div class="schedule-days">Mon, Tue, Wed, Thu, Fri</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Schedule card 3 -->
-                <div class="schedule-card">
-                    <div class="schedule-header">
-                        <div>
-                            <a href="#" class="schedule-name">EOR Default VN FT schedule - 40 - Salaried</a>
-                            <div class="schedule-subtitle">1 COUNTRY</div>
-                        </div>
-                        <div>
-                            <div class="schedule-hours">40 hours</div>
-                            <div class="schedule-days">Mon, Tue, Wed, Thu, Fri</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Shift forecast section -->
-        <div class="shift-forecast-section">
-            <div class="forecast-header">
-                <div class="section-info">
-                    <h3 class="section-name">Shift forecast settings for salaried workers</h3>
-                    <p class="section-description">Manage shift forecasting for salaried workers</p>
-                </div>
-                <div class="help-icon">ℹ️</div>
-            </div>
-
-            <div class="forecast-policy">
-                <div class="policy-label">Shift forecast policy</div>
-                <a href="#" class="policy-value">Default Shift Forecast Policy</a>
+                <!-- Empty - no schedule cards -->
             </div>
         </div>
     </div>
@@ -668,27 +537,11 @@
 
 {% block scripts %}
 <script>
-    // Handle navigation clicks
-    document.querySelectorAll('.create-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Create functionality would be implemented here');
-        });
-    });
-
     // Handle schedule name clicks
     document.querySelectorAll('.schedule-name').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             alert('Schedule details would be shown here');
-        });
-    });
-
-    // Handle policy link clicks
-    document.querySelectorAll('.policy-value').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Policy details would be shown here');
         });
     });
 

@@ -1427,6 +1427,30 @@ def time_tracking():
     
     return render_template('time_tracking.html', user=user, organization=organization, active_page='time_tracking')
 
+@app.route('/create-schedule')
+def create_schedule():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('create_schedule.html', user=user)
+
+@app.route('/create-schedule-step2')
+def create_schedule_step2():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('create_schedule_step2.html', user=user)
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running
