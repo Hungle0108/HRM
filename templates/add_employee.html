@@ -837,7 +837,7 @@
         }
 
         .group-dropdown-arrow.rotated {
-            transform: rotate(180deg);
+            /* Remove rotation effect */
         }
 
         .group-dropdown-menu {
@@ -951,7 +951,7 @@
         }
 
         .position-dropdown-selected {
-            padding: 0 16px;
+            padding: 8px 16px;
             border: 1px solid #ced4da;
             border-radius: 8px;
             background: white;
@@ -960,16 +960,32 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
-            height: 50px; /* Set a fixed height */
+            height: 72px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .position-dropdown-selected.has-selection {
-            /* No padding change needed with fixed height */
+            padding: 8px 16px;
+        }
+
+        .position-dropdown-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+            min-height: 38px;
+            margin-top: 0;
+        }
+
+        .position-dropdown-content.with-label {
+            margin-top: 12px;
         }
 
         .position-dropdown-label {
             position: absolute;
-            top: 6px;
+            top: 8px;
             left: 16px;
             font-size: 0.75rem;
             color: #6c757d;
@@ -1007,10 +1023,50 @@
             color: #1a1a1a;
         }
 
-        .position-dropdown-arrow {
-            transition: transform 0.2s;
-            width: 16px; 
-            height: 16px;
+        .position-dropdown-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .position-selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .position-selected-tag {
+            background-color: #e9ecef;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .position-selected-tag .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            color: #6c757d;
+            font-size: 0.75rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #adb5bd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .position-selected-tag .remove-tag:hover {
+            background: #6c757d;
         }
 
         .position-dropdown-delete {
@@ -1036,7 +1092,7 @@
         }
 
         .position-dropdown-arrow.rotated {
-            transform: rotate(180deg);
+            /* Remove rotation effect */
         }
 
         .position-dropdown-menu {
@@ -1073,6 +1129,9 @@
             font-size: 0.95rem;
             color: #202124;
             background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .position-dropdown-item:hover {
@@ -1082,6 +1141,11 @@
         .position-dropdown-item.selected {
             background: #f1f3f5;
             font-weight: 500;
+        }
+
+        .position-dropdown-item .checkmark {
+            flex-shrink: 0;
+            margin-left: 8px;
         }
 
         .position-dropdown-empty {
@@ -1104,6 +1168,28 @@
         .position-dropdown-selected.active {
             border-color: #1a1a1a;
             box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+        }
+
+        .multi-select-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tag {
+            background-color: #e9ecef;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -1239,31 +1325,57 @@
                     <div class="form-section">
                         <h3 class="section-title">Organization position</h3>
                         <div class="position-selection-container">
-                            {% if structures %}
-                                {% for structure in structures %}
-                                    <div class="position-dropdown-wrapper" data-structure-id="{{ structure.id }}">
+                            {% if org_structures %}
+                                {% for structure in org_structures %}
+                                    <div class="position-dropdown-wrapper" 
+                                         data-structure-id="{{ structure.id }}" 
+                                         data-allow-multiple="{{ 'true' if structure.allow_multiple_assignments else 'false' }}">
                                         <div class="position-dropdown-selected">
                                             <div class="position-dropdown-label">{{ structure.name }} (optional)</div>
+                                            <div class="position-dropdown-content">
                                             <span class="position-dropdown-text">{{ structure.name }} (optional)</span>
-                                            <div style="display: flex; align-items: center;">
+                                                <div class="position-selected-tags"></div>
+                                            </div>
+                                            <div class="position-dropdown-controls">
                                                 <div class="position-dropdown-delete"></div>
-                                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="position-dropdown-arrow">
+                                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="position-dropdown-arrow" style="width: 16px; height: 16px;">
                                             </div>
                                         </div>
                                         <div class="position-dropdown-menu">
-                                            {% for item in structure.items %}
-                                                <div class="position-dropdown-item position-level-{{ item.level }}" data-value="{{ item.id }}">
-                                                    {{ item.name }}
+                                            {% if structure['items'] %}
+                                                {% for item in structure['items'] %}
+                                                    <div class="position-dropdown-item position-level-1" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}">
+                                                        <span>{{ item.name }}</span>
+                                                        <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
                                                 </div>
-                                            {% else %}
-                                                 <div class="position-dropdown-empty">No positions in this structure.</div>
+                                                    {% if item.children %}
+                                                        {% for child in item.children %}
+                                                            <div class="position-dropdown-item position-level-2" data-item-id="{{ child.id }}" data-item-name="{{ child.name }}">
+                                                                <span>{{ child.name }}</span>
+                                                                <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
+                                                            </div>
+                                                            {% if child.children %}
+                                                                {% for grandchild in child.children %}
+                                                                    <div class="position-dropdown-item position-level-3" data-item-id="{{ grandchild.id }}" data-item-name="{{ grandchild.name }}">
+                                                                        <span>{{ grandchild.name }}</span>
+                                                                        <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
+                                                                    </div>
                                             {% endfor %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="position-dropdown-empty">No items in this structure</div>
+                                            {% endif %}
                                         </div>
+                                        <input type="hidden" name="structure-{{ structure.id }}" class="selected-items-input">
                                     </div>
                                 {% endfor %}
-                                <input type="hidden" name="structure_position_id" id="structurePositionId">
                             {% else %}
-                                <p class="no-structures-message">No organizational structures have been created yet.</p>
+                                <div class="no-structures-message">
+                                    No organization structures have been set up. You can create them in Settings.
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -1468,13 +1580,15 @@
         function openDropdown() {
             dropdownMenu.classList.add('show');
             dropdownSelected.classList.add('active');
-            dropdownArrow.classList.add('rotated');
+            // Change arrow to point up
+            dropdownArrow.src = dropdownArrow.src.replace('angle-small-down.png', 'angle-small-up.png');
         }
 
         function closeDropdown() {
             dropdownMenu.classList.remove('show');
             dropdownSelected.classList.remove('active');
-            dropdownArrow.classList.remove('rotated');
+            // Change arrow to point down
+            dropdownArrow.src = dropdownArrow.src.replace('angle-small-up.png', 'angle-small-down.png');
         }
 
         // Restore selected group if exists
@@ -1937,223 +2051,218 @@
     });
 
     function initializePositionDropdowns() {
-        const dropdownWrappers = document.querySelectorAll('.position-dropdown-wrapper');
-        const hiddenInput = document.getElementById('structurePositionId');
+        const dropdowns = document.querySelectorAll('.position-dropdown-wrapper');
 
-        dropdownWrappers.forEach(wrapper => {
+        dropdowns.forEach(wrapper => {
             const selected = wrapper.querySelector('.position-dropdown-selected');
             const menu = wrapper.querySelector('.position-dropdown-menu');
             const text = wrapper.querySelector('.position-dropdown-text');
             const label = wrapper.querySelector('.position-dropdown-label');
             const arrow = wrapper.querySelector('.position-dropdown-arrow');
             const deleteBtn = wrapper.querySelector('.position-dropdown-delete');
+            const hiddenInput = wrapper.querySelector('.selected-items-input');
+            const tagsContainer = wrapper.querySelector('.position-selected-tags');
+            const allowMultiple = wrapper.dataset.allowMultiple === 'true';
             
-            // Store original text
-            text.dataset.originalText = text.textContent;
+            let selectedItems = new Map();
 
             selected.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isCurrentlyOpen = menu.classList.contains('show');
-                
-                if (!isCurrentlyOpen) {
-                    // Opening: Close all other dropdowns first
-                    closeAllPositionDropdowns();
-                    
-                    // Position the dropdown smartly
-                    positionDropdown(wrapper, menu);
-                    menu.classList.add('show');
-                    selected.classList.add('active');
-                    arrow.classList.add('rotated');
-                    
-                    // Show floating label only on first opening (when no selection exists and label is not already shown)
-                    if (!text.classList.contains('selected') && !label.classList.contains('show')) {
-                        // This triggers both animations at the same time for a cross-fade effect
-                        selected.classList.add('has-selection');
-                        label.classList.add('show');
-
-                        // After animation, set the content to a space to prepare for item selection text
-                        setTimeout(() => {
-                           if (!text.classList.contains('selected')) {
-                                text.innerHTML = '&nbsp;';
-                           }
-                        }, 200);
-                    }
-                } else {
-                    // Closing: Just close this dropdown without changing text/label state
-                    menu.classList.remove('show', 'show-above');
-                    selected.classList.remove('active');
-                    arrow.classList.remove('rotated');
-                    
-                    // If there's a floating label visible (no selection made), hide it instantly without transition
-                    if (!text.classList.contains('selected') && label.classList.contains('show')) {
-                        // Disable transitions temporarily
-                        label.classList.add('no-transition');
-                        text.classList.add('no-transition');
-                        
-                        // Instantly hide and reset the state
-                        label.classList.remove('show');
-                        text.textContent = text.dataset.originalText;
-                        selected.classList.remove('has-selection');
-
-                        // Re-enable transitions after a brief delay
-                        setTimeout(() => {
-                            label.classList.remove('no-transition');
-                            text.classList.remove('no-transition');
-                        }, 50);
-                    }
-                }
+                if (e.target.classList.contains('position-dropdown-delete') || e.target.closest('.remove-tag')) return;
+                toggleMenu(menu, arrow, selected);
             });
 
-            // Delete button functionality
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                
-                // Instantly clear the selection
-                label.classList.add('no-transition');
-                text.classList.add('no-transition');
-
-                label.classList.remove('show');
-                deleteBtn.classList.remove('show');
-                text.textContent = text.dataset.originalText;
-                text.classList.remove('selected');
-                selected.classList.remove('has-selection');
-                
-                // Re-enable transitions
-                setTimeout(() => {
-                    label.classList.remove('no-transition');
-                    text.classList.remove('no-transition');
-                }, 50);
-                
-                // Clear the hidden input if this was the selected structure
-                const currentSelectedItem = wrapper.querySelector('.position-dropdown-item.selected');
-                if (currentSelectedItem && hiddenInput.value === currentSelectedItem.dataset.value) {
-                    hiddenInput.value = '';
-                }
-                
-                // Remove selection highlight from menu items
-                wrapper.querySelectorAll('.position-dropdown-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                
-                saveFormData();
+                clearSelection();
             });
 
-            menu.querySelectorAll('.position-dropdown-item').forEach(item => {
-                item.addEventListener('click', (e) => {
+            menu.addEventListener('click', (e) => {
+                const item = e.target.closest('.position-dropdown-item');
+                if (!item) return;
+
+                const itemId = item.dataset.itemId;
+                const itemName = item.dataset.itemName;
+
+                if (allowMultiple) {
+                    if (selectedItems.has(itemId)) {
+                        selectedItems.delete(itemId);
+                    } else {
+                        selectedItems.set(itemId, itemName);
+                    }
+                } else {
+                    if (selectedItems.has(itemId)) {
+                        selectedItems.clear();
+                    } else {
+                        selectedItems.clear();
+                        selectedItems.set(itemId, itemName);
+                    }
+                    // Close menu on single select
+                    toggleMenu(menu, arrow, selected, false);
+                }
+                updateSelection();
+            });
+
+            function updateSelection() {
+                updateTags();
+                updateHiddenInput();
+                updateDisplay();
+                updateCheckmarks();
+            }
+
+            function updateTags() {
+                tagsContainer.innerHTML = '';
+                if (selectedItems.size === 0 || !allowMultiple) return;
+
+                selectedItems.forEach((name, id) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'position-selected-tag';
+                    tag.innerHTML = `<span>${name}</span><span class="remove-tag" data-id="${id}">×</span>`;
+                    tagsContainer.appendChild(tag);
+                });
+                    }
+            
+            tagsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-tag')) {
                     e.stopPropagation();
-                    
-                    // Set the main hidden input
-                    hiddenInput.value = item.dataset.value;
-                    
-                    // Reset all other dropdown texts and remove selection highlights
-                    dropdownWrappers.forEach(w => {
-                        const w_text = w.querySelector('.position-dropdown-text');
-                        const w_label = w.querySelector('.position-dropdown-label');
-                        const w_selected = w.querySelector('.position-dropdown-selected');
-                        const w_deleteBtn = w.querySelector('.position-dropdown-delete');
-                        w_text.textContent = w_text.dataset.originalText;
-                        w_text.classList.remove('selected');
-                        w_selected.classList.remove('has-selection');
-                        w_label.classList.remove('show');
-                        w_deleteBtn.classList.remove('show');
-                        w.querySelector('.position-dropdown-menu').querySelectorAll('.position-dropdown-item').forEach(i => i.classList.remove('selected'));
+                    const idToRemove = e.target.dataset.id;
+                    selectedItems.delete(idToRemove);
+                    updateSelection();
+                }
+            });
+
+            function updateHiddenInput() {
+                const ids = Array.from(selectedItems.keys());
+                hiddenInput.value = ids.join(',');
+            }
+
+            function updateDisplay() {
+                const contentContainer = wrapper.querySelector('.position-dropdown-content');
+                
+                if (selectedItems.size === 0) {
+                    text.textContent = wrapper.querySelector('.position-dropdown-label').textContent;
+                text.classList.remove('selected');
+                    text.style.display = 'block';
+                    label.classList.remove('show');
+                selected.classList.remove('has-selection');
+                    deleteBtn.classList.remove('show');
+                    contentContainer.classList.remove('with-label');
+                } else if (!allowMultiple && selectedItems.size === 1) {
+                    // Single select: show the item name as text
+                    text.textContent = selectedItems.values().next().value;
+                    text.classList.add('selected');
+                    text.style.display = 'block';
+                    label.classList.add('show');
+                    selected.classList.add('has-selection');
+                    deleteBtn.classList.add('show');
+                    contentContainer.classList.add('with-label');
+                } else if (allowMultiple) {
+                    // Multi select: hide text and show label with tags
+                    text.style.display = 'none';
+                    label.classList.add('show');
+                    selected.classList.add('has-selection');
+                    deleteBtn.classList.add('show');
+                    contentContainer.classList.add('with-label');
+                }
+            }
+
+            function updateCheckmarks() {
+                const allItems = wrapper.querySelectorAll('.position-dropdown-item');
+                allItems.forEach(item => {
+                    const checkmark = item.querySelector('.checkmark');
+                    if (selectedItems.has(item.dataset.itemId)) {
+                        checkmark.style.display = 'inline';
+            } else {
+                        checkmark.style.display = 'none';
+                    }
+                });
+            }
+            
+            function clearSelection() {
+                selectedItems.clear();
+                updateSelection();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const openDropdown = document.querySelector('.position-dropdown-menu.show');
+            if (openDropdown && !openDropdown.parentElement.contains(e.target)) {
+                const wrapper = openDropdown.parentElement;
+                const selected = wrapper.querySelector('.position-dropdown-selected');
+                const arrow = wrapper.querySelector('.position-dropdown-arrow');
+                toggleMenu(openDropdown, arrow, selected, false);
+                }
+            });
+        }
+
+    function toggleMenu(menu, arrow, selected, forceState) {
+        const wrapper = menu.parentElement;
+        const allowMultiple = wrapper.dataset.allowMultiple === 'true';
+        const label = wrapper.querySelector('.position-dropdown-label');
+        const text = wrapper.querySelector('.position-dropdown-text');
+        const selectedItems = wrapper.querySelectorAll('.position-selected-tag');
+        const contentContainer = wrapper.querySelector('.position-dropdown-content');
+        
+        const shouldShow = forceState !== undefined ? forceState : !menu.classList.contains('show');
+        if (shouldShow) {
+            // Close other open dropdowns first
+            document.querySelectorAll('.position-dropdown-menu.show').forEach(openMenu => {
+                if (openMenu !== menu) {
+                    const otherWrapper = openMenu.parentElement;
+                    const otherSelected = otherWrapper.querySelector('.position-dropdown-selected');
+                    const otherArrow = otherWrapper.querySelector('.position-dropdown-arrow');
+                    toggleMenu(openMenu, otherArrow, otherSelected, false);
+                }
                     });
 
-                    // Update the current dropdown
-                    text.textContent = item.textContent.trim();
-                    text.classList.add('selected');
-                    selected.classList.add('has-selection');
+            // Show floating label when dropdown opens (for both single and multi-select)
+            // Only if no items are currently selected
+            const hasSelections = allowMultiple ? selectedItems.length > 0 : text.classList.contains('selected');
+            if (!hasSelections) {
                     label.classList.add('show');
-                    deleteBtn.classList.add('show');
-                    item.classList.add('selected');
-                    
-                    closeAllPositionDropdowns();
-                    saveFormData();
-                });
-            });
-        });
-
-        function positionDropdown(wrapper, menu) {
-            // Reset positioning classes
-            menu.classList.remove('show-above');
+                text.style.display = 'none';
+                selected.classList.add('has-selection');
+                contentContainer.classList.add('with-label');
+            }
             
-            // Get dimensions
-            const wrapperRect = wrapper.getBoundingClientRect();
+            // Change arrow to point up
+            arrow.src = arrow.src.replace('angle-small-down.png', 'angle-small-up.png');
+            
+            // Calculate positioning
+            const selectedRect = selected.getBoundingClientRect();
+            const menuHeight = 250; // max-height of dropdown
             const viewportHeight = window.innerHeight;
-            
-            // Height of the bottom taskbar (approximate)
-            const taskbarHeight = 80; // Adjust based on your taskbar height
+            const bottomNavHeight = 80; // Approximate height of bottom navigation
             
             // Calculate space below and above
-            const spaceBelow = viewportHeight - wrapperRect.bottom - taskbarHeight;
-            const spaceAbove = wrapperRect.top;
+            const spaceBelow = viewportHeight - selectedRect.bottom - bottomNavHeight;
+            const spaceAbove = selectedRect.top;
             
-            // Dropdown max height from CSS
-            const dropdownMaxHeight = 250;
-            
-            // Check if dropdown would fit below without interfering with taskbar
-            if (spaceBelow >= Math.min(dropdownMaxHeight, 150)) {
-                // Position below (default)
-                menu.classList.remove('show-above');
-            } else if (spaceAbove >= Math.min(dropdownMaxHeight, 150)) {
-                // Position above
+            // Position dropdown above if there's not enough space below
+            if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
                 menu.classList.add('show-above');
             } else {
-                // Not enough space in either direction, default to below
                 menu.classList.remove('show-above');
             }
-        }
-
-        function closeAllPositionDropdowns() {
-            document.querySelectorAll('.position-dropdown-wrapper').forEach(w => {
-                const menu = w.querySelector('.position-dropdown-menu');
-                const selected = w.querySelector('.position-dropdown-selected');
-                const label = w.querySelector('.position-dropdown-label');
-                const text = w.querySelector('.position-dropdown-text');
-                const arrow = w.querySelector('.position-dropdown-arrow');
-                
-                menu.classList.remove('show', 'show-above');
-                selected.classList.remove('active');
-                arrow.classList.remove('rotated');
-                
-                // Hide floating label only if no actual selection has been made AND label is currently visible
-                if (!text.classList.contains('selected') && label.classList.contains('show')) {
-                    // Temporarily disable the transition for an instant effect
-                    label.classList.add('no-transition');
-                    text.classList.add('no-transition');
-                    
-                    // Instantly hide and reset the state
-                    label.classList.remove('show');
-                    text.textContent = text.dataset.originalText;
-                    selected.classList.remove('has-selection');
-
-                    // Re-enable the transition shortly after, so it works next time
-                    setTimeout(() => {
-                        label.classList.remove('no-transition');
-                        text.classList.remove('no-transition');
-                    }, 50);
-                }
-            });
-        }
-
-        document.addEventListener('click', () => {
-            // Only close dropdowns if there are any open menus or temporary floating labels
-            const hasOpenDropdowns = document.querySelector('.position-dropdown-menu.show');
-            const hasTemporaryLabels = document.querySelector('.position-dropdown-label.show') && 
-                                      !document.querySelector('.position-dropdown-text.selected');
             
-            if (hasOpenDropdowns || hasTemporaryLabels) {
-                closeAllPositionDropdowns();
+            menu.classList.add('show');
+            selected.classList.add('active');
+        } else {
+            // Hide floating label when dropdown closes (only if no selections)
+            const hasSelections = allowMultiple ? selectedItems.length > 0 : text.classList.contains('selected');
+            if (!hasSelections) {
+                    label.classList.remove('show');
+                text.style.display = 'block';
+                    selected.classList.remove('has-selection');
+                contentContainer.classList.remove('with-label');
             }
-        });
-
-        // Reposition dropdowns on window resize
-        window.addEventListener('resize', () => {
-            document.querySelectorAll('.position-dropdown-menu.show').forEach(menu => {
-                const wrapper = menu.closest('.position-dropdown-wrapper');
-                positionDropdown(wrapper, menu);
-            });
-        });
+            
+            // Change arrow to point down
+            arrow.src = arrow.src.replace('angle-small-up.png', 'angle-small-down.png');
+            
+            menu.classList.remove('show');
+            menu.classList.remove('show-above');
+            selected.classList.remove('active');
+        }
     }
     </script>
 </body>

@@ -163,6 +163,15 @@ class StructureItem(db.Model):
     
     children = db.relationship('StructureItem', backref=db.backref('parent', remote_side=[id]), cascade="all, delete-orphan")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'level': self.level,
+            'parent_id': self.parent_id,
+            'children': [child.to_dict() for child in self.children]
+        }
+
 # Create database tables
 def init_db():
     with app.app_context():
@@ -171,11 +180,6 @@ def init_db():
         # Create all tables
         db.create_all()
         print("Database initialized successfully!")
-
-# Initialize the database before first request
-@app.before_first_request
-def create_tables():
-    init_db()
 
 # Serve static files
 @app.route('/')
@@ -241,15 +245,28 @@ def add_employee():
     
     organization = None
     user_groups = []
-    structures = []
+    structure_data = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
-        # Get all groups for this organization
         user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
-        # Get all structures for this organization
+        
         structures = OrgStructure.query.filter_by(organization_id=user.organization_id).all()
+        for structure in structures:
+            # Fetch top-level items for each structure
+            top_level_items = StructureItem.query.filter_by(structure_id=structure.id, parent_id=None).all()
+            structure_dict = {
+                'id': structure.id,
+                'name': structure.name,
+                'allow_multiple_assignments': structure.allow_multiple_assignments,
+                'items': [item.to_dict() for item in top_level_items]
+            }
+            print(f"DEBUG: Structure {structure.name} - items type: {type(structure_dict['items'])}, items: {structure_dict['items']}")
+            structure_data.append(structure_dict)
+        
+        print(f"DEBUG: Total structure_data: {len(structure_data)}")
+        print(f"DEBUG: Type of structure_data: {type(structure_data)}")
     
-    return render_template('add_employee.html', user=user, organization=organization, groups=user_groups, structures=structures)
+    return render_template('add_employee.html', user=user, organization=organization, groups=user_groups, org_structures=structure_data)
 
 @app.route('/add-employee-step2')
 def add_employee_step2():
@@ -1392,6 +1409,23 @@ def api_create_structure():
         logger.error(f"Error creating structure: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': 'Failed to create structure'}), 500
+
+@app.route('/settings/time-tracking')
+def time_tracking():
+    """Time tracking settings page"""
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    # Get the user's organization
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('time_tracking.html', user=user, organization=organization, active_page='time_tracking')
 
 if __name__ == '__main__':
     with app.app_context():
