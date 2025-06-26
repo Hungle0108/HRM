@@ -426,6 +426,205 @@
             color: #495057;
             font-weight: 500;
         }
+
+        /* Weekday Details Styles */
+        .weekday-details {
+            display: block;
+            margin-top: 24px;
+            padding-top: 24px;
+        }
+
+        .weekday-details.show {
+            display: block;
+        }
+
+        .weekday-section {
+            margin-bottom: 32px;
+        }
+
+        .weekday-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .repeat-button {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .repeat-button:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .repeat-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            gap: 16px;
+        }
+
+        .checkbox-item:hover {
+            border-color: #d1d5db;
+            background: #fafafa;
+        }
+
+        .checkbox-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-item.selected {
+            border-color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .checkbox-item.disabled {
+            background: #f8f9fa;
+            opacity: 0.6;
+        }
+
+        .checkbox-item.disabled .time-input {
+            background: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .day-name {
+            min-width: 100px;
+            font-size: 0.95rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .time-input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-input {
+            padding: 12px 14px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #495057;
+            background: white;
+            transition: all 0.2s;
+            width: 130px;
+            max-width: 150px;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .time-input::placeholder {
+            color: #adb5bd;
+        }
+
+        .time-input.error {
+            border-color: #e53e3e;
+            color: #e53e3e;
+        }
+
+        .time-input.error::placeholder {
+            color: #e53e3e;
+        }
+
+        .validation-message {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            margin-top: 4px;
+        }
+
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .checkbox-input:checked {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .checkbox-input:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            color: #e53e3e;
+            font-size: 0.9rem;
+        }
+
+        .error-icon {
+            width: 16px;
+            height: 16px;
+            background: #e53e3e;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -479,14 +678,122 @@
                         <h3 class="section-title">Working days and hours per day</h3>
                         <p class="section-description">Specify number of worked hours per week or specify hours per days, start & end time etc.</p>
                         
-                        <div class="toggle-section">
-                            <label class="toggle-label" for="specifyDaysToggle">
-                                Specify the working days for your employees (e.g. Mon, Tues)
-                            </label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="specifyDaysToggle">
-                                <span class="toggle-slider"></span>
-                            </label>
+                        <div class="weekday-details">
+                            <div class="weekday-section">
+                                <h4 class="weekday-section-title">
+                                    Weekdays details
+                                    <button type="button" class="repeat-button" id="repeatFirstButton">
+                                        <img src="/static/images/copy.png" class="repeat-icon" alt="Copy">
+                                        Repeat the first to all
+                                    </button>
+                                </h4>
+                                
+                                <div class="checkbox-list">
+                                    <div class="checkbox-item" data-day="monday">
+                                        <input type="checkbox" class="checkbox-input" id="monday" name="weekdays" value="monday">
+                                        <div class="day-name">Monday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="monday-start">
+                                                <div class="validation-message" id="monday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="monday-end">
+                                                <div class="validation-message" id="monday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="tuesday">
+                                        <input type="checkbox" class="checkbox-input" id="tuesday" name="weekdays" value="tuesday">
+                                        <div class="day-name">Tuesday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="tuesday-start">
+                                                <div class="validation-message" id="tuesday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="tuesday-end">
+                                                <div class="validation-message" id="tuesday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="wednesday">
+                                        <input type="checkbox" class="checkbox-input" id="wednesday" name="weekdays" value="wednesday">
+                                        <div class="day-name">Wednesday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="wednesday-start">
+                                                <div class="validation-message" id="wednesday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="wednesday-end">
+                                                <div class="validation-message" id="wednesday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="thursday">
+                                        <input type="checkbox" class="checkbox-input" id="thursday" name="weekdays" value="thursday">
+                                        <div class="day-name">Thursday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="thursday-start">
+                                                <div class="validation-message" id="thursday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="thursday-end">
+                                                <div class="validation-message" id="thursday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="friday">
+                                        <input type="checkbox" class="checkbox-input" id="friday" name="weekdays" value="friday">
+                                        <div class="day-name">Friday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="friday-start">
+                                                <div class="validation-message" id="friday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="friday-end">
+                                                <div class="validation-message" id="friday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="saturday">
+                                        <input type="checkbox" class="checkbox-input" id="saturday" name="weekdays" value="saturday">
+                                        <div class="day-name">Saturday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="saturday-start">
+                                                <div class="validation-message" id="saturday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="saturday-end">
+                                                <div class="validation-message" id="saturday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="sunday">
+                                        <input type="checkbox" class="checkbox-input" id="sunday" name="weekdays" value="sunday">
+                                        <div class="day-name">Sunday</div>
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="Start time" id="sunday-start">
+                                                <div class="validation-message" id="sunday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <input type="text" class="time-input" placeholder="End time" id="sunday-end">
+                                                <div class="validation-message" id="sunday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="error-message" id="weekdayError" style="display: none;">
+                                    <div class="error-icon">!</div>
+                                    <span>The working days are not selected</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -550,7 +857,6 @@
             
             const hoursPerWeek = document.getElementById('hoursPerWeek').value;
             const employmentType = document.getElementById('employmentType').value;
-            const specifyDays = document.getElementById('specifyDaysToggle').checked;
             
             if (!hoursPerWeek) {
                 alert('Please enter number of hours per week');
@@ -562,8 +868,7 @@
             const updatedData = {
                 ...existingData,
                 employmentType: employmentType,
-                hoursPerWeek: parseInt(hoursPerWeek),
-                specifyWorkingDays: specifyDays
+                hoursPerWeek: parseInt(hoursPerWeek)
             };
             
             sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
@@ -571,6 +876,118 @@
             // Navigate to step 3 (placeholder for now)
             alert('Step 2 completed! Next step would be Review and finish.');
             // window.location.href = '/create-schedule-step3';
+        });
+
+        // Update schedule details based on employment type
+        document.getElementById('employmentType').addEventListener('change', function() {
+            const scheduleDetails = document.querySelector('.schedule-details-content');
+            const type = this.value;
+            
+            if (type === 'full-time') {
+                scheduleDetails.innerHTML = `
+                    <h4>Full-time Schedule details</h4>
+                    <p>A typical full-time schedule generally ranges from 35 to 50 hours. However, it's important to note that the specific duration may vary depending on the regulations set by each country.</p>
+                `;
+            } else if (type === 'part-time') {
+                scheduleDetails.innerHTML = `
+                    <h4>Part-time Schedule details</h4>
+                    <p>Part-time schedules typically range from 15 to 34 hours per week. The specific hours and days can be customized based on business needs and local regulations.</p>
+                `;
+            } else if (type === 'contract') {
+                scheduleDetails.innerHTML = `
+                    <h4>Contract Schedule details</h4>
+                    <p>Contract schedules are flexible and can vary based on project requirements. Hours can range from minimal weekly commitments to full-time equivalent hours.</p>
+                `;
+            }
+        });
+
+        // Checkbox and time input functionality
+        document.querySelectorAll('.checkbox-input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const timeInputs = dayItem.querySelectorAll('.time-input');
+                
+                if (this.checked) {
+                    dayItem.classList.add('selected');
+                    dayItem.classList.remove('disabled');
+                    timeInputs.forEach(input => {
+                        input.disabled = false;
+                        input.classList.remove('disabled');
+                    });
+                } else {
+                    dayItem.classList.remove('selected');
+                    dayItem.classList.add('disabled');
+                    timeInputs.forEach(input => {
+                        input.disabled = true;
+                        input.classList.add('disabled');
+                        input.value = '';
+                        // Hide validation messages
+                        const errorMsg = input.parentNode.querySelector('.validation-message');
+                        if (errorMsg) errorMsg.style.display = 'none';
+                        input.classList.remove('error');
+                    });
+                }
+                updateContinueButton();
+            });
+        });
+
+        // Repeat the first to all functionality
+        document.getElementById('repeatFirstButton').addEventListener('click', function() {
+            const mondayStartTime = document.getElementById('monday-start').value;
+            const mondayEndTime = document.getElementById('monday-end').value;
+            
+            if (!mondayStartTime || !mondayEndTime) {
+                alert('Please fill in Monday\'s start and end times first.');
+                return;
+            }
+            
+            // Apply to all checked days except Monday
+            const checkedDays = document.querySelectorAll('input[name="weekdays"]:checked');
+            checkedDays.forEach(checkbox => {
+                if (checkbox.value !== 'monday') {
+                    const day = checkbox.value;
+                    document.getElementById(day + '-start').value = mondayStartTime;
+                    document.getElementById(day + '-end').value = mondayEndTime;
+                    
+                    // Clear any validation errors
+                    document.getElementById(day + '-start-error').style.display = 'none';
+                    document.getElementById(day + '-end-error').style.display = 'none';
+                    document.getElementById(day + '-start').classList.remove('error');
+                    document.getElementById(day + '-end').classList.remove('error');
+                }
+            });
+        });
+
+        // Time input validation
+        document.querySelectorAll('.time-input').forEach(input => {
+            input.addEventListener('blur', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const checkbox = dayItem.querySelector('.checkbox-input');
+                
+                if (checkbox.checked && !this.value) {
+                    this.classList.add('error');
+                    const errorMsg = this.parentNode.querySelector('.validation-message');
+                    if (errorMsg) errorMsg.style.display = 'block';
+                } else {
+                    this.classList.remove('error');
+                    const errorMsg = this.parentNode.querySelector('.validation-message');
+                    if (errorMsg) errorMsg.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize disabled state for all time inputs
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            const checkbox = item.querySelector('.checkbox-input');
+            const timeInputs = item.querySelectorAll('.time-input');
+            
+            if (!checkbox.checked) {
+                item.classList.add('disabled');
+                timeInputs.forEach(input => {
+                    input.disabled = true;
+                    input.classList.add('disabled');
+                });
+            }
         });
 
         // Update continue button state
@@ -620,29 +1037,6 @@
 
         // Initialize button state
         updateContinueButton();
-
-        // Update schedule details based on employment type
-        document.getElementById('employmentType').addEventListener('change', function() {
-            const scheduleDetails = document.querySelector('.schedule-details-content');
-            const type = this.value;
-            
-            if (type === 'full-time') {
-                scheduleDetails.innerHTML = `
-                    <h4>Full-time Schedule details</h4>
-                    <p>A typical full-time schedule generally ranges from 35 to 50 hours. However, it's important to note that the specific duration may vary depending on the regulations set by each country.</p>
-                `;
-            } else if (type === 'part-time') {
-                scheduleDetails.innerHTML = `
-                    <h4>Part-time Schedule details</h4>
-                    <p>Part-time schedules typically range from 15 to 34 hours per week. The specific hours and days can be customized based on business needs and local regulations.</p>
-                `;
-            } else if (type === 'contract') {
-                scheduleDetails.innerHTML = `
-                    <h4>Contract Schedule details</h4>
-                    <p>Contract schedules are flexible and can vary based on project requirements. Hours can range from minimal weekly commitments to full-time equivalent hours.</p>
-                `;
-            }
-        });
     </script>
 </body>
 </html> 
