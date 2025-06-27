@@ -514,11 +514,23 @@
             cursor: not-allowed;
         }
 
-        .day-name {
+        .day-info {
             min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day-name {
             font-size: 0.95rem;
             color: #495057;
             font-weight: 500;
+        }
+
+        .day-duration {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 400;
         }
 
         .time-inputs {
@@ -531,10 +543,17 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .time-input-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .time-input {
-            padding: 12px 14px;
+            padding: 20px 14px 8px 14px;
             border: 1px solid #e9ecef;
             border-radius: 6px;
             font-size: 0.9rem;
@@ -543,31 +562,242 @@
             transition: all 0.2s;
             width: 130px;
             max-width: 150px;
+            outline: none;
+        }
+
+        .time-input:hover {
+            border-color: #1a1a1a;
         }
 
         .time-input:focus {
-            outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
         }
 
         .time-input::placeholder {
             color: #adb5bd;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .time-input:focus::placeholder {
+            opacity: 1;
+        }
+
+        .time-input.has-value::placeholder {
+            opacity: 1;
+        }
+
+        .time-label {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            color: #adb5bd;
+            background: white;
+            padding: 0 4px;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 2;
+            opacity: 1;
+        }
+
+        .time-input:focus + .time-label,
+        .time-input:not(:placeholder-shown) + .time-label,
+        .time-input.has-value + .time-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #1a1a1a;
+            font-weight: 500;
+            opacity: 1;
+        }
+
+        .time-input:focus + .time-label {
+            color: #1a1a1a;
+        }
+
+        .time-input.has-value:not(:focus) + .time-label {
+            color: #6b7280;
         }
 
         .time-input.error {
-            border-color: #e53e3e;
-            color: #e53e3e;
+            border-color: #dc2626;
+            color: #dc2626;
         }
 
         .time-input.error::placeholder {
-            color: #e53e3e;
+            color: #dc2626;
+        }
+
+        .time-input.error + .time-label {
+            color: #dc2626 !important;
         }
 
         .validation-message {
             font-size: 0.8rem;
             color: #e53e3e;
             margin-top: 4px;
+        }
+
+        /* Duration Input Styles */
+        .duration-input {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .duration-input-wrapper {
+            position: relative;
+            height: 52px;
+            display: flex;
+            align-items: center;
+        }
+
+        .duration-warning-icon {
+            position: absolute;
+            right: 65px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-image: url('/static/images/diamond-exclamation (4).png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+            display: none;
+            z-index: 3;
+        }
+
+        .duration-field.warning + .duration-warning-icon,
+        .duration-field.error + .duration-warning-icon {
+            display: block;
+        }
+
+        .duration-field {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #495057;
+            background: white;
+            transition: all 0.2s;
+            outline: none;
+            height: 52px;
+            box-sizing: border-box;
+            line-height: 1.4;
+        }
+
+        .duration-field:hover {
+            border-color: #1a1a1a !important;
+        }
+
+        .duration-field:focus {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+        }
+
+        .duration-field::placeholder {
+            color: #adb5bd;
+        }
+
+        .duration-field.error {
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .duration-field.error::placeholder {
+            color: #dc2626;
+        }
+
+        .duration-field.warning {
+            border-color: #dc2626;
+        }
+
+        .duration-field.warning::placeholder {
+            color: #dc2626;
+        }
+
+        .duration-label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            background: white;
+            padding: 0 4px;
+            z-index: 2;
+        }
+
+        .duration-input-wrapper:hover .duration-label {
+            color: #1a1a1a;
+        }
+
+        .duration-field:focus + .duration-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .duration-field:not(:placeholder-shown) + .duration-label,
+        .duration-field.has-value + .duration-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .duration-field.warning + .duration-label,
+        .duration-field.error + .duration-label {
+            color: #dc2626;
+        }
+
+        .duration-input-wrapper:hover .duration-field.warning + .duration-label,
+        .duration-input-wrapper:hover .duration-field.error + .duration-label {
+            color: #dc2626;
+        }
+
+        .duration-unit {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a1a1a;
+            font-size: 0.9rem;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .duration-error {
+            font-size: 0.8rem;
+            color: #dc2626;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .duration-error.show {
+            display: block;
+        }
+
+        .checkbox-item.checked .duration-field.error {
+            border-color: #dc2626;
+        }
+
+        .checkbox-item:not(.checked) .duration-field {
+            border-color: #e9ecef;
+            color: #adb5bd;
+            background: #f8f9fa;
+            pointer-events: none;
+        }
+
+        .checkbox-item:not(.checked) .duration-error {
+            display: none;
         }
 
         .checkbox-input {
@@ -678,6 +908,14 @@
                         <h3 class="section-title">Working days and hours per day</h3>
                         <p class="section-description">Specify number of worked hours per week or specify hours per days, start & end time etc.</p>
                         
+                        <div class="toggle-section">
+                            <span class="toggle-label">Specify the work duration for each day</span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="specifyDuration" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                        
                         <div class="weekday-details">
                             <div class="weekday-section">
                                 <h4 class="weekday-section-title">
@@ -691,98 +929,238 @@
                                 <div class="checkbox-list">
                                     <div class="checkbox-item" data-day="monday">
                                         <input type="checkbox" class="checkbox-input" id="monday" name="weekdays" value="monday">
-                                        <div class="day-name">Monday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Monday</div>
+                                            <div class="day-duration" id="monday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="monday-duration-input">
+                                <label class="duration-label" for="monday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="monday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="monday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="monday-start" maxlength="5">
+                                                    <label class="time-label" for="monday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="monday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="monday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="monday-end" maxlength="5">
+                                                    <label class="time-label" for="monday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="monday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="checkbox-item" data-day="tuesday">
                                         <input type="checkbox" class="checkbox-input" id="tuesday" name="weekdays" value="tuesday">
-                                        <div class="day-name">Tuesday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Tuesday</div>
+                                            <div class="day-duration" id="tuesday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="tuesday-duration-input">
+                                <label class="duration-label" for="tuesday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="tuesday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="tuesday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="tuesday-start" maxlength="5">
+                                                    <label class="time-label" for="tuesday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="tuesday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="tuesday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="tuesday-end" maxlength="5">
+                                                    <label class="time-label" for="tuesday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="tuesday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="checkbox-item" data-day="wednesday">
                                         <input type="checkbox" class="checkbox-input" id="wednesday" name="weekdays" value="wednesday">
-                                        <div class="day-name">Wednesday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Wednesday</div>
+                                            <div class="day-duration" id="wednesday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="wednesday-duration-input">
+                                <label class="duration-label" for="wednesday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="wednesday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="wednesday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="wednesday-start" maxlength="5">
+                                                    <label class="time-label" for="wednesday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="wednesday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="wednesday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="wednesday-end" maxlength="5">
+                                                    <label class="time-label" for="wednesday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="wednesday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="checkbox-item" data-day="thursday">
                                         <input type="checkbox" class="checkbox-input" id="thursday" name="weekdays" value="thursday">
-                                        <div class="day-name">Thursday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Thursday</div>
+                                            <div class="day-duration" id="thursday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="thursday-duration-input">
+                                <label class="duration-label" for="thursday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="thursday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="thursday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="thursday-start" maxlength="5">
+                                                    <label class="time-label" for="thursday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="thursday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="thursday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="thursday-end" maxlength="5">
+                                                    <label class="time-label" for="thursday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="thursday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="checkbox-item" data-day="friday">
                                         <input type="checkbox" class="checkbox-input" id="friday" name="weekdays" value="friday">
-                                        <div class="day-name">Friday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Friday</div>
+                                            <div class="day-duration" id="friday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="friday-duration-input">
+                                <label class="duration-label" for="friday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="friday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="friday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="friday-start" maxlength="5">
+                                                    <label class="time-label" for="friday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="friday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="friday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="friday-end" maxlength="5">
+                                                    <label class="time-label" for="friday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="friday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="checkbox-item" data-day="saturday">
                                         <input type="checkbox" class="checkbox-input" id="saturday" name="weekdays" value="saturday">
-                                        <div class="day-name">Saturday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Saturday</div>
+                                            <div class="day-duration" id="saturday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="saturday-duration-input">
+                                <label class="duration-label" for="saturday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="saturday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="saturday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="saturday-start" maxlength="5">
+                                                    <label class="time-label" for="saturday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="saturday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="saturday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="saturday-end" maxlength="5">
+                                                    <label class="time-label" for="saturday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="saturday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="checkbox-item" data-day="sunday">
                                         <input type="checkbox" class="checkbox-input" id="sunday" name="weekdays" value="sunday">
-                                        <div class="day-name">Sunday</div>
+                                        <div class="day-info">
+                                            <div class="day-name">Sunday</div>
+                                            <div class="day-duration" id="sunday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="sunday-duration-input">
+                                <label class="duration-label" for="sunday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit">Hours</span>
+                            </div>
+                            <div class="duration-error" id="sunday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
                                         <div class="time-inputs">
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="Start time" id="sunday-start">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="sunday-start" maxlength="5">
+                                                    <label class="time-label" for="sunday-start">Start time</label>
+                                                </div>
                                                 <div class="validation-message" id="sunday-start-error" style="display: none;">Start time is required</div>
                                             </div>
                                             <div class="time-input-group">
-                                                <input type="text" class="time-input" placeholder="End time" id="sunday-end">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="sunday-end" maxlength="5">
+                                                    <label class="time-label" for="sunday-end">End time</label>
+                                                </div>
                                                 <div class="validation-message" id="sunday-end-error" style="display: none;">End time is required</div>
                                             </div>
                                         </div>
@@ -1037,6 +1415,489 @@
 
         // Initialize button state
         updateContinueButton();
+
+        // Time input formatting and floating label functionality
+        document.querySelectorAll('.time-input').forEach(input => {
+            // Handle floating label on focus/blur/input
+            function updateFloatingLabel() {
+                const label = input.nextElementSibling;
+                if (input.value.trim() !== '') {
+                    input.classList.add('has-value');
+                } else {
+                    input.classList.remove('has-value');
+                }
+            }
+
+            // Time input formatting with independent hour/minute editing
+            let lastValue = '';
+
+            input.addEventListener('input', function(e) {
+                const currentValue = e.target.value;
+                const currentCursor = e.target.selectionStart;
+                
+                // Handle empty input
+                if (currentValue === '') {
+                    lastValue = '';
+                    updateFloatingLabel();
+                    return;
+                }
+
+                // Extract current parts
+                let hours = '';
+                let minutes = '';
+                
+                // Parse existing value
+                const parts = currentValue.split(':');
+                if (parts.length >= 1) {
+                    hours = parts[0].replace(/\D/g, '').slice(0, 2);
+                }
+                if (parts.length >= 2) {
+                    minutes = parts[1].replace(/\D/g, '').slice(0, 2);
+                }
+
+                // Determine which part is being edited based on cursor position
+                const hasColon = currentValue.includes(':');
+                const cursorBeforeColon = currentCursor <= 2;
+                const cursorAfterColon = currentCursor >= 3;
+                
+                // More precise section detection
+                let isEditingHours = false;
+                let isEditingMinutes = false;
+                
+                if (hasColon) {
+                    // If there's a colon, determine by cursor position relative to colon
+                    const colonPos = currentValue.indexOf(':');
+                    isEditingHours = currentCursor <= colonPos;
+                    isEditingMinutes = currentCursor > colonPos;
+                } else {
+                    // No colon means we're definitely editing hours
+                    isEditingHours = true;
+                    isEditingMinutes = false;
+                }
+
+                // Calculate valid minutes first
+                const hasValidMinutes = minutes.length > 0 && minutes !== '0' && minutes !== '00';
+
+                // Smart hour completion - only for single digits > 2 when clearly editing hours
+                let shouldAutoCompleteHour = false;
+                if (isEditingHours && hours.length === 1 && !hasColon) {
+                    const digit = parseInt(hours);
+                    if (digit > 2) {
+                        hours = '0' + digit;
+                        shouldAutoCompleteHour = true;
+                    }
+                }
+
+                // Validate hours
+                if (hours.length === 2) {
+                    const hourValue = parseInt(hours);
+                    if (hourValue > 23) {
+                        // If invalid hour, treat as single digit hour + first minute digit
+                        hours = '0' + hours[0];
+                        minutes = hours[1] + (minutes || '');
+                        minutes = minutes.slice(0, 2);
+                    }
+                }
+
+                // Validate minutes
+                if (minutes.length === 2) {
+                    const minuteValue = parseInt(minutes);
+                    if (minuteValue > 59) {
+                        minutes = '59';
+                    }
+                }
+
+                // Build formatted value
+                let formattedValue = '';
+                
+                // Hours formatting
+                if (hours.length > 0) {
+                    // Check if hours is just zeros (like "0" or "00") and skip if so
+                    const isJustZeros = hours === '0' || hours === '00';
+                    
+                    if (!isJustZeros) {
+                        if (hours.length === 1 && !shouldAutoCompleteHour && isEditingHours && parseInt(hours) <= 2) {
+                            // Single digit hour 0, 1, or 2 being actively edited - don't pad yet, allow further editing
+                            formattedValue = hours;
+                        } else {
+                            // Two digit hour, auto-completed hour, or finished editing single digit
+                            formattedValue = hours.padStart(2, '0');
+                        }
+                    }
+                }
+
+                // Add colon when needed
+                
+                // Show colon when:
+                // 1. We auto-completed an hour (like 3 -> 03:)
+                // 2. User is editing minutes
+                // 3. We have a formatted two-digit hour (padded)
+                // 4. We already had valid minutes (preserve existing structure) BUT not when actively editing single digit hours 0-2
+                const hasFormattedHour = formattedValue.length === 2;
+                const isEditingSingleDigitLowHour = isEditingHours && hours.length === 1 && parseInt(hours) <= 2 && !shouldAutoCompleteHour;
+                const shouldShowColon = shouldAutoCompleteHour || isEditingMinutes || hasFormattedHour || (hasColon && hasValidMinutes && !isEditingSingleDigitLowHour);
+                
+                if (shouldShowColon) {
+                    if (formattedValue.length === 1) {
+                        formattedValue = '0' + formattedValue;
+                    } else if (formattedValue.length === 0 && isEditingMinutes) {
+                        // If editing minutes but no hours, still add colon
+                        formattedValue = '';
+                    }
+                    formattedValue += ':';
+                    
+                    if (hasValidMinutes) {
+                        formattedValue += minutes;
+                    }
+                } else if (hasColon && isEditingMinutes) {
+                    // If editing minutes but they're zeros or empty, still show colon
+                    if (formattedValue.length > 0) {
+                        if (formattedValue.length === 1) {
+                            formattedValue = '0' + formattedValue;
+                        }
+                        formattedValue += ':';
+                    } else {
+                        formattedValue = ':';
+                    }
+                }
+
+                // Set the value
+                e.target.value = formattedValue;
+                lastValue = formattedValue;
+                
+                // Set cursor position - keep in same section
+                setTimeout(() => {
+                    const finalValue = e.target.value;
+                    const finalColonPos = finalValue.indexOf(':');
+                    
+                    if (isEditingHours) {
+                        // Always keep cursor in hour section
+                        let hourCursor = currentCursor;
+                        
+                        if (shouldAutoCompleteHour) {
+                            // After auto-complete, cursor at end of hours (position 2)
+                            hourCursor = 2;
+                        } else if (finalColonPos !== -1) {
+                            // If there's a colon, keep cursor before it
+                            hourCursor = Math.min(Math.max(hourCursor, 0), finalColonPos);
+                        } else {
+                            // No colon, keep cursor within the value length
+                            hourCursor = Math.min(Math.max(hourCursor, 0), finalValue.length);
+                        }
+                        
+                        e.target.setSelectionRange(hourCursor, hourCursor);
+                    } else if (isEditingMinutes) {
+                        // Always keep cursor in minutes section (after colon)
+                        if (finalColonPos !== -1) {
+                            const minuteStart = finalColonPos + 1;
+                            let minuteCursor = Math.max(currentCursor, minuteStart);
+                            minuteCursor = Math.min(minuteCursor, finalValue.length);
+                            
+                            e.target.setSelectionRange(minuteCursor, minuteCursor);
+                        }
+                    }
+                }, 0);
+
+                updateFloatingLabel();
+            });
+
+            // Handle keydown for special key behaviors
+            input.addEventListener('keydown', function(e) {
+                const cursor = this.selectionStart;
+                const value = this.value;
+                
+                // Handle arrow keys - respect section boundaries
+                if (e.keyCode === 37) { // Left arrow
+                    if (cursor === 3 && value[2] === ':') {
+                        // At start of minutes, don't move to hours - stay in minutes
+                        e.preventDefault();
+                        return;
+                    }
+                } else if (e.keyCode === 39) { // Right arrow  
+                    if (cursor === 2 && value[2] === ':') {
+                        // At end of hours, don't auto-move to minutes unless user explicitly clicks
+                        e.preventDefault();
+                        return;
+                    }
+                }
+                
+                // Handle backspace to delete parts independently
+                if (e.keyCode === 8) { // Backspace
+                    const isInHourSection = cursor <= 2;
+                    const isInMinuteSection = cursor >= 3;
+                    
+                    if (cursor === 3 && value[2] === ':') {
+                        // If at start of minutes, stay in minutes section - don't move to hours
+                        e.preventDefault();
+                        return; // Do nothing, keep cursor where it is
+                    } else if (isInHourSection && cursor === 0 && value.length > 0) {
+                        // If at start of hours and trying to delete, clear only hours
+                        e.preventDefault();
+                        const parts = value.split(':');
+                        if (parts.length > 1 && parts[1]) {
+                            this.value = ':' + parts[1];
+                            this.setSelectionRange(0, 0); // Stay at start of input
+                        } else {
+                            this.value = '';
+                            this.setSelectionRange(0, 0);
+                        }
+                        updateFloatingLabel();
+                    }
+                }
+                
+                // Handle delete key
+                if (e.keyCode === 46) { // Delete
+                    if (cursor === 2 && value[2] === ':') {
+                        // If at colon, delete first minute digit
+                        e.preventDefault();
+                        const parts = value.split(':');
+                        if (parts.length > 1 && parts[1].length > 0) {
+                            const newMinutes = parts[1].slice(1);
+                            this.value = parts[0] + ':' + newMinutes;
+                            this.setSelectionRange(3, 3);
+                            updateFloatingLabel();
+                        }
+                    }
+                }
+            });
+
+            // Handle keypress to allow only numbers
+            input.addEventListener('keypress', function(e) {
+                const allowedKeys = [8, 9, 27, 13, 46]; // backspace, tab, esc, enter, delete
+                const isNumber = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+                const isControlKey = e.ctrlKey && [65, 67, 86, 88].includes(e.keyCode); // Ctrl+A, C, V, X
+                
+                // Don't allow colon input - it's automatically managed
+                if (!isNumber && !allowedKeys.includes(e.keyCode) && !isControlKey) {
+                    e.preventDefault();
+                }
+            });
+
+            // Handle paste events
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const cleanPaste = paste.replace(/\D/g, '').slice(0, 4);
+                
+                let formatted = cleanPaste;
+                if (cleanPaste.length >= 2) {
+                    formatted = cleanPaste.slice(0, 2) + ':' + cleanPaste.slice(2, 4);
+                }
+                
+                this.value = formatted;
+                updateFloatingLabel();
+            });
+
+            // Update floating label on load if input has value
+            input.addEventListener('focus', updateFloatingLabel);
+            input.addEventListener('blur', updateFloatingLabel);
+            
+            // Initialize floating label state
+            updateFloatingLabel();
+        });
+
+        // Calculate and display working hours for each day
+        function calculateWorkingHours(startTime, endTime) {
+            if (!startTime || !endTime || startTime.length !== 5 || endTime.length !== 5) {
+                return null;
+            }
+
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+
+            if (isNaN(startHour) || isNaN(startMin) || isNaN(endHour) || isNaN(endMin)) {
+                return null;
+            }
+
+            // Convert to minutes
+            const startMinutes = startHour * 60 + startMin;
+            let endMinutes = endHour * 60 + endMin;
+
+            // Handle next day scenario (e.g., 23:00 to 07:00)
+            if (endMinutes <= startMinutes) {
+                endMinutes += 24 * 60; // Add 24 hours
+            }
+
+            const diffMinutes = endMinutes - startMinutes;
+            const hours = Math.floor(diffMinutes / 60);
+            const minutes = diffMinutes % 60;
+
+            return { hours, minutes };
+        }
+
+        function formatDuration(hours, minutes) {
+            let result = '';
+            if (hours > 0) {
+                result += `${hours} hr`;
+            }
+            if (minutes > 0) {
+                if (result) result += ' ';
+                result += `${minutes} mins`;
+            }
+            return result || '0 mins';
+        }
+
+        function updateDayDuration(day) {
+            const startInput = document.getElementById(day + '-start');
+            const endInput = document.getElementById(day + '-end');
+            const durationElement = document.getElementById(day + '-duration');
+            
+            if (!startInput || !endInput || !durationElement) return;
+
+            const startTime = startInput.value;
+            const endTime = endInput.value;
+            
+            const duration = calculateWorkingHours(startTime, endTime);
+            
+            if (duration) {
+                durationElement.textContent = formatDuration(duration.hours, duration.minutes);
+                durationElement.style.display = 'block';
+            } else {
+                durationElement.textContent = '';
+                durationElement.style.display = 'none';
+            }
+        }
+
+        // Add event listeners to all time inputs to update duration
+        const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        weekdays.forEach(day => {
+            const startInput = document.getElementById(day + '-start');
+            const endInput = document.getElementById(day + '-end');
+            
+            if (startInput && endInput) {
+                startInput.addEventListener('input', () => updateDayDuration(day));
+                startInput.addEventListener('blur', () => updateDayDuration(day));
+                endInput.addEventListener('input', () => updateDayDuration(day));
+                endInput.addEventListener('blur', () => updateDayDuration(day));
+            }
+        });
+
+        // Toggle between duration and time modes
+        const specifyDurationToggle = document.getElementById('specifyDuration');
+        
+        function toggleInputMode() {
+            const isDurationMode = specifyDurationToggle.checked;
+            
+            weekdays.forEach(day => {
+                const timeInputs = document.querySelector(`[data-day="${day}"] .time-inputs`);
+                const durationInput = document.querySelector(`[data-day="${day}"] .duration-input`);
+                
+                if (isDurationMode) {
+                    // Show duration inputs, hide time inputs
+                    timeInputs.style.display = 'none';
+                    durationInput.style.display = 'block';
+                } else {
+                    // Show time inputs, hide duration inputs
+                    timeInputs.style.display = 'flex';
+                    durationInput.style.display = 'none';
+                }
+            });
+        }
+
+        // Handle checkbox state changes for duration validation
+        function updateDurationValidation() {
+            weekdays.forEach(day => {
+                const checkbox = document.getElementById(day);
+                const checkboxItem = document.querySelector(`[data-day="${day}"]`);
+                const durationField = document.getElementById(`${day}-duration-input`);
+                const durationError = document.getElementById(`${day}-duration-error`);
+                
+                if (checkbox.checked) {
+                    checkboxItem.classList.add('checked');
+                    // Show error if duration is empty and toggle is on
+                    if (specifyDurationToggle.checked && !durationField.value.trim()) {
+                        durationField.classList.add('error');
+                        durationError.classList.add('show');
+                    }
+                } else {
+                    checkboxItem.classList.remove('checked');
+                    durationField.classList.remove('error');
+                    durationError.classList.remove('show');
+                }
+            });
+        }
+
+        // Add event listeners
+        specifyDurationToggle.addEventListener('change', toggleInputMode);
+        
+        // Add event listeners for checkboxes
+        weekdays.forEach(day => {
+            const checkbox = document.getElementById(day);
+            const durationField = document.getElementById(`${day}-duration-input`);
+            const durationError = document.getElementById(`${day}-duration-error`);
+            
+            checkbox.addEventListener('change', updateDurationValidation);
+            
+            // Track if user has hovered over the field
+            let hasHovered = false;
+            
+            // Function to update floating label state
+            function updateDurationFloatingLabel() {
+                if (durationField.value.trim()) {
+                    durationField.classList.add('has-value');
+                } else {
+                    durationField.classList.remove('has-value');
+                }
+            }
+            
+            // Mark as hovered when mouse enters
+            durationField.addEventListener('mouseenter', function() {
+                hasHovered = true;
+            });
+            
+            // Show warning when user leaves field empty after hovering
+            durationField.addEventListener('mouseleave', function() {
+                if (specifyDurationToggle.checked && checkbox.checked && hasHovered && !this.value.trim()) {
+                    this.classList.add('warning');
+                    durationError.classList.add('show');
+                }
+            });
+            
+            // Also check on blur in case user focused without hovering
+            durationField.addEventListener('blur', function() {
+                if (specifyDurationToggle.checked && checkbox.checked && hasHovered && !this.value.trim()) {
+                    this.classList.add('warning');
+                    durationError.classList.add('show');
+                } else if (this.value.trim()) {
+                    this.classList.remove('warning');
+                    this.classList.remove('error');
+                    durationError.classList.remove('show');
+                }
+            });
+            
+            // Remove warning on input
+            durationField.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('warning');
+                    this.classList.remove('error');
+                    durationError.classList.remove('show');
+                    hasHovered = false; // Reset hover state when user fills in
+                }
+                updateDurationFloatingLabel();
+            });
+            
+            // Update floating label on focus and blur
+            durationField.addEventListener('focus', updateDurationFloatingLabel);
+            durationField.addEventListener('blur', updateDurationFloatingLabel);
+            
+            // Initialize floating label state
+            updateDurationFloatingLabel();
+            
+            // Reset hover state when checkbox is unchecked
+            checkbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    hasHovered = false;
+                    durationField.classList.remove('warning');
+                    durationField.classList.remove('error');
+                    durationError.classList.remove('show');
+                }
+            });
+        });
+
+        // Initialize the toggle state
+        toggleInputMode();
+        updateDurationValidation();
     </script>
 </body>
 </html> 
