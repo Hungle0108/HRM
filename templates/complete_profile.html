@@ -1035,8 +1035,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentMonth = instance.currentMonth;
                 const currentYear = instance.currentYear;
                 
-                // Current date is June 10, 2025
-                const today = new Date(2025, 5, 10); // Month is 0-indexed, so 5 = June
+                // Use the actual current date
+                const today = new Date(); // This will get the real current date
                 
                 // Calculate the first day of the next month that would be shown
                 const nextMonth = new Date(currentYear, currentMonth + 1, 1);

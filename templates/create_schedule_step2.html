@@ -43,7 +43,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
         }
 
@@ -1086,7 +1086,6 @@
         <div class="top-bar">
             <div class="top-bar-content">
                 <div class="logo"></div>
-                <button class="close-btn" onclick="window.location.href='/settings/time-tracking'">&times;</button>
             </div>
         </div>
 
@@ -2263,11 +2262,10 @@
 
         // Initialize button state (function removed since hoursPerWeek input was removed)
 
-        // Time input formatting and floating label functionality
+        // Simplified time input formatting and floating label functionality
         document.querySelectorAll('.time-input').forEach(input => {
             // Handle floating label on focus/blur/input
             function updateFloatingLabel() {
-                const label = input.nextElementSibling;
                 if (input.value.trim() !== '') {
                     input.classList.add('has-value');
                 } else {
@@ -2275,271 +2273,77 @@
                 }
             }
 
-            // Time input formatting with independent hour/minute editing
-            let lastValue = '';
-
+            // Simple time input formatting
             input.addEventListener('input', function(e) {
-                const currentValue = e.target.value;
-                const currentCursor = e.target.selectionStart;
+                let value = e.target.value;
                 
-                // Handle empty input
-                if (currentValue === '') {
-                    lastValue = '';
-                    updateFloatingLabel();
-                    return;
-                }
-
-                // Extract current parts
-                let hours = '';
-                let minutes = '';
+                // Remove all non-digit characters
+                let numbers = value.replace(/\D/g, '');
                 
-                // Parse existing value
-                const parts = currentValue.split(':');
-                if (parts.length >= 1) {
-                    hours = parts[0].replace(/\D/g, '').slice(0, 2);
-                }
-                if (parts.length >= 2) {
-                    minutes = parts[1].replace(/\D/g, '').slice(0, 2);
-                }
-
-                // Determine which part is being edited based on cursor position
-                const hasColon = currentValue.includes(':');
-                const cursorBeforeColon = currentCursor <= 2;
-                const cursorAfterColon = currentCursor >= 3;
+                // Limit to 4 digits (HHMM)
+                numbers = numbers.slice(0, 4);
                 
-                // More precise section detection
-                let isEditingHours = false;
-                let isEditingMinutes = false;
-                
-                if (hasColon) {
-                    // If there's a colon, determine by cursor position relative to colon
-                    const colonPos = currentValue.indexOf(':');
-                    isEditingHours = currentCursor <= colonPos;
-                    isEditingMinutes = currentCursor > colonPos;
-                } else {
-                    // No colon means we're definitely editing hours
-                    isEditingHours = true;
-                    isEditingMinutes = false;
-                }
-
-                // Calculate valid minutes first
-                const hasValidMinutes = minutes.length > 0 && minutes !== '0' && minutes !== '00';
-
-                // Smart hour completion - only for single digits > 2 when clearly editing hours
-                let shouldAutoCompleteHour = false;
-                if (isEditingHours && hours.length === 1 && !hasColon) {
-                    const digit = parseInt(hours);
-                    if (digit > 2) {
-                        hours = '0' + digit;
-                        shouldAutoCompleteHour = true;
+                // Format as HH:MM
+                if (numbers.length >= 3) {
+                    // If we have 3 or 4 digits, format as HH:MM
+                    let hours = numbers.slice(0, 2);
+                    let minutes = numbers.slice(2, 4);
+                    
+                    // Validate hours (00-23)
+                    if (parseInt(hours) > 23) {
+                        hours = '23';
                     }
-                }
-
-                // Validate hours
-                if (hours.length === 2) {
-                    const hourValue = parseInt(hours);
-                    if (hourValue > 23) {
-                        // If invalid hour, treat as single digit hour + first minute digit
-                        hours = '0' + hours[0];
-                        minutes = hours[1] + (minutes || '');
-                        minutes = minutes.slice(0, 2);
-                    }
-                }
-
-                // Validate minutes
-                if (minutes.length === 2) {
-                    const minuteValue = parseInt(minutes);
-                    if (minuteValue > 59) {
+                    
+                    // Validate minutes (00-59)
+                    if (parseInt(minutes) > 59) {
                         minutes = '59';
                     }
-                }
-
-                // Build formatted value
-                let formattedValue = '';
-                
-                // Hours formatting
-                if (hours.length > 0) {
-                    // Check if hours is just zeros (like "0" or "00") and skip if so
-                    const isJustZeros = hours === '0' || hours === '00';
                     
-                    if (!isJustZeros) {
-                        if (hours.length === 1 && !shouldAutoCompleteHour && isEditingHours && parseInt(hours) <= 2) {
-                            // Single digit hour 0, 1, or 2 being actively edited - don't pad yet, allow further editing
-                            formattedValue = hours;
-                        } else {
-                            // Two digit hour, auto-completed hour, or finished editing single digit
-                            formattedValue = hours.padStart(2, '0');
-                        }
-                    }
+                    e.target.value = hours + ':' + minutes;
+                } else if (numbers.length === 2) {
+                    // If we have exactly 2 digits, just show them (user might still be typing)
+                    e.target.value = numbers;
+                } else if (numbers.length === 1) {
+                    // If we have 1 digit, just show it
+                    e.target.value = numbers;
+                } else {
+                    // No digits, clear the field
+                    e.target.value = '';
                 }
-
-                // Add colon when needed
                 
-                // Show colon when:
-                // 1. We auto-completed an hour (like 3 -> 03:)
-                // 2. User is editing minutes
-                // 3. We have a formatted two-digit hour (padded)
-                // 4. We already had valid minutes (preserve existing structure) BUT not when actively editing single digit hours 0-2
-                const hasFormattedHour = formattedValue.length === 2;
-                const isEditingSingleDigitLowHour = isEditingHours && hours.length === 1 && parseInt(hours) <= 2 && !shouldAutoCompleteHour;
-                const shouldShowColon = shouldAutoCompleteHour || isEditingMinutes || hasFormattedHour || (hasColon && hasValidMinutes && !isEditingSingleDigitLowHour);
-                
-                if (shouldShowColon) {
-                    if (formattedValue.length === 1) {
-                        formattedValue = '0' + formattedValue;
-                    } else if (formattedValue.length === 0 && isEditingMinutes) {
-                        // If editing minutes but no hours, still add colon
-                        formattedValue = '';
-                    }
-                    formattedValue += ':';
-                    
-                    if (hasValidMinutes) {
-                        formattedValue += minutes;
-                    }
-                } else if (hasColon && isEditingMinutes) {
-                    // If editing minutes but they're zeros or empty, still show colon
-                    if (formattedValue.length > 0) {
-                        if (formattedValue.length === 1) {
-                            formattedValue = '0' + formattedValue;
-                        }
-                        formattedValue += ':';
-                    } else {
-                        formattedValue = ':';
-                    }
-                }
-
-                // Set the value
-                e.target.value = formattedValue;
-                lastValue = formattedValue;
-                
-                // Set cursor position - keep in same section
-                setTimeout(() => {
-                    const finalValue = e.target.value;
-                    const finalColonPos = finalValue.indexOf(':');
-                    
-                    if (isEditingHours) {
-                        // Always keep cursor in hour section
-                        let hourCursor = currentCursor;
-                        
-                        if (shouldAutoCompleteHour) {
-                            // After auto-complete, cursor at end of hours (position 2)
-                            hourCursor = 2;
-                        } else if (finalColonPos !== -1) {
-                            // If there's a colon, keep cursor before it
-                            hourCursor = Math.min(Math.max(hourCursor, 0), finalColonPos);
-                        } else {
-                            // No colon, keep cursor within the value length
-                            hourCursor = Math.min(Math.max(hourCursor, 0), finalValue.length);
-                        }
-                        
-                        e.target.setSelectionRange(hourCursor, hourCursor);
-                    } else if (isEditingMinutes) {
-                        // Always keep cursor in minutes section (after colon)
-                        if (finalColonPos !== -1) {
-                            const minuteStart = finalColonPos + 1;
-                            let minuteCursor = Math.max(currentCursor, minuteStart);
-                            minuteCursor = Math.min(minuteCursor, finalValue.length);
-                            
-                            e.target.setSelectionRange(minuteCursor, minuteCursor);
-                        }
-                    }
-                }, 0);
-
                 updateFloatingLabel();
             });
 
-            // Handle keydown for special key behaviors
-            input.addEventListener('keydown', function(e) {
-                const cursor = this.selectionStart;
-                const value = this.value;
+            // Handle blur to ensure proper formatting
+            input.addEventListener('blur', function(e) {
+                let value = e.target.value;
+                let numbers = value.replace(/\D/g, '');
                 
-                // Handle arrow keys - respect section boundaries
-                if (e.keyCode === 37) { // Left arrow
-                    if (cursor === 3 && value[2] === ':') {
-                        // At start of minutes, don't move to hours - stay in minutes
-                        e.preventDefault();
-                        return;
-                    }
-                } else if (e.keyCode === 39) { // Right arrow  
-                    if (cursor === 2 && value[2] === ':') {
-                        // At end of hours, don't auto-move to minutes unless user explicitly clicks
-                        e.preventDefault();
-                        return;
-                    }
+                if (numbers.length === 1) {
+                    // Single digit becomes 0X:00
+                    e.target.value = '0' + numbers + ':00';
+                } else if (numbers.length === 2) {
+                    // Two digits become XX:00
+                    e.target.value = numbers + ':00';
+                } else if (numbers.length === 3) {
+                    // Three digits become 0X:XX
+                    e.target.value = '0' + numbers.slice(0, 1) + ':' + numbers.slice(1, 3);
                 }
+                // 4 digits are already properly formatted by input handler
                 
-                // Handle backspace to delete parts independently
-                if (e.keyCode === 8) { // Backspace
-                    const isInHourSection = cursor <= 2;
-                    const isInMinuteSection = cursor >= 3;
-                    
-                    if (cursor === 3 && value[2] === ':') {
-                        // If at start of minutes, stay in minutes section - don't move to hours
-                        e.preventDefault();
-                        return; // Do nothing, keep cursor where it is
-                    } else if (isInHourSection && cursor === 0 && value.length > 0) {
-                        // If at start of hours and trying to delete, clear only hours
-                        e.preventDefault();
-                        const parts = value.split(':');
-                        if (parts.length > 1 && parts[1]) {
-                            this.value = ':' + parts[1];
-                            this.setSelectionRange(0, 0); // Stay at start of input
-                        } else {
-                            this.value = '';
-                            this.setSelectionRange(0, 0);
-                        }
-                        updateFloatingLabel();
-                    }
-                }
-                
-                // Handle delete key
-                if (e.keyCode === 46) { // Delete
-                    if (cursor === 2 && value[2] === ':') {
-                        // If at colon, delete first minute digit
-                        e.preventDefault();
-                        const parts = value.split(':');
-                        if (parts.length > 1 && parts[1].length > 0) {
-                            const newMinutes = parts[1].slice(1);
-                            this.value = parts[0] + ':' + newMinutes;
-                            this.setSelectionRange(3, 3);
-                            updateFloatingLabel();
-                        }
-                    }
-                }
+                updateFloatingLabel();
             });
 
-            // Handle keypress to allow only numbers
+            // Allow only numbers and colon
             input.addEventListener('keypress', function(e) {
-                const allowedKeys = [8, 9, 27, 13, 46]; // backspace, tab, esc, enter, delete
-                const isNumber = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
-                const isControlKey = e.ctrlKey && [65, 67, 86, 88].includes(e.keyCode); // Ctrl+A, C, V, X
-                
-                // Don't allow colon input - it's automatically managed
-                if (!isNumber && !allowedKeys.includes(e.keyCode) && !isControlKey) {
+                const char = String.fromCharCode(e.which);
+                if (!/[0-9:]/.test(char) && !e.ctrlKey && e.which !== 8 && e.which !== 9) {
                     e.preventDefault();
                 }
             });
 
-            // Handle paste events
-            input.addEventListener('paste', function(e) {
-                e.preventDefault();
-                const paste = (e.clipboardData || window.clipboardData).getData('text');
-                const cleanPaste = paste.replace(/\D/g, '').slice(0, 4);
-                
-                let formatted = cleanPaste;
-                if (cleanPaste.length >= 2) {
-                    formatted = cleanPaste.slice(0, 2) + ':' + cleanPaste.slice(2, 4);
-                }
-                
-                this.value = formatted;
-                updateFloatingLabel();
-            });
-
-            // Update floating label on load if input has value
-            input.addEventListener('focus', updateFloatingLabel);
-            input.addEventListener('blur', updateFloatingLabel);
-            
             // Initialize floating label state
+            input.addEventListener('focus', updateFloatingLabel);
             updateFloatingLabel();
         });
 
@@ -2859,4 +2663,5 @@
         addCalculationListeners();
     </script>
 </body>
+</html> 
 </html> 
