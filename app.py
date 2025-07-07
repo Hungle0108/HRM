@@ -1451,6 +1451,10 @@ def create_schedule_step2():
     
     return render_template('create_schedule_step2.html', user=user)
 
+@app.route('/create-schedule-step3')
+def create_schedule_step3():
+    return render_template('create_schedule_step3.html')
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running

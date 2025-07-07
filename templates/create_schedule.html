@@ -26,7 +26,6 @@
 
         .top-bar {
             background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -43,7 +42,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -56,17 +55,22 @@
         .close-btn {
             background: none;
             border: none;
-            font-size: 24px;
             cursor: pointer;
-            color: #666;
             padding: 8px;
-            border-radius: 4px;
+            border-radius: 50%;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .close-btn:hover {
-            background: #f5f5f5;
-            color: #333;
+            background: #f0f0f0;
+        }
+
+        .close-btn img {
+            width: 16px;
+            height: 16px;
         }
 
         .page-header {
@@ -347,6 +351,9 @@
         <div class="top-bar">
             <div class="top-bar-content">
                 <div class="logo"></div>
+                <a href="/settings/time-tracking" class="close-btn">
+                    <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
+                </a>
             </div>
         </div>
 

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a schedule - Step 3 - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .close-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: white;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        .step-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #28a745;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .section-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+            flex: 0 0 150px;
+        }
+
+        .summary-value {
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            flex: 1;
+            text-align: right;
+        }
+
+        .summary-value.primary {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .edit-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-left: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .edit-link:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+        }
+
+        .schedule-preview {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .schedule-preview-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .working-days {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .working-day {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .day-name {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .day-hours {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .total-hours {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .total-value {
+            font-size: 1.1rem;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-icon {
+            width: 20px;
+            height: 20px;
+            background: #28a745;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .success-text {
+            font-size: 0.9rem;
+            color: #155724;
+            line-height: 1.4;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            width: 100%;
+            max-width: 930px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .btn-create {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-create:hover {
+            background: #333333;
+        }
+
+        .btn-create:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .create-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .create-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .create-title {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .multiple-shifts-indicator {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .shift-section {
+            margin-bottom: 16px;
+        }
+
+        .shift-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .review-item-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .review-item-label {
+            color: #6c757d;
+        }
+
+        .review-item-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .review-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-icon {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <div class="logo"></div>
+                <a href="/settings/time-tracking" class="close-btn">
+                    <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Create a schedule</h1>
+                <p class="page-subtitle">Review your schedule details and create the final schedule.</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Schedule Name -->
+                <div class="form-section">
+                    <h3 class="section-title" style="margin-bottom: 16px;">Schedule name</h3>
+                    <div class="review-item-box">
+                        <span class="review-item-label">Schedule name</span>
+                        <span id="reviewScheduleName" class="review-item-value">--</span>
+                    </div>
+                </div>
+
+                <!-- Assigned Worker Types -->
+                <div class="form-section">
+                    <h3 class="section-title" style="margin-bottom: 16px;">Assigned worker types</h3>
+                    <div class="review-item-box">
+                        <span class="review-item-label">Worker types</span>
+                        <span id="reviewWorkerType" class="review-item-value">--</span>
+                    </div>
+                </div>
+
+                <!-- Working Hours -->
+                <div class="form-section">
+                    <h3 class="section-title" style="margin-bottom: 16px;">Working Hours</h3>
+                    <div class="review-items-container">
+                        <div class="review-item-box">
+                            <span class="review-item-label">Numbers of hours per week</span>
+                            <span class="review-item-value">34 hr</span>
+                        </div>
+                        <div class="review-item-box">
+                            <span class="review-item-label">
+                                Work schedule type
+                                <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="info" class="info-icon">
+                            </span>
+                            <span class="review-item-value">Flexible work schedule</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Working Time Details -->
+                <div class="form-section">
+                    <h3 class="section-title">Working time details</h3>
+                    <p class="section-description">Your weekly schedule configuration for this worker type.</p>
+                    
+                    <div id="schedulePreviewContainer">
+                        <!-- Schedule preview will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 class="sidebar-title">Steps</h3>
+                
+                <ol class="steps-list">
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div>
+                            <div class="step-badge">Completed</div>
+                            <div class="step-text">Name and worker types</div>
+                        </div>
+                    </li>
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div>
+                            <div class="step-badge">Completed</div>
+                            <div class="step-text">Working time details</div>
+                        </div>
+                    </li>
+                    <li class="step-item active">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Review and finish</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <a href="/create-schedule-step2" class="btn-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </a>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="create-info">
+                        <div class="create-label">Ready to create:</div>
+                        <div class="create-title">Your new schedule</div>
+                    </div>
+                    <button type="button" class="btn-create" id="createScheduleBtn">Create Schedule</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and display saved data from previous steps
+        function loadSavedData() {
+            const savedData = sessionStorage.getItem('scheduleFormData');
+            if (!savedData) {
+                console.warn('No saved schedule data found');
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            console.log('Loaded schedule data:', data);
+            
+            // Display basic information
+            if (data.scheduleName) {
+                document.getElementById('reviewScheduleName').textContent = data.scheduleName;
+            }
+            
+            if (data.workerType) {
+                const workerTypeText = data.workerType.charAt(0).toUpperCase() + data.workerType.slice(1);
+                document.getElementById('reviewWorkerType').textContent = workerTypeText;
+            }
+            
+            // Display schedule details
+            if (data.scheduleDetails) {
+                const details = data.scheduleDetails;
+                const scheduleType = details.specifyDuration ? 'Duration-based schedule' : 'Basic schedule';
+                document.getElementById('reviewScheduleType').textContent = scheduleType;
+                
+                // Show shift count if multiple shifts
+                if (details.numberOfShifts && details.numberOfShifts > 1) {
+                    document.getElementById('reviewShiftCount').textContent = `(${details.numberOfShifts} shifts)`;
+                }
+                
+                // Generate schedule preview
+                generateSchedulePreview(details);
+            }
+        }
+        
+        function generateSchedulePreview(scheduleDetails) {
+            const container = document.getElementById('schedulePreviewContainer');
+            
+            if (!scheduleDetails.shifts || Object.keys(scheduleDetails.shifts).length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; font-style: italic;">No working time details configured.</p>';
+                return;
+            }
+            
+            const shifts = scheduleDetails.shifts;
+            const numberOfShifts = scheduleDetails.numberOfShifts || 1;
+            
+            let previewHTML = '';
+            
+            // Generate preview for each shift
+            for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
+                if (!shifts[shiftNum]) continue;
+                
+                const shiftData = shifts[shiftNum];
+                let totalWeeklyHours = 0;
+                
+                previewHTML += '<div class="schedule-preview">';
+                
+                if (numberOfShifts > 1) {
+                    previewHTML += `<div class="schedule-preview-title">Shift ${shiftNum}</div>`;
+                }
+                
+                previewHTML += '<div class="working-days">';
+                
+                // Days of the week
+                const dayNames = {
+                    'monday': 'Monday',
+                    'tuesday': 'Tuesday', 
+                    'wednesday': 'Wednesday',
+                    'thursday': 'Thursday',
+                    'friday': 'Friday',
+                    'saturday': 'Saturday',
+                    'sunday': 'Sunday'
+                };
+                
+                for (const [dayKey, dayName] of Object.entries(dayNames)) {
+                    if (shiftData[dayKey] && shiftData[dayKey].checked) {
+                        const dayData = shiftData[dayKey];
+                        let dayHours = '';
+                        
+                        if (dayData.start && dayData.end) {
+                            // Time-based
+                            dayHours = `${dayData.start} - ${dayData.end}`;
+                            // Calculate hours for total
+                            const duration = calculateWorkingHours(dayData.start, dayData.end);
+                            if (duration) {
+                                totalWeeklyHours += duration.hours + (duration.minutes / 60);
+                            }
+                        } else if (dayData.duration) {
+                            // Duration-based
+                            dayHours = `${dayData.duration} hours`;
+                            totalWeeklyHours += parseFloat(dayData.duration) || 0;
+                        } else {
+                            dayHours = 'Working day';
+                        }
+                        
+                        previewHTML += `
+                            <div class="working-day">
+                                <span class="day-name">${dayName}</span>
+                                <span class="day-hours">${dayHours}</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                previewHTML += '</div>';
+                
+                // Total weekly hours
+                if (totalWeeklyHours > 0) {
+                    previewHTML += `
+                        <div class="total-hours">
+                            <span class="total-label">Total weekly hours:</span>
+                            <span class="total-value">${totalWeeklyHours.toFixed(1)} hrs</span>
+                        </div>
+                    `;
+                }
+                
+                previewHTML += '</div>';
+            }
+            
+            container.innerHTML = previewHTML;
+        }
+        
+        // Helper function to calculate working hours from time strings
+        function calculateWorkingHours(startTime, endTime) {
+            if (!startTime || !endTime) return null;
+            
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+            
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            
+            let diffMinutes = endMinutes - startMinutes;
+            if (diffMinutes < 0) {
+                diffMinutes += 24 * 60; // Handle overnight shifts
+            }
+            
+            return {
+                hours: Math.floor(diffMinutes / 60),
+                minutes: diffMinutes % 60
+            };
+        }
+        
+        // Handle schedule creation
+        document.getElementById('createScheduleBtn').addEventListener('click', function() {
+            const savedData = sessionStorage.getItem('scheduleFormData');
+            if (!savedData) {
+                alert('Error: No schedule data found. Please start over.');
+                window.location.href = '/create-schedule';
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            
+            // Here you would typically send the data to your server
+            console.log('Creating schedule with data:', data);
+            
+            // Show success message and redirect
+            alert('Schedule created successfully!');
+            
+            // Clear the session storage
+            sessionStorage.removeItem('scheduleFormData');
+            
+            // Redirect to schedules page or dashboard
+            window.location.href = '/settings/time-tracking';
+        });
+        
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadSavedData);
+    </script>
+</body>
+</html> 
