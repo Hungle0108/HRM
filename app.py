@@ -10,6 +10,7 @@ import ssl
 import traceback
 import base64
 import urllib.parse
+import json
 
 app = Flask(__name__)
 
@@ -170,6 +171,74 @@ class StructureItem(db.Model):
             'level': self.level,
             'parent_id': self.parent_id,
             'children': [child.to_dict() for child in self.children]
+        }
+
+# Work Schedule Model
+class WorkSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    schedule_type = db.Column(db.String(50), nullable=False)  # 'fixed' or 'flexible'
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # JSON field to store the complete schedule data
+    schedule_data = db.Column(db.Text, nullable=False)
+    
+    organization = db.relationship('Organization', backref='schedules')
+    creator = db.relationship('User', backref='created_schedules')
+    
+    def to_dict(self):
+        import json
+        schedule_data = json.loads(self.schedule_data)
+        
+        # Calculate total hours from the schedule data
+        total_hours = 0
+        working_days = []
+        
+        if 'scheduleDetails' in schedule_data and 'shifts' in schedule_data['scheduleDetails']:
+            shifts = schedule_data['scheduleDetails']['shifts']
+            
+            for shift_num, shift_data in shifts.items():
+                if 'weekdays' in shift_data:
+                    for day_key, day_data in shift_data['weekdays'].items():
+                        if day_data.get('checked'):
+                            working_days.append(day_key.capitalize()[:3])  # Mon, Tue, etc.
+                            
+                            if shift_data.get('includeTime') and day_data.get('startTime') and day_data.get('endTime'):
+                                # Calculate hours from time range
+                                start_time = day_data['startTime']
+                                end_time = day_data['endTime']
+                                start_hour, start_min = map(int, start_time.split(':'))
+                                end_hour, end_min = map(int, end_time.split(':'))
+                                
+                                start_minutes = start_hour * 60 + start_min
+                                end_minutes = end_hour * 60 + end_min
+                                
+                                if end_minutes > start_minutes:
+                                    day_hours = (end_minutes - start_minutes) / 60
+                                    total_hours += day_hours
+                            elif day_data.get('duration'):
+                                # Add duration-based hours
+                                try:
+                                    total_hours += float(day_data['duration'])
+                                except (ValueError, TypeError):
+                                    pass
+        
+        # Remove duplicates and sort working days
+        working_days = sorted(list(set(working_days)))
+        working_days_str = ', '.join(working_days) if working_days else ''
+        
+        return {
+            'id': self.id,
+            'name': self.name,
+            'schedule_type': self.schedule_type,
+            'organization_id': self.organization_id,
+            'created_by': self.created_by,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'total_hours': int(total_hours) if total_hours.is_integer() else total_hours,
+            'working_days': working_days_str,
+            'schedule_data': schedule_data
         }
 
 # Create database tables
@@ -1422,10 +1491,13 @@ def time_tracking():
     
     # Get the user's organization
     organization = None
+    schedules = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
+        # Fetch all schedules for this organization
+        schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).order_by(WorkSchedule.created_at.desc()).all()
     
-    return render_template('time_tracking.html', user=user, organization=organization, active_page='time_tracking')
+    return render_template('time_tracking.html', user=user, organization=organization, schedules=schedules, active_page='time_tracking')
 
 @app.route('/create-schedule')
 def create_schedule():
@@ -1453,7 +1525,63 @@ def create_schedule_step2():
 
 @app.route('/create-schedule-step3')
 def create_schedule_step3():
-    return render_template('create_schedule_step3.html')
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    return render_template('create_schedule_step3.html', user=user)
+
+@app.route('/api/create-schedule', methods=['POST'])
+def api_create_schedule():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Extract schedule name and type
+        schedule_details = data.get('scheduleDetails', {})
+        schedule_name = schedule_details.get('name', 'Untitled Schedule')
+        
+        # Determine schedule type based on whether any shift includes time
+        schedule_type = 'flexible'  # default
+        shifts = schedule_details.get('shifts', {})
+        for shift_data in shifts.values():
+            if shift_data.get('includeTime'):
+                schedule_type = 'fixed'
+                break
+        
+        # Create new schedule
+        new_schedule = WorkSchedule(
+            name=schedule_name,
+            schedule_type=schedule_type,
+            organization_id=user.organization_id,
+            created_by=user.id,
+            schedule_data=json.dumps(data)
+        )
+        
+        db.session.add(new_schedule)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Schedule created successfully',
+            'schedule_id': new_schedule.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating schedule: {str(e)}")
+        return jsonify({'error': 'Failed to create schedule'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

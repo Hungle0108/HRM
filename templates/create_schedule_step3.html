@@ -907,6 +907,11 @@
                     
                     const shiftData = shifts[shiftNum];
                     
+                    // Check if the shift has any actual data (checked days) before rendering its title.
+                    const hasData = shiftData.weekdays && Object.values(shiftData.weekdays).some(day => day.checked);
+
+                    if (!hasData) continue; // Skip this shift if it has no data
+                    
                     if (numberOfShifts > 1) {
                         previewHTML += `<div class="shift-section-title">Shift ${shiftNum}</div>`;
                     }
@@ -966,6 +971,11 @@
                     if (!shifts[shiftNum]) continue;
                     
                     const shiftData = shifts[shiftNum];
+                    
+                    // Also apply the check here for the duration-based view.
+                    const hasData = shiftData.weekdays && Object.values(shiftData.weekdays).some(day => day.checked);
+
+                    if (!hasData) continue;
                     
                     if (numberOfShifts > 1) {
                         previewHTML += `<div class="schedule-preview-title">Shift ${shiftNum}</div>`;
@@ -1045,17 +1055,46 @@
             
             const data = JSON.parse(savedData);
             
-            // Here you would typically send the data to your server
-            console.log('Creating schedule with data:', data);
+            // Show loading state
+            const button = this;
+            const originalText = button.textContent;
+            button.textContent = 'Creating...';
+            button.disabled = true;
             
-            // Show success message and redirect
-            alert('Schedule created successfully!');
-            
-            // Clear the session storage
-            sessionStorage.removeItem('scheduleFormData');
-            
-            // Redirect to schedules page or dashboard
-            window.location.href = '/settings/time-tracking';
+            // Send data to server
+            fetch('/api/create-schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Clear the session storage
+                    sessionStorage.removeItem('scheduleFormData');
+                    
+                    // Show success message and redirect
+                    alert('Schedule created successfully!');
+                    window.location.href = '/settings/time-tracking';
+                } else {
+                    // Show error message
+                    alert('Error: ' + (result.error || 'Failed to create schedule'));
+                    
+                    // Reset button
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error creating schedule:', error);
+                alert('Error: Failed to create schedule. Please try again.');
+                
+                // Reset button
+                button.textContent = originalText;
+                button.disabled = false;
+            });
         });
         
         // Initialize everything when page loads

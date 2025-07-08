@@ -466,11 +466,17 @@
             }
             
             if (!hasErrors) {
+                // Preserve existing schedule details if they exist
+                const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                
                 // Save data and proceed to next step
-                sessionStorage.setItem('scheduleFormData', JSON.stringify({
+                const updatedData = {
+                    ...existingData,  // Preserve existing data (like scheduleDetails)
                     scheduleName: scheduleName,
                     workerType: workerType
-                }));
+                };
+                
+                sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
                 
                 // Navigate to step 2
                 window.location.href = '/create-schedule-step2';

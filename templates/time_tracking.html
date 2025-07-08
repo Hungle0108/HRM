@@ -528,7 +528,26 @@
             </div>
 
             <div class="schedules-grid">
-                <!-- Empty - no schedule cards -->
+                {% if schedules %}
+                    {% for schedule in schedules %}
+                    <div class="schedule-card">
+                        <div class="schedule-header">
+                            <div>
+                                <a href="#" class="schedule-name">{{ schedule.name }}</a>
+                            </div>
+                            <div>
+                                <div class="schedule-hours">{{ schedule.to_dict().total_hours }} hours</div>
+                                <div class="schedule-days">{{ schedule.to_dict().working_days }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <div class="empty-state-text">No work schedules created yet</div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

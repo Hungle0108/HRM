@@ -1491,7 +1491,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/create-schedule" class="btn-back">
+                <a href="/create-schedule" class="btn-back" id="backBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -1513,8 +1513,16 @@
         const savedData = sessionStorage.getItem('scheduleFormData');
         if (savedData) {
             const data = JSON.parse(savedData);
-            console.log('Step 1 data:', data);
         }
+
+        // Back button handler - save data before navigating
+        document.getElementById('backBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Save current form data before going back
+            saveFormStateToSession();
+            // Navigate to step 1
+            window.location.href = '/create-schedule';
+        });
 
         // Form validation and submission
         document.getElementById('schedule-form-step2').addEventListener('submit', function(e) {
@@ -1529,7 +1537,6 @@
             // State is already saved by listeners, but we save one last time to be safe.
             saveFormStateToSession();
             
-            console.log('Schedule data saved, navigating to step 3.');
             window.location.href = '/create-schedule-step3';
         });
 
@@ -1662,7 +1669,7 @@
             });
         });
 
-        // Toggle functionality for showing/hiding weekday details and include time toggle
+        // Specify Duration toggle functionality
         document.getElementById('specifyDuration').addEventListener('change', function() {
             const weekdayDetails = document.querySelector('.weekday-details');
             const includeTimeToggle = document.getElementById('includeTimeToggle');
@@ -1673,21 +1680,30 @@
                 weekdayDetails.style.display = 'block';
                 includeTimeToggle.style.display = 'flex';
                 
-                // Only reset include time toggle if we're not loading data (i.e., user interaction)
+                // Only reset include time toggle if we're not loading data AND there's no saved state for it
                 if (!isLoadingData) {
-                    // Ensure include time toggle is OFF when it first appears
-                    includeTimeCheckbox.checked = false;
-                    // Trigger the change event to update the input visibility
-                    includeTimeCheckbox.dispatchEvent(new Event('change'));
+                    const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                    const hasIncludeTimeSaved = savedForm && savedForm.scheduleDetails && 
+                                               savedForm.scheduleDetails.shifts && 
+                                               savedForm.scheduleDetails.shifts[currentShift] &&
+                                               typeof savedForm.scheduleDetails.shifts[currentShift].includeTime !== 'undefined';
+                    
+                    // Only reset to false if there's no saved state
+                    if (!hasIncludeTimeSaved) {
+                        includeTimeCheckbox.checked = false;
+                        includeTimeCheckbox.dispatchEvent(new Event('change'));
+                    }
                 }
             } else {
                 // Hide both weekday details, include time toggle, shifts dropdown, and pagination when specify duration is OFF
                 weekdayDetails.style.display = 'none';
                 includeTimeToggle.style.display = 'none';
 
-                // Force include time checkbox OFF so dependent UI hides correctly
-                includeTimeCheckbox.checked = false;
-                includeTimeCheckbox.dispatchEvent(new Event('change'));
+                // Only force checkbox OFF if not during data loading
+                if (!isLoadingData) {
+                    includeTimeCheckbox.checked = false;
+                    includeTimeCheckbox.dispatchEvent(new Event('change'));
+                }
 
                 // Explicitly hide shifts dropdown and shift pagination (in case they were visible)
                 const shiftsDropdown = document.getElementById('shiftsDropdown');
@@ -1753,7 +1769,6 @@
 
         // Initialize toggle states on page load
         function initializeToggleStates() {
-            console.log('=== INITIALIZE TOGGLE STATES START ===');
             const specifyDurationToggle = document.getElementById('specifyDuration');
             const includeTimeToggle = document.getElementById('includeTimeToggle');
             const includeTimeCheckbox = document.getElementById('includeTime');
@@ -1761,20 +1776,12 @@
             const timeInputs = document.querySelectorAll('.time-inputs');
             const shiftsDropdown = document.getElementById('shiftsDropdown');
             
-            // Check if we have saved data that might override defaults
+            // Only set default state if no saved data exists
             const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-            const hasSavedData = savedForm && savedForm.scheduleDetails && 
-                                (savedForm.scheduleDetails.shifts || savedForm.scheduleDetails.includeTimePerShift);
+            const hasSavedData = savedForm && savedForm.scheduleDetails && savedForm.scheduleDetails.shifts;
             
-            console.log('Has saved data:', hasSavedData);
-            console.log('Current toggle state before init:', includeTimeCheckbox ? includeTimeCheckbox.checked : 'toggle not found');
-            
-            // Only set toggle to OFF by default if we don't have saved data to restore
             if (!hasSavedData) {
-                console.log('No saved data - setting toggle to false');
                 includeTimeCheckbox.checked = false;
-            } else {
-                console.log('Has saved data - keeping current toggle state for restoration');
             }
             
             // Set initial visibility based on specify duration toggle state
@@ -1786,43 +1793,7 @@
                 includeTimeToggle.style.display = 'none';
             }
             
-            // Set initial inputs visibility based on include time toggle state
-            const durationInputs = document.querySelectorAll('.duration-input');
-            
-            if (includeTimeCheckbox.checked) {
-                // Show time inputs and shifts dropdown, hide duration inputs
-                timeInputs.forEach(timeInput => {
-                    const dayItem = timeInput.closest('.checkbox-item');
-                    const checkbox = dayItem.querySelector('.checkbox-input');
-                    if (checkbox.checked && specifyDurationToggle.checked) {
-                    timeInput.style.display = 'flex';
-                    } else {
-                        timeInput.style.display = 'none';
-                    }
-                });
-                durationInputs.forEach(durationInput => {
-                    durationInput.style.display = 'none';
-                });
-                shiftsDropdown.style.display = 'block';
-            } else {
-                // Hide time inputs and shifts dropdown, show duration inputs
-                timeInputs.forEach(timeInput => {
-                    timeInput.style.display = 'none';
-                });
-                durationInputs.forEach(durationInput => {
-                    const dayItem = durationInput.closest('.checkbox-item');
-                    const checkbox = dayItem.querySelector('.checkbox-input');
-                    if (checkbox.checked && specifyDurationToggle.checked) {
-                    durationInput.style.display = 'block';
-                    } else {
-                        durationInput.style.display = 'none';
-                    }
-                });
-                shiftsDropdown.style.display = 'none';
-            }
-            
-            console.log('Final toggle state after init:', includeTimeCheckbox ? includeTimeCheckbox.checked : 'toggle not found');
-            console.log('=== INITIALIZE TOGGLE STATES END ===');
+            updateInputVisibility();
         }
 
         // Initialize "hour" text visibility for duration fields that already have values
@@ -1904,43 +1875,19 @@
 
         // --- Main Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== DOM CONTENT LOADED START ===');
-            
-            // FIRST: Let's see what's actually in sessionStorage
-            const rawSessionData = sessionStorage.getItem('scheduleFormData');
-            console.log('Raw sessionStorage data:', rawSessionData);
-            if (rawSessionData) {
-                const parsedData = JSON.parse(rawSessionData);
-                console.log('Parsed sessionStorage data:', parsedData);
-                if (parsedData.scheduleDetails) {
-                    console.log('scheduleDetails.shifts:', parsedData.scheduleDetails.shifts);
-                    console.log('scheduleDetails.includeTimePerShift:', parsedData.scheduleDetails.includeTimePerShift);
-                }
-            }
-            
             // Initialize default states first
-            console.log('1. Calling initializeToggleStates...');
             initializeToggleStates();
-            
-            console.log('2. Calling initializeDurationUnits...');
             initializeDurationUnits();
             
             // Then restore saved state (which will override defaults)
-            console.log('3. Calling restoreFormState...');
             restoreFormState();
             
             // Apply the restored/current state to UI
-            console.log('4. Calling toggleInputMode...');
             toggleInputMode();
-            
-            console.log('5. Calling updateDurationValidation...');
             updateDurationValidation();
-            
-            console.log('6. Calling updateContinueButtonState...');
             updateContinueButtonState();
 
             // Set up all event listeners
-            console.log('7. Setting up event listeners...');
             const elementsToWatch = document.querySelectorAll(
                 '.checkbox-input, .time-input, .duration-field, #specifyDuration, #includeTime, .dropdown-option'
             );
@@ -1949,48 +1896,6 @@
                 el.addEventListener('input', updateContinueButtonState);
                 el.addEventListener('click', updateContinueButtonState); // For dropdown
             });
-            
-            const includeTimeToggle = document.getElementById('includeTime');
-            console.log('Final toggle state after all initialization:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
-            
-            // DEBUGGING: Let's manually check and force restore the toggle state after a brief delay
-            setTimeout(() => {
-                console.log('=== MANUAL TOGGLE CHECK AFTER DELAY ===');
-                const sessionData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-                console.log('Session data in timeout:', sessionData);
-                
-                if (sessionData.scheduleDetails && sessionData.scheduleDetails.shifts) {
-                    console.log('Current shift in timeout:', currentShift);
-                    console.log('Shift data for current shift:', sessionData.scheduleDetails.shifts[currentShift]);
-                    
-                    if (sessionData.scheduleDetails.shifts[currentShift] && 
-                        typeof sessionData.scheduleDetails.shifts[currentShift].includeTime !== 'undefined') {
-                        const savedToggleState = sessionData.scheduleDetails.shifts[currentShift].includeTime;
-                        console.log('Found saved toggle state:', savedToggleState);
-                        console.log('Current toggle state:', includeTimeToggle ? includeTimeToggle.checked : 'not found');
-                        
-                        if (includeTimeToggle && includeTimeToggle.checked !== savedToggleState) {
-                            console.log('TOGGLE MISMATCH - Forcing correction');
-                            includeTimeToggle.checked = savedToggleState;
-                            updateInputVisibility();
-                        }
-                    } else if (sessionData.scheduleDetails.includeTimePerShift && 
-                              typeof sessionData.scheduleDetails.includeTimePerShift[currentShift] !== 'undefined') {
-                        const savedToggleState = sessionData.scheduleDetails.includeTimePerShift[currentShift];
-                        console.log('Found saved toggle state in fallback:', savedToggleState);
-                        console.log('Current toggle state:', includeTimeToggle ? includeTimeToggle.checked : 'not found');
-                        
-                        if (includeTimeToggle && includeTimeToggle.checked !== savedToggleState) {
-                            console.log('TOGGLE MISMATCH - Forcing correction from fallback');
-                            includeTimeToggle.checked = savedToggleState;
-                            updateInputVisibility();
-                        }
-                    }
-                }
-                console.log('=== MANUAL TOGGLE CHECK END ===');
-            }, 100);
-            
-            console.log('=== DOM CONTENT LOADED END ===');
         });
 
         // Save current shift data
@@ -2047,23 +1952,15 @@
             const specifyDurationToggle = document.getElementById('specifyDuration');
             const includeTimeToggle = document.getElementById('includeTime');
             
-            console.log('Shift data:', data);
-            console.log('data.includeTime:', data.includeTime);
-            console.log('Current toggle state before load:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
-            
             // Only change toggle state if this shift has saved data, otherwise keep current state
             let includeTime;
             if (data.includeTime !== undefined) {
                 includeTime = data.includeTime;
                 includeTimeToggle.checked = includeTime;
-                console.log('Set toggle from saved data to:', includeTime);
             } else {
                 // No saved data for this shift, keep current toggle state
                 includeTime = includeTimeToggle.checked;
-                console.log('No saved data for toggle, keeping current state:', includeTime);
             }
-            
-            console.log('Final toggle state after load:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
 
             // Set state for each day
             ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
@@ -2186,8 +2083,6 @@
             calculateWeeklyDuration();
 
             isLoadingData = false;
-            console.log('=== LOAD SHIFT DATA END ===');
-            console.log('Final toggle state at end of load:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
         }
         
         // Clear all form data
@@ -3060,9 +2955,7 @@
 
         // Helper to save the entire form state to session storage
         function saveFormStateToSession() {
-            console.log('=== SAVE FORM STATE TO SESSION START ===');
             if (isLoadingData) {
-                console.log('Skipping save - isLoadingData is true');
                 return;
             }
 
@@ -3073,12 +2966,8 @@
             const selectedShiftsText = document.getElementById('dropdownSelected');
             const calculatedDurationElement = document.getElementById('calculatedDuration');
             
-            console.log('Current includeTime toggle state:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
-            console.log('Current shiftData:', shiftData);
-            
             // Add null checks
             if (!durationToggle || !selectedShiftsText) {
-                console.log('Missing required elements for save');
                 return;
             }
 
@@ -3099,18 +2988,12 @@
             for (let i = 1; i <= numberOfShifts; i++) {
                 if (shiftData[i] && typeof shiftData[i].includeTime !== 'undefined') {
                     scheduleDetails.includeTimePerShift[i] = shiftData[i].includeTime;
-                    console.log(`Saving includeTime for shift ${i}:`, shiftData[i].includeTime);
                 }
             }
-            
-            console.log('Schedule details to save:', scheduleDetails);
             
             const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
             const updatedData = { ...existingData, scheduleDetails };
             sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
-            
-            console.log('Saved to sessionStorage:', updatedData);
-            console.log('=== SAVE FORM STATE TO SESSION END ===');
         }
 
         // Enhanced restoration function with complete state preservation
@@ -3127,18 +3010,22 @@
             const specifyDurationToggle = document.getElementById('specifyDuration');
             const includeTimeToggle = document.getElementById('includeTime');
 
+            // Restore main toggles
             if (specifyDurationToggle) {
                 specifyDurationToggle.checked = details.specifyDuration || false;
             }
 
+            // Restore shift data
             if (details.shifts) {
                 shiftData = details.shifts;
             }
 
+            // Restore current shift
             if (details.currentShift) {
                 currentShift = details.currentShift;
             }
 
+            // Restore includeTime toggle state for the current shift
             if (includeTimeToggle && details.shifts && details.shifts[currentShift]) {
                 const currentShiftData = details.shifts[currentShift];
                 if (typeof currentShiftData.includeTime !== 'undefined') {
@@ -3146,6 +3033,7 @@
                 }
             }
 
+            // Restore shift count and pagination
             if (details.numberOfShifts) {
                 const dropdownSelected = document.getElementById('dropdownSelected');
                 if (dropdownSelected) {
@@ -3154,12 +3042,18 @@
                 updateShiftPagination(details.numberOfShifts);
             }
 
+            // Load the current shift data to populate form fields
+            loadShiftData(currentShift);
+
+            // Update UI visibility
             updateInputVisibility();
             
+            // Fire the change event to ensure all dependent UI elements are synced
             if (specifyDurationToggle) {
                 specifyDurationToggle.dispatchEvent(new Event('change'));
             }
 
+            // Update calculations
             updateAllDayDurations();
             calculateWeeklyDuration();
 
