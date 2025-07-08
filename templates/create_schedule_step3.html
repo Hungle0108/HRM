@@ -301,6 +301,80 @@
             font-weight: 600;
         }
 
+        /* Daily workload detailing styles */
+        .daily-workload-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+
+        .daily-workload-header {
+            margin-bottom: 20px;
+        }
+
+        .daily-workload-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+
+        .daily-workload-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .daily-workload-details {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .workload-day-item {
+            background: white;
+            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+        }
+
+        .workload-day-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .workload-day-name {
+            font-size: 0.95rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .workload-day-time {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .workload-day-duration {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .shift-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 20px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
         .total-hours {
             margin-top: 12px;
             padding-top: 12px;
@@ -472,8 +546,30 @@
         }
 
         .review-item-value {
+            font-size: 0.95rem;
+            font-weight: 600;
             color: #1a1a1a;
-            font-weight: 500;
+        }
+
+        .schedule-type-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .edit-link {
+            font-size: 0.9rem;
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .edit-link:hover {
+            background: #f8f9fa;
+            text-decoration: none;
         }
 
         .review-items-container {
@@ -483,10 +579,70 @@
         }
 
         .info-icon {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             vertical-align: middle;
             margin-left: 4px;
+            cursor: pointer;
+        }
+
+        /* Info modal styles */
+        .info-modal {
+            display: none; /* hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 48px 32px 48px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .info-modal-content img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+        }
+
+        .info-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .info-modal-text {
+            font-size: 0.95rem;
+            color: #495057;
+            margin-bottom: 32px;
+            line-height: 1.45;
+        }
+
+        .info-modal-close {
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .info-modal-close:hover {
+            background: #333;
         }
     </style>
 </head>
@@ -538,14 +694,16 @@
                     <div class="review-items-container">
                         <div class="review-item-box">
                             <span class="review-item-label">Numbers of hours per week</span>
-                            <span class="review-item-value">34 hr</span>
+                            <span id="reviewWeeklyHours" class="review-item-value">--</span>
                         </div>
                         <div class="review-item-box">
                             <span class="review-item-label">
                                 Work schedule type
                                 <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="info" class="info-icon">
                             </span>
-                            <span class="review-item-value">Flexible work schedule</span>
+                            <div class="review-item-content">
+                                <span class="schedule-type-value">Flexible work schedule</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -606,7 +764,16 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Info popup (hidden initially) -->
+        <div id="infoModal" class="info-modal">
+            <div class="info-modal-content">
+                <img src="{{ url_for('static', filename='images/information.png') }}" alt="Info">
+                <h2 class="info-modal-title">Work schedule type</h2>
+                <p class="info-modal-text">A fixed work schedule has specific start and end times for its workdays. A flexible work schedule allows employees to vary their start and end times.</p>
+                <button type="button" id="infoModalClose" class="info-modal-close">OK</button>
+            </div>
+        </div>
 
     <script>
         // Load and display saved data from previous steps
@@ -622,23 +789,78 @@
             
             // Display basic information
             if (data.scheduleName) {
-                document.getElementById('reviewScheduleName').textContent = data.scheduleName;
+                const scheduleNameElement = document.getElementById('reviewScheduleName');
+                if (scheduleNameElement) {
+                    scheduleNameElement.textContent = data.scheduleName;
+                }
             }
             
             if (data.workerType) {
                 const workerTypeText = data.workerType.charAt(0).toUpperCase() + data.workerType.slice(1);
-                document.getElementById('reviewWorkerType').textContent = workerTypeText;
+                const workerTypeElement = document.getElementById('reviewWorkerType');
+                if (workerTypeElement) {
+                    workerTypeElement.textContent = workerTypeText;
+                }
             }
             
             // Display schedule details
             if (data.scheduleDetails) {
                 const details = data.scheduleDetails;
                 const scheduleType = details.specifyDuration ? 'Duration-based schedule' : 'Basic schedule';
-                document.getElementById('reviewScheduleType').textContent = scheduleType;
+                const scheduleTypeElement = document.querySelector('.schedule-type-value');
+                if (scheduleTypeElement) {
+                    scheduleTypeElement.textContent = scheduleType;
+                }
                 
+                // Calculate total weekly hours from all shifts
+                let totalWeeklyHours = 0;
+                if (details.shifts) {
+                    const numberOfShifts = details.numberOfShifts || 1;
+                    for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
+                        if (details.shifts[shiftNum] && details.shifts[shiftNum].weekdays) {
+                            const shiftData = details.shifts[shiftNum];
+                            const weekdaysData = shiftData.weekdays;
+                            
+                            Object.keys(weekdaysData).forEach(day => {
+                                const dayData = weekdaysData[day];
+                                if (dayData && dayData.checked) {
+                                    if (shiftData.includeTime && dayData.startTime && dayData.endTime) {
+                                        // Time-based: calculate hours from start/end times
+                                        const duration = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                                        if (duration) {
+                                            totalWeeklyHours += duration.hours + (duration.minutes / 60);
+                                        }
+                                    } else if (!shiftData.includeTime && dayData.duration) {
+                                        // Duration-based: use duration directly
+                                        totalWeeklyHours += parseFloat(dayData.duration) || 0;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // Display the calculated weekly hours
+                const reviewWeeklyHoursElement = document.getElementById('reviewWeeklyHours');
+                if (reviewWeeklyHoursElement) {
+                    if (totalWeeklyHours > 0) {
+                        reviewWeeklyHoursElement.textContent = `${totalWeeklyHours.toFixed(1)} hrs`;
+                    } else if (details.weeklyDuration) {
+                        // Fallback to saved weeklyDuration if calculation fails
+                        reviewWeeklyHoursElement.textContent = `${details.weeklyDuration} hrs`;
+                    } else {
+                        reviewWeeklyHoursElement.textContent = '--';
+                    }
+                } else {
+                    console.warn('reviewWeeklyHours element not found');
+                }
+
                 // Show shift count if multiple shifts
                 if (details.numberOfShifts && details.numberOfShifts > 1) {
-                    document.getElementById('reviewShiftCount').textContent = `(${details.numberOfShifts} shifts)`;
+                    const shiftCountElement = document.getElementById('reviewShiftCount');
+                    if (shiftCountElement) {
+                        shiftCountElement.textContent = `(${details.numberOfShifts} shifts)`;
+                    }
                 }
                 
                 // Generate schedule preview
@@ -659,72 +881,130 @@
             
             let previewHTML = '';
             
-            // Generate preview for each shift
+            // Check if any shift has start/end time configured (includeTime toggle was ON)
+            let hasTimeDetails = false;
             for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
-                if (!shifts[shiftNum]) continue;
-                
-                const shiftData = shifts[shiftNum];
-                let totalWeeklyHours = 0;
-                
-                previewHTML += '<div class="schedule-preview">';
-                
-                if (numberOfShifts > 1) {
-                    previewHTML += `<div class="schedule-preview-title">Shift ${shiftNum}</div>`;
+                if (shifts[shiftNum] && shifts[shiftNum].includeTime) {
+                    hasTimeDetails = true;
+                    break;
                 }
+            }
+            
+            // Only show the new format if start/end time toggle was enabled
+            if (hasTimeDetails) {
+                previewHTML += `
+                    <div class="daily-workload-container">
+                        <div class="daily-workload-header">
+                            <h4 class="daily-workload-title">Daily workload detailing</h4>
+                            <p class="daily-workload-subtitle">Specify the working days, the hours for each day, start & end times, etc.</p>
+                        </div>
+                        <div class="daily-workload-details">
+                `;
                 
-                previewHTML += '<div class="working-days">';
-                
-                // Days of the week
-                const dayNames = {
-                    'monday': 'Monday',
-                    'tuesday': 'Tuesday', 
-                    'wednesday': 'Wednesday',
-                    'thursday': 'Thursday',
-                    'friday': 'Friday',
-                    'saturday': 'Saturday',
-                    'sunday': 'Sunday'
-                };
-                
-                for (const [dayKey, dayName] of Object.entries(dayNames)) {
-                    if (shiftData[dayKey] && shiftData[dayKey].checked) {
-                        const dayData = shiftData[dayKey];
-                        let dayHours = '';
-                        
-                        if (dayData.start && dayData.end) {
-                            // Time-based
-                            dayHours = `${dayData.start} - ${dayData.end}`;
-                            // Calculate hours for total
-                            const duration = calculateWorkingHours(dayData.start, dayData.end);
-                            if (duration) {
-                                totalWeeklyHours += duration.hours + (duration.minutes / 60);
+                // Generate preview for each shift
+                for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
+                    if (!shifts[shiftNum]) continue;
+                    
+                    const shiftData = shifts[shiftNum];
+                    
+                    if (numberOfShifts > 1) {
+                        previewHTML += `<div class="shift-section-title">Shift ${shiftNum}</div>`;
+                    }
+                    
+                    // Days of the week
+                    const dayNames = {
+                        'monday': 'Monday',
+                        'tuesday': 'Tuesday', 
+                        'wednesday': 'Wednesday',
+                        'thursday': 'Thursday',
+                        'friday': 'Friday',
+                        'saturday': 'Saturday',
+                        'sunday': 'Sunday'
+                    };
+                    
+                    for (const [dayKey, dayName] of Object.entries(dayNames)) {
+                        if (shiftData.weekdays && shiftData.weekdays[dayKey] && shiftData.weekdays[dayKey].checked) {
+                            const dayData = shiftData.weekdays[dayKey];
+                            
+                            if (shiftData.includeTime && dayData.startTime && dayData.endTime) {
+                                // Calculate duration for display
+                                const duration = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                                let durationText = '';
+                                if (duration) {
+                                    if (duration.hours > 0 && duration.minutes > 0) {
+                                        durationText = `${duration.hours} hr ${duration.minutes} min`;
+                                    } else if (duration.hours > 0) {
+                                        durationText = `${duration.hours} hr`;
+                                    } else if (duration.minutes > 0) {
+                                        durationText = `${duration.minutes} min`;
+                                    }
+                                }
+                                
+                                previewHTML += `
+                                    <div class="workload-day-item">
+                                        <div class="workload-day-row">
+                                            <span class="workload-day-name">${dayName}</span>
+                                            <span class="workload-day-time">${dayData.startTime} - ${dayData.endTime}</span>
+                                        </div>
+                                        ${durationText ? `<div class="workload-day-duration">${durationText}</div>` : ''}
+                                    </div>
+                                `;
                             }
-                        } else if (dayData.duration) {
-                            // Duration-based
-                            dayHours = `${dayData.duration} hours`;
-                            totalWeeklyHours += parseFloat(dayData.duration) || 0;
-                        } else {
-                            dayHours = 'Working day';
                         }
-                        
-                        previewHTML += `
-                            <div class="working-day">
-                                <span class="day-name">${dayName}</span>
-                                <span class="day-hours">${dayHours}</span>
-                            </div>
-                        `;
                     }
                 }
                 
-                previewHTML += '</div>';
-                
-                // Total weekly hours
-                if (totalWeeklyHours > 0) {
-                    previewHTML += `
-                        <div class="total-hours">
-                            <span class="total-label">Total weekly hours:</span>
-                            <span class="total-value">${totalWeeklyHours.toFixed(1)} hrs</span>
+                previewHTML += `
                         </div>
-                    `;
+                    </div>
+                `;
+            } else {
+                // Fall back to original format for duration-based schedules
+                previewHTML += '<div class="schedule-preview">';
+                
+                for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
+                    if (!shifts[shiftNum]) continue;
+                    
+                    const shiftData = shifts[shiftNum];
+                    
+                    if (numberOfShifts > 1) {
+                        previewHTML += `<div class="schedule-preview-title">Shift ${shiftNum}</div>`;
+                    }
+                    
+                    previewHTML += '<div class="working-days">';
+                    
+                    const dayNames = {
+                        'monday': 'Monday',
+                        'tuesday': 'Tuesday', 
+                        'wednesday': 'Wednesday',
+                        'thursday': 'Thursday',
+                        'friday': 'Friday',
+                        'saturday': 'Saturday',
+                        'sunday': 'Sunday'
+                    };
+                    
+                    for (const [dayKey, dayName] of Object.entries(dayNames)) {
+                        if (shiftData.weekdays && shiftData.weekdays[dayKey] && shiftData.weekdays[dayKey].checked) {
+                            const dayData = shiftData.weekdays[dayKey];
+                            let dayHours = '';
+                            
+                            if (!shiftData.includeTime && dayData.duration) {
+                                // Duration-based
+                                dayHours = `${dayData.duration} hours`;
+                            } else {
+                                dayHours = 'Working day';
+                            }
+                            
+                            previewHTML += `
+                                <div class="working-day">
+                                    <span class="day-name">${dayName}</span>
+                                    <span class="day-hours">${dayHours}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    previewHTML += '</div>';
                 }
                 
                 previewHTML += '</div>';
@@ -778,8 +1058,48 @@
             window.location.href = '/settings/time-tracking';
         });
         
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadSavedData);
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data first
+            loadSavedData();
+            
+            // Check the schedule type from sessionStorage and update the text
+            const saved = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            if (saved.scheduleDetails && saved.scheduleDetails.shifts) {
+                const firstShift = saved.scheduleDetails.shifts[1];
+                const scheduleTypeElement = document.querySelector('.schedule-type-value');
+                if (scheduleTypeElement) {
+                    if (firstShift && firstShift.includeTime) {
+                        scheduleTypeElement.textContent = 'Fixed work schedule';
+                    } else {
+                        scheduleTypeElement.textContent = 'Flexible work schedule';
+                    }
+                }
+            }
+
+            // --- Info modal logic ---
+            const infoIcon = document.querySelector('.info-icon');
+            const infoModal = document.getElementById('infoModal');
+            const infoModalClose = document.getElementById('infoModalClose');
+
+            if (infoIcon && infoModal && infoModalClose) {
+                infoIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    infoModal.style.display = 'flex';
+                });
+
+                infoModalClose.addEventListener('click', function() {
+                    infoModal.style.display = 'none';
+                });
+
+                // Close modal when clicking outside the content
+                infoModal.addEventListener('click', function(e) {
+                    if (e.target === infoModal) {
+                        infoModal.style.display = 'none';
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html> 

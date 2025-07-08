@@ -459,6 +459,7 @@
             background: #e9ecef;
             color: #6c757d;
             cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .next-step-info {
@@ -1518,40 +1519,17 @@
         // Form validation and submission
         document.getElementById('schedule-form-step2').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // Save current shift data before submitting
-            saveCurrentShiftData();
-            
-            // Collect all schedule data including shifts
-            const specifyDurationToggle = document.getElementById('specifyDuration');
-            const selectedShiftsText = document.getElementById('dropdownSelected').textContent;
-            const numberOfShifts = parseInt(selectedShiftsText.match(/\d+/)[0]) || 1;
-            
-            const scheduleData = {
-                specifyDuration: specifyDurationToggle.checked,
-                numberOfShifts: numberOfShifts,
-                shifts: {}
-            };
-            
-            // Save data for each shift that has data
-            for (let i = 1; i <= numberOfShifts; i++) {
-                if (shiftData[i] && Object.keys(shiftData[i]).length > 0) {
-                    scheduleData.shifts[i] = shiftData[i];
-                }
+
+            // Re-run validation on submit click
+            if (!isFormValid()) {
+                alert('Please turn on "Specify the work duration" and provide details for at least one day before continuing.');
+                return;
             }
             
-            // Save step 2 data
-            const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-            const updatedData = {
-                ...existingData,
-                scheduleDetails: scheduleData
-            };
+            // State is already saved by listeners, but we save one last time to be safe.
+            saveFormStateToSession();
             
-            sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
-            
-            console.log('Schedule data saved:', updatedData);
-            
-            // Navigate to step 3
+            console.log('Schedule data saved, navigating to step 3.');
             window.location.href = '/create-schedule-step3';
         });
 
@@ -1695,30 +1673,87 @@
                 weekdayDetails.style.display = 'block';
                 includeTimeToggle.style.display = 'flex';
                 
-                // Ensure include time toggle is OFF when it first appears
-                includeTimeCheckbox.checked = false;
-                
-                // Trigger the change event to update the input visibility
-                includeTimeCheckbox.dispatchEvent(new Event('change'));
+                // Only reset include time toggle if we're not loading data (i.e., user interaction)
+                if (!isLoadingData) {
+                    // Ensure include time toggle is OFF when it first appears
+                    includeTimeCheckbox.checked = false;
+                    // Trigger the change event to update the input visibility
+                    includeTimeCheckbox.dispatchEvent(new Event('change'));
+                }
             } else {
-                // Hide both weekday details and include time toggle when specify duration is OFF
+                // Hide both weekday details, include time toggle, shifts dropdown, and pagination when specify duration is OFF
                 weekdayDetails.style.display = 'none';
                 includeTimeToggle.style.display = 'none';
+
+                // Force include time checkbox OFF so dependent UI hides correctly
+                includeTimeCheckbox.checked = false;
+                includeTimeCheckbox.dispatchEvent(new Event('change'));
+
+                // Explicitly hide shifts dropdown and shift pagination (in case they were visible)
+                const shiftsDropdown = document.getElementById('shiftsDropdown');
+                if (shiftsDropdown) shiftsDropdown.style.display = 'none';
+                const shiftPagination = document.getElementById('shiftPagination');
+                if (shiftPagination) shiftPagination.style.display = 'none';
             }
             calculateWeeklyDuration();
+            
+            // Save state immediately when toggle changes
+            if (!isLoadingData) {
+                saveFormStateToSession();
+            }
         });
 
         // Toggle functionality for showing/hiding start and end time inputs
         document.getElementById('includeTime').addEventListener('change', function() {
-            if (!isLoadingData) {
-                saveCurrentShiftData();
-                shiftData[currentShift].includeTime = this.checked;
-                loadShiftData(currentShift); // Reload to apply the new mode
-            }
+            if (isLoadingData) return;
+            updateInputVisibility();
+            saveFormStateToSession();
         });
+
+        // Function to update input visibility based on current toggle states
+        function updateInputVisibility() {
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeCheckbox = document.getElementById('includeTime');
+            const shiftsDropdown = document.getElementById('shiftsDropdown');
+            
+            const includeTime = includeTimeCheckbox.checked;
+            const specifyDuration = specifyDurationToggle.checked;
+            
+            // Update shifts dropdown visibility
+            if (shiftsDropdown) {
+                shiftsDropdown.style.display = (includeTime && specifyDuration) ? 'block' : 'none';
+            }
+            
+            // Update input visibility for each day
+            ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                const checkbox = document.getElementById(day);
+                if (!checkbox) return;
+                
+                const dayItem = checkbox.closest('.checkbox-item');
+                const timeInputs = dayItem.querySelector('.time-inputs');
+                const durationInput = dayItem.querySelector('.duration-input');
+                
+                if (checkbox.checked && specifyDuration) {
+                    if (includeTime) {
+                        // Show time inputs (start/end time), hide duration input
+                        if (timeInputs) timeInputs.style.display = 'flex';
+                        if (durationInput) durationInput.style.display = 'none';
+                    } else {
+                        // Show duration input, hide time inputs
+                        if (timeInputs) timeInputs.style.display = 'none';
+                        if (durationInput) durationInput.style.display = 'block';
+                    }
+                } else {
+                    // Day not checked or specify duration is off - hide all inputs
+                    if (timeInputs) timeInputs.style.display = 'none';
+                    if (durationInput) durationInput.style.display = 'none';
+                }
+            });
+        }
 
         // Initialize toggle states on page load
         function initializeToggleStates() {
+            console.log('=== INITIALIZE TOGGLE STATES START ===');
             const specifyDurationToggle = document.getElementById('specifyDuration');
             const includeTimeToggle = document.getElementById('includeTimeToggle');
             const includeTimeCheckbox = document.getElementById('includeTime');
@@ -1726,8 +1761,21 @@
             const timeInputs = document.querySelectorAll('.time-inputs');
             const shiftsDropdown = document.getElementById('shiftsDropdown');
             
-            // Ensure include time toggle is always OFF by default
-            includeTimeCheckbox.checked = false;
+            // Check if we have saved data that might override defaults
+            const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            const hasSavedData = savedForm && savedForm.scheduleDetails && 
+                                (savedForm.scheduleDetails.shifts || savedForm.scheduleDetails.includeTimePerShift);
+            
+            console.log('Has saved data:', hasSavedData);
+            console.log('Current toggle state before init:', includeTimeCheckbox ? includeTimeCheckbox.checked : 'toggle not found');
+            
+            // Only set toggle to OFF by default if we don't have saved data to restore
+            if (!hasSavedData) {
+                console.log('No saved data - setting toggle to false');
+                includeTimeCheckbox.checked = false;
+            } else {
+                console.log('Has saved data - keeping current toggle state for restoration');
+            }
             
             // Set initial visibility based on specify duration toggle state
             if (specifyDurationToggle.checked) {
@@ -1772,11 +1820,11 @@
                 });
                 shiftsDropdown.style.display = 'none';
             }
+            
+            console.log('Final toggle state after init:', includeTimeCheckbox ? includeTimeCheckbox.checked : 'toggle not found');
+            console.log('=== INITIALIZE TOGGLE STATES END ===');
         }
 
-        // Call initialization when page loads
-        initializeToggleStates();
-        
         // Initialize "hour" text visibility for duration fields that already have values
         function initializeDurationUnits() {
             document.querySelectorAll('.duration-field').forEach(durationInput => {
@@ -1790,9 +1838,6 @@
                 }
             });
         }
-        
-        // Initialize duration units
-        initializeDurationUnits();
         
         // Shift Pagination Functionality
         function updateShiftPagination(numberOfShifts) {
@@ -1853,28 +1898,131 @@
             3: {}
         };
         
+        console.log('INITIAL VARIABLES SET - currentShift:', currentShift, 'shiftData:', shiftData);
+        
+
+
+        // --- Main Initialization ---
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOM CONTENT LOADED START ===');
+            
+            // FIRST: Let's see what's actually in sessionStorage
+            const rawSessionData = sessionStorage.getItem('scheduleFormData');
+            console.log('Raw sessionStorage data:', rawSessionData);
+            if (rawSessionData) {
+                const parsedData = JSON.parse(rawSessionData);
+                console.log('Parsed sessionStorage data:', parsedData);
+                if (parsedData.scheduleDetails) {
+                    console.log('scheduleDetails.shifts:', parsedData.scheduleDetails.shifts);
+                    console.log('scheduleDetails.includeTimePerShift:', parsedData.scheduleDetails.includeTimePerShift);
+                }
+            }
+            
+            // Initialize default states first
+            console.log('1. Calling initializeToggleStates...');
+            initializeToggleStates();
+            
+            console.log('2. Calling initializeDurationUnits...');
+            initializeDurationUnits();
+            
+            // Then restore saved state (which will override defaults)
+            console.log('3. Calling restoreFormState...');
+            restoreFormState();
+            
+            // Apply the restored/current state to UI
+            console.log('4. Calling toggleInputMode...');
+            toggleInputMode();
+            
+            console.log('5. Calling updateDurationValidation...');
+            updateDurationValidation();
+            
+            console.log('6. Calling updateContinueButtonState...');
+            updateContinueButtonState();
+
+            // Set up all event listeners
+            console.log('7. Setting up event listeners...');
+            const elementsToWatch = document.querySelectorAll(
+                '.checkbox-input, .time-input, .duration-field, #specifyDuration, #includeTime, .dropdown-option'
+            );
+            elementsToWatch.forEach(el => {
+                el.addEventListener('change', updateContinueButtonState);
+                el.addEventListener('input', updateContinueButtonState);
+                el.addEventListener('click', updateContinueButtonState); // For dropdown
+            });
+            
+            const includeTimeToggle = document.getElementById('includeTime');
+            console.log('Final toggle state after all initialization:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
+            
+            // DEBUGGING: Let's manually check and force restore the toggle state after a brief delay
+            setTimeout(() => {
+                console.log('=== MANUAL TOGGLE CHECK AFTER DELAY ===');
+                const sessionData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                console.log('Session data in timeout:', sessionData);
+                
+                if (sessionData.scheduleDetails && sessionData.scheduleDetails.shifts) {
+                    console.log('Current shift in timeout:', currentShift);
+                    console.log('Shift data for current shift:', sessionData.scheduleDetails.shifts[currentShift]);
+                    
+                    if (sessionData.scheduleDetails.shifts[currentShift] && 
+                        typeof sessionData.scheduleDetails.shifts[currentShift].includeTime !== 'undefined') {
+                        const savedToggleState = sessionData.scheduleDetails.shifts[currentShift].includeTime;
+                        console.log('Found saved toggle state:', savedToggleState);
+                        console.log('Current toggle state:', includeTimeToggle ? includeTimeToggle.checked : 'not found');
+                        
+                        if (includeTimeToggle && includeTimeToggle.checked !== savedToggleState) {
+                            console.log('TOGGLE MISMATCH - Forcing correction');
+                            includeTimeToggle.checked = savedToggleState;
+                            updateInputVisibility();
+                        }
+                    } else if (sessionData.scheduleDetails.includeTimePerShift && 
+                              typeof sessionData.scheduleDetails.includeTimePerShift[currentShift] !== 'undefined') {
+                        const savedToggleState = sessionData.scheduleDetails.includeTimePerShift[currentShift];
+                        console.log('Found saved toggle state in fallback:', savedToggleState);
+                        console.log('Current toggle state:', includeTimeToggle ? includeTimeToggle.checked : 'not found');
+                        
+                        if (includeTimeToggle && includeTimeToggle.checked !== savedToggleState) {
+                            console.log('TOGGLE MISMATCH - Forcing correction from fallback');
+                            includeTimeToggle.checked = savedToggleState;
+                            updateInputVisibility();
+                        }
+                    }
+                }
+                console.log('=== MANUAL TOGGLE CHECK END ===');
+            }, 100);
+            
+            console.log('=== DOM CONTENT LOADED END ===');
+        });
+
         // Save current shift data
         function saveCurrentShiftData() {
-            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            const includeTimeToggle = document.getElementById('includeTime');
+            if (isLoadingData) return;
             
-            // Initialize shift data if it doesn't exist
+            const includeTimeToggle = document.getElementById('includeTime');
+            if (!includeTimeToggle) return;
+            
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const includeTime = includeTimeToggle.checked;
+            
+            // --- FIX ---
+            // Ensure the shift data object exists, then update it instead of replacing it.
+            // This preserves properties like 'includeTime' even if we are just saving day data.
             if (!shiftData[currentShift]) {
                 shiftData[currentShift] = {};
             }
-            
-            shiftData[currentShift] = {
-                weekdays: {},
-                includeTime: includeTimeToggle.checked
-            };
+            if (!shiftData[currentShift].weekdays) {
+                shiftData[currentShift].weekdays = {};
+            }
+            shiftData[currentShift].includeTime = includeTime;
             
             weekdays.forEach(day => {
                 const checkbox = document.getElementById(day);
+                if (!checkbox) return;
+                
                 const dayData = {
                     checked: checkbox.checked
                 };
                 
-                if (includeTimeToggle.checked) {
+                if (includeTime) {
                     // Time mode - always save both start and end times
                     const startInput = document.getElementById(day + '-start');
                     const endInput = document.getElementById(day + '-end');
@@ -1888,8 +2036,6 @@
                 
                 shiftData[currentShift].weekdays[day] = dayData;
             });
-            
-
         }
         
         // Load shift data
@@ -1901,15 +2047,23 @@
             const specifyDurationToggle = document.getElementById('specifyDuration');
             const includeTimeToggle = document.getElementById('includeTime');
             
+            console.log('Shift data:', data);
+            console.log('data.includeTime:', data.includeTime);
+            console.log('Current toggle state before load:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
+            
             // Only change toggle state if this shift has saved data, otherwise keep current state
             let includeTime;
             if (data.includeTime !== undefined) {
                 includeTime = data.includeTime;
                 includeTimeToggle.checked = includeTime;
+                console.log('Set toggle from saved data to:', includeTime);
             } else {
                 // No saved data for this shift, keep current toggle state
                 includeTime = includeTimeToggle.checked;
+                console.log('No saved data for toggle, keeping current state:', includeTime);
             }
+            
+            console.log('Final toggle state after load:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
 
             // Set state for each day
             ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
@@ -1993,9 +2147,24 @@
                 dayItem.classList.remove('disabled');
                 if (checkbox.checked) {
                     dayItem.classList.add('selected');
+                    // Manually apply the visual states that the change event would do for checked boxes
+                    const timeInputElements = dayItem.querySelectorAll('.time-input');
+                    timeInputElements.forEach(input => {
+                        input.disabled = false;
+                        input.classList.remove('disabled');
+                    });
                 } else {
                     dayItem.classList.remove('selected');
+                    // Manually apply the visual states that the change event would do for unchecked boxes
+                    const timeInputElements = dayItem.querySelectorAll('.time-input');
+                    timeInputElements.forEach(input => {
+                        input.disabled = true;
+                        input.classList.add('disabled');
+                    });
                 }
+
+                // Don't fire change event during restoration to avoid clearing data
+                // checkbox.dispatchEvent(new Event('change'));
             });
 
             // Manually trigger visibility for shifts dropdown
@@ -2017,6 +2186,8 @@
             calculateWeeklyDuration();
 
             isLoadingData = false;
+            console.log('=== LOAD SHIFT DATA END ===');
+            console.log('Final toggle state at end of load:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
         }
         
         // Clear all form data
@@ -2088,6 +2259,9 @@
                     
                     // Load new shift data (or clear if no data exists)
                     loadShiftData(shiftNumber);
+                    
+                    // Save the form state after switching
+                    saveFormStateToSession();
                 });
             });
         }
@@ -2139,6 +2313,9 @@
                     
                     // Update shift pagination visibility
                     updateShiftPagination(parseInt(value));
+                    
+                    // Save the form state after changing shift count
+                    saveFormStateToSession();
                     
                     // Close dropdown
                     closeDropdown();
@@ -2645,10 +2822,6 @@
             });
         });
 
-        // Initialize the toggle state
-        toggleInputMode();
-        updateDurationValidation();
-
         // Helper to calculate total hours for a stored shift object
         function calculateShiftHours(shiftObj) {
             if (!shiftObj || !shiftObj.weekdays) return 0;
@@ -2753,8 +2926,245 @@
             });
         }
         
-        // Call initialization when page loads
-        initializeToggleStates();
+        // Validation function with user feedback
+        function validateForm() {
+            if (!isFormValid()) {
+                // Find specific validation issues and show user-friendly messages
+                const durationToggle = document.getElementById('specifyDuration');
+                if (!durationToggle || !durationToggle.checked) {
+                    alert('Please enable "Specify duration" to continue.');
+                    return false;
+                }
+
+                const includeTimeToggle = document.getElementById('includeTime');
+                const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+                const dayNames = {
+                    'monday': 'Monday',
+                    'tuesday': 'Tuesday', 
+                    'wednesday': 'Wednesday',
+                    'thursday': 'Thursday',
+                    'friday': 'Friday',
+                    'saturday': 'Saturday',
+                    'sunday': 'Sunday'
+                };
+                
+                let missingFields = [];
+                
+                for (const day of weekdaysArr) {
+                    const checkbox = document.getElementById(day);
+                    if (!checkbox || !checkbox.checked) continue;
+
+                    if (includeTimeToggle && includeTimeToggle.checked) {
+                        const startVal = (document.getElementById(`${day}-start`) || {}).value || '';
+                        const endVal = (document.getElementById(`${day}-end`) || {}).value || '';
+                        if (!startVal.trim() || !endVal.trim()) {
+                            missingFields.push(`${dayNames[day]} (start and end time)`);
+                        }
+                    } else {
+                        const durVal = (document.getElementById(`${day}-duration-input`) || {}).value || '';
+                        if (!durVal.trim()) {
+                            missingFields.push(`${dayNames[day]} (duration)`);
+                        }
+                    }
+                }
+                
+                if (missingFields.length > 0) {
+                    alert(`Please fill in the required fields for:\n\n${missingFields.join('\n')}`);
+                }
+                return false;
+            }
+            return true;
+        }
+
+        // Save and Continue button handler
+        document.getElementById('continueBtn').addEventListener('click', function() {
+            if (validateForm()) {
+                saveFormStateToSession();
+                window.location.href = '/create-schedule-step3';
+            }
+        });
+
+        // Helper to calculate total hours for a stored shift object
+        function calculateShiftHours(shiftObj) {
+            if (!shiftObj || !shiftObj.weekdays) return 0;
+            let shiftHours = 0;
+            const includeTime = shiftObj.includeTime;
+            const weekdaysData = shiftObj.weekdays;
+            const dayNames = Object.keys(weekdaysData);
+            dayNames.forEach(day => {
+                const dayData = weekdaysData[day] || {};
+                if (!dayData.checked) return;
+                if (includeTime) {
+                    if (dayData.startTime && dayData.endTime) {
+                        const dur = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                        if (dur) {
+                            shiftHours += dur.hours + dur.minutes / 60;
+                        }
+                    }
+                } else {
+                    if (dayData.duration) {
+                        shiftHours += parseFloat(dayData.duration) || 0;
+                    }
+                }
+            });
+            return shiftHours;
+        }
+        
+        // Note: All initialization is now handled in DOMContentLoaded
+
+        // === Continue button state management ===
+        function isFormValid() {
+            const durationToggle = document.getElementById('specifyDuration');
+            if (!durationToggle || !durationToggle.checked) return false;
+
+            const includeTimeToggle = document.getElementById('includeTime');
+            const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+            
+            let hasAtLeastOneValidDay = false;
+            
+            // Check each day - ALL checked days must have valid input
+            for (const day of weekdaysArr) {
+                const checkbox = document.getElementById(day);
+                if (!checkbox || !checkbox.checked) continue;
+
+                // This day is checked, so it must have valid input
+                if (includeTimeToggle && includeTimeToggle.checked) {
+                    // Time mode: both start and end time must be filled
+                    const startVal = (document.getElementById(`${day}-start`) || {}).value || '';
+                    const endVal = (document.getElementById(`${day}-end`) || {}).value || '';
+                    if (!startVal.trim() || !endVal.trim()) {
+                        return false; // This checked day is missing required fields
+                    }
+                    hasAtLeastOneValidDay = true;
+                } else {
+                    // Duration mode: duration must be filled
+                    const durVal = (document.getElementById(`${day}-duration-input`) || {}).value || '';
+                    if (!durVal.trim()) {
+                        return false; // This checked day is missing required fields
+                    }
+                    hasAtLeastOneValidDay = true;
+                }
+            }
+            
+            // Form is valid only if we have at least one valid day and all checked days are complete
+            return hasAtLeastOneValidDay;
+        }
+
+        function updateContinueButtonState() {
+            const btn = document.getElementById('continueBtn');
+            if (!btn) return;
+            btn.disabled = !isFormValid();
+        }
+
+
+
+        // Helper to save the entire form state to session storage
+        function saveFormStateToSession() {
+            console.log('=== SAVE FORM STATE TO SESSION START ===');
+            if (isLoadingData) {
+                console.log('Skipping save - isLoadingData is true');
+                return;
+            }
+
+            saveCurrentShiftData(); // Updates the global `shiftData` object from UI
+
+            const durationToggle = document.getElementById('specifyDuration');
+            const includeTimeToggle = document.getElementById('includeTime');
+            const selectedShiftsText = document.getElementById('dropdownSelected');
+            const calculatedDurationElement = document.getElementById('calculatedDuration');
+            
+            console.log('Current includeTime toggle state:', includeTimeToggle ? includeTimeToggle.checked : 'toggle not found');
+            console.log('Current shiftData:', shiftData);
+            
+            // Add null checks
+            if (!durationToggle || !selectedShiftsText) {
+                console.log('Missing required elements for save');
+                return;
+            }
+
+            const numberOfShifts = parseInt(selectedShiftsText.textContent.match(/\d+/)?.[0]) || 1;
+            const weeklyDuration = calculatedDurationElement ? calculatedDurationElement.textContent : '0';
+
+            const scheduleDetails = {
+                specifyDuration: durationToggle.checked,
+                numberOfShifts: numberOfShifts,
+                weeklyDuration: weeklyDuration,
+                shifts: shiftData,
+                // Save current shift and toggle states for each shift
+                currentShift: currentShift,
+                includeTimePerShift: {}
+            };
+
+            // Save the includeTime state for each shift that has data
+            for (let i = 1; i <= numberOfShifts; i++) {
+                if (shiftData[i] && typeof shiftData[i].includeTime !== 'undefined') {
+                    scheduleDetails.includeTimePerShift[i] = shiftData[i].includeTime;
+                    console.log(`Saving includeTime for shift ${i}:`, shiftData[i].includeTime);
+                }
+            }
+            
+            console.log('Schedule details to save:', scheduleDetails);
+            
+            const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            const updatedData = { ...existingData, scheduleDetails };
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
+            
+            console.log('Saved to sessionStorage:', updatedData);
+            console.log('=== SAVE FORM STATE TO SESSION END ===');
+        }
+
+        // Enhanced restoration function with complete state preservation
+        function restoreFormState() {
+            const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            
+            if (!savedForm || !savedForm.scheduleDetails) {
+                return;
+            }
+
+            isLoadingData = true;
+
+            const details = savedForm.scheduleDetails;
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeToggle = document.getElementById('includeTime');
+
+            if (specifyDurationToggle) {
+                specifyDurationToggle.checked = details.specifyDuration || false;
+            }
+
+            if (details.shifts) {
+                shiftData = details.shifts;
+            }
+
+            if (details.currentShift) {
+                currentShift = details.currentShift;
+            }
+
+            if (includeTimeToggle && details.shifts && details.shifts[currentShift]) {
+                const currentShiftData = details.shifts[currentShift];
+                if (typeof currentShiftData.includeTime !== 'undefined') {
+                    includeTimeToggle.checked = currentShiftData.includeTime;
+                }
+            }
+
+            if (details.numberOfShifts) {
+                const dropdownSelected = document.getElementById('dropdownSelected');
+                if (dropdownSelected) {
+                    dropdownSelected.textContent = details.numberOfShifts === 1 ? '1 shift' : `${details.numberOfShifts} shifts`;
+                }
+                updateShiftPagination(details.numberOfShifts);
+            }
+
+            updateInputVisibility();
+            
+            if (specifyDurationToggle) {
+                specifyDurationToggle.dispatchEvent(new Event('change'));
+            }
+
+            updateAllDayDurations();
+            calculateWeeklyDuration();
+
+            isLoadingData = false;
+        }
     </script>
 </body>
 </html> 
