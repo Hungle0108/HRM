@@ -262,10 +262,10 @@
         }
 
         .schedule-preview {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
             margin: 16px 0;
         }
 
@@ -288,24 +288,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
         }
 
         .day-name {
-            color: #495057;
-            font-weight: 500;
+            color: #6c757d;
         }
 
         .day-hours {
-            color: #1a1a1a;
+            font-size: 0.95rem;
             font-weight: 600;
+            color: #1a1a1a;
         }
 
         /* Daily workload detailing styles */
         .daily-workload-container {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 24px;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
             margin-top: 16px;
         }
 
@@ -330,40 +334,28 @@
         .daily-workload-details {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 8px;
         }
 
         .workload-day-item {
-            background: white;
-            border-radius: 6px;
-            padding: 16px;
-            border: 1px solid #e9ecef;
-        }
-
-        .workload-day-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
         }
 
         .workload-day-name {
-            font-size: 0.95rem;
-            color: #495057;
-            font-weight: 500;
+            color: #6c757d;
         }
 
         .workload-day-time {
             font-size: 0.95rem;
-            color: #1a1a1a;
             font-weight: 600;
-        }
-
-        .workload-day-duration {
-            text-align: right;
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 4px;
+            color: #1a1a1a;
         }
 
         .shift-section-title {
@@ -947,11 +939,8 @@
                                 
                                 previewHTML += `
                                     <div class="workload-day-item">
-                                        <div class="workload-day-row">
-                                            <span class="workload-day-name">${dayName}</span>
-                                            <span class="workload-day-time">${dayData.startTime} - ${dayData.endTime}</span>
-                                        </div>
-                                        ${durationText ? `<div class="workload-day-duration">${durationText}</div>` : ''}
+                                        <span class="workload-day-name">${dayName}</span>
+                                        <span class="workload-day-time">${dayData.startTime} - ${dayData.endTime}</span>
                                     </div>
                                 `;
                             }
@@ -1075,8 +1064,7 @@
                     // Clear the session storage
                     sessionStorage.removeItem('scheduleFormData');
                     
-                    // Show success message and redirect
-                    alert('Schedule created successfully!');
+                    // Redirect to time tracking page
                     window.location.href = '/settings/time-tracking';
                 } else {
                     // Show error message

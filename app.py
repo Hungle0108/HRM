@@ -241,6 +241,29 @@ class WorkSchedule(db.Model):
             'schedule_data': schedule_data
         }
 
+# Worker Type Model
+class WorkerType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    template_name = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    organization = db.relationship('Organization', backref='worker_types')
+    creator = db.relationship('User', backref='created_worker_types')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'template_name': self.template_name,
+            'description': self.description,
+            'organization_id': self.organization_id,
+            'created_by': self.created_by,
+            'created_at': self.created_at.strftime('%b %d, %Y'),
+            'creator_name': self.creator.name if self.creator else 'Unknown'
+        }
+
 # Create database tables
 def init_db():
     with app.app_context():
@@ -1499,6 +1522,72 @@ def time_tracking():
     
     return render_template('time_tracking.html', user=user, organization=organization, schedules=schedules, active_page='time_tracking')
 
+@app.route('/settings/worker-type')
+def worker_type():
+    """Worker type settings page"""
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    # Get the user's organization and worker types
+    organization = None
+    worker_types = []
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+        # Fetch all worker types for this organization
+        worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+    
+    return render_template('worker_type.html', user=user, organization=organization, worker_types=worker_types, active_page='worker_type')
+
+@app.route('/api/create-worker-type', methods=['POST'])
+def api_create_worker_type():
+    """API endpoint to create a new worker type"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        template_name = data.get('templateName', '').strip()
+        description = data.get('workDescription', '').strip()
+        
+        if not template_name:
+            return jsonify({'error': 'Template name is required'}), 400
+        
+        if not description:
+            return jsonify({'error': 'Worker type description is required'}), 400
+        
+        # Create new worker type
+        new_worker_type = WorkerType(
+            template_name=template_name,
+            description=description,
+            organization_id=user.organization_id,
+            created_by=user.id
+        )
+        
+        db.session.add(new_worker_type)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Worker type created successfully',
+            'worker_type': new_worker_type.to_dict()
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating worker type: {str(e)}")
+        return jsonify({'error': 'Failed to create worker type'}), 500
+
 @app.route('/create-schedule')
 def create_schedule():
     if 'user_id' not in session:
@@ -1550,7 +1639,7 @@ def api_create_schedule():
         
         # Extract schedule name and type
         schedule_details = data.get('scheduleDetails', {})
-        schedule_name = schedule_details.get('name', 'Untitled Schedule')
+        schedule_name = data.get('scheduleName', 'Untitled Schedule')
         
         # Determine schedule type based on whether any shift includes time
         schedule_type = 'flexible'  # default
