@@ -5,8 +5,6 @@
 <!-- Backend sets current user information -->
 <meta name="current-user" content="{{ user.name if user else 'Current User' }}">
 
-<!-- Worker types data -->
-<script type="application/json" id="worker-types-data">{{ worker_types | tojson | safe }}</script>
 
 {% block styles %}
 <style>
@@ -54,7 +52,7 @@
     .search-input {
         width: 100%;
         padding: 10px 16px 10px 40px;
-        border: 1px solid #e9ecef;
+        border: none;
         border-radius: 8px;
         font-size: 0.875rem;
         background: #f8f9fa;
@@ -63,7 +61,6 @@
 
     .search-input:focus {
         outline: none;
-        border-color: #80bdff;
         background: white;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
@@ -168,6 +165,59 @@
     .nav-item.expandable.expanded .dropdown-arrow .arrow-down { display: none; }
     .nav-item.expandable.expanded .dropdown-arrow .arrow-up { display: inline; }
 
+    .dropdown-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+    }
+
+    .dropdown-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .dropdown-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .dropdown-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .option-text {
+        color: #1a1a1a;
+        font-size: 0.875rem;
+    }
+
     .nav-item.expandable:hover .dropdown-arrow {
         color: #495057;
     }
@@ -241,9 +291,6 @@
     }
 
     .content-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         margin-bottom: 40px;
     }
 
@@ -282,6 +329,8 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         border: 1px solid #e9ecef;
         margin-bottom: 40px;
+        position: relative;
+        z-index: 1;
     }
 
     .section-header {
@@ -340,34 +389,378 @@
     /* Filters section */
     .filters-section {
         display: flex;
-        gap: 16px;
+        justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid #e9ecef;
+        gap: 16px;
+    }
+
+    .filters-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Filter dropdown styles */
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 120px;
+        justify-content: space-between;
+    }
+
+    .dropdown-toggle:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .dropdown-toggle.active {
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .dropdown-label {
+        font-weight: 500;
+    }
+
+    .dropdown-arrow {
+        width: 12px;
+        height: 12px;
+        opacity: 0.6;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        z-index: 1000;
+        width: 400px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: none !important;
+    }
+
+    .dropdown-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .dropdown-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: all 0.2s;
+    }
+
+    .dropdown-close:hover {
+        background: #f8f9fa;
+        opacity: 1;
+    }
+
+    .dropdown-content {
+        padding: 0 20px 16px 20px;
+        max-height: 200px;
+        overflow-y: auto;
+        border-top: none !important;
+    }
+
+    .dropdown-option {
+        margin-bottom: 12px;
+    }
+
+    .dropdown-option:first-child {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 16px;
+    }
+
+    /* Make "Select all" text bolder */
+    #selectAll + .option-text {
+        font-weight: 600;
+    }
+
+    .dropdown-separator {
+        height: 1px;
+        background: #e9ecef;
+        margin: 12px 0;
+    }
+
+    .dropdown-footer {
+        display: flex;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .btn-reset {
+        flex: 1;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .btn-show-results {
+        flex: 1;
+        padding: 10px 16px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-show-results:hover {
+        background: #333;
+        border-color: #333;
+    }
+
+    /* Delete Modal Styles */
+    .delete-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .delete-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .delete-modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+
+    .delete-modal.show .delete-modal-content {
+        transform: scale(1);
+    }
+
+    .delete-modal-header {
+        margin-bottom: 24px;
+    }
+
+    .delete-icon {
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+
+    .delete-main-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .delete-modal-body {
+        margin-bottom: 32px;
+    }
+
+    .delete-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .delete-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .template-info {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .template-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .template-creator {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .delete-modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-cancel-delete {
+        padding: 12px 24px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 100px;
+    }
+
+    .btn-cancel-delete:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .btn-delete-confirm {
+        padding: 12px 24px;
+        background: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 100px;
+    }
+
+    .btn-delete-confirm:hover {
+        background: #c82333;
+        border-color: #bd2130;
     }
 
     .filters-section .search-container {
         position: relative;
-        flex: 1;
+        height: 44px;
+        width: 44px;
         max-width: 300px;
+        transition: width 0.3s ease;
+        cursor: pointer;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Expanded state */
+    .filters-section .search-container.expanded {
+        width: 300px;
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .filters-section .search-container:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .filters-section .search-container.expanded:hover {
+        background: white;
+        border-color: #80bdff;
     }
 
     .filters-section .search-input {
-        width: 100%;
-        padding: 10px 16px 10px 40px;
-        border: 1px solid #e9ecef;
+        width: 0;
+        padding: 0;
+        border: none !important;
+        outline: none !important;
         border-radius: 8px;
         font-size: 0.875rem;
-        background: #f8f9fa;
-        transition: all 0.2s;
+        background: transparent;
+        transition: all 0.3s ease;
+        opacity: 0;
+        margin-left: 40px;
+        box-shadow: none !important;
+    }
+
+    /* Visible input in expanded state */
+    .filters-section .search-container.expanded .search-input {
+        width: calc(100% - 50px);
+        padding: 10px 16px 10px 0;
+        opacity: 1;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     .filters-section .search-input:focus {
-        outline: none;
-        border-color: #80bdff;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        outline: none !important;
+        background: transparent;
+        border: none !important;
+        box-shadow: none !important;
     }
 
     .filters-section .search-icon {
@@ -378,6 +771,18 @@
         width: 16px;
         height: 16px;
         opacity: 0.6;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+
+    .filters-section .search-container.expanded .search-icon {
+        opacity: 0.8;
+    }
+
+    .filters-section .search-icon:hover {
+        opacity: 1;
     }
 
 
@@ -403,7 +808,7 @@
         color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
         border-right: 1px solid #e9ecef;
         background: #f8f9fa;
         cursor: pointer;
@@ -415,24 +820,28 @@
         border-right: none;
     }
 
-    .worker-types-table th:hover {
-        background: #e9ecef;
-    }
+
 
     .worker-types-table th .sort-icon {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
+        display: inline-block;
+        margin-left: 8px;
         width: 12px;
         height: 12px;
-        opacity: 0.5;
-        transition: opacity 0.2s;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        vertical-align: baseline;
+        transform: translateY(-2px);
     }
 
-    .worker-types-table th.sortable:hover .sort-icon {
-        opacity: 1;
+    .worker-types-table th .sort-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        vertical-align: middle;
+        transition: none;
     }
+
+
 
     .worker-types-table th.sorted .sort-icon {
         opacity: 1;
@@ -462,6 +871,115 @@
     .worker-type-name {
         font-weight: 600;
         color: #1a1a1a;
+    }
+
+    .worker-type-name.clickable {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .worker-type-name.clickable:hover {
+        color: #8b5cf6;
+    }
+
+    /* Edit button styles */
+    .edit-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+    }
+
+    .edit-btn:hover {
+        background: #f8f9fa;
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .edit-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Actions column width */
+    .worker-types-table td:last-child,
+    .worker-types-table th:last-child {
+        width: 60px;
+        text-align: center;
+        padding: 12px 8px;
+        position: relative;
+    }
+
+    /* Actions container */
+    .actions-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Action menu popup */
+    .action-menu {
+        position: fixed;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        min-width: 120px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .action-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* Action menu items */
+    .action-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+
+    .action-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .action-item.delete {
+        color: #dc3545;
+    }
+
+    .action-item.delete:hover {
+        background-color: #f8f9fa;
+        color: #dc3545;
+    }
+
+    .action-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        opacity: 0.7;
+    }
+
+    .action-item:hover .action-icon {
+        opacity: 1;
+    }
+
+    .action-item.delete .action-icon {
+        filter: brightness(0) saturate(100%) invert(24%) sepia(92%) saturate(4159%) hue-rotate(347deg) brightness(91%) contrast(92%);
     }
 
 
@@ -521,6 +1039,7 @@
         width: 400px;
         background: white;
         border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
         box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
         transform: translateX(100%);
         transition: transform 0.3s ease;
@@ -581,6 +1100,18 @@
 
     .form-section {
         margin-bottom: 24px;
+    }
+
+    .form-section-box {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .form-section-box .form-section {
+        margin-bottom: 0;
     }
 
     .form-label {
@@ -665,22 +1196,7 @@
         justify-content: flex-end;
     }
 
-    .btn-cancel {
-        padding: 12px 20px;
-        background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #495057;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
 
-    .btn-cancel:hover {
-        background: #f8f9fa;
-        border-color: #adb5bd;
-    }
 
     .btn-primary {
         padding: 12px 20px;
@@ -704,6 +1220,115 @@
         border-color: #e9ecef;
         color: #6c757d;
         cursor: not-allowed;
+    }
+
+    /* Worker Type Info Modal */
+    .info-modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 400px;
+        background: white;
+        border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1002;
+        overflow-y: auto;
+    }
+
+    .info-modal.show {
+        transform: translateX(0);
+    }
+
+    .info-modal-header {
+        padding: 24px 24px 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .info-modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .info-modal-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .info-edit-btn {
+        padding: 6px 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .info-edit-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        color: #1a1a1a;
+    }
+
+    .info-modal-content {
+        padding: 24px;
+    }
+
+    .info-section {
+        margin-bottom: 24px;
+    }
+
+    .info-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-section-box {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .info-section-box:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-section-box .info-section {
+        margin-bottom: 0;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #1a1a1a;
+        line-height: 1.5;
+        word-wrap: break-word;
+        white-space: pre-wrap;
     }
 
     /* Icons */
@@ -758,6 +1383,13 @@
         .filters-section {
             flex-direction: column;
             align-items: stretch;
+            justify-content: flex-start;
+            gap: 16px;
+        }
+
+        .filters-left {
+            flex-direction: column;
+            gap: 12px;
         }
 
         .filters-section .search-container {
@@ -807,6 +1439,37 @@
     .settings-sidebar::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
     }
+
+    .dropdown-option:first-child {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 16px;
+    }
+
+    .table-wrapper {
+        margin-top: 24px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+    }
+
+    .table-summary {
+        background: white;
+        color: #6c757d;
+        font-size: 0.875rem;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+
+
+    /* Data table styles */
+    .worker-types-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
 </style>
 {% endblock %}
 
@@ -820,98 +1483,248 @@
         <!-- Header -->
         <div class="content-header">
             <h1 class="content-title">Worker Type</h1>
-            <a href="#" class="action-button" id="headerCreateBtn">Create worker type</a>
         </div>
 
         <!-- Worker types section -->
         <div class="worker-types-section">
             <!-- Filters -->
             <div class="filters-section">
-                <div class="search-container">
-                    <img src="/static/images/search.png" alt="Search" class="search-icon">
-                    <input type="text" class="search-input" placeholder="Search by template name..." id="searchInput">
+                <div class="filters-left">
+                    <div class="search-container" id="searchContainer">
+                        <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                        <input type="text" class="search-input" placeholder="Search by template name..." id="searchInput">
+                    </div>
+                    <div class="filter-dropdown">
+                        <button class="dropdown-toggle" id="creatorDropdown">
+                            <span class="dropdown-label">Creator</span>
+                            <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="creatorDropdownMenu">
+                            <div class="dropdown-header">
+                                <span class="dropdown-title">Creator</span>
+                                                <button class="dropdown-close" id="dropdownClose">
+                    <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                </button>
+                            </div>
+                            <div class="dropdown-content">
+                                <label class="dropdown-option">
+                                    <input type="checkbox" class="dropdown-checkbox" id="selectAll" data-value="all">
+                                    <span class="option-text">Select all</span>
+                                </label>
+                                <div class="dropdown-options-list" id="creatorOptionsList">
+                                    <!-- Dynamic creator options will be added here -->
+                                </div>
+                            </div>
+                            <div class="dropdown-footer">
+                                <button class="btn-reset" id="resetFilters">Reset</button>
+                                <button class="btn-show-results" id="showResults">Show results</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <a href="#" class="action-button" id="headerCreateBtn">Create worker type</a>
             </div>
 
-            <!-- Data table -->
-            <table class="worker-types-table" id="workerTypesTable">
-                <thead>
-                    <tr>
-                        <th class="sortable" data-sort="name">
-                            Template name
-                            <span class="sort-icon">↕️</span>
-                        </th>
-                        <th class="sortable" data-sort="created">
-                            Created by
-                            <span class="sort-icon">↕️</span>
-                        </th>
-                        <th class="sortable" data-sort="creation">
-                            Creation day
-                            <span class="sort-icon">↕️</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="workerTypesBody">
-                    <tr>
-                        <td colspan="3">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">📋</div>
-                                <div class="empty-state-title">No worker types yet</div>
-                                <div class="empty-state-description">Create your first worker type template to standardize roles and responsibilities</div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- Table Wrapper -->
+            <div class="table-wrapper">
+                <div class="table-summary" id="tableSummary">Total 0 items</div>
+                <!-- Data table -->
+                <table class="worker-types-table" id="workerTypesTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable sorted" data-sort="name">
+                                Template name
+                                <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                            </th>
+                            <th class="sortable" data-sort="created">
+                                Created by
+                                <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
+                            </th>
+                            <th class="sortable" data-sort="creation">
+                                Creation day
+                                <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
+                            </th>
+                            <th style="width: 60px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="workerTypesBody">
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon"><img src="/static/images/legal.png" alt="Legal document" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                                    <div class="empty-state-title">No worker types yet</div>
+                                    <div class="empty-state-description">Create your first worker type template to standardize roles and responsibilities</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="modalOverlay"></div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <div class="delete-icon">
+                    <img src="/static/images/delete.png" alt="Delete" class="delete-main-icon">
+                </div>
+            </div>
+            <div class="delete-modal-body">
+                <h3 class="delete-title">Delete template</h3>
+                <p class="delete-message">Are you sure you want to delete this template?</p>
+                <div class="template-info">
+                    <div class="template-name" id="deleteTemplateName"></div>
+                    <div class="template-creator" id="deleteTemplateCreator"></div>
+                </div>
+            </div>
+            <div class="delete-modal-footer">
+                <button class="btn-cancel-delete" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn-delete-confirm" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Create Modal -->
     <div class="create-modal" id="createModal">
         <div class="modal-header">
-            <h2 class="modal-title">Add worker type</h2>
-            <button class="close-btn" id="closeBtn">&times;</button>
+                                                    <h2 class="modal-title">Create worker type</h2>
+            <button class="close-btn" id="closeBtn">
+                <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+            </button>
         </div>
         
         <div class="modal-content">
             <p class="modal-subtitle">Create and reuse the worker type template in future contract creations</p>
             
             <form id="createWorkerTypeForm">
-                <div class="form-section">
-                    <label class="form-label required" for="templateName">Template name</label>
-                    <input type="text" class="form-input" id="templateName" name="templateName" required>
-                    <div class="error-message" id="templateNameError">This field is required</div>
+                <!-- Template Name Section -->
+                <div class="form-section-box">
+                    <div class="form-section">
+                        <label class="form-label required" for="templateName">Template name</label>
+                        <input type="text" class="form-input" id="templateName" name="templateName" required>
+                        <div class="error-message" id="templateNameError">This field is required</div>
+                    </div>
                 </div>
 
-                <div class="form-section">
-                    <label class="form-label required" for="workDescription">Worker type description</label>
-                    <textarea class="form-textarea" id="workDescription" name="workDescription" required maxlength="10000"></textarea>
-                    <div class="error-message" id="workDescriptionError">This field is required</div>
-                    <div class="character-count">
-                        <span id="charCount">0</span>/10000
+                <!-- Worker Type Description Section -->
+                <div class="form-section-box">
+                    <div class="form-section">
+                        <label class="form-label required" for="workDescription">Worker type description</label>
+                        <textarea class="form-textarea" id="workDescription" name="workDescription" required maxlength="10000"></textarea>
+                        <div class="error-message" id="workDescriptionError">This field is required</div>
+                        <div class="character-count">
+                            <span id="charCount">0</span>/10000
+                        </div>
                     </div>
                 </div>
             </form>
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
-            <button type="submit" class="btn-primary" id="addBtn" disabled>Add</button>
+                                    <button type="submit" class="btn-primary" id="addBtn" disabled>Create</button>
+        </div>
+    </div>
+
+    <!-- Worker Type Info Modal -->
+    <div class="info-modal" id="infoModal">
+        <div class="info-modal-header">
+            <h2 class="info-modal-title" id="infoModalTitle">Details</h2>
+            <div class="info-modal-actions">
+                <button class="info-edit-btn" id="infoEditBtn">Edit</button>
+                <button class="close-btn" id="infoModalCloseBtn">
+                    <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                </button>
+            </div>
+        </div>
+        
+        <div class="info-modal-content">
+            <div class="info-section-box">
+                <div class="info-section">
+                    <label class="info-label">Template Name</label>
+                    <div class="info-value" id="infoTemplateName">-</div>
+                </div>
+            </div>
+
+            <div class="info-section-box">
+                <div class="info-section">
+                    <label class="info-label">Description</label>
+                    <div class="info-value" id="infoDescription">-</div>
+                </div>
+            </div>
+
+            <div class="info-section-box">
+                <div class="info-section">
+                    <label class="info-label">Created By</label>
+                    <div class="info-value" id="infoCreatedBy">-</div>
+                </div>
+            </div>
+
+            <div class="info-section-box">
+                <div class="info-section">
+                    <label class="info-label">Creation Date</label>
+                    <div class="info-value" id="infoCreationDate">-</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<!-- Worker types data -->
+<!-- DEBUG: Raw worker_types variable: {{ worker_types }} -->
+<!-- DEBUG: worker_types length: {{ worker_types|length }} -->
+<!-- DEBUG: worker_types type: {{ worker_types.__class__.__name__ }} -->
+<script type="application/json" id="worker-types-data">{{ (worker_types or []) | tojson | safe }}</script>
+
 <script>
-    let currentSort = { field: null, direction: 'asc' };
+    let currentSort = { field: 'name', direction: 'asc' };
     let originalData = [];
+
+    // Debug function to check data availability
+    function debugWorkerTypesData() {
+        console.log('=== DEBUGGING WORKER TYPES DATA ===');
+        const workerTypesScript = document.getElementById('worker-types-data');
+        console.log('Script element exists:', !!workerTypesScript);
+        
+        if (workerTypesScript) {
+            console.log('Script content length:', workerTypesScript.textContent.length);
+            console.log('Script content:', workerTypesScript.textContent);
+            
+            try {
+                const data = JSON.parse(workerTypesScript.textContent);
+                console.log('Parsed data:', data);
+                console.log('Data type:', typeof data);
+                console.log('Is array:', Array.isArray(data));
+                console.log('Array length:', data.length);
+                
+                if (data.length > 0) {
+                    console.log('First item:', data[0]);
+                    console.log('First item ID:', data[0].id, 'Type:', typeof data[0].id);
+                }
+            } catch (error) {
+                console.error('Failed to parse data:', error);
+            }
+        }
+        console.log('=== END DEBUGGING ===');
+    }
+
+    // Make debug function available globally for console debugging
+    window.debugWorkerTypes = debugWorkerTypesData;
 
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== PAGE LOADED ===');
+        console.log('DOM Content Loaded, starting initialization...');
+        
+        // Debug data first
+        debugWorkerTypesData();
+        
         // Load existing worker types from backend
         loadExistingWorkerTypes();
 
@@ -919,38 +1732,241 @@
         setupSorting();
         setupFiltering();
         setupModal();
+        setupDropdown();
+        setupDeleteModal();
+        setupInfoModal();
+
+        // Apply default sort by name (ascending)
+        applyDefaultSort();
+        
+        // Ensure empty state is shown if no data was loaded
+        setTimeout(() => {
+            checkAndShowEmptyState();
+        }, 100);
+        
+        console.log('=== PAGE INITIALIZATION COMPLETE ===');
     });
 
     // Load existing worker types from the backend data
     function loadExistingWorkerTypes() {
-        const workerTypesScript = document.getElementById('worker-types-data');
-        const workerTypes = workerTypesScript ? JSON.parse(workerTypesScript.textContent) : [];
-        const tbody = document.getElementById('workerTypesBody');
+        console.log('=== LOADING EXISTING WORKER TYPES ===');
         
-        if (workerTypes && workerTypes.length > 0) {
+        const workerTypesScript = document.getElementById('worker-types-data');
+        console.log('Script element found:', !!workerTypesScript);
+        
+        if (workerTypesScript) {
+            console.log('Script element content:', workerTypesScript.textContent);
+            console.log('Script content length:', workerTypesScript.textContent.length);
+            console.log('Script content preview:', workerTypesScript.textContent.substring(0, 100));
+        } else {
+            console.log('No worker-types-data script element found!');
+        }
+        
+        // If template data failed, try to fetch directly from API
+        if (!workerTypesScript || !workerTypesScript.textContent.trim()) {
+            console.log('Template data empty, fetching from API...');
+            fetchWorkerTypesFromAPI();
+            return;
+        }
+        
+        let workerTypes = [];
+        try {
+            workerTypes = workerTypesScript ? JSON.parse(workerTypesScript.textContent) : [];
+            console.log('Parsed worker types:', workerTypes);
+            console.log('Is array?', Array.isArray(workerTypes));
+            console.log('Length:', workerTypes.length);
+        } catch (error) {
+            console.error('Error parsing worker types JSON:', error);
+            console.error('Raw content that failed to parse:', workerTypesScript ? workerTypesScript.textContent : 'null');
+            // Fallback to API if template parsing fails
+            console.log('Falling back to API fetch...');
+            fetchWorkerTypesFromAPI();
+            return;
+        }
+        
+        const tbody = document.getElementById('workerTypesBody');
+        console.log('Table body element found:', !!tbody);
+        
+        originalData = []; // Clear existing data before loading
+
+        if (workerTypes && Array.isArray(workerTypes) && workerTypes.length > 0) {
+            console.log('Processing', workerTypes.length, 'worker types');
             tbody.innerHTML = ''; // Clear empty state
             
-            workerTypes.forEach(workerType => {
+            workerTypes.forEach((workerType, index) => {
+                console.log(`Processing worker type ${index}:`, workerType);
+                
+                if (!workerType.template_name) {
+                    console.warn('Skipping worker type with no template_name:', workerType);
+                    return;
+                }
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
-                        <div class="worker-type-name">${workerType.template_name}</div>
+                        <div class="worker-type-name clickable" onclick="showWorkerTypeInfo(${workerType.id})" title="Click to view details">${workerType.template_name || 'Unknown'}</div>
                     </td>
-                    <td>${workerType.creator_name}</td>
-                    <td>${workerType.created_at}</td>
+                    <td>${workerType.creator_name || 'Unknown'}</td>
+                    <td>${workerType.created_at || 'Unknown'}</td>
+                    <td>
+                        <div class="actions-container">
+                            <button class="edit-btn" onclick="toggleActionMenu(event, ${workerType.id})" title="More actions">
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                            </button>
+                            <div class="action-menu" id="menu-${workerType.id}">
+                                <div class="action-item" onclick="editWorkerType(${workerType.id})">
+                                    <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                    <span>Edit</span>
+                                </div>
+                                <div class="action-item" onclick="copyWorkerType(${workerType.id})">
+                                    <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
+                                    <span>Duplicate</span>
+                                </div>
+                                <div class="action-item delete" onclick="deleteWorkerType(${workerType.id})">
+                                    <img src="/static/images/trash-bold.png" alt="Delete" class="action-icon">
+                                    <span>Delete</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                 `;
                 
                 tbody.appendChild(row);
+                console.log('Added row to table for:', workerType.template_name);
                 
                 // Add to originalData for filtering/sorting
                 originalData.push({
                     element: row,
-                    name: workerType.template_name.toLowerCase(),
-                    description: workerType.description.toLowerCase(),
-                    created: workerType.creator_name.toLowerCase(),
-                    creation: workerType.created_at
+                    name: (workerType.template_name || '').toLowerCase(),
+                    description: (workerType.description || '').toLowerCase(),
+                    created: (workerType.creator_name || '').toLowerCase(),
+                    creation: workerType.created_at || ''
                 });
             });
+            
+            console.log('Final originalData length:', originalData.length);
+        } else {
+            console.log('No worker types to display. Conditions failed:');
+            console.log('- workerTypes exists:', !!workerTypes);
+            console.log('- is Array:', Array.isArray(workerTypes));
+            console.log('- has length > 0:', workerTypes && workerTypes.length > 0);
+            
+            console.log('Showing empty state - no worker types found');
+            showEmptyState();
+        }
+        
+        console.log('=== END LOADING WORKER TYPES ===');
+    }
+    
+    // Fallback function to fetch worker types from API
+    function fetchWorkerTypesFromAPI() {
+        console.log('=== FETCHING FROM API ===');
+        fetch('/api/get-worker-types')
+            .then(response => response.json())
+            .then(data => {
+                console.log('API response:', data);
+                if (data.success && data.worker_types) {
+                    const workerTypes = data.worker_types;
+                    console.log('API returned', workerTypes.length, 'worker types');
+                    
+                    const tbody = document.getElementById('workerTypesBody');
+                    tbody.innerHTML = ''; // Clear empty state
+                    originalData = []; // Clear existing data
+                    
+                    workerTypes.forEach((workerType, index) => {
+                        console.log(`Processing API worker type ${index}:`, workerType);
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="worker-type-name clickable" onclick="showWorkerTypeInfo(${workerType.id})" title="Click to view details">${workerType.template_name || 'Unknown'}</div>
+                            </td>
+                            <td>${workerType.creator_name || 'Unknown'}</td>
+                            <td>${workerType.created_at || 'Unknown'}</td>
+                            <td>
+                                <div class="actions-container">
+                                    <button class="edit-btn" onclick="toggleActionMenu(event, ${workerType.id})" title="More actions">
+                                        <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                                    </button>
+                                    <div class="action-menu" id="menu-${workerType.id}">
+                                        <div class="action-item" onclick="editWorkerType(${workerType.id})">
+                                            <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                            <span>Edit</span>
+                                        </div>
+                                        <div class="action-item" onclick="copyWorkerType(${workerType.id})">
+                                            <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
+                                            <span>Duplicate</span>
+                                        </div>
+                                        <div class="action-item delete" onclick="deleteWorkerType(${workerType.id})">
+                                            <img src="/static/images/trash-bold.png" alt="Delete" class="action-icon">
+                                            <span>Delete</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(row);
+                        
+                        // Add to originalData for filtering/sorting
+                        originalData.push({
+                            element: row,
+                            name: (workerType.template_name || '').toLowerCase(),
+                            description: (workerType.description || '').toLowerCase(),
+                            created: (workerType.creator_name || '').toLowerCase(),
+                            creation: workerType.created_at || ''
+                        });
+                    });
+                    
+                    console.log('Successfully loaded from API');
+                } else {
+                    console.error('API fetch failed:', data);
+                    showEmptyState();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching from API:', error);
+                showEmptyState();
+            });
+    }
+    
+    // Function to show empty state
+    function showEmptyState() {
+        console.log('Displaying empty state');
+        const tbody = document.getElementById('workerTypesBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><img src="/static/images/legal.png" alt="Legal document" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                        <div class="empty-state-title">No worker types yet</div>
+                        <div class="empty-state-description">Create your first worker type template to standardize roles and responsibilities</div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+    
+    // Function to check if data was loaded and show empty state if needed
+    function checkAndShowEmptyState() {
+        console.log('Checking if empty state should be shown');
+        console.log('originalData length:', originalData.length);
+        
+        const tbody = document.getElementById('workerTypesBody');
+        const existingRows = tbody.querySelectorAll('tr');
+        console.log('Existing table rows:', existingRows.length);
+        
+        // If no data was loaded and table is empty or only has placeholder content
+        if (originalData.length === 0) {
+            const hasEmptyState = tbody.querySelector('.empty-state');
+            if (!hasEmptyState) {
+                console.log('No empty state found, showing empty state');
+                showEmptyState();
+            } else {
+                console.log('Empty state already visible');
+            }
+        } else {
+            console.log('Data exists, not showing empty state');
         }
     }
 
@@ -971,26 +1987,473 @@
                 document.querySelectorAll('.sortable').forEach(h => h.classList.remove('sorted'));
                 this.classList.add('sorted');
 
+                // Update arrow directions
+                updateSortArrows();
+
                 // Sort the data
                 sortTable();
             });
         });
     }
 
-    function setupFiltering() {
-        const searchInput = document.getElementById('searchInput');
-
-        searchInput.addEventListener('input', filterTable);
+    function updateSortArrows() {
+        document.querySelectorAll('.sortable').forEach(header => {
+            const sortIcon = header.querySelector('.sort-icon img');
+            const sortField = header.dataset.sort;
+            
+            if (currentSort.field === sortField) {
+                // Show arrow indicating NEXT action (opposite of current state)
+                if (currentSort.direction === 'asc') {
+                    sortIcon.src = '/static/images/arrow-small-up.png'; // Next: descending (up arrow)
+                } else {
+                    sortIcon.src = '/static/images/arrow-small-down.png'; // Next: ascending (down arrow)
+                }
+            } else {
+                // Default: show down arrow (first click will be ascending)
+                sortIcon.src = '/static/images/arrow-small-down.png';
+            }
+        });
     }
 
+    function applyDefaultSort() {
+        // Set visual indicator for name column
+        const nameHeader = document.querySelector('[data-sort="name"]');
+        if (nameHeader) {
+            nameHeader.classList.add('sorted');
+        }
 
+        // Update arrow directions
+        updateSortArrows();
 
-        function setupModal() {
+        // Apply the sort to the table
+        if (originalData.length > 0) {
+            sortTable();
+        }
+    }
+
+    function setupFiltering() {
+        const searchInput = document.getElementById('searchInput');
+        const searchContainer = document.getElementById('searchContainer');
+        const searchIcon = document.getElementById('searchIcon');
+
+        // Start in collapsed state (default styling)
+        // searchContainer starts without 'expanded' class
+
+        // Handle search input events
+        searchInput.addEventListener('input', filterTable);
+
+        // Handle expand/collapse functionality
+        function expandSearch() {
+            searchContainer.classList.add('expanded');
+            setTimeout(() => {
+                searchInput.focus();
+            }, 150); // Shorter delay for smoother UX
+        }
+
+        function collapseSearch() {
+            if (searchInput.value.trim() === '') {
+                searchContainer.classList.remove('expanded');
+            }
+        }
+
+        // Click on container or icon to expand
+        searchContainer.addEventListener('click', function(e) {
+            if (!searchContainer.classList.contains('expanded')) {
+                expandSearch();
+            }
+        });
+
+        // Click on icon to expand (additional handler for better UX)
+        searchIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (!searchContainer.classList.contains('expanded')) {
+                expandSearch();
+            }
+        });
+
+        // Handle input focus and blur
+        searchInput.addEventListener('focus', function() {
+            expandSearch();
+        });
+
+        searchInput.addEventListener('blur', function() {
+            // Small delay to allow for potential interaction
+            setTimeout(() => {
+                collapseSearch();
+            }, 200);
+        });
+
+        // Handle escape key to collapse
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                searchInput.blur();
+                collapseSearch();
+            }
+        });
+
+        // Prevent collapse if there's search text
+        searchInput.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                searchContainer.classList.add('expanded');
+            }
+        });
+    }
+
+    function setupDropdown() {
+        const dropdownToggle = document.getElementById('creatorDropdown');
+        const dropdownMenu = document.getElementById('creatorDropdownMenu');
+        const dropdownClose = document.getElementById('dropdownClose');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const resetButton = document.getElementById('resetFilters');
+        const showResultsButton = document.getElementById('showResults');
+        const optionsList = document.getElementById('creatorOptionsList');
+        
+        let selectedCreators = new Set(); // Start with nothing selected
+
+        // Toggle dropdown
+        dropdownToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = dropdownToggle.classList.contains('active');
+            
+            // Close all other dropdowns first
+            closeAllDropdowns();
+            
+            if (!isActive) {
+                dropdownToggle.classList.add('active');
+                dropdownMenu.classList.add('show');
+                populateCreatorDropdown();
+                // Change arrow to up
+                const arrow = dropdownToggle.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+            }
+        });
+
+        // Close button functionality
+        dropdownClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeAllDropdowns();
+        });
+
+        // Select all functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            const creatorCheckboxes = optionsList.querySelectorAll('.dropdown-checkbox');
+            
+            if (isChecked) {
+                selectedCreators.clear();
+                creatorCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedCreators.add(checkbox.dataset.value);
+                });
+            } else {
+                selectedCreators.clear();
+                creatorCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            updateDropdownLabel();
+        });
+
+        // Reset button functionality
+        resetButton.addEventListener('click', function() {
+            selectedCreators.clear();
+            selectAllCheckbox.checked = false;
+            const creatorCheckboxes = optionsList.querySelectorAll('.dropdown-checkbox');
+            creatorCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateDropdownLabel();
+        });
+
+        // Show results button functionality
+        showResultsButton.addEventListener('click', function() {
+            filterTable();
+            closeAllDropdowns();
+        });
+
+        // Handle individual checkbox changes
+        optionsList.addEventListener('change', function(e) {
+            if (e.target.classList.contains('dropdown-checkbox')) {
+                const value = e.target.dataset.value;
+                
+                if (e.target.checked) {
+                    selectedCreators.add(value);
+                } else {
+                    selectedCreators.delete(value);
+                    selectAllCheckbox.checked = false;
+                }
+                
+                // Check if all individual items are selected
+                const allCheckboxes = optionsList.querySelectorAll('.dropdown-checkbox');
+                const checkedCheckboxes = optionsList.querySelectorAll('.dropdown-checkbox:checked');
+                
+                if (allCheckboxes.length === checkedCheckboxes.length && allCheckboxes.length > 0) {
+                    selectAllCheckbox.checked = true;
+                }
+                
+                updateDropdownLabel();
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            closeAllDropdowns();
+        });
+
+        function closeAllDropdowns() {
+            dropdownToggle.classList.remove('active');
+            dropdownMenu.classList.remove('show');
+            // Change arrow back to down
+            const arrow = dropdownToggle.querySelector('.dropdown-arrow');
+            arrow.src = '/static/images/angle-small-down.png';
+        }
+
+        function populateCreatorDropdown() {
+            // Get unique creators from originalData
+            const creators = new Set();
+            originalData.forEach(item => {
+                // Extract creator name from the table data
+                const creatorCell = item.element.children[1].textContent.trim();
+                if (creatorCell && creatorCell !== 'Unknown') {
+                    creators.add(creatorCell);
+                }
+            });
+
+            // Clear existing options
+            optionsList.innerHTML = '';
+
+            // Add creator options
+            creators.forEach(creator => {
+                const option = document.createElement('label');
+                option.className = 'dropdown-option';
+                option.innerHTML = `
+                    <input type="checkbox" class="dropdown-checkbox" data-value="${creator.toLowerCase()}" ${selectedCreators.has(creator.toLowerCase()) ? 'checked' : ''}>
+                    <span class="option-text">${creator}</span>
+                `;
+                optionsList.appendChild(option);
+            });
+
+            // Update select all checkbox state
+            const allCheckboxes = optionsList.querySelectorAll('.dropdown-checkbox');
+            const checkedCheckboxes = optionsList.querySelectorAll('.dropdown-checkbox:checked');
+            selectAllCheckbox.checked = (allCheckboxes.length === checkedCheckboxes.length && allCheckboxes.length > 0);
+        }
+
+        function updateDropdownLabel() {
+            const label = dropdownToggle.querySelector('.dropdown-label');
+            
+            if (selectedCreators.size === 0) {
+                label.textContent = 'Creator';
+            } else if (selectedCreators.size === 1) {
+                const creatorName = Array.from(selectedCreators)[0];
+                // Capitalize first letter
+                label.textContent = creatorName.charAt(0).toUpperCase() + creatorName.slice(1);
+            } else {
+                label.textContent = `${selectedCreators.size} selected`;
+            }
+        }
+
+        // Return current filter function for use in filterTable
+        window.getCurrentCreatorFilter = function() {
+            return selectedCreators;
+        };
+    }
+
+    function setupDeleteModal() {
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        // Cancel delete
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('show');
+        });
+
+        // Confirm delete
+        confirmDeleteBtn.addEventListener('click', function() {
+            const workerId = deleteModal.getAttribute('data-worker-id');
+            
+            if (workerId) {
+                // Show loading state
+                confirmDeleteBtn.textContent = 'Deleting...';
+                confirmDeleteBtn.disabled = true;
+                
+                // Call delete API
+                fetch(`/api/delete-worker-type/${workerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Worker type deleted successfully:', workerId);
+                        
+                        // Remove from table and originalData
+                        removeWorkerTypeFromTable(workerId);
+                        
+                        // Close modal
+                        deleteModal.classList.remove('show');
+                        
+                        // Reset button
+                        confirmDeleteBtn.textContent = 'Delete';
+                        confirmDeleteBtn.disabled = false;
+                        
+                    } else {
+                        console.error('Delete failed:', data.error);
+                        alert('Error: ' + (data.error || 'Failed to delete worker type'));
+                        
+                        // Reset button
+                        confirmDeleteBtn.textContent = 'Delete';
+                        confirmDeleteBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting worker type:', error);
+                    alert('Error deleting worker type. Please try again.');
+                    
+                    // Reset button
+                    confirmDeleteBtn.textContent = 'Delete';
+                    confirmDeleteBtn.disabled = false;
+                });
+            }
+        });
+
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('show');
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+                deleteModal.classList.remove('show');
+            }
+        });
+    }
+
+    function setupInfoModal() {
+        const infoModal = document.getElementById('infoModal');
+        const infoModalCloseBtn = document.getElementById('infoModalCloseBtn');
+        const infoEditBtn = document.getElementById('infoEditBtn');
+
+        // Close info modal
+        infoModalCloseBtn.addEventListener('click', function() {
+            infoModal.classList.remove('show');
+            document.getElementById('settingsContent').classList.remove('modal-open');
+        });
+
+        // Edit button functionality
+        infoEditBtn.addEventListener('click', function() {
+            const currentWorkerId = infoModal.getAttribute('data-worker-id');
+            if (currentWorkerId) {
+                // Close info modal
+                infoModal.classList.remove('show');
+                document.getElementById('settingsContent').classList.remove('modal-open');
+                // Open edit modal with pre-filled data
+                editWorkerType(currentWorkerId);
+            }
+        });
+
+        // Close modal when clicking outside (optional)
+        document.addEventListener('click', function(e) {
+            if (e.target === infoModal) {
+                infoModal.classList.remove('show');
+                document.getElementById('settingsContent').classList.remove('modal-open');
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && infoModal.classList.contains('show')) {
+                infoModal.classList.remove('show');
+                document.getElementById('settingsContent').classList.remove('modal-open');
+            }
+        });
+    }
+
+    // Function to show worker type info modal
+    function showWorkerTypeInfo(workerId) {
+        console.log('Showing worker type info for ID:', workerId);
+        
+        if (workerId === 'new') {
+            alert('Info functionality for newly created items will be implemented soon.');
+            return;
+        }
+        
+        // Find the worker type data
+        const workerTypesScript = document.getElementById('worker-types-data');
+        console.log('Info - Script element found:', !!workerTypesScript);
+        
+        if (!workerTypesScript) {
+            console.error('No worker-types-data script element found for info');
+            alert('Worker type data not available. Please refresh the page and try again.');
+            return;
+        }
+        
+        let workerTypes = [];
+        
+        try {
+            workerTypes = JSON.parse(workerTypesScript.textContent) || [];
+            console.log('Info - Parsed worker types:', workerTypes);
+        } catch (error) {
+            console.error('Error parsing worker types for info:', error);
+            alert('Error loading worker type data. Please refresh the page and try again.');
+            return;
+        }
+        
+        // Try different ID matching strategies
+        let workerType = null;
+        
+        // Try exact match first
+        workerType = workerTypes.find(wt => wt.id === workerId);
+        
+        // If not found, try converting workerId to number
+        if (!workerType) {
+            const numericId = parseInt(workerId);
+            workerType = workerTypes.find(wt => wt.id === numericId);
+        }
+        
+        // If still not found, try converting workerId to string
+        if (!workerType) {
+            const stringId = String(workerId);
+            workerType = workerTypes.find(wt => String(wt.id) === stringId);
+        }
+        
+        if (workerType) {
+            // Populate the info modal with worker type data
+            document.getElementById('infoTemplateName').textContent = workerType.template_name || 'N/A';
+            document.getElementById('infoDescription').textContent = workerType.description || 'No description available';
+            document.getElementById('infoCreatedBy').textContent = workerType.creator_name || 'Unknown';
+            document.getElementById('infoCreationDate').textContent = workerType.created_at || 'Unknown';
+            
+            // Store the worker ID for the edit button
+            const infoModal = document.getElementById('infoModal');
+            infoModal.setAttribute('data-worker-id', workerId);
+            
+            // Show the modal and shrink the table
+            const settingsContent = document.getElementById('settingsContent');
+            infoModal.classList.add('show');
+            settingsContent.classList.add('modal-open');
+        } else {
+            console.error('Could not find worker type data for ID:', workerId);
+            alert('Worker type not found. Please refresh the page and try again.');
+        }
+    }
+
+    function setupModal() {
         const headerCreateBtn = document.getElementById('headerCreateBtn');
         const modalOverlay = document.getElementById('modalOverlay');
         const createModal = document.getElementById('createModal');
         const closeBtn = document.getElementById('closeBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
         const addBtn = document.getElementById('addBtn');
         const settingsContent = document.getElementById('settingsContent');
         const form = document.getElementById('createWorkerTypeForm');
@@ -1018,7 +2481,6 @@
         }
 
         closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
         modalOverlay.addEventListener('click', closeModal);
 
         // Character count
@@ -1084,41 +2546,51 @@
              e.preventDefault();
              
              if (validateForm()) {
-                 // Submit to API
-                 addBtn.textContent = 'Adding...';
-                 addBtn.disabled = true;
-                 
                  const templateName = templateNameInput.value.trim();
                  const workDescription = workDescriptionInput.value.trim();
+                 const editId = form.getAttribute('data-edit-id');
                  
-                 fetch('/api/create-worker-type', {
-                     method: 'POST',
+                 // Determine if this is an edit or create operation
+                 const isEdit = editId && editId !== '';
+                 const apiUrl = isEdit ? `/api/update-worker-type/${editId}` : '/api/create-worker-type';
+                 const buttonText = isEdit ? 'Updating...' : 'Adding...';
+                 const originalButtonText = isEdit ? 'Update' : 'Add';
+                 
+                 // Update button state
+                 addBtn.textContent = buttonText;
+                 addBtn.disabled = true;
+                 
+                 const requestBody = {
+                     templateName: templateName,
+                     workDescription: workDescription
+                 };
+                 
+                 console.log('Submitting form:', { isEdit, editId, apiUrl, requestBody });
+                 
+                 fetch(apiUrl, {
+                     method: isEdit ? 'PUT' : 'POST',
                      headers: {
                          'Content-Type': 'application/json'
                      },
-                     body: JSON.stringify({
-                         templateName: templateName,
-                         workDescription: workDescription
-                     })
+                     body: JSON.stringify(requestBody)
                  })
                  .then(response => response.json())
                  .then(data => {
                      if (data.success) {
-                         // Add new worker type to the table
-                         addWorkerTypeToTable(data.worker_type.template_name, data.worker_type.creator_name, data.worker_type.created_at);
-                         
-                         alert('Worker type created successfully!');
-                         closeModal();
+                         console.log('Success response:', data);
+                         // Always refresh the page to show updated data
+                         window.location.reload();
                      } else {
-                         alert('Error: ' + (data.error || 'Failed to create worker type'));
+                         console.error('API error:', data);
+                         alert('Error: ' + (data.error || `Failed to ${isEdit ? 'update' : 'create'} worker type`));
+                         addBtn.textContent = originalButtonText;
+                         addBtn.disabled = false;
                      }
-                     addBtn.textContent = 'Add';
-                     addBtn.disabled = false;
                  })
                  .catch(error => {
-                     console.error('Error:', error);
-                     alert('Error creating worker type. Please try again.');
-                     addBtn.textContent = 'Add';
+                     console.error('Request error:', error);
+                     alert(`Error ${isEdit ? 'updating' : 'creating'} worker type. Please try again.`);
+                     addBtn.textContent = originalButtonText;
                      addBtn.disabled = false;
                  });
              }
@@ -1134,11 +2606,15 @@
             charCountElement.textContent = '0';
             charCountElement.style.color = '#6c757d';
             addBtn.disabled = true;
-            addBtn.textContent = 'Add';
+                                addBtn.textContent = 'Create';
             hideError('templateNameError');
             hideError('workDescriptionError');
             templateNameInput.classList.remove('error');
             workDescriptionInput.classList.remove('error');
+            
+            // Reset modal to create mode
+                            document.querySelector('.modal-title').textContent = 'Create worker type';
+            form.removeAttribute('data-edit-id');
         }
 
         // Prevent modal from closing when clicking inside it
@@ -1159,10 +2635,31 @@
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
             <td>
-                <div class="worker-type-name">${name}</div>
+                <div class="worker-type-name clickable" onclick="showWorkerTypeInfo('new')" title="Click to view details">${name}</div>
             </td>
             <td>${creatorName}</td>
             <td>${createdAt}</td>
+            <td>
+                <div class="actions-container">
+                    <button class="edit-btn" onclick="toggleActionMenu(event, 'new')" title="More actions">
+                        <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                    </button>
+                    <div class="action-menu" id="menu-new">
+                        <div class="action-item" onclick="editWorkerType('new')">
+                            <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                            <span>Edit</span>
+                        </div>
+                        <div class="action-item" onclick="copyWorkerType('new')">
+                            <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
+                            <span>Duplicate</span>
+                        </div>
+                        <div class="action-item delete" onclick="deleteWorkerType('new')">
+                            <img src="/static/images/trash-bold.png" alt="Delete" class="action-icon">
+                            <span>Delete</span>
+                        </div>
+                    </div>
+                </div>
+            </td>
         `;
 
         // Add to table
@@ -1177,6 +2674,53 @@
             creation: createdAt
         };
         originalData.push(newData);
+    }
+
+    function removeWorkerTypeFromTable(workerId) {
+        console.log('Removing worker type from table:', workerId);
+        
+        // Find and remove from originalData
+        const index = originalData.findIndex(item => {
+            // Find by checking if this row contains the workerId in its action menu
+            const actionMenu = item.element.querySelector(`#menu-${workerId}`);
+            return actionMenu !== null;
+        });
+        
+        if (index !== -1) {
+            const removedItem = originalData[index];
+            console.log('Found item to remove:', removedItem);
+            
+            // Remove from originalData
+            originalData.splice(index, 1);
+            
+            // Remove from DOM
+            if (removedItem.element && removedItem.element.parentNode) {
+                removedItem.element.remove();
+            }
+            
+            console.log('Remaining originalData length:', originalData.length);
+            
+            // Check if table is now empty
+            const tbody = document.getElementById('workerTypesBody');
+            if (originalData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><img src="/static/images/legal.png" alt="Legal document" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                                <div class="empty-state-title">No worker types yet</div>
+                                <div class="empty-state-description">Create your first worker type template to standardize roles and responsibilities</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Re-apply current filters and sorting
+                filterTable();
+            }
+        } else {
+            console.warn('Could not find worker type in originalData for ID:', workerId);
+        }
     }
 
     function sortTable() {
@@ -1217,12 +2761,27 @@
 
     function filterTable() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const selectedCreators = window.getCurrentCreatorFilter ? window.getCurrentCreatorFilter() : new Set();
 
         const filteredData = originalData.filter(item => {
+            // Search filter
             const matchesSearch = !searchTerm || 
                 item.name.includes(searchTerm);
 
-            return matchesSearch;
+            // Creator filter - if nothing selected, show all
+            let matchesCreator = true;
+            if (selectedCreators && selectedCreators.size > 0) {
+                // Check if any of the selected creators match this item's creator
+                matchesCreator = false;
+                for (const creator of selectedCreators) {
+                    if (item.created.includes(creator.toLowerCase())) {
+                        matchesCreator = true;
+                        break;
+                    }
+                }
+            }
+
+            return matchesSearch && matchesCreator;
         });
 
         // Update table
@@ -1234,9 +2793,9 @@
                 // Show empty state if no worker types exist
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="3">
+                        <td colspan="4">
                             <div class="empty-state">
-                                <div class="empty-state-icon">📋</div>
+                                <div class="empty-state-icon"><img src="/static/images/legal.png" alt="Legal document" style="width: 48px; height: 48px; opacity: 0.5;"></div>
                                 <div class="empty-state-title">No worker types yet</div>
                                 <div class="empty-state-description">Create your first worker type template to standardize roles and responsibilities</div>
                             </div>
@@ -1247,7 +2806,7 @@
                 // Show no results message if filters don't match
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="3">
+                        <td colspan="4">
                             <div class="empty-state">
                                 <div class="empty-state-icon">🔍</div>
                                 <div class="empty-state-title">No results found</div>
@@ -1261,6 +2820,322 @@
             filteredData.forEach(item => {
                 tbody.appendChild(item.element.cloneNode(true));
             });
+        }
+
+        updateTableSummary(filteredData.length);
+        
+        // After filtering, check if any rows are visible
+        checkAndShowEmptyState(filteredData.length > 0);
+    }
+
+    function updateTableSummary(count) {
+        const summaryEl = document.getElementById('tableSummary');
+        if (summaryEl) {
+            summaryEl.textContent = `Total ${count} items`;
+        }
+    }
+
+    // Edit worker type function
+    function editWorkerType(workerId) {
+        console.log('Edit worker type with ID:', workerId, 'Type:', typeof workerId);
+        
+        if (workerId === 'new') {
+            alert('Edit functionality for newly created items will be implemented soon.');
+            return;
+        }
+        
+        // Find the worker type data
+        const workerTypesScript = document.getElementById('worker-types-data');
+        console.log('Script element found:', !!workerTypesScript);
+        
+        if (!workerTypesScript) {
+            console.error('No worker-types-data script element found');
+            alert('Worker type data not available. Please refresh the page and try again.');
+            return;
+        }
+        
+        let workerTypes = [];
+        
+        try {
+            workerTypes = JSON.parse(workerTypesScript.textContent) || [];
+            console.log('Parsed worker types for edit:', workerTypes);
+            console.log('Available worker types count:', workerTypes.length);
+        } catch (error) {
+            console.error('Error parsing worker types for edit:', error);
+            alert('Error loading worker type data. Please refresh the page and try again.');
+            return;
+        }
+        
+        // Try different ID matching strategies (same as deleteWorkerType)
+        let workerType = null;
+        
+        // Try exact match first
+        workerType = workerTypes.find(wt => wt.id === workerId);
+        console.log('Exact match found:', !!workerType);
+        
+        // If not found, try converting workerId to number
+        if (!workerType) {
+            const numericId = parseInt(workerId);
+            workerType = workerTypes.find(wt => wt.id === numericId);
+            console.log('Trying numeric ID:', numericId, 'Found:', !!workerType);
+        }
+        
+        // If still not found, try converting workerId to string
+        if (!workerType) {
+            const stringId = String(workerId);
+            workerType = workerTypes.find(wt => String(wt.id) === stringId);
+            console.log('Trying string ID:', stringId, 'Found:', !!workerType);
+        }
+        
+        if (workerType) {
+            // Pre-fill the modal with existing data
+            document.getElementById('templateName').value = workerType.template_name;
+            document.getElementById('workDescription').value = workerType.description;
+            
+            // Update character count
+            const charCountElement = document.getElementById('charCount');
+            if (charCountElement) {
+                charCountElement.textContent = workerType.description.length;
+            }
+            
+            // Change modal title and button text
+            document.querySelector('.modal-title').textContent = 'Edit worker type';
+            document.getElementById('addBtn').textContent = 'Update';
+            
+            // Store the ID for updating
+            document.getElementById('createWorkerTypeForm').setAttribute('data-edit-id', workerId);
+            
+            // Open the modal
+            const modalOverlay = document.getElementById('modalOverlay');
+            const createModal = document.getElementById('createModal');
+            const settingsContent = document.getElementById('settingsContent');
+            
+            modalOverlay.classList.add('show');
+            createModal.classList.add('show');
+            settingsContent.classList.add('modal-open');
+            
+            document.getElementById('templateName').focus();
+        } else {
+            alert('Worker type not found. Please refresh the page and try again.');
+        }
+    }
+
+    // Toggle action menu
+    function toggleActionMenu(event, workerId) {
+        event.stopPropagation();
+        
+        const menu = document.getElementById(`menu-${workerId}`);
+        const isCurrentlyVisible = menu.classList.contains('show');
+        
+        // Close all other menus
+        document.querySelectorAll('.action-menu').forEach(m => {
+            m.classList.remove('show');
+        });
+        
+        // Toggle current menu
+        if (!isCurrentlyVisible) {
+            // Get button position for fixed positioning
+            const button = event.target.closest('.edit-btn');
+            const rect = button.getBoundingClientRect();
+            
+            // Position the menu below and to the right of the button
+            menu.style.top = (rect.bottom + 5) + 'px';
+            menu.style.left = (rect.right - 120) + 'px'; // 120px is min-width of menu
+            
+            // Ensure menu doesn't go off screen
+            const menuRect = menu.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Adjust horizontal position if menu goes off right edge
+            if (rect.right < 120) {
+                menu.style.left = rect.left + 'px';
+            }
+            
+            // Adjust vertical position if menu goes off bottom edge
+            if (rect.bottom + menuRect.height + 5 > viewportHeight) {
+                menu.style.top = (rect.top - menuRect.height - 5) + 'px';
+            }
+            
+            menu.classList.add('show');
+        }
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.actions-container')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+
+    // Duplicate worker type function
+    function copyWorkerType(workerId) {
+        console.log('Duplicate worker type with ID:', workerId);
+        
+        // Close the menu
+        document.getElementById(`menu-${workerId}`).classList.remove('show');
+        
+        if (workerId === 'new') {
+            alert('Duplicate functionality for newly created items will be implemented soon.');
+            return;
+        }
+        
+        // Get the worker type data
+        const workerTypesScript = document.getElementById('worker-types-data');
+        console.log('Duplicate - Script element found:', !!workerTypesScript);
+        
+        if (!workerTypesScript) {
+            console.error('No worker-types-data script element found for duplicate');
+            alert('Worker type data not available. Please refresh the page and try again.');
+            return;
+        }
+        
+        let workerTypes = [];
+        
+        try {
+            workerTypes = JSON.parse(workerTypesScript.textContent) || [];
+            console.log('Duplicate - Parsed worker types:', workerTypes);
+        } catch (error) {
+            console.error('Error parsing worker types for duplicate:', error);
+            alert('Error loading worker type data. Please refresh the page and try again.');
+            return;
+        }
+        
+        // Try different ID matching strategies
+        let workerType = null;
+        
+        // Try exact match first
+        workerType = workerTypes.find(wt => wt.id === workerId);
+        
+        // If not found, try converting workerId to number
+        if (!workerType) {
+            const numericId = parseInt(workerId);
+            workerType = workerTypes.find(wt => wt.id === numericId);
+        }
+        
+        // If still not found, try converting workerId to string
+        if (!workerType) {
+            const stringId = String(workerId);
+            workerType = workerTypes.find(wt => String(wt.id) === stringId);
+        }
+        
+        if (workerType) {
+            // Pre-fill the modal with duplicated data (blank template name, same description)
+            document.getElementById('templateName').value = '';
+            document.getElementById('workDescription').value = workerType.description;
+            
+            // Update character count
+            const charCountElement = document.getElementById('charCount');
+            if (charCountElement) {
+                charCountElement.textContent = workerType.description.length;
+            }
+            
+            // Change modal title and button text
+            document.querySelector('.modal-title').textContent = 'Duplicate worker type';
+            document.getElementById('addBtn').textContent = 'Create';
+            
+            // Remove edit ID to ensure it creates new instead of updating
+            document.getElementById('createWorkerTypeForm').removeAttribute('data-edit-id');
+            
+            // Open the modal
+            const modalOverlay = document.getElementById('modalOverlay');
+            const createModal = document.getElementById('createModal');
+            const settingsContent = document.getElementById('settingsContent');
+            
+            modalOverlay.classList.add('show');
+            createModal.classList.add('show');
+            settingsContent.classList.add('modal-open');
+            
+            document.getElementById('templateName').focus();
+        } else {
+            alert('Worker type not found. Please refresh the page and try again.');
+        }
+    }
+
+    // Delete worker type function
+    function deleteWorkerType(workerId) {
+        console.log('Delete worker type with ID:', workerId, 'Type:', typeof workerId);
+        
+        // Close the menu
+        document.getElementById(`menu-${workerId}`).classList.remove('show');
+        
+        if (workerId === 'new') {
+            alert('Delete functionality for newly created items will be implemented soon.');
+            return;
+        }
+        
+        // Try to get worker type data from multiple sources
+        let workerType = null;
+        let templateName = '';
+        let creatorName = '';
+        
+        // Method 1: Try to get from template script data
+        const workerTypesScript = document.getElementById('worker-types-data');
+        if (workerTypesScript) {
+            try {
+                const workerTypes = JSON.parse(workerTypesScript.textContent) || [];
+                console.log('Available worker types:', workerTypes);
+                
+                // Try exact match first
+                workerType = workerTypes.find(wt => wt.id === workerId);
+                
+                // If not found, try converting workerId to number
+                if (!workerType) {
+                    const numericId = parseInt(workerId);
+                    workerType = workerTypes.find(wt => wt.id === numericId);
+                    console.log('Trying numeric ID:', numericId, 'Found:', !!workerType);
+                }
+                
+                // If still not found, try converting workerId to string
+                if (!workerType) {
+                    const stringId = String(workerId);
+                    workerType = workerTypes.find(wt => String(wt.id) === stringId);
+                    console.log('Trying string ID:', stringId, 'Found:', !!workerType);
+                }
+                
+            } catch (error) {
+                console.error('Error parsing worker types for delete:', error);
+            }
+        }
+        
+        // Method 2: If not found in template data, get from table row
+        if (!workerType) {
+            console.log('Worker type not found in template data, extracting from table row');
+            
+            // Find the table row that contains this workerId
+            const actionMenu = document.getElementById(`menu-${workerId}`);
+            if (actionMenu) {
+                const tableRow = actionMenu.closest('tr');
+                if (tableRow) {
+                    const cells = tableRow.querySelectorAll('td');
+                    if (cells.length >= 2) {
+                        templateName = cells[0].textContent.trim();
+                        creatorName = cells[1].textContent.trim();
+                        console.log('Extracted from table - Name:', templateName, 'Creator:', creatorName);
+                    }
+                }
+            }
+        } else {
+            templateName = workerType.template_name;
+            creatorName = workerType.creator_name;
+        }
+        
+        // Show delete modal if we have the data
+        if (templateName && creatorName) {
+            // Populate delete modal
+            document.getElementById('deleteTemplateName').textContent = templateName;
+            document.getElementById('deleteTemplateCreator').textContent = `Created by ${creatorName}`;
+            
+            // Store worker ID for deletion
+            document.getElementById('deleteModal').setAttribute('data-worker-id', workerId);
+            
+            // Show delete modal
+            document.getElementById('deleteModal').classList.add('show');
+        } else {
+            console.error('Could not find worker type data for ID:', workerId);
+            alert('Worker type not found. Please refresh the page and try again.');
         }
     }
 </script>

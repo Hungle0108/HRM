@@ -62,7 +62,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_completed = db.Column(db.Boolean, default=False)
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
-    organization = db.relationship('Organization')
+    organization = db.relationship('Organization', back_populates='users')
     avatar_url = db.Column(db.String(255))
     reset_token = db.Column(db.String(100), unique=True)
     reset_token_expiry = db.Column(db.DateTime)
@@ -105,7 +105,7 @@ class Organization(db.Model):
     location = db.Column(db.String(120))
     logo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    users = db.relationship('User', backref='org', lazy=True)
+    users = db.relationship('User', back_populates='organization')
     groups = db.relationship('Group', backref='organization', lazy=True)
 
     def to_dict(self):
@@ -267,9 +267,7 @@ class WorkerType(db.Model):
 # Create database tables
 def init_db():
     with app.app_context():
-        # Drop all tables first to ensure clean state
-        db.drop_all()
-        # Create all tables
+        # Only create tables if they don't exist (preserves existing data)
         db.create_all()
         print("Database initialized successfully!")
 
@@ -287,7 +285,9 @@ def home():
 
 @app.route('/login')
 def login_page():
+    print(f"DEBUG: Login page accessed, session: {dict(session)}")
     if 'user_id' in session:
+        print("DEBUG: User already logged in, redirecting to home")
         return redirect('/')
     return render_template('login.html')
 
@@ -1525,22 +1525,124 @@ def time_tracking():
 @app.route('/settings/worker-type')
 def worker_type():
     """Worker type settings page"""
+    print("DEBUG: ===== WORKER TYPE ROUTE CALLED =====")
+    print(f"DEBUG: Session contents: {dict(session)}")
+    
     if 'user_id' not in session:
+        print("DEBUG: No user_id in session, redirecting to login")
         return redirect('/login')
     
     user = User.query.get(session['user_id'])
+    print(f"DEBUG: Retrieved user: {user}")
     if not user:
+        print("DEBUG: User not found, redirecting to login")
         return redirect('/login')
+    
+    print(f"DEBUG: User details - ID: {user.id}, Email: {user.email}, Org ID: {user.organization_id}")
     
     # Get the user's organization and worker types
     organization = None
     worker_types = []
-    if user.organization_id:
-        organization = Organization.query.get(user.organization_id)
-        # Fetch all worker types for this organization
-        worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
     
+    if user.organization_id:
+        print(f"DEBUG: User has organization_id: {user.organization_id}")
+        organization = Organization.query.get(user.organization_id)
+        print(f"DEBUG: Retrieved organization: {organization}")
+        
+        # Fetch all worker types for this organization with proper relationships
+        print(f"DEBUG: Querying WorkerType.query.filter_by(organization_id={user.organization_id})")
+        worker_types_raw = WorkerType.query.options(db.joinedload(WorkerType.creator)).filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+        print(f"DEBUG: Raw query result: {worker_types_raw}")
+        print(f"DEBUG: Raw query result length: {len(worker_types_raw)}")
+
+        # Convert to list of dictionaries for JSON serialization in template
+        worker_types = []
+        for wt in worker_types_raw:
+            wt_dict = wt.to_dict()
+            print(f"DEBUG: Worker type dict: {wt_dict}")
+            worker_types.append(wt_dict)
+        print(f"DEBUG: Final worker_types length: {len(worker_types)}")
+
+        # Debug logging
+        print(f"DEBUG: User {user.email} with org_id {user.organization_id}")
+        print(f"DEBUG: Found {len(worker_types)} worker types")
+        for wt in worker_types:
+            print(f"DEBUG: - {wt['template_name']} (id: {wt['id']})")
+    else:
+        print("DEBUG: User has no organization_id")
+
+    print(f"DEBUG: ===== END WORKER TYPE ROUTE =====")
+
     return render_template('worker_type.html', user=user, organization=organization, worker_types=worker_types, active_page='worker_type')
+
+
+@app.route('/api/get-worker-types', methods=['GET'])
+def api_get_worker_types():
+    """API endpoint to get worker types for current user's organization"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        # Fetch all worker types for this organization with proper relationships
+        worker_types_raw = WorkerType.query.options(db.joinedload(WorkerType.creator)).filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+        
+        # Convert to list of dictionaries for JSON serialization
+        worker_types = []
+        for wt in worker_types_raw:
+            worker_types.append(wt.to_dict())
+        
+        return jsonify({
+            'success': True,
+            'worker_types': worker_types
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching worker types: {str(e)}")
+        return jsonify({'error': 'Failed to fetch worker types'}), 500
+
+@app.route('/api/delete-worker-type/<int:worker_type_id>', methods=['DELETE'])
+def api_delete_worker_type(worker_type_id):
+    """API endpoint to delete a worker type"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        # Find the worker type
+        worker_type = WorkerType.query.filter_by(
+            id=worker_type_id,
+            organization_id=user.organization_id
+        ).first()
+        
+        if not worker_type:
+            return jsonify({'error': 'Worker type not found'}), 404
+        
+        # Check if the user has permission to delete (owner or admin)
+        if worker_type.created_by != user.id:
+            # You can add admin role check here if needed
+            # For now, only allow creator to delete
+            return jsonify({'error': 'You can only delete worker types you created'}), 403
+        
+        # Delete the worker type
+        db.session.delete(worker_type)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Worker type deleted successfully'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting worker type: {str(e)}")
+        return jsonify({'error': 'Failed to delete worker type'}), 500
 
 @app.route('/api/create-worker-type', methods=['POST'])
 def api_create_worker_type():
@@ -1577,16 +1679,79 @@ def api_create_worker_type():
         db.session.add(new_worker_type)
         db.session.commit()
         
+        # Refresh the instance to ensure relationships are loaded
+        db.session.refresh(new_worker_type)
+        
         return jsonify({
             'success': True,
             'message': 'Worker type created successfully',
-            'worker_type': new_worker_type.to_dict()
+            'worker_type': new_worker_type.to_dict(),
+            'refresh': True  # Signal to refresh the page
         })
         
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error creating worker type: {str(e)}")
         return jsonify({'error': 'Failed to create worker type'}), 500
+
+@app.route('/api/update-worker-type/<int:worker_type_id>', methods=['PUT'])
+def api_update_worker_type(worker_type_id):
+    """API endpoint to update an existing worker type"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        template_name = data.get('templateName', '').strip()
+        description = data.get('workDescription', '').strip()
+        
+        if not template_name:
+            return jsonify({'error': 'Template name is required'}), 400
+        
+        if not description:
+            return jsonify({'error': 'Worker type description is required'}), 400
+        
+        # Find the worker type
+        worker_type = WorkerType.query.filter_by(
+            id=worker_type_id,
+            organization_id=user.organization_id
+        ).first()
+        
+        if not worker_type:
+            return jsonify({'error': 'Worker type not found'}), 404
+        
+        # Check if the user has permission to update (owner or admin)
+        if worker_type.created_by != user.id:
+            # You can add admin role check here if needed
+            # For now, only allow creator to update
+            return jsonify({'error': 'You can only update worker types you created'}), 403
+        
+        # Update the worker type
+        worker_type.template_name = template_name
+        worker_type.description = description
+        
+        db.session.commit()
+        
+        # Refresh the instance to ensure relationships are loaded
+        db.session.refresh(worker_type)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Worker type updated successfully',
+            'worker_type': worker_type.to_dict()
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating worker type: {str(e)}")
+        return jsonify({'error': 'Failed to update worker type'}), 500
 
 @app.route('/create-schedule')
 def create_schedule():
