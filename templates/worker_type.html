@@ -323,14 +323,30 @@
 
     /* Worker types section */
     .worker-types-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    /* Filters box */
+    .filters-box {
         background: white;
         border-radius: 12px;
-        padding: 32px;
+        padding: 24px 32px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         border: 1px solid #e9ecef;
-        margin-bottom: 40px;
         position: relative;
         z-index: 1;
+    }
+
+    /* Table box */
+    .table-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
     }
 
     .section-header {
@@ -391,7 +407,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
         gap: 16px;
     }
 
@@ -402,11 +417,11 @@
     }
 
     /* Filter dropdown styles */
-    .filter-dropdown {
+    .creator-filter {
         position: relative;
     }
 
-    .dropdown-toggle {
+    .creator-filter .dropdown-toggle {
         display: flex;
         align-items: center;
         gap: 8px;
@@ -422,28 +437,28 @@
         justify-content: space-between;
     }
 
-    .dropdown-toggle:hover {
+    .creator-filter .dropdown-toggle:hover {
         background: #e9ecef;
         border-color: #adb5bd;
     }
 
-    .dropdown-toggle.active {
+    .creator-filter .dropdown-toggle.active {
         background: white;
         border-color: #80bdff;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
-    .dropdown-label {
+    .creator-filter .dropdown-label {
         font-weight: 500;
     }
 
-    .dropdown-arrow {
+    .creator-filter .dropdown-arrow {
         width: 12px;
         height: 12px;
         opacity: 0.6;
     }
 
-    .dropdown-menu {
+    .creator-filter .dropdown-menu {
         position: absolute;
         top: calc(100% + 8px);
         left: 0;
@@ -460,13 +475,13 @@
         transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
     }
 
-    .dropdown-menu.show {
+    .creator-filter .dropdown-menu.show {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
     }
 
-    .dropdown-header {
+    .creator-filter .dropdown-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -474,13 +489,13 @@
         border-bottom: none !important;
     }
 
-    .dropdown-title {
+    .creator-filter .dropdown-title {
         font-size: 1rem;
         font-weight: 600;
         color: #1a1a1a;
     }
 
-    .dropdown-close {
+    .creator-filter .dropdown-close {
         background: none;
         border: none;
         cursor: pointer;
@@ -493,46 +508,46 @@
         transition: all 0.2s;
     }
 
-    .dropdown-close:hover {
+    .creator-filter .dropdown-close:hover {
         background: #f8f9fa;
         opacity: 1;
     }
 
-    .dropdown-content {
+    .creator-filter .dropdown-content {
         padding: 0 20px 16px 20px;
         max-height: 200px;
         overflow-y: auto;
         border-top: none !important;
     }
 
-    .dropdown-option {
+    .creator-filter .dropdown-option {
         margin-bottom: 12px;
     }
 
-    .dropdown-option:first-child {
+    .creator-filter .dropdown-option:first-child {
         margin-top: 0;
         border-top: none;
         padding-top: 16px;
     }
 
     /* Make "Select all" text bolder */
-    #selectAll + .option-text {
+    .creator-filter #selectAll + .option-text {
         font-weight: 600;
     }
 
-    .dropdown-separator {
+    .creator-filter .dropdown-separator {
         height: 1px;
         background: #e9ecef;
         margin: 12px 0;
     }
 
-    .dropdown-footer {
+    .creator-filter .dropdown-footer {
         display: flex;
         gap: 12px;
         padding: 16px 20px;
     }
 
-    .btn-reset {
+    .creator-filter .btn-reset {
         flex: 1;
         padding: 10px 16px;
         background: #f8f9fa;
@@ -545,12 +560,12 @@
         transition: all 0.2s;
     }
 
-    .btn-reset:hover {
+    .creator-filter .btn-reset:hover {
         background: #e9ecef;
         border-color: #adb5bd;
     }
 
-    .btn-show-results {
+    .creator-filter .btn-show-results {
         flex: 1;
         padding: 10px 16px;
         background: #1a1a1a;
@@ -563,7 +578,7 @@
         transition: all 0.2s;
     }
 
-    .btn-show-results:hover {
+    .creator-filter .btn-show-results:hover {
         background: #333;
         border-color: #333;
     }
@@ -841,9 +856,15 @@
         transition: none;
     }
 
-
+    .worker-types-table th.sortable:hover .sort-icon {
+        opacity: 0.5;
+    }
 
     .worker-types-table th.sorted .sort-icon {
+        opacity: 1;
+    }
+
+    .worker-types-table th.sorted:hover .sort-icon {
         opacity: 1;
     }
 
@@ -928,7 +949,7 @@
         border: 1px solid #e9ecef;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 9999;
+        z-index: 999;
         min-width: 120px;
         opacity: 0;
         visibility: hidden;
@@ -1235,7 +1256,7 @@
         box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
         transform: translateX(100%);
         transition: transform 0.3s ease;
-        z-index: 1002;
+        z-index: 1010;
         overflow-y: auto;
     }
 
@@ -1285,8 +1306,53 @@
         color: #1a1a1a;
     }
 
+    .info-modal-footer {
+        padding: 20px 24px;
+        background: white;
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .info-duplicate-btn {
+        padding: 8px 16px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .info-duplicate-btn:hover {
+        background: #333333;
+        border-color: #333333;
+    }
+
+    .info-delete-btn {
+        padding: 8px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #dc3545;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .info-delete-btn:hover {
+        background: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
     .info-modal-content {
-        padding: 24px;
+        padding: 24px 24px 0 24px;
     }
 
     .info-section {
@@ -1447,11 +1513,8 @@
     }
 
     .table-wrapper {
-        margin-top: 24px;
-        border-radius: 12px;
+        border-radius: 0;
         overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        border: 1px solid #e9ecef;
     }
 
     .table-summary {
@@ -1487,60 +1550,63 @@
 
         <!-- Worker types section -->
         <div class="worker-types-section">
-            <!-- Filters -->
-            <div class="filters-section">
-                <div class="filters-left">
-                    <div class="search-container" id="searchContainer">
-                        <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
-                        <input type="text" class="search-input" placeholder="Search by template name..." id="searchInput">
-                    </div>
-                    <div class="filter-dropdown">
-                        <button class="dropdown-toggle" id="creatorDropdown">
-                            <span class="dropdown-label">Creator</span>
-                            <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
-                        </button>
-                        <div class="dropdown-menu" id="creatorDropdownMenu">
-                            <div class="dropdown-header">
-                                <span class="dropdown-title">Creator</span>
-                                                <button class="dropdown-close" id="dropdownClose">
-                    <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
-                </button>
-                            </div>
-                            <div class="dropdown-content">
-                                <label class="dropdown-option">
-                                    <input type="checkbox" class="dropdown-checkbox" id="selectAll" data-value="all">
-                                    <span class="option-text">Select all</span>
-                                </label>
-                                <div class="dropdown-options-list" id="creatorOptionsList">
-                                    <!-- Dynamic creator options will be added here -->
+            <!-- Filters Box -->
+            <div class="filters-box">
+                <div class="filters-section">
+                    <div class="filters-left">
+                        <div class="search-container" id="searchContainer">
+                            <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                            <input type="text" class="search-input" placeholder="Search by template name..." id="searchInput">
+                        </div>
+                        <div class="filter-dropdown creator-filter">
+                            <button class="dropdown-toggle" id="creatorDropdown">
+                                <span class="dropdown-label">Creator</span>
+                                <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu" id="creatorDropdownMenu">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-title">Creator</span>
+                                                    <button class="dropdown-close" id="dropdownClose">
+                        <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                    </button>
                                 </div>
-                            </div>
-                            <div class="dropdown-footer">
-                                <button class="btn-reset" id="resetFilters">Reset</button>
-                                <button class="btn-show-results" id="showResults">Show results</button>
+                                <div class="dropdown-content">
+                                    <label class="dropdown-option">
+                                        <input type="checkbox" class="dropdown-checkbox" id="selectAll" data-value="all">
+                                        <span class="option-text">Select all</span>
+                                    </label>
+                                    <div class="dropdown-options-list" id="creatorOptionsList">
+                                        <!-- Dynamic creator options will be added here -->
+                                    </div>
+                                </div>
+                                <div class="dropdown-footer">
+                                    <button class="btn-reset" id="resetFilters">Reset</button>
+                                    <button class="btn-show-results" id="showResults">Show results</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <a href="#" class="action-button" id="headerCreateBtn">Create worker type</a>
                 </div>
-                <a href="#" class="action-button" id="headerCreateBtn">Create worker type</a>
             </div>
 
-            <!-- Table Wrapper -->
-            <div class="table-wrapper">
-                <div class="table-summary" id="tableSummary">Total 0 items</div>
-                <!-- Data table -->
-                <table class="worker-types-table" id="workerTypesTable">
+            <!-- Table Box -->
+            <div class="table-box">
+                <div class="table-wrapper">
+                    <div class="table-summary" id="tableSummary">Total 0 items</div>
+                    <!-- Data table -->
+                    <table class="worker-types-table" id="workerTypesTable">
                     <thead>
                         <tr>
-                            <th class="sortable sorted" data-sort="name">
+                            <th class="sortable" data-sort="name">
                                 Template name
                                 <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
                             </th>
                             <th class="sortable" data-sort="created">
                                 Created by
-                                <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
+                                <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
                             </th>
-                            <th class="sortable" data-sort="creation">
+                            <th class="sortable sorted" data-sort="creation">
                                 Creation day
                                 <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
                             </th>
@@ -1559,9 +1625,9 @@
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
-    </div>
 
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="modalOverlay"></div>
@@ -1671,6 +1737,11 @@
                 </div>
             </div>
         </div>
+        
+        <div class="info-modal-footer">
+            <button class="info-delete-btn" id="infoDeleteBtn">Delete</button>
+            <button class="info-duplicate-btn" id="infoDuplicateBtn">Duplicate</button>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -1683,8 +1754,9 @@
 <script type="application/json" id="worker-types-data">{{ (worker_types or []) | tojson | safe }}</script>
 
 <script>
-    let currentSort = { field: 'name', direction: 'asc' };
+    let currentSort = { field: 'creation', direction: 'desc' };
     let originalData = [];
+    let sortStates = {}; // Track sort state for each column (0: default, 1: asc, 2: desc)
 
     // Debug function to check data availability
     function debugWorkerTypesData() {
@@ -1845,6 +1917,7 @@
             });
             
             console.log('Final originalData length:', originalData.length);
+            updateTableSummary(originalData.length);
         } else {
             console.log('No worker types to display. Conditions failed:');
             console.log('- workerTypes exists:', !!workerTypes);
@@ -1853,6 +1926,7 @@
             
             console.log('Showing empty state - no worker types found');
             showEmptyState();
+            updateTableSummary(0);
         }
         
         console.log('=== END LOADING WORKER TYPES ===');
@@ -1919,14 +1993,17 @@
                     });
                     
                     console.log('Successfully loaded from API');
+                    updateTableSummary(originalData.length);
                 } else {
                     console.error('API fetch failed:', data);
                     showEmptyState();
+                    updateTableSummary(0);
                 }
             })
             .catch(error => {
                 console.error('Error fetching from API:', error);
                 showEmptyState();
+                updateTableSummary(0);
             });
     }
     
@@ -1974,18 +2051,64 @@
         document.querySelectorAll('.sortable').forEach(header => {
             header.addEventListener('click', function() {
                 const sortField = this.dataset.sort;
+                // Initialize sort state if not exists
+                if (!(sortField in sortStates)) {
+                    sortStates[sortField] = 0;
+                }
                 
-                // Toggle direction if clicking the same field
+                // Handle sorting logic
                 if (currentSort.field === sortField) {
-                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    // Clicking the same field - advance to next state
+                    if (sortField === 'creation') {
+                        // Creation column: 2 (desc visible) -> 0 (desc invisible) -> 1 (asc visible) -> 2 (desc visible)
+                        if (sortStates[sortField] === 2) {
+                            sortStates[sortField] = 0; // Go to invisible state
+                        } else if (sortStates[sortField] === 0) {
+                            sortStates[sortField] = 1; // Go to ascending
+                        } else {
+                            sortStates[sortField] = 2; // Go back to descending
+                        }
+                    } else {
+                        // Other columns: normal 3-state cycle
+                        sortStates[sortField] = (sortStates[sortField] + 1) % 3;
+                    }
                 } else {
+                    // Clicking different field - reset all states and start with asc
+                    Object.keys(sortStates).forEach(key => sortStates[key] = 0);
+                    sortStates[sortField] = 1;
+                }
+                
+                // Apply sort based on state
+                if (sortField === 'creation' && sortStates[sortField] === 0) {
+                    // Special case: creation column in invisible state - data stays desc but no visual indicator
+                    currentSort.field = 'creation';
+                    currentSort.direction = 'desc';
+                } else if (sortStates[sortField] === 0) {
+                    // Other columns: return to default (creation date descending, all invisible)
+                    currentSort.field = 'creation';
+                    currentSort.direction = 'desc';
+                    Object.keys(sortStates).forEach(key => sortStates[key] = 0);
+                } else if (sortStates[sortField] === 1) {
+                    // Ascending
                     currentSort.field = sortField;
                     currentSort.direction = 'asc';
+                } else {
+                    // Descending
+                    currentSort.field = sortField;
+                    currentSort.direction = 'desc';
                 }
 
                 // Update visual indicators
                 document.querySelectorAll('.sortable').forEach(h => h.classList.remove('sorted'));
-                this.classList.add('sorted');
+                
+                // Only add sorted class if we're not in default state (all sortStates are 0)
+                const isDefaultState = Object.values(sortStates).every(state => state === 0);
+                if (!isDefaultState) {
+                    const activeHeader = document.querySelector(`[data-sort="${currentSort.field}"]`);
+                    if (activeHeader) {
+                        activeHeader.classList.add('sorted');
+                    }
+                }
 
                 // Update arrow directions
                 updateSortArrows();
@@ -2001,25 +2124,35 @@
             const sortIcon = header.querySelector('.sort-icon img');
             const sortField = header.dataset.sort;
             
-            if (currentSort.field === sortField) {
-                // Show arrow indicating NEXT action (opposite of current state)
+            // Special case for creation column in invisible state (state 0)
+            if (sortField === 'creation' && sortStates['creation'] === 0) {
+                sortIcon.src = '/static/images/arrow-small-up.png'; // Up arrow when invisible
+            } else if (currentSort.field === sortField) {
+                // Show arrow indicating CURRENT state
                 if (currentSort.direction === 'asc') {
-                    sortIcon.src = '/static/images/arrow-small-up.png'; // Next: descending (up arrow)
+                    sortIcon.src = '/static/images/arrow-small-up.png'; // Currently ascending (up arrow)
                 } else {
-                    sortIcon.src = '/static/images/arrow-small-down.png'; // Next: ascending (down arrow)
+                    sortIcon.src = '/static/images/arrow-small-down.png'; // Currently descending (down arrow)
                 }
             } else {
-                // Default: show down arrow (first click will be ascending)
-                sortIcon.src = '/static/images/arrow-small-down.png';
+                // Default: show up arrow (indicating default ascending sort)
+                sortIcon.src = '/static/images/arrow-small-up.png';
             }
         });
     }
 
     function applyDefaultSort() {
-        // Set visual indicator for name column
-        const nameHeader = document.querySelector('[data-sort="name"]');
-        if (nameHeader) {
-            nameHeader.classList.add('sorted');
+        // Initialize sort states - creation starts in state 2 (visible, descending)
+        sortStates = {
+            'name': 0,
+            'created': 0, 
+            'creation': 2  // Creation starts in descending state (visible)
+        };
+        
+        // Set visual indicator for creation column
+        const creationHeader = document.querySelector('[data-sort="creation"]');
+        if (creationHeader) {
+            creationHeader.classList.add('sorted');
         }
 
         // Update arrow directions
@@ -2344,10 +2477,14 @@
         const infoModal = document.getElementById('infoModal');
         const infoModalCloseBtn = document.getElementById('infoModalCloseBtn');
         const infoEditBtn = document.getElementById('infoEditBtn');
+        const infoDuplicateBtn = document.getElementById('infoDuplicateBtn');
+        const infoDeleteBtn = document.getElementById('infoDeleteBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
 
         // Close info modal
         infoModalCloseBtn.addEventListener('click', function() {
             infoModal.classList.remove('show');
+            modalOverlay.classList.remove('show');
             document.getElementById('settingsContent').classList.remove('modal-open');
         });
 
@@ -2357,16 +2494,51 @@
             if (currentWorkerId) {
                 // Close info modal
                 infoModal.classList.remove('show');
+                modalOverlay.classList.remove('show');
                 document.getElementById('settingsContent').classList.remove('modal-open');
                 // Open edit modal with pre-filled data
                 editWorkerType(currentWorkerId);
             }
         });
 
+        // Duplicate button functionality
+        infoDuplicateBtn.addEventListener('click', function() {
+            const currentWorkerId = infoModal.getAttribute('data-worker-id');
+            if (currentWorkerId) {
+                // Close info modal
+                infoModal.classList.remove('show');
+                modalOverlay.classList.remove('show');
+                document.getElementById('settingsContent').classList.remove('modal-open');
+                // Call the existing duplicate function
+                copyWorkerType(currentWorkerId);
+            }
+        });
+
+        // Delete button functionality
+        infoDeleteBtn.addEventListener('click', function() {
+            const currentWorkerId = infoModal.getAttribute('data-worker-id');
+            if (currentWorkerId) {
+                // Close info modal
+                infoModal.classList.remove('show');
+                modalOverlay.classList.remove('show');
+                document.getElementById('settingsContent').classList.remove('modal-open');
+                // Call the existing delete function
+                deleteWorkerType(currentWorkerId);
+            }
+        });
+
+        // Close modal when clicking on overlay
+        modalOverlay.addEventListener('click', function() {
+            infoModal.classList.remove('show');
+            modalOverlay.classList.remove('show');
+            document.getElementById('settingsContent').classList.remove('modal-open');
+        });
+
         // Close modal when clicking outside (optional)
         document.addEventListener('click', function(e) {
             if (e.target === infoModal) {
                 infoModal.classList.remove('show');
+                modalOverlay.classList.remove('show');
                 document.getElementById('settingsContent').classList.remove('modal-open');
             }
         });
@@ -2375,6 +2547,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && infoModal.classList.contains('show')) {
                 infoModal.classList.remove('show');
+                modalOverlay.classList.remove('show');
                 document.getElementById('settingsContent').classList.remove('modal-open');
             }
         });
@@ -2437,10 +2610,12 @@
             
             // Store the worker ID for the edit button
             const infoModal = document.getElementById('infoModal');
+            const modalOverlay = document.getElementById('modalOverlay');
             infoModal.setAttribute('data-worker-id', workerId);
             
-            // Show the modal and shrink the table
+            // Show the modal, overlay and shrink the table
             const settingsContent = document.getElementById('settingsContent');
+            modalOverlay.classList.add('show');
             infoModal.classList.add('show');
             settingsContent.classList.add('modal-open');
         } else {
@@ -2674,6 +2849,9 @@
             creation: createdAt
         };
         originalData.push(newData);
+        
+        // Update table summary count
+        updateTableSummary(originalData.length);
     }
 
     function removeWorkerTypeFromTable(workerId) {
@@ -2714,9 +2892,11 @@
                         </td>
                     </tr>
                 `;
+                updateTableSummary(0);
             } else {
                 // Re-apply current filters and sorting
                 filterTable();
+                updateTableSummary(originalData.length);
             }
         } else {
             console.warn('Could not find worker type in originalData for ID:', workerId);

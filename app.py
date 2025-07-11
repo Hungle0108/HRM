@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory, redirect, session, make_response, render_template
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 from flask_mail import Mail, Message
 import secrets
@@ -254,13 +254,17 @@ class WorkerType(db.Model):
     creator = db.relationship('User', backref='created_worker_types')
     
     def to_dict(self):
+        # Convert UTC to GMT+7 (Asia/Bangkok timezone)
+        gmt_plus_7 = timezone(timedelta(hours=7))
+        created_at_gmt7 = self.created_at.replace(tzinfo=timezone.utc).astimezone(gmt_plus_7)
+        
         return {
             'id': self.id,
             'template_name': self.template_name,
             'description': self.description,
             'organization_id': self.organization_id,
             'created_by': self.created_by,
-            'created_at': self.created_at.strftime('%b %d, %Y'),
+            'created_at': created_at_gmt7.strftime('%b %d, %Y'),
             'creator_name': self.creator.name if self.creator else 'Unknown'
         }
 
