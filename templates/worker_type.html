@@ -291,7 +291,7 @@
     }
 
     .content-header {
-        margin-bottom: 40px;
+        margin-bottom: 0;
     }
 
     .content-title {
@@ -321,11 +321,258 @@
         color: white;
     }
 
+    .customize-columns-btn {
+        padding: 12px 20px;
+        background: white;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .customize-columns-btn:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+
+    .action-buttons-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Customize Columns Modal */
+    .customize-modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 400px;
+        background: white;
+        border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1020;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customize-modal.show {
+        transform: translateX(0);
+    }
+
+    .customize-modal-content {
+        background: white;
+        border-radius: 0;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .customize-modal-header {
+        padding: 24px 24px 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .customize-modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .customize-modal-body {
+        padding: 24px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .column-option {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .column-option:hover {
+        background: #f8f9fa;
+    }
+
+    .column-option:last-child {
+        margin-bottom: 0;
+    }
+
+    .select-all-option {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .select-all-option .column-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 0;
+    }
+    .select-all-option .column-name {
+        margin-left: 0;
+    }
+
+    .select-all-option:hover {
+        background: #e9ecef;
+    }
+
+    .column-checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 0;
+    }
+
+    .column-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .column-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .column-checkbox:indeterminate {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:indeterminate::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        background: white;
+        transform: translate(-50%, -50%);
+    }
+
+    .column-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+        margin-left: 12px;
+    }
+
+    .column-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-left: 12px;
+    }
+
+    .selection-count {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .customize-modal-footer {
+        padding: 20px 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: white;
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .btn-reset {
+        padding: 10px 20px;
+        background: transparent;
+        color: #6c757d;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .btn-save {
+        padding: 10px 20px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-save:hover {
+        background: #333;
+    }
+
     /* Worker types section */
     .worker-types-section {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 0;
         margin-bottom: 40px;
     }
 
@@ -346,7 +593,9 @@
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         border: 1px solid #e9ecef;
-        overflow: hidden;
+        overflow: visible;
+        margin-top: 20px;
+        position: relative;
     }
 
     .section-header {
@@ -800,6 +1049,31 @@
         opacity: 1;
     }
 
+    .search-clear-btn {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 3;
+        display: none;
+    }
+
+    .search-clear-btn:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn.show {
+        display: block;
+        opacity: 0.6;
+    }
+
 
 
 
@@ -810,9 +1084,9 @@
         border-collapse: separate;
         border-spacing: 0;
         background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 12px;
-        overflow: hidden;
+        border: none;
+        border-radius: 0;
+        overflow: visible;
     }
 
     .worker-types-table th {
@@ -826,16 +1100,10 @@
         border-bottom: 1px solid #e9ecef;
         border-right: 1px solid #e9ecef;
         background: #f8f9fa;
-        cursor: pointer;
         user-select: none;
         position: relative;
+        transition: background-color 0.2s ease;
     }
-
-    .worker-types-table th:last-child {
-        border-right: none;
-    }
-
-
 
     .worker-types-table th .sort-icon {
         display: inline-block;
@@ -846,6 +1114,7 @@
         transition: opacity 0.2s ease;
         vertical-align: baseline;
         transform: translateY(-2px);
+        cursor: pointer;
     }
 
     .worker-types-table th .sort-icon img {
@@ -856,17 +1125,118 @@
         transition: none;
     }
 
-    .worker-types-table th.sortable:hover .sort-icon {
-        opacity: 0.5;
-    }
-
+    .worker-types-table th.sortable:hover .sort-icon,
     .worker-types-table th.sorted .sort-icon {
         opacity: 1;
     }
 
-    .worker-types-table th.sorted:hover .sort-icon {
+    .header-menu-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        z-index: 2;
+        padding: 6px;
+        margin: -6px;
+    }
+
+    .worker-types-table th:hover .header-menu-icon {
+        opacity: 0.7;
+    }
+
+    .header-menu-icon:hover {
         opacity: 1;
     }
+
+    /* Dropdown menu styles */
+    .header-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+        z-index: 1001;
+        display: none;
+        padding: 6px 0;
+        margin-top: 4px;
+        animation: fadeIn 0.15s ease-out;
+    }
+    
+    .header-dropdown.positioned-above {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+        to {
+        opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.15s ease;
+        position: relative;
+        font-weight: 500;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+        color: #1f2937;
+        padding-left: 16px;
+    }
+
+    .dropdown-item:first-child {
+        margin-top: 2px;
+    }
+
+    .dropdown-item:last-child {
+        margin-bottom: 2px;
+    }
+
+    .dropdown-item img {
+        width: 14px;
+        height: 14px;
+        opacity: 0.7;
+        transition: opacity 0.15s ease;
+    }
+
+    .dropdown-item:hover img {
+        opacity: 1;
+    }
+
+
+
+    .worker-types-table th:last-child {
+        border-right: none;
+    }
+
+
 
     .worker-types-table td {
         padding: 16px;
@@ -887,6 +1257,23 @@
 
     .worker-types-table tr:hover {
         background: #f8f9fa;
+    }
+
+    /* Ensure rounded corners are respected */
+    .worker-types-table thead tr:first-child th:first-child {
+        border-top-left-radius: 0;
+    }
+    
+    .worker-types-table thead tr:first-child th:last-child {
+        border-top-right-radius: 0;
+    }
+    
+    .worker-types-table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+    }
+    
+    .worker-types-table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
     }
 
     .worker-type-name {
@@ -1074,7 +1461,6 @@
 
     .modal-header {
         padding: 24px 24px 20px 24px;
-        border-bottom: 1px solid #e9ecef;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1169,6 +1555,34 @@
         border-color: #dc3545;
     }
 
+    /* Modern form inputs */
+    .form-input-modern {
+        width: 100%;
+        padding: 16px 20px;
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        background: white;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .form-input-modern:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .form-input-modern.error {
+        border-color: #dc3545;
+    }
+
+    .form-input-modern::placeholder {
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+
     .form-textarea {
         width: 100%;
         padding: 12px 16px;
@@ -1187,6 +1601,75 @@
         outline: none;
         border-color: #80bdff;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    /* Modern textarea */
+    .textarea-container {
+        position: relative;
+    }
+
+    .form-textarea-modern {
+        width: 100%;
+        padding: 16px 20px 40px 20px;
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        background: white;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        resize: vertical;
+        min-height: 180px;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .form-textarea-modern:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .form-textarea-modern.error {
+        border-color: #dc3545;
+    }
+
+    .form-textarea-modern::placeholder {
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+
+    .form-textarea-modern {
+        resize: none;
+    }
+
+    .form-textarea-modern::-webkit-resizer {
+        display: none;
+    }
+
+    .textarea-container {
+        position: relative;
+    }
+
+    .textarea-resize-handle {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        cursor: s-resize;
+        z-index: 10;
+    }
+
+    .character-count-modern {
+        position: absolute;
+        bottom: 12px;
+        right: 16px;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        pointer-events: none;
+        background: white;
+        padding: 2px 4px;
+        border-radius: 4px;
     }
 
     .error-message {
@@ -1397,6 +1880,28 @@
         white-space: pre-wrap;
     }
 
+    /* Three dot menu icon styles */
+    .box-menu-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 12px;
+        height: 12px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .form-section-box:hover .box-menu-icon,
+    .info-section-box:hover .box-menu-icon {
+        opacity: 0.7;
+    }
+
+    .form-section-box,
+    .info-section-box {
+        position: relative;
+    }
+
     /* Icons */
     .icon-organization {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'/%3e%3c/svg%3e");
@@ -1513,8 +2018,8 @@
     }
 
     .table-wrapper {
-        border-radius: 0;
-        overflow: hidden;
+        border-radius: 12px;
+        overflow: visible;
     }
 
     .table-summary {
@@ -1523,6 +2028,8 @@
         font-size: 0.875rem;
         padding: 16px 24px;
         border-bottom: 1px solid #e9ecef;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
     }
 
 
@@ -1532,6 +2039,12 @@
         width: 100%;
         border-collapse: collapse;
         background: white;
+    }
+
+    /* Hide Active contracts column by default */
+    .worker-types-table th:nth-child(2),
+    .worker-types-table td:nth-child(2) {
+        display: none;
     }
 </style>
 {% endblock %}
@@ -1557,6 +2070,9 @@
                         <div class="search-container" id="searchContainer">
                             <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
                             <input type="text" class="search-input" placeholder="Search by template name..." id="searchInput">
+                            <button class="search-clear-btn" id="searchClearBtn">
+                                <img src="/static/images/cross.png" alt="Clear" style="width: 16px; height: 16px;">
+                            </button>
                         </div>
                         <div class="filter-dropdown creator-filter">
                             <button class="dropdown-toggle" id="creatorDropdown">
@@ -1586,7 +2102,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="action-buttons-group">
+                        <button class="customize-columns-btn" id="customizeColumnsBtn">
+                            Customize columns
+                        </button>
                     <a href="#" class="action-button" id="headerCreateBtn">Create worker type</a>
+                    </div>
                 </div>
             </div>
 
@@ -1601,14 +2122,78 @@
                             <th class="sortable" data-sort="name">
                                 Template name
                                 <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-name')">
+                                <div class="header-dropdown" id="dropdown-name">
+                                    <div class="dropdown-item" onclick="sortColumn('name', 'asc')">
+                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                                        Sort by ASC
+                                    </div>
+                                    <div class="dropdown-item" onclick="sortColumn('name', 'desc')">
+                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                                        Sort by DESC
+                                    </div>
+                                    <div class="dropdown-item" onclick="customizeColumns()">
+                                        <img src="/static/images/columns-3.png" alt="Customize">
+                                        Customize columns
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-sort="contracts" style="display: none;">
+                                Active contracts
+                                <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-contracts')">
+                                <div class="header-dropdown" id="dropdown-contracts">
+                                    <div class="dropdown-item" onclick="sortColumn('contracts', 'asc')">
+                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                                        Sort by ASC
+                                    </div>
+                                    <div class="dropdown-item" onclick="sortColumn('contracts', 'desc')">
+                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                                        Sort by DESC
+                                    </div>
+                                    <div class="dropdown-item" onclick="customizeColumns()">
+                                        <img src="/static/images/columns-3.png" alt="Customize">
+                                        Customize columns
+                                    </div>
+                                </div>
                             </th>
                             <th class="sortable" data-sort="created">
                                 Created by
                                 <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-created')">
+                                <div class="header-dropdown" id="dropdown-created">
+                                    <div class="dropdown-item" onclick="sortColumn('created', 'asc')">
+                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                                        Sort by ASC
+                                    </div>
+                                    <div class="dropdown-item" onclick="sortColumn('created', 'desc')">
+                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                                        Sort by DESC
+                                    </div>
+                                    <div class="dropdown-item" onclick="customizeColumns()">
+                                        <img src="/static/images/columns-3.png" alt="Customize">
+                                        Customize columns
+                                    </div>
+                                </div>
                             </th>
                             <th class="sortable sorted" data-sort="creation">
                                 Creation day
                                 <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-creation')">
+                                <div class="header-dropdown" id="dropdown-creation">
+                                    <div class="dropdown-item" onclick="sortColumn('creation', 'asc')">
+                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                                        Sort by ASC
+                                    </div>
+                                    <div class="dropdown-item" onclick="sortColumn('creation', 'desc')">
+                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                                        Sort by DESC
+                                    </div>
+                                    <div class="dropdown-item" onclick="customizeColumns()">
+                                        <img src="/static/images/columns-3.png" alt="Customize">
+                                        Customize columns
+                                    </div>
+                                </div>
                             </th>
                             <th style="width: 60px;"></th>
                         </tr>
@@ -1658,35 +2243,36 @@
     <!-- Create Modal -->
     <div class="create-modal" id="createModal">
         <div class="modal-header">
-                                                    <h2 class="modal-title">Create worker type</h2>
+            <div>
+                <h2 class="modal-title">Add worker type</h2>
+                <p class="modal-subtitle" style="margin-bottom: 0; margin-top: 4px;">Create and reuse the worker type template in future contract creations</p>
+            </div>
             <button class="close-btn" id="closeBtn">
                 <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
             </button>
         </div>
         
         <div class="modal-content">
-            <p class="modal-subtitle">Create and reuse the worker type template in future contract creations</p>
-            
             <form id="createWorkerTypeForm">
                 <!-- Template Name Section -->
-                <div class="form-section-box">
                     <div class="form-section">
                         <label class="form-label required" for="templateName">Template name</label>
-                        <input type="text" class="form-input" id="templateName" name="templateName" required>
+                    <input type="text" class="form-input-modern" id="templateName" name="templateName" required placeholder="Template name">
                         <div class="error-message" id="templateNameError">This field is required</div>
-                    </div>
+                    <div class="error-message" id="templateNameDuplicateError">This template name already exists</div>
                 </div>
 
                 <!-- Worker Type Description Section -->
-                <div class="form-section-box">
                     <div class="form-section">
                         <label class="form-label required" for="workDescription">Worker type description</label>
-                        <textarea class="form-textarea" id="workDescription" name="workDescription" required maxlength="10000"></textarea>
-                        <div class="error-message" id="workDescriptionError">This field is required</div>
-                        <div class="character-count">
-                            <span id="charCount">0</span>/10000
+                    <div class="textarea-container">
+                        <textarea class="form-textarea-modern" id="workDescription" name="workDescription" required maxlength="10000" placeholder="Worker type description"></textarea>
+                        <div class="textarea-resize-handle" id="textareaResizeHandle"></div>
+                        <div class="character-count-modern">
+                            <span id="charCount">0</span> / 10000
                         </div>
                     </div>
+                    <div class="error-message" id="workDescriptionError">This field is required</div>
                 </div>
             </form>
         </div>
@@ -1710,6 +2296,7 @@
         
         <div class="info-modal-content">
             <div class="info-section-box">
+                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Template Name</label>
                     <div class="info-value" id="infoTemplateName">-</div>
@@ -1717,6 +2304,7 @@
             </div>
 
             <div class="info-section-box">
+                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Description</label>
                     <div class="info-value" id="infoDescription">-</div>
@@ -1724,6 +2312,7 @@
             </div>
 
             <div class="info-section-box">
+                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Created By</label>
                     <div class="info-value" id="infoCreatedBy">-</div>
@@ -1731,6 +2320,7 @@
             </div>
 
             <div class="info-section-box">
+                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Creation Date</label>
                     <div class="info-value" id="infoCreationDate">-</div>
@@ -1741,6 +2331,63 @@
         <div class="info-modal-footer">
             <button class="info-delete-btn" id="infoDeleteBtn">Delete</button>
             <button class="info-duplicate-btn" id="infoDuplicateBtn">Duplicate</button>
+        </div>
+    </div>
+
+    <!-- Customize Columns Modal -->
+    <div class="customize-modal" id="customizeModal">
+        <div class="customize-modal-content">
+            <div class="customize-modal-header">
+                <h3 class="customize-modal-title">Customize columns</h3>
+                <button class="close-btn" id="customizeCloseBtn">
+                    <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                </button>
+            </div>
+            
+            <div class="customize-modal-body">
+                <div class="column-option select-all-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" id="selectAllColumns">
+                        <div class="column-info">
+                            <span class="column-name">Select all</span>
+                            <span class="selection-count" id="selectionCount">3 / 4 selected</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="template-name" checked>
+                        <span class="column-name">Template name</span>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="active-contracts">
+                        <span class="column-name">Active contracts</span>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="created-by" checked>
+                        <span class="column-name">Created by</span>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="creation-date" checked>
+                        <span class="column-name">Creation date</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="customize-modal-footer">
+                <button class="btn-reset" id="customizeResetBtn">Reset</button>
+                <button class="btn-save" id="customizeSaveBtn">Save</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1756,7 +2403,6 @@
 <script>
     let currentSort = { field: 'creation', direction: 'desc' };
     let originalData = [];
-    let sortStates = {}; // Track sort state for each column (0: default, 1: asc, 2: desc)
 
     // Debug function to check data availability
     function debugWorkerTypesData() {
@@ -1807,6 +2453,8 @@
         setupDropdown();
         setupDeleteModal();
         setupInfoModal();
+        setupCustomizeColumnsBtn();
+        setupCustomizeModal();
 
         // Apply default sort by name (ascending)
         applyDefaultSort();
@@ -1878,6 +2526,7 @@
                     <td>
                         <div class="worker-type-name clickable" onclick="showWorkerTypeInfo(${workerType.id})" title="Click to view details">${workerType.template_name || 'Unknown'}</div>
                     </td>
+                    <td>${workerType.active_contracts || '0'}</td>
                     <td>${workerType.creator_name || 'Unknown'}</td>
                     <td>${workerType.created_at || 'Unknown'}</td>
                     <td>
@@ -1918,6 +2567,16 @@
             
             console.log('Final originalData length:', originalData.length);
             updateTableSummary(originalData.length);
+            
+            // Apply column visibility after loading data
+            setTimeout(() => {
+                if (window.updateSelectionCount) {
+                    window.updateSelectionCount();
+                }
+                if (window.updateTableColumns) {
+                    window.updateTableColumns();
+                }
+            }, 100);
         } else {
             console.log('No worker types to display. Conditions failed:');
             console.log('- workerTypes exists:', !!workerTypes);
@@ -1955,6 +2614,7 @@
                             <td>
                                 <div class="worker-type-name clickable" onclick="showWorkerTypeInfo(${workerType.id})" title="Click to view details">${workerType.template_name || 'Unknown'}</div>
                             </td>
+                            <td>${workerType.active_contracts || '0'}</td>
                             <td>${workerType.creator_name || 'Unknown'}</td>
                             <td>${workerType.created_at || 'Unknown'}</td>
                             <td>
@@ -1994,6 +2654,16 @@
                     
                     console.log('Successfully loaded from API');
                     updateTableSummary(originalData.length);
+                    
+                    // Apply column visibility after loading data from API
+                    setTimeout(() => {
+                        if (window.updateSelectionCount) {
+                            window.updateSelectionCount();
+                        }
+                        if (window.updateTableColumns) {
+                            window.updateTableColumns();
+                        }
+                    }, 100);
                 } else {
                     console.error('API fetch failed:', data);
                     showEmptyState();
@@ -2049,72 +2719,19 @@
 
     function setupSorting() {
         document.querySelectorAll('.sortable').forEach(header => {
-            header.addEventListener('click', function() {
+            header.addEventListener('click', function(event) {
+                if (event.target.closest('.sort-icon')) {
                 const sortField = this.dataset.sort;
-                // Initialize sort state if not exists
-                if (!(sortField in sortStates)) {
-                    sortStates[sortField] = 0;
-                }
                 
-                // Handle sorting logic
                 if (currentSort.field === sortField) {
-                    // Clicking the same field - advance to next state
-                    if (sortField === 'creation') {
-                        // Creation column: 2 (desc visible) -> 0 (desc invisible) -> 1 (asc visible) -> 2 (desc visible)
-                        if (sortStates[sortField] === 2) {
-                            sortStates[sortField] = 0; // Go to invisible state
-                        } else if (sortStates[sortField] === 0) {
-                            sortStates[sortField] = 1; // Go to ascending
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
                         } else {
-                            sortStates[sortField] = 2; // Go back to descending
-                        }
-                    } else {
-                        // Other columns: normal 3-state cycle
-                        sortStates[sortField] = (sortStates[sortField] + 1) % 3;
-                    }
-                } else {
-                    // Clicking different field - reset all states and start with asc
-                    Object.keys(sortStates).forEach(key => sortStates[key] = 0);
-                    sortStates[sortField] = 1;
-                }
-                
-                // Apply sort based on state
-                if (sortField === 'creation' && sortStates[sortField] === 0) {
-                    // Special case: creation column in invisible state - data stays desc but no visual indicator
-                    currentSort.field = 'creation';
-                    currentSort.direction = 'desc';
-                } else if (sortStates[sortField] === 0) {
-                    // Other columns: return to default (creation date descending, all invisible)
-                    currentSort.field = 'creation';
-                    currentSort.direction = 'desc';
-                    Object.keys(sortStates).forEach(key => sortStates[key] = 0);
-                } else if (sortStates[sortField] === 1) {
-                    // Ascending
                     currentSort.field = sortField;
                     currentSort.direction = 'asc';
-                } else {
-                    // Descending
-                    currentSort.field = sortField;
-                    currentSort.direction = 'desc';
-                }
-
-                // Update visual indicators
-                document.querySelectorAll('.sortable').forEach(h => h.classList.remove('sorted'));
-                
-                // Only add sorted class if we're not in default state (all sortStates are 0)
-                const isDefaultState = Object.values(sortStates).every(state => state === 0);
-                if (!isDefaultState) {
-                    const activeHeader = document.querySelector(`[data-sort="${currentSort.field}"]`);
-                    if (activeHeader) {
-                        activeHeader.classList.add('sorted');
                     }
+                    
+                    updateTableView();
                 }
-
-                // Update arrow directions
-                updateSortArrows();
-
-                // Sort the data
-                sortTable();
             });
         });
     }
@@ -2124,41 +2741,28 @@
             const sortIcon = header.querySelector('.sort-icon img');
             const sortField = header.dataset.sort;
             
-            // Special case for creation column in invisible state (state 0)
-            if (sortField === 'creation' && sortStates['creation'] === 0) {
-                sortIcon.src = '/static/images/arrow-small-up.png'; // Up arrow when invisible
-            } else if (currentSort.field === sortField) {
-                // Show arrow indicating CURRENT state
-                if (currentSort.direction === 'asc') {
-                    sortIcon.src = '/static/images/arrow-small-up.png'; // Currently ascending (up arrow)
+            if (currentSort.field === sortField) {
+                // Set the correct arrow direction for the active column
+                sortIcon.src = currentSort.direction === 'asc' ? 
+                    '/static/images/arrow-small-up.png' : 
+                    '/static/images/arrow-small-down.png';
                 } else {
-                    sortIcon.src = '/static/images/arrow-small-down.png'; // Currently descending (down arrow)
-                }
-            } else {
-                // Default: show up arrow (indicating default ascending sort)
+                // Other columns default to the 'up' arrow for when they are hovered
                 sortIcon.src = '/static/images/arrow-small-up.png';
             }
         });
     }
 
     function applyDefaultSort() {
-        // Initialize sort states - creation starts in state 2 (visible, descending)
-        sortStates = {
-            'name': 0,
-            'created': 0, 
-            'creation': 2  // Creation starts in descending state (visible)
-        };
+        currentSort = { field: 'creation', direction: 'desc' };
         
-        // Set visual indicator for creation column
         const creationHeader = document.querySelector('[data-sort="creation"]');
         if (creationHeader) {
             creationHeader.classList.add('sorted');
         }
 
-        // Update arrow directions
         updateSortArrows();
 
-        // Apply the sort to the table
         if (originalData.length > 0) {
             sortTable();
         }
@@ -2168,21 +2772,15 @@
         const searchInput = document.getElementById('searchInput');
         const searchContainer = document.getElementById('searchContainer');
         const searchIcon = document.getElementById('searchIcon');
+        const searchClearBtn = document.getElementById('searchClearBtn');
 
-        // Start in collapsed state (default styling)
-        // searchContainer starts without 'expanded' class
-
-        // Handle search input events
-        searchInput.addEventListener('input', filterTable);
-
-        // Handle expand/collapse functionality
+        // Expand/collapse logic
         function expandSearch() {
             searchContainer.classList.add('expanded');
             setTimeout(() => {
                 searchInput.focus();
-            }, 150); // Shorter delay for smoother UX
+            }, 150);
         }
-
         function collapseSearch() {
             if (searchInput.value.trim() === '') {
                 searchContainer.classList.remove('expanded');
@@ -2195,8 +2793,6 @@
                 expandSearch();
             }
         });
-
-        // Click on icon to expand (additional handler for better UX)
         searchIcon.addEventListener('click', function(e) {
             e.stopPropagation();
             if (!searchContainer.classList.contains('expanded')) {
@@ -2204,19 +2800,17 @@
             }
         });
 
-        // Handle input focus and blur
+        // Input focus/blur
         searchInput.addEventListener('focus', function() {
             expandSearch();
         });
-
         searchInput.addEventListener('blur', function() {
-            // Small delay to allow for potential interaction
             setTimeout(() => {
                 collapseSearch();
             }, 200);
         });
 
-        // Handle escape key to collapse
+        // Escape key to collapse
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 searchInput.blur();
@@ -2230,6 +2824,84 @@
                 searchContainer.classList.add('expanded');
             }
         });
+
+        // Filtering logic
+        searchInput.addEventListener('input', () => {
+            updateTableView();
+            toggleClearButton();
+        });
+        searchClearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            searchInput.value = '';
+            searchInput.focus();
+            updateTableView();
+            toggleClearButton();
+        });
+    }
+
+    function updateTableView() {
+        // 1. Get filter values
+        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+        const selectedCreators = window.getCurrentCreatorFilter ? window.getCurrentCreatorFilter() : new Set();
+
+        // 2. Filter data
+        let processedData = originalData.filter(item => {
+            // Only match if the displayed template name starts with the search term
+            const matchesSearch = !searchTerm ||
+                (item.element && item.element.querySelector('.worker-type-name') &&
+                    item.element.querySelector('.worker-type-name').textContent.trim().toLowerCase().startsWith(searchTerm));
+
+            let matchesCreator = true;
+            if (selectedCreators && selectedCreators.size > 0) {
+                matchesCreator = false;
+                for (const creator of selectedCreators) {
+                    if (item.created.includes(creator.toLowerCase())) {
+                        matchesCreator = true;
+                        break;
+                    }
+                }
+            }
+            return matchesSearch && matchesCreator;
+        });
+
+        // 3. Sort the filtered data
+        processedData.sort((a, b) => {
+            let aVal, bVal;
+            switch (currentSort.field) {
+                case 'name': aVal = a.name; bVal = b.name; break;
+                case 'created': aVal = a.created; bVal = b.created; break;
+                case 'creation': aVal = new Date(a.creation); bVal = new Date(b.creation); break;
+                default: return 0;
+            }
+            if (currentSort.direction === 'asc') {
+                return aVal > bVal ? 1 : -1;
+            } else {
+                return aVal < bVal ? 1 : -1;
+            }
+        });
+
+        // 4. Update visual indicators for sorting
+        document.querySelectorAll('.sortable').forEach(h => h.classList.remove('sorted'));
+        const activeHeader = document.querySelector(`[data-sort="${currentSort.field}"]`);
+        if (activeHeader) {
+            activeHeader.classList.add('sorted');
+        }
+        updateSortArrows();
+
+        // 5. Render the data
+        const tbody = document.getElementById('workerTypesBody');
+        tbody.innerHTML = '';
+        
+        if (processedData.length === 0) {
+            // ... (empty state logic)
+        } else {
+            processedData.forEach(item => {
+                tbody.appendChild(item.element.cloneNode(true));
+            });
+        }
+
+        updateTableSummary(processedData.length);
+        checkAndShowEmptyState(processedData.length > 0);
     }
 
     function setupDropdown() {
@@ -2350,8 +3022,8 @@
             // Get unique creators from originalData
             const creators = new Set();
             originalData.forEach(item => {
-                // Extract creator name from the table data
-                const creatorCell = item.element.children[1].textContent.trim();
+                // Extract creator name from the table data (column index 2 = "Created by")
+                const creatorCell = item.element.children[2].textContent.trim();
                 if (creatorCell && creatorCell !== 'Unknown') {
                     creators.add(creatorCell);
                 }
@@ -2666,34 +3338,91 @@
             // Update character count color
             if (count > 9500) {
                 charCountElement.style.color = '#dc3545';
+                charCountElement.style.fontWeight = '600';
             } else if (count > 8000) {
-                charCountElement.style.color = '#ffc107';
+                charCountElement.style.color = '#f59e0b';
+                charCountElement.style.fontWeight = '500';
             } else {
-                charCountElement.style.color = '#6c757d';
+                charCountElement.style.color = '#9ca3af';
+                charCountElement.style.fontWeight = '400';
             }
         });
 
-        // Form validation
-        function validateForm() {
+        // Textarea resize functionality
+        const resizeHandle = document.getElementById('textareaResizeHandle');
+        let isResizing = false;
+        let startY, startHeight;
+
+        resizeHandle.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            startY = e.clientY;
+            startHeight = parseInt(document.defaultView.getComputedStyle(workDescriptionInput).height, 10);
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('mouseup', stopResize);
+            e.preventDefault();
+        });
+
+        function doResize(e) {
+            if (!isResizing) return;
+            const newHeight = startHeight + e.clientY - startY;
+            if (newHeight >= 180) { // Minimum height
+                workDescriptionInput.style.height = newHeight + 'px';
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('mousemove', doResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        // Form validation (without duplicate checking)
+        function validateForm(checkDuplicates = false, forceValidation = false) {
             const templateName = templateNameInput.value.trim();
             const workDescription = workDescriptionInput.value.trim();
+            const editId = form.getAttribute('data-edit-id');
             
             let isValid = true;
 
             // Template name validation
             if (!templateName) {
+                // Only show required error if user has touched the field or we're forcing validation (on submit)
+                if (templateNameTouched || forceValidation) {
                 showError('templateNameError');
+                    hideError('templateNameDuplicateError');
                 templateNameInput.classList.add('error');
+                }
                 isValid = false;
             } else {
                 hideError('templateNameError');
+                
+                // Only check for duplicates when explicitly requested (on blur or submit)
+                if (checkDuplicates) {
+                    const isDuplicate = checkDuplicateTemplateName(templateName, editId);
+                    
+                    if (isDuplicate) {
+                        showError('templateNameDuplicateError');
+                        templateNameInput.classList.add('error');
+                        isValid = false;
+                    } else {
+                        hideError('templateNameDuplicateError');
                 templateNameInput.classList.remove('error');
+                    }
+                } else {
+                    // Don't show duplicate error during typing, but keep existing state
+                    if (!document.getElementById('templateNameDuplicateError').classList.contains('show')) {
+                        templateNameInput.classList.remove('error');
+                    }
+                }
             }
 
             // Work description validation
             if (!workDescription) {
+                // Only show required error if user has touched the field or we're forcing validation (on submit)
+                if (workDescriptionTouched || forceValidation) {
                 showError('workDescriptionError');
                 workDescriptionInput.classList.add('error');
+                }
                 isValid = false;
             } else {
                 hideError('workDescriptionError');
@@ -2704,6 +3433,25 @@
             return isValid;
         }
 
+        // Check for duplicate template names
+        function checkDuplicateTemplateName(templateName, editId) {
+            const workerTypesScript = document.getElementById('worker-types-data');
+            if (!workerTypesScript) return false;
+            
+            try {
+                const workerTypes = JSON.parse(workerTypesScript.textContent) || [];
+                return workerTypes.some(wt => {
+                    // Case-insensitive comparison, exclude current item if editing
+                    const isSameName = wt.template_name.toLowerCase() === templateName.toLowerCase();
+                    const isDifferentItem = editId ? String(wt.id) !== String(editId) : true;
+                    return isSameName && isDifferentItem;
+                });
+            } catch (error) {
+                console.error('Error checking duplicate names:', error);
+                return false;
+            }
+        }
+
         function showError(elementId) {
             document.getElementById(elementId).classList.add('show');
         }
@@ -2712,15 +3460,43 @@
             document.getElementById(elementId).classList.remove('show');
         }
 
-        // Real-time validation
-        templateNameInput.addEventListener('input', validateForm);
-        workDescriptionInput.addEventListener('input', validateForm);
+        // Track if user has interacted with fields
+        let templateNameTouched = false;
+        let workDescriptionTouched = false;
+
+        // Real-time validation (without duplicate checking)
+        templateNameInput.addEventListener('input', function() {
+            templateNameTouched = true;
+            validateForm(false);
+        });
+        
+        // Check for duplicates when user leaves the template name field
+        templateNameInput.addEventListener('blur', function() {
+            if (templateNameInput.value.trim()) {
+                validateForm(true);
+            } else if (templateNameTouched) {
+                // Only show required error if user has actually typed something before
+                validateForm(false);
+            }
+        });
+        
+        workDescriptionInput.addEventListener('input', function() {
+            workDescriptionTouched = true;
+            validateForm(false);
+        });
+
+        workDescriptionInput.addEventListener('blur', function() {
+            if (!workDescriptionInput.value.trim() && workDescriptionTouched) {
+                // Only show required error if user has actually typed something before
+                validateForm(false);
+            }
+        });
 
                  // Form submission
          form.addEventListener('submit', function(e) {
              e.preventDefault();
              
-             if (validateForm()) {
+             if (validateForm(true, true)) {
                  const templateName = templateNameInput.value.trim();
                  const workDescription = workDescriptionInput.value.trim();
                  const editId = form.getAttribute('data-edit-id');
@@ -2779,13 +3555,19 @@
         function clearForm() {
             form.reset();
             charCountElement.textContent = '0';
-            charCountElement.style.color = '#6c757d';
+            charCountElement.style.color = '#9ca3af';
+            charCountElement.style.fontWeight = '400';
             addBtn.disabled = true;
                                 addBtn.textContent = 'Create';
             hideError('templateNameError');
+            hideError('templateNameDuplicateError');
             hideError('workDescriptionError');
             templateNameInput.classList.remove('error');
             workDescriptionInput.classList.remove('error');
+            
+            // Reset touched state
+            templateNameTouched = false;
+            workDescriptionTouched = false;
             
             // Reset modal to create mode
                             document.querySelector('.modal-title').textContent = 'Create worker type';
@@ -2812,6 +3594,7 @@
             <td>
                 <div class="worker-type-name clickable" onclick="showWorkerTypeInfo('new')" title="Click to view details">${name}</div>
             </td>
+            <td>0</td>
             <td>${creatorName}</td>
             <td>${createdAt}</td>
             <td>
@@ -2852,6 +3635,11 @@
         
         // Update table summary count
         updateTableSummary(originalData.length);
+        
+        // Apply current column visibility to new row
+        if (window.updateTableColumns) {
+            window.updateTableColumns();
+        }
     }
 
     function removeWorkerTypeFromTable(workerId) {
@@ -2937,6 +3725,11 @@
         sortedData.forEach(item => {
             tbody.appendChild(item.element);
         });
+        
+        // Apply current column visibility to sorted rows
+        if (window.updateTableColumns) {
+            window.updateTableColumns();
+        }
     }
 
     function filterTable() {
@@ -3000,6 +3793,11 @@
             filteredData.forEach(item => {
                 tbody.appendChild(item.element.cloneNode(true));
             });
+            
+            // Apply current column visibility to filtered rows
+            if (window.updateTableColumns) {
+                window.updateTableColumns();
+            }
         }
 
         updateTableSummary(filteredData.length);
@@ -3148,7 +3946,291 @@
                 menu.classList.remove('show');
             });
         }
+        
+        // Close header dropdowns when clicking outside
+        if (!event.target.closest('.header-menu-icon')) {
+            document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
     });
+
+    // Header dropdown functions
+    function toggleDropdown(event, dropdownId) {
+        event.stopPropagation();
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+            if (dropdown.id !== dropdownId) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Toggle the clicked dropdown
+        const dropdown = document.getElementById(dropdownId);
+        const isCurrentlyVisible = dropdown.classList.contains('show');
+        
+        if (isCurrentlyVisible) {
+            dropdown.classList.remove('show');
+        } else {
+            // Reset any previous positioning
+            dropdown.style.top = '';
+            dropdown.style.bottom = '';
+            dropdown.style.marginTop = '';
+            dropdown.style.marginBottom = '';
+            dropdown.classList.remove('positioned-above');
+            
+            // Always position dropdown below the header
+            dropdown.classList.add('show');
+        }
+    }
+
+    function sortColumn(field, direction) {
+        // Update current sort state
+        currentSort = { field: field, direction: direction };
+        
+        // Update sort icons
+        updateSortIcons();
+        
+        // Re-sort the table
+        sortTable();
+        
+        // Close dropdown
+        document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+    }
+
+    function customizeColumns() {
+        // Close dropdown
+        document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+        
+        // Show customize modal
+        const customizeModal = document.getElementById('customizeModal');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const settingsContent = document.getElementById('settingsContent');
+        
+        customizeModal.classList.add('show');
+        modalOverlay.classList.add('show');
+        settingsContent.classList.add('modal-open');
+        
+        // Update selection count
+        updateSelectionCount();
+    }
+
+    function setupCustomizeColumnsBtn() {
+        const customizeColumnsBtn = document.getElementById('customizeColumnsBtn');
+        
+        if (customizeColumnsBtn) {
+            customizeColumnsBtn.addEventListener('click', function() {
+                // Same functionality as the dropdown customize columns
+                customizeColumns();
+            });
+        }
+    }
+
+    function setupCustomizeModal() {
+        const modal = document.getElementById('customizeModal');
+        const closeBtn = document.getElementById('customizeCloseBtn');
+        const resetBtn = document.getElementById('customizeResetBtn');
+        const saveBtn = document.getElementById('customizeSaveBtn');
+        const selectAllCheckbox = document.getElementById('selectAllColumns');
+        const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+        const selectionCount = document.getElementById('selectionCount');
+
+        // Close modal
+        function closeModal() {
+            modal.classList.remove('show');
+            document.getElementById('modalOverlay').classList.remove('show');
+            document.getElementById('settingsContent').classList.remove('modal-open');
+        }
+
+        // Update selection count
+        function updateSelectionCount() {
+            const totalColumns = columnCheckboxes.length;
+            const checkedColumns = document.querySelectorAll('.column-checkbox[data-column]:checked').length;
+            selectionCount.textContent = `${checkedColumns} / ${totalColumns} selected`;
+            
+            // Update select all checkbox state
+            if (checkedColumns === totalColumns) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedColumns === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        // Make updateSelectionCount available globally
+        window.updateSelectionCount = updateSelectionCount;
+        
+        // Make updateTableColumns available globally
+        window.updateTableColumns = updateTableColumns;
+
+        // Function to update table columns visibility
+        function updateTableColumns() {
+            const columnMapping = {
+                'template-name': 0,
+                'active-contracts': 1,
+                'created-by': 2,
+                'creation-date': 3
+                // Actions column (index 4) is always visible
+            };
+            
+            const table = document.getElementById('workerTypesTable');
+            const rows = table.querySelectorAll('tr');
+            
+            // Update header row
+            const headerRow = rows[0];
+            Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                const headerCell = headerRow.cells[columnIndex];
+                
+                if (checkbox && headerCell) {
+                    if (checkbox.checked) {
+                        headerCell.style.display = 'table-cell';
+                    } else {
+                        headerCell.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Update data rows
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                    const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                    const cell = row.cells[columnIndex];
+                    
+                    if (checkbox && cell) {
+                        if (checkbox.checked) {
+                            cell.style.display = 'table-cell';
+                        } else {
+                            cell.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            // Update empty state colspan
+            updateEmptyStateColspan();
+        }
+
+        // Function to calculate visible columns and update empty state colspan
+        function updateEmptyStateColspan() {
+            const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+            let visibleColumns = 1; // Actions column is always visible
+            
+            columnCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    visibleColumns++;
+                }
+            });
+            
+            // Update all empty state colspans
+            const emptyStateCells = document.querySelectorAll('td[colspan]');
+            emptyStateCells.forEach(cell => {
+                cell.setAttribute('colspan', visibleColumns);
+            });
+        }
+
+        // Initial count update
+        updateSelectionCount();
+        
+        // Initial colspan update
+        updateEmptyStateColspan();
+
+        // Close button
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close on overlay click
+        const modalOverlay = document.getElementById('modalOverlay');
+        modalOverlay.addEventListener('click', function(e) {
+            if (modal.classList.contains('show') && e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        // Select all functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            const shouldCheck = this.checked;
+            columnCheckboxes.forEach(checkbox => {
+                checkbox.checked = shouldCheck;
+            });
+            updateSelectionCount();
+        });
+
+        // Individual checkbox changes
+        columnCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectionCount();
+            });
+        });
+
+        // Reset button
+        resetBtn.addEventListener('click', function() {
+            // Reset to default state (all checked)
+            columnCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateSelectionCount();
+        });
+
+        // Save button
+        saveBtn.addEventListener('click', function() {
+            // Apply column visibility changes
+            console.log('Saving column preferences...');
+            
+            // Get selected columns
+            const selectedColumns = [];
+            columnCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedColumns.push(checkbox.dataset.column);
+                }
+            });
+            
+            console.log('Selected columns:', selectedColumns);
+            
+            // Apply the table column changes
+            updateTableColumns();
+            
+            // Close the modal
+            closeModal();
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+    }
+
+    function updateSortIcons() {
+        // Remove all sorted classes
+        document.querySelectorAll('.worker-types-table th').forEach(th => {
+            th.classList.remove('sorted');
+        });
+        
+        // Add sorted class to current sort field
+        const sortField = document.querySelector(`[data-sort="${currentSort.field}"]`);
+        if (sortField) {
+            sortField.classList.add('sorted');
+            
+            // Update sort icon
+            const sortIcon = sortField.querySelector('.sort-icon img');
+            if (sortIcon) {
+                sortIcon.src = currentSort.direction === 'asc' ? 
+                    '/static/images/arrow-small-up.png' : 
+                    '/static/images/arrow-small-down.png';
+            }
+        }
+    }
 
     // Duplicate worker type function
     function copyWorkerType(workerId) {
