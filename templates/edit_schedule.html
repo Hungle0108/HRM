@@ -3,27 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a schedule - HR Management System</title>
+    <title>Edit schedule - HR Management System</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             margin: 0;
             padding: 0;
             background: #f8f9fa;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
-
         .page-container {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
         .top-bar {
             background: #f8f9fa;
             padding: 20px 40px;
@@ -37,7 +34,6 @@
             right: 0;
             z-index: 1000;
         }
-
         .top-bar-content {
             max-width: 930px;
             width: 100%;
@@ -45,13 +41,11 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
             color: #1a1a1a;
         }
-
         .close-btn {
             background: none;
             border: none;
@@ -63,16 +57,13 @@
             align-items: center;
             justify-content: center;
         }
-
         .close-btn:hover {
             background: #f0f0f0;
         }
-
         .close-btn img {
             width: 16px;
             height: 16px;
         }
-
         .page-header {
             background: white;
             padding: 40px 40px 20px 40px;
@@ -81,26 +72,22 @@
             padding-left: calc(50% - 470px);
             margin-top: 80px;
         }
-
         .page-header-content {
             max-width: 600px;
             width: 100%;
             text-align: left;
         }
-
         .page-title {
             font-size: 2rem;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 8px;
         }
-
         .page-subtitle {
             font-size: 1rem;
             color: #6c757d;
             line-height: 1.4;
         }
-
         .main-container {
             flex: 1;
             display: flex;
@@ -110,13 +97,11 @@
             padding: 40px 40px 120px 40px;
             gap: 60px;
         }
-
         .content-area {
             flex: 0 0 auto;
             max-width: 600px;
             width: 100%;
         }
-
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
@@ -126,27 +111,23 @@
             padding: 30px 25px;
             height: fit-content;
         }
-
         .sidebar-title {
             font-size: 1.1rem;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 30px;
         }
-
         .steps-list {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-
         .step-item {
             display: flex;
             align-items: center;
             margin-bottom: 24px;
             font-size: 0.95rem;
         }
-
         .step-number {
             width: 32px;
             height: 32px;
@@ -158,31 +139,25 @@
             margin-right: 16px;
             font-size: 0.9rem;
         }
-
         .step-item.active .step-number {
             background: #1a1a1a;
             color: white;
         }
-
         .step-item.completed .step-number {
             background: #28a745;
             color: white;
         }
-
         .step-item:not(.active):not(.completed) .step-number {
             background: #e9ecef;
             color: #6c757d;
         }
-
         .step-item.active .step-text {
             color: #1a1a1a;
             font-weight: 600;
         }
-
         .step-item:not(.active) .step-text {
             color: #6c757d;
         }
-
         .form-section {
             background: white;
             border: 1px solid #e9ecef;
@@ -191,39 +166,33 @@
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
         .section-title {
             font-size: 1.2rem;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 8px;
         }
-
         .section-description {
             font-size: 0.9rem;
             color: #6c757d;
             margin-bottom: 24px;
             line-height: 1.4;
         }
-
         .form-group {
             display: flex;
             flex-direction: column;
             margin-bottom: 24px;
         }
-
         .form-label {
             font-size: 0.9rem;
             font-weight: 500;
             color: #495057;
             margin-bottom: 8px;
         }
-
         .form-label.required::after {
             content: " *";
             color: #dc3545;
         }
-
         .form-input, .form-select {
             padding: 14px 16px;
             border: 1px solid #ced4da;
@@ -232,13 +201,11 @@
             background: white;
             transition: all 0.2s;
         }
-
         .form-input:focus, .form-select:focus {
             outline: none;
             border-color: #80bdff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
-
         .form-select {
             appearance: none;
             -webkit-appearance: none;
@@ -250,18 +217,15 @@
             padding-right: 48px;
             cursor: pointer;
         }
-
         .form-input::placeholder {
             color: #999;
         }
-
         .error-message {
             color: #dc3545;
             font-size: 0.875rem;
             margin-top: 8px;
             display: none;
         }
-
         .bottom-navigation {
             position: fixed;
             bottom: 0;
@@ -274,7 +238,6 @@
             justify-content: center;
             z-index: 1000;
         }
-
         .bottom-nav-content {
             width: 100%;
             max-width: 930px;
@@ -282,7 +245,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .btn-back {
             background: white;
             border: 1px solid #e9ecef;
@@ -297,13 +259,11 @@
             text-decoration: none;
             color: #495057;
         }
-
         .btn-back:hover {
             background: #f8f9fa;
             border-color: #d1d5db;
             text-decoration: none;
         }
-
         .btn-continue {
             background: #1a1a1a;
             color: white;
@@ -314,36 +274,30 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .btn-continue:hover {
             background: #333;
         }
-
         .btn-continue:disabled {
             background: #e9ecef;
             color: #6c757d;
             cursor: not-allowed;
         }
-
         .next-step-info {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             text-align: right;
         }
-
         .next-step-label {
             font-size: 0.8rem;
             color: #6c757d;
             margin-bottom: 4px;
         }
-
         .next-step-title {
             font-size: 0.9rem;
             color: #495057;
             font-weight: 500;
         }
-
         .custom-dropdown {
             position: relative;
             width: 100%;
@@ -426,7 +380,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-content">
-                <h1 class="page-title">Create a schedule</h1>
+                <h1 class="page-title">Edit schedule</h1>
                 <p class="page-subtitle">Schedules define the weekly work time for a worker.</p>
             </div>
         </div>
@@ -439,17 +393,14 @@
                     <div class="form-section">
                         <h3 class="section-title">Schedule name</h3>
                         <p class="section-description">Assigning a unique name to each schedule will help you distinguish between them during the contract creation process.</p>
-                        
                         <div class="form-group">
                             <input type="text" class="form-input" placeholder="Schedule name *" id="scheduleName" required>
                             <div class="error-message" id="scheduleNameError">Worker type relation must not be empty</div>
                         </div>
                     </div>
-
                     <div class="form-section">
                         <h3 class="section-title">Worker type relation</h3>
                         <p class="section-description">Depending on the worker type, the work schedule may have specific restrictions. Select the worker type that will follow this schedule.</p>
-                        
                         <div class="form-group">
                             <div class="custom-dropdown" id="workerTypeDropdown">
                                 <button type="button" class="dropdown-toggle" id="workerTypeDropdownBtn">
@@ -468,11 +419,9 @@
                     </div>
                 </form>
             </div>
-
             <!-- Sidebar -->
             <div class="sidebar">
                 <h3 class="sidebar-title">Steps</h3>
-                
                 <ol class="steps-list">
                     <li class="step-item active">
                         <div class="step-number">1</div>
@@ -489,7 +438,6 @@
                 </ol>
             </div>
         </div>
-
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
@@ -509,131 +457,128 @@
             </div>
         </div>
     </div>
-
     <script>
+    // Prefill logic for edit schedule step 1
     window.addEventListener('DOMContentLoaded', function() {
-        sessionStorage.removeItem('scheduleFormData');
-        // Form validation and submission
-        document.getElementById('schedule-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const scheduleName = document.getElementById('scheduleName').value.trim();
-            const workerType = document.getElementById('workerType').value;
-            const workerTypeName = document.getElementById('workerType').getAttribute('data-name') || '';
-            
-            // Reset error messages
-            document.getElementById('scheduleNameError').style.display = 'none';
-            document.getElementById('workerTypeError').style.display = 'none';
-            
-            let hasErrors = false;
-            
-            // Validate schedule name
-            if (!scheduleName) {
-                document.getElementById('scheduleNameError').textContent = 'Schedule name is required';
-                document.getElementById('scheduleNameError').style.display = 'block';
-                hasErrors = true;
+        var prefill = {{ prefill_data|tojson|safe }};
+        if (prefill) {
+            // Prefill schedule name
+            if (prefill.scheduleName && document.getElementById('scheduleName')) {
+                document.getElementById('scheduleName').value = prefill.scheduleName;
             }
-            
-            // Validate worker type
-            if (!workerType) {
-                document.getElementById('workerTypeError').style.display = 'block';
-                hasErrors = true;
-            }
-            
-            if (!hasErrors) {
-                // Preserve existing schedule details if they exist
-                const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-                
-                // Save data and proceed to next step
-                const updatedData = {
-                    ...existingData,  // Preserve existing data (like scheduleDetails)
-                    scheduleName: scheduleName,
-                    workerType: workerType,
-                    workerTypeName: workerTypeName
-                };
-                
-                sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
-                
-                // Navigate to step 2
-                window.location.href = '/create-schedule-step2';
-            }
-        });
-
-        // Real-time validation
-        document.getElementById('scheduleName').addEventListener('input', function() {
-            if (this.value.trim()) {
-                document.getElementById('scheduleNameError').style.display = 'none';
-            }
-        });
-
-        // Custom dropdown for worker type
-        (function() {
-            const dropdown = document.getElementById('workerTypeDropdown');
-            const btn = document.getElementById('workerTypeDropdownBtn');
-            const menu = document.getElementById('workerTypeDropdownMenu');
-            const label = document.getElementById('workerTypeDropdownLabel');
-            const hiddenInput = document.getElementById('workerType');
-            const options = menu.querySelectorAll('.dropdown-option');
-
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-            });
-
-            options.forEach(option => {
-                option.addEventListener('click', function() {
-                    options.forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                    label.textContent = this.textContent;
-                    hiddenInput.value = this.getAttribute('data-value');
-                    hiddenInput.setAttribute('data-name', this.textContent); // Save name as data attribute
-                    menu.classList.remove('show');
-                    document.getElementById('workerTypeError').style.display = 'none';
-                    updateContinueButton();
-                });
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!dropdown.contains(e.target)) {
-                    menu.classList.remove('show');
+            // Prefill worker type
+            if (prefill.workerType && document.getElementById('workerType')) {
+                document.getElementById('workerType').value = prefill.workerType;
+                document.getElementById('workerType').setAttribute('data-name', prefill.workerTypeName || '');
+                if (document.getElementById('workerTypeDropdownLabel') && prefill.workerTypeName) {
+                    document.getElementById('workerTypeDropdownLabel').textContent = prefill.workerTypeName;
                 }
-            });
-        })();
-
-        // Update continue button state
-        function updateContinueButton() {
-            const scheduleName = document.getElementById('scheduleName').value.trim();
-            const workerType = document.getElementById('workerType').value;
-            const continueBtn = document.getElementById('continueBtn');
-            
-            if (scheduleName && workerType) {
-                continueBtn.disabled = false;
-            } else {
-                continueBtn.disabled = true;
+                // Set selected class in dropdown menu
+                if (document.getElementById('workerTypeDropdownMenu')) {
+                    var options = document.querySelectorAll('#workerTypeDropdownMenu .dropdown-option');
+                    options.forEach(function(opt) {
+                        if (opt.getAttribute('data-value') === String(prefill.workerType)) {
+                            opt.classList.add('selected');
+                        } else {
+                            opt.classList.remove('selected');
+                        }
+                    });
+                }
             }
-        }
-
-        // Listen for changes to update button state
-        document.getElementById('scheduleName').addEventListener('input', updateContinueButton);
-        document.getElementById('workerType').addEventListener('change', updateContinueButton);
-
-        // Initialize button state
-        updateContinueButton();
-
-        // Restore form data if available
-        const savedData = sessionStorage.getItem('scheduleFormData');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            document.getElementById('scheduleName').value = data.scheduleName || '';
-            document.getElementById('workerType').value = data.workerType || '';
-            if (data.workerTypeName) {
-                document.getElementById('workerType').setAttribute('data-name', data.workerTypeName);
-                document.getElementById('workerTypeDropdownLabel').textContent = data.workerTypeName;
-            }
-            updateContinueButton();
+            // Store full prefill data in sessionStorage for later steps
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
         }
     });
+    </script>
+    <script>
+    // Form validation and submission
+    document.getElementById('schedule-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const scheduleName = document.getElementById('scheduleName').value.trim();
+        const workerType = document.getElementById('workerType').value;
+        const workerTypeName = document.getElementById('workerType').getAttribute('data-name') || '';
+        document.getElementById('scheduleNameError').style.display = 'none';
+        document.getElementById('workerTypeError').style.display = 'none';
+        let hasErrors = false;
+        if (!scheduleName) {
+            document.getElementById('scheduleNameError').textContent = 'Schedule name is required';
+            document.getElementById('scheduleNameError').style.display = 'block';
+            hasErrors = true;
+        }
+        if (!workerType) {
+            document.getElementById('workerTypeError').style.display = 'block';
+            hasErrors = true;
+        }
+        if (!hasErrors) {
+            const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            const updatedData = {
+                ...existingData,
+                scheduleName: scheduleName,
+                workerType: workerType,
+                workerTypeName: workerTypeName
+            };
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
+            window.location.href = '/edit-schedule-step2/{{ schedule_id }}';
+        }
+    });
+    document.getElementById('scheduleName').addEventListener('input', function() {
+        if (this.value.trim()) {
+            document.getElementById('scheduleNameError').style.display = 'none';
+        }
+    });
+    (function() {
+        const dropdown = document.getElementById('workerTypeDropdown');
+        const btn = document.getElementById('workerTypeDropdownBtn');
+        const menu = document.getElementById('workerTypeDropdownMenu');
+        const label = document.getElementById('workerTypeDropdownLabel');
+        const hiddenInput = document.getElementById('workerType');
+        const options = menu.querySelectorAll('.dropdown-option');
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menu.classList.toggle('show');
+        });
+        options.forEach(option => {
+            option.addEventListener('click', function() {
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                label.textContent = this.textContent;
+                hiddenInput.value = this.getAttribute('data-value');
+                hiddenInput.setAttribute('data-name', this.textContent);
+                menu.classList.remove('show');
+                document.getElementById('workerTypeError').style.display = 'none';
+                updateContinueButton();
+            });
+        });
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+    })();
+    function updateContinueButton() {
+        const scheduleName = document.getElementById('scheduleName').value.trim();
+        const workerType = document.getElementById('workerType').value;
+        const continueBtn = document.getElementById('continueBtn');
+        if (scheduleName && workerType) {
+            continueBtn.disabled = false;
+        } else {
+            continueBtn.disabled = true;
+        }
+    }
+    document.getElementById('scheduleName').addEventListener('input', updateContinueButton);
+    document.getElementById('workerType').addEventListener('change', updateContinueButton);
+    updateContinueButton();
+    const savedData = sessionStorage.getItem('scheduleFormData');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        document.getElementById('scheduleName').value = data.scheduleName || '';
+        document.getElementById('workerType').value = data.workerType || '';
+        if (data.workerTypeName) {
+            document.getElementById('workerType').setAttribute('data-name', data.workerTypeName);
+            document.getElementById('workerTypeDropdownLabel').textContent = data.workerTypeName;
+        }
+        updateContinueButton();
+    }
     </script>
 </body>
 </html> 

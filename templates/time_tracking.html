@@ -306,28 +306,34 @@
         font-size: 0.875rem;
         color: #6c757d;
         line-height: 1.5;
-        margin-bottom: 24px;
+        margin-bottom: 0;
     }
 
     .create-btn {
-        padding: 8px 16px;
-        background: white;
-        border: 1px solid #e9ecef;
+        padding: 0 0;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
         border-radius: 6px;
-        font-size: 0.875rem;
+        font-size: 1rem;
         font-weight: 500;
-        color: #495057;
+        color: white;
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none;
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 44px;
+        text-align: center;
+        box-sizing: border-box;
     }
 
     .create-btn:hover {
-        background: #f8f9fa;
-        border-color: #adb5bd;
+        background: #333;
+        border-color: #333;
         text-decoration: none;
-        color: #495057;
+        color: white;
     }
 
     .empty-state {
@@ -385,9 +391,13 @@
     }
 
     .schedules-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .schedules-grid.empty {
+        display: block;
+        width: 100%;
     }
 
     .schedule-card {
@@ -395,6 +405,7 @@
         border-radius: 8px;
         padding: 20px;
         background: #f8f9fa;
+        width: 100%;
     }
 
     .schedule-header {
@@ -407,13 +418,19 @@
     .schedule-name {
         font-size: 1rem;
         font-weight: 600;
-        color: #1a73e8;
+        color: #1a1a1a;
         text-decoration: none;
         margin-bottom: 4px;
+        transition: all 0.2s ease-in-out;
+        padding: 0.5rem;
+        border-radius: 6px;
+        display: inline-block;
     }
 
     .schedule-name:hover {
-        text-decoration: underline;
+        color: #4f46e5;
+        transform: translateX(2px);
+        text-decoration: none;
     }
 
     .schedule-hours {
@@ -499,6 +516,435 @@
     .settings-sidebar::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
     }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(44, 62, 80, 0.25);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+        max-width: 600px;
+        width: 100%;
+        min-width: 420px;
+        padding: 32px 32px 24px 32px;
+        position: relative;
+        animation: fadeInModal 0.2s;
+    }
+    @keyframes fadeInModal {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .modal-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .modal-close:hover {
+        color: #000;
+    }
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .modal-subtitle {
+        color: #666;
+        font-size: 1rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    .modal-section {
+        margin-bottom: 1.25rem;
+    }
+    .modal-label {
+        color: #888;
+        font-size: 0.98rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    .modal-value {
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .modal-days {
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+    .modal-day-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 1rem;
+    }
+    .modal-day-row:last-child {
+        border-bottom: none;
+    }
+    .modal-info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .modal-info-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafbfc;
+        border-radius: 12px;
+        padding: 0.85rem 1.1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #444;
+        border: 1px solid #f0f0f0;
+    }
+    .modal-info-label {
+        color: #888;
+        font-size: 0.98rem;
+        font-weight: 400;
+    }
+    .modal-info-value {
+        font-weight: 600;
+        color: #222;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+    }
+    .modal-info-value img {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: 0.25em;
+    }
+    .modal-info-value.inactive {
+        color: #bbb;
+        font-weight: 500;
+    }
+    .modal-day-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .modal-day-box {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        background: #fafbfc;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #444;
+        border: 1px solid #f0f0f0;
+    }
+    .modal-day-box .modal-day-label {
+        color: #888;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    .modal-day-box .modal-day-details {
+        text-align: right;
+        color: #222;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: space-between;
+    }
+    .modal-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 0.85rem 0;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+    }
+    .modal-btn-delete {
+        background: #fff0ee;
+        color: #e53935;
+        border: none;
+    }
+    .modal-btn-delete:hover {
+        background: #ffe4e1;
+    }
+    .modal-btn-assign {
+        background: #f5f5f5;
+        color: #444;
+        border: none;
+    }
+    .modal-btn-assign:hover {
+        background: #e9e9e9;
+    }
+    .modal-btn-edit {
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+    }
+    .modal-btn-edit:hover {
+        background: #333;
+    }
+
+    .delete-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(44, 62, 80, 0.25);
+        z-index: 3000;
+        justify-content: center;
+        align-items: center;
+    }
+    .delete-modal-overlay.active {
+        display: flex;
+    }
+    .delete-modal {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+        max-width: 440px;
+        width: 100%;
+        padding: 32px 32px 24px 32px;
+        position: relative;
+        animation: fadeInModal 0.2s;
+    }
+    .delete-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    .delete-modal-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-align: center;
+        width: 100%;
+    }
+    .delete-modal-close {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .delete-modal-close:hover {
+        color: #000;
+    }
+    .delete-modal-back {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .delete-modal-back:hover {
+        color: #000;
+    }
+    .delete-modal-schedname {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        color: #222;
+        text-align: center;
+        width: 100%;
+    }
+    .delete-modal-desc {
+        color: #444;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .delete-modal-schedbox {
+        background: #fafbfc;
+        border-radius: 12px;
+        border: 1px solid #f0f0f0;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    .delete-modal-schedleft {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .delete-modal-schedname2 {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #222;
+    }
+    .delete-modal-country {
+        background: #f3f3f3;
+        color: #444;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        padding: 0.2em 0.7em;
+        display: inline-block;
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+    .delete-modal-schedright {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-end;
+    }
+    .delete-modal-hours {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #222;
+    }
+    .delete-modal-days {
+        color: #888;
+        font-size: 0.95rem;
+    }
+    .delete-modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+    .delete-modal-btn {
+        flex: 1;
+        padding: 0.85rem 0;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+    .delete-modal-btn-cancel {
+        background: #f5f5f5;
+        color: #444;
+    }
+    .delete-modal-btn-cancel:hover {
+        background: #e9e9e9;
+    }
+    .delete-modal-btn-delete {
+        background: #e53935;
+        color: #fff;
+    }
+    .delete-modal-btn-delete:hover {
+        background: #c62828;
+    }
+    .schedule-list-panel {
+        /* Remove max-width, min-width, and set flex: 1 for equal split */
+        flex: 1;
+        max-width: none;
+        min-width: 0;
+        margin-right: 0;
+    }
+    .schedule-info-panel {
+        flex: 1;
+        max-width: none;
+        min-width: 0;
+    }
+    .schedule-panels {
+        display: flex;
+        gap: 32px;
+        width: 100%;
+        transition: gap 0.6s cubic-bezier(.4,0,.2,1);
+    }
+    .schedule-list-panel {
+        transition: flex-basis 0.6s cubic-bezier(.4,0,.2,1), max-width 0.6s cubic-bezier(.4,0,.2,1);
+        flex-basis: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+    .schedule-info-panel {
+        transition: transform 0.6s cubic-bezier(.4,0,.2,1), opacity 0.6s cubic-bezier(.4,0,.2,1);
+        transform: translateX(100%);
+        opacity: 0;
+        width: 50%;
+        max-width: none;
+        min-width: 0;
+        position: relative;
+        z-index: 2;
+        display: none;
+    }
+    .schedule-panels.split .schedule-list-panel {
+        flex-basis: 50%;
+        max-width: 50%;
+    }
+    .schedule-panels.split .schedule-info-panel {
+        display: block;
+        transform: translateX(0);
+        opacity: 1;
+    }
+    .schedule-info-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+        cursor: pointer;
+        transition: color 0.2s;
+        z-index: 1;
+    }
+    .schedule-info-close:hover {
+        color: #000;
+    }
+    .schedule-info-inner {
+        position: relative;
+        opacity: 0;
+        transform: translateY(24px);
+        transition: opacity 0.4s cubic-bezier(.4,0,.2,1), transform 0.4s cubic-bezier(.4,0,.2,1);
+    }
+    .schedule-panels.split .schedule-info-inner {
+        opacity: 1;
+        transform: translateY(0);
+    }
 </style>
 {% endblock %}
 
@@ -508,32 +954,29 @@
     {% include 'org_settings_sidebar.html' %}
 
     <!-- Main Content -->
-    <div class="settings-content">
-        <!-- Header -->
-        <div class="content-header">
-            <h1 class="content-title">Time tracking</h1>
-            <button class="assign-schedules-btn">Assign schedules in bulk</button>
+    <div class="settings-content" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="content-header" style="margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <h1 class="content-title" style="font-size:2rem; font-weight:700; color:#1a1a1a; margin-bottom: 4px;">Time tracking</h1>
+                <div style="font-size:1rem; color:#444;">Manage weekly fixed schedules for your hourly and salaried workers</div>
         </div>
-
-        <!-- Work schedules section -->
+            <a href="/create-schedule" class="create-btn">Create</a>
+        </div>
+        <div class="schedule-panels" id="schedule-panels">
+            <div class="schedule-list-panel">
         <div class="work-schedules-section">
+                    <div style="font-size: 1rem; font-weight: 500; color: #222; margin-bottom: 4px;">{{ schedules|length }} Schedules</div>
             <div class="schedules-header">
-                <div class="schedules-info">
-                    <h3 class="section-name">Work schedules</h3>
-                    <p class="section-description">Manage weekly fixed schedules for your hourly and salaried workers</p>
+                        <div class="schedules-info"></div>
                 </div>
-                <div class="schedules-help">
-                    <a href="/create-schedule" class="create-btn">Create</a>
-                </div>
-            </div>
-
-            <div class="schedules-grid">
+            <div class="schedules-grid{% if not schedules %} empty{% endif %}">
                 {% if schedules %}
                     {% for schedule in schedules %}
                     <div class="schedule-card">
                         <div class="schedule-header">
                             <div>
-                                <a href="#" class="schedule-name">{{ schedule.name }}</a>
+                                        <a href="#" class="schedule-name" 
+                                           data-schedule='{{ schedule.to_dict() | tojson | safe }}'>{{ schedule.name }}</a>
                             </div>
                             <div>
                                 <div class="schedule-hours">{{ schedule.to_dict().total_hours }} hours</div>
@@ -544,6 +987,72 @@
                     {% endfor %}
                 {% endif %}
             </div>
+                </div>
+            </div>
+            <div class="schedule-info-panel" id="schedule-info-panel">
+                <div class="schedule-info-inner" id="schedule-info-inner">
+                    <button class="schedule-info-close" id="schedule-info-close" title="Close">&times;</button>
+                    <div class="work-schedules-section">
+                        <div id="schedule-info-placeholder" style="color: #888; text-align: center; margin-top: 80px; font-size: 1.1rem;">Select a schedule to view details</div>
+                        <div id="schedule-info-content" style="display: none;">
+                            <div class="modal-title" id="info-title"></div>
+                            <div class="modal-info-list">
+                                <div class="modal-info-box">
+                                    <span class="modal-info-label">Assigned workers</span>
+                                    <span class="modal-info-value inactive" id="info-workers">Assigned workers</span>
+                                </div>
+                                <div class="modal-info-box">
+                                    <span class="modal-info-label">Work hours per week</span>
+                                    <span class="modal-info-value" id="info-hours"></span>
+                                </div>
+                                <div class="modal-info-box">
+                                    <span class="modal-info-label">Work schedule type</span>
+                                    <span class="modal-info-value" id="info-type"></span>
+                                </div>
+                                <div class="modal-info-box">
+                                    <span class="modal-info-label">Worker type</span>
+                                    <span class="modal-info-value" id="info-worker-type"></span>
+                                </div>
+                            </div>
+                            <div class="modal-section modal-days" id="info-days-list">
+                                <!-- Days will be populated here -->
+                            </div>
+                            <div class="modal-actions">
+                                <button class="modal-btn modal-btn-delete">Delete</button>
+                                <button class="modal-btn modal-btn-assign">Assign workers</button>
+                                <button class="modal-btn modal-btn-edit">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for schedule details -->
+<!-- (Removed the modal-overlay for info) -->
+<!-- Delete confirmation modal -->
+<div class="delete-modal-overlay" id="delete-modal-overlay">
+    <div class="delete-modal" id="delete-modal">
+        <div class="delete-modal-header">
+            <button class="delete-modal-back" id="delete-modal-back" style="background: none; border: none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); cursor: pointer; padding: 0;"><img src="/static/images/arrow-left.png" alt="Back" style="width: 1rem; height: 1rem;"></button>
+            <div class="delete-modal-title">Delete Schedule</div>
+            <button class="delete-modal-close" id="delete-modal-close"><img src="/static/images/cross.png" alt="Close" style="width: 1rem; height: 1rem;"></button>
+        </div>
+        <div class="delete-modal-schedname" id="delete-modal-schedname"></div>
+        <div class="delete-modal-desc">Are you sure you want to delete this work schedule?</div>
+        <div class="delete-modal-schedbox">
+            <div class="delete-modal-schedleft">
+                <div class="delete-modal-schedname2" id="delete-modal-schedname2"></div>
+            </div>
+            <div class="delete-modal-schedright">
+                <div class="delete-modal-hours" id="delete-modal-hours"></div>
+                <div class="delete-modal-days" id="delete-modal-days"></div>
+            </div>
+        </div>
+        <div class="delete-modal-actions">
+            <button class="delete-modal-btn delete-modal-btn-cancel" id="delete-modal-cancel">Cancel</button>
+            <button class="delete-modal-btn delete-modal-btn-delete">Delete</button>
         </div>
     </div>
 </div>
@@ -552,22 +1061,142 @@
 {% block scripts %}
 <script>
     // Handle schedule name clicks
+    window.lastOpenedSchedule = null;
+    const schedulePanels = document.getElementById('schedule-panels');
+    const scheduleInfoPanel = document.getElementById('schedule-info-panel');
+    const scheduleInfoClose = document.getElementById('schedule-info-close');
     document.querySelectorAll('.schedule-name').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            alert('Schedule details would be shown here');
+            const schedule = JSON.parse(this.dataset.schedule);
+            window.lastOpenedSchedule = schedule;
+            schedulePanels.classList.add('animating');
+            setTimeout(function() {
+                schedulePanels.classList.add('split');
+                document.getElementById('schedule-info-inner').classList.add('visible');
+            }, 0);
+            // Populate info panel
+            document.getElementById('schedule-info-placeholder').style.display = 'none';
+            document.getElementById('schedule-info-content').style.display = '';
+            document.getElementById('info-title').textContent = schedule.name || '';
+            document.getElementById('info-hours').textContent = schedule.total_hours ? schedule.total_hours + ' hours' : '';
+            document.getElementById('info-type').textContent = schedule.schedule_type ? (schedule.schedule_type.charAt(0).toUpperCase() + schedule.schedule_type.slice(1) + (schedule.schedule_type === 'fixed' ? ' work schedule' : '')) : '';
+            document.getElementById('info-worker-type').textContent = schedule.worker_type_name
+                ? schedule.worker_type_name
+                : (schedule.worker_type ? (schedule.worker_type.charAt(0).toUpperCase() + schedule.worker_type.slice(1) + ' worker') : '');
+            // Days
+            const daysList = document.getElementById('info-days-list');
+            daysList.innerHTML = '<div class="modal-label" style="margin-bottom:0.5rem; font-weight: bold;">Daily workload detailing</div>';
+            if (schedule.schedule_data && schedule.schedule_data.scheduleDetails && schedule.schedule_data.scheduleDetails.shifts) {
+                const shifts = schedule.schedule_data.scheduleDetails.shifts;
+                let dayRows = '';
+                Object.values(shifts).forEach(shift => {
+                    if (shift.weekdays) {
+                        Object.entries(shift.weekdays).forEach(([day, data]) => {
+                            if (data.checked) {
+                                let time = '';
+                                if (shift.includeTime && data.startTime && data.endTime) {
+                                    time = `${data.startTime} - ${data.endTime}`;
+                                }
+                                let duration = data.duration ? `${data.duration} Hours` : '';
+                                dayRows += `<div class='modal-day-box'><span class='modal-day-label'>${day.charAt(0).toUpperCase() + day.slice(1)}</span><span class='modal-day-details'><span>${time ? time : ''}${time && duration ? ' / ' : ''}${duration}</span></span></div>`;
+                            }
+                        });
+                    }
+                });
+                daysList.innerHTML += dayRows;
+            }
         });
     });
-
-    // Handle assign schedules button
-    document.querySelector('.assign-schedules-btn')?.addEventListener('click', function() {
-        alert('Assign schedules in bulk functionality would be implemented here');
+    // Info panel close button
+    scheduleInfoClose.addEventListener('click', function() {
+        schedulePanels.classList.add('animating');
+        schedulePanels.classList.remove('split');
+        document.getElementById('schedule-info-inner').classList.remove('visible');
+        document.getElementById('schedule-info-content').style.display = 'none';
+        document.getElementById('schedule-info-placeholder').style.display = 'none';
     });
-
-    // Handle help icons
-    document.querySelectorAll('.help-icon').forEach(icon => {
-        icon.addEventListener('click', function() {
-            alert('Help information would be shown here');
+    // Close info panel with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && schedulePanels.classList.contains('split')) {
+            schedulePanels.classList.add('animating');
+            schedulePanels.classList.remove('split');
+            document.getElementById('schedule-info-inner').classList.remove('visible');
+            document.getElementById('schedule-info-content').style.display = 'none';
+            document.getElementById('schedule-info-placeholder').style.display = 'none';
+        }
+    });
+    // Listen for transitionend to remove animating and hide panel
+    scheduleInfoPanel.addEventListener('transitionend', function(e) {
+        if (e.propertyName === 'transform' && !schedulePanels.classList.contains('split')) {
+            schedulePanels.classList.remove('animating');
+            scheduleInfoPanel.style.display = 'none';
+            document.getElementById('schedule-info-placeholder').style.display = '';
+        }
+        if (e.propertyName === 'transform' && schedulePanels.classList.contains('split')) {
+            schedulePanels.classList.remove('animating');
+        }
+    });
+    // Modal close logic removed (no info modal)
+    // Assign schedules button
+    document.querySelector('.modal-btn-assign').addEventListener('click', function() {
+        alert('Assign workers functionality would be implemented here');
+    });
+    // Edit button
+    document.querySelector('.modal-btn-edit').addEventListener('click', function() {
+        if (window.lastOpenedSchedule && window.lastOpenedSchedule.id) {
+            window.location.href = '/edit-schedule/' + window.lastOpenedSchedule.id;
+        }
+    });
+    // Delete modal logic (unchanged)
+    const deleteModalOverlay = document.getElementById('delete-modal-overlay');
+    const deleteModalClose = document.getElementById('delete-modal-close');
+    const deleteModalCancel = document.getElementById('delete-modal-cancel');
+    const deleteModalBack = document.getElementById('delete-modal-back');
+    document.querySelector('.modal-btn-delete').addEventListener('click', function() {
+        if (!window.lastOpenedSchedule) return;
+        const schedule = window.lastOpenedSchedule;
+        document.getElementById('delete-modal-schedname').textContent = schedule.name || '';
+        document.getElementById('delete-modal-schedname2').textContent = schedule.name || '';
+        document.getElementById('delete-modal-hours').textContent = schedule.total_hours ? schedule.total_hours + ' hours' : '';
+        document.getElementById('delete-modal-days').textContent = schedule.working_days || '';
+        deleteModalOverlay.classList.add('active');
+    });
+    deleteModalClose.onclick = function() {
+        deleteModalOverlay.classList.remove('active');
+    };
+    deleteModalCancel.onclick = function() {
+        deleteModalOverlay.classList.remove('active');
+    };
+    deleteModalBack.onclick = function() {
+        deleteModalOverlay.classList.remove('active');
+        // Reopen the info panel (no action needed, info panel stays open)
+    };
+    deleteModalOverlay.onclick = function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    };
+    document.querySelector('.delete-modal-btn-delete').addEventListener('click', function() {
+        if (!window.lastOpenedSchedule) return;
+        const scheduleId = window.lastOpenedSchedule.id;
+        fetch(`/api/delete-schedule/${scheduleId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                deleteModalOverlay.classList.remove('active');
+                window.location.reload();
+            } else {
+                alert(data.error || 'Failed to delete schedule');
+            }
+        })
+        .catch(() => {
+            alert('Failed to delete schedule');
         });
     });
 </script>

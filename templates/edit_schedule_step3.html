@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a schedule - Step 3 - HR Management System</title>
+    <title>Edit schedule - Step 3 - HR Management System</title>
     <style>
         * {
             margin: 0;
@@ -653,7 +653,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-content">
-                <h1 class="page-title">Create a schedule</h1>
+                <h1 class="page-title">Edit schedule</h1>
                 <p class="page-subtitle">Review your schedule details and create the final schedule.</p>
             </div>
         </div>
@@ -741,18 +741,19 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/create-schedule-step2" class="btn-back">
+                <a href="/edit-schedule-step2/{{ schedule_id }}" class="btn-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
                     Back
                 </a>
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div class="create-info">
-                        <div class="create-label">Ready to create:</div>
-                        <div class="create-title">Your new schedule</div>
+                    <div class="next-step-info">
+                        <div class="next-step-label">Next step:</div>
+                        <div class="next-step-title">3. Review and finish</div>
                     </div>
-                    <button type="button" class="btn-create" id="createScheduleBtn">Create Schedule</button>
+                    <!-- Ensure the button is type='button' and outside the form -->
+                    <button type="button" class="btn-create" id="createScheduleBtn">Update</button>
                 </div>
             </div>
         </div>
@@ -1038,60 +1039,57 @@
             };
         }
         
-        // Handle schedule creation
-        document.getElementById('createScheduleBtn').addEventListener('click', function() {
-            const savedData = sessionStorage.getItem('scheduleFormData');
-            if (!savedData) {
-                alert('Error: No schedule data found. Please start over.');
-                window.location.href = '/create-schedule';
-                return;
-            }
-            
-            const data = JSON.parse(savedData);
-            
-            // Show loading state
-            const button = this;
-            const originalText = button.textContent;
-            button.textContent = 'Creating...';
-            button.disabled = true;
-            
-            // Send data to server
-            fetch('/api/create-schedule', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    // Clear the session storage
-                    sessionStorage.removeItem('scheduleFormData');
-                    
-                    // Redirect to time tracking page
-                    window.location.href = '/settings/time-tracking';
-                } else {
-                    // Show error message
-                    alert('Error: ' + (result.error || 'Failed to create schedule'));
-                    
-                    // Reset button
+        // Use event delegation for the update button
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'createScheduleBtn') {
+                console.log('Update button clicked!');
+                const savedData = sessionStorage.getItem('scheduleFormData');
+                console.log('Saved data from sessionStorage:', savedData);
+                if (!savedData) {
+                    alert('Error: No schedule data found. Please start over.');
+                    window.location.href = '/create-schedule';
+                    return;
+                }
+                const data = JSON.parse(savedData);
+                data.id = {{ schedule_id }};
+                // Show loading state
+                const button = e.target;
+                const originalText = button.textContent;
+                button.textContent = 'Updating...';
+                button.disabled = true;
+                console.log('About to send update:', data);
+                fetch('/api/edit-schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        sessionStorage.removeItem('scheduleFormData');
+                        window.location.href = '/settings/time-tracking';
+                    } else {
+                        alert('Error: ' + (result.error || 'Failed to update schedule'));
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating schedule:', error);
+                    alert('Error: Failed to update schedule. Please try again.');
                     button.textContent = originalText;
                     button.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error creating schedule:', error);
-                alert('Error: Failed to create schedule. Please try again.');
-                
-                // Reset button
-                button.textContent = originalText;
-                button.disabled = false;
-            });
+                });
+            }
         });
         
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking for update button...');
+            
             // Load saved data first
             loadSavedData();
             
@@ -1133,5 +1131,14 @@
             }
         });
     </script>
+    <script>
+window.addEventListener('DOMContentLoaded', function() {
+    var prefill = {{ prefill_data|tojson|safe }};
+    if (prefill && prefill.scheduleDetails) {
+        sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
+        // Optionally trigger UI updates if needed
+    }
+});
+</script>
 </body>
 </html> 

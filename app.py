@@ -229,6 +229,13 @@ class WorkSchedule(db.Model):
         working_days = sorted(list(set(working_days)))
         working_days_str = ', '.join(working_days) if working_days else ''
         
+        # Try to get worker type name from schedule_data
+        worker_type_name = None
+        if 'workerTypeName' in schedule_data:
+            worker_type_name = schedule_data['workerTypeName']
+        elif 'worker_type_name' in schedule_data:
+            worker_type_name = schedule_data['worker_type_name']
+        
         return {
             'id': self.id,
             'name': self.name,
@@ -238,7 +245,8 @@ class WorkSchedule(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'total_hours': int(total_hours) if total_hours.is_integer() else total_hours,
             'working_days': working_days_str,
-            'schedule_data': schedule_data
+            'schedule_data': schedule_data,
+            'worker_type_name': worker_type_name
         }
 
 # Worker Type Model
@@ -1767,7 +1775,11 @@ def create_schedule():
         session.pop('user_id', None)
         return redirect('/login')
     
-    return render_template('create_schedule.html', user=user)
+    worker_types = []
+    if user.organization_id:
+        worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+    
+    return render_template('create_schedule.html', user=user, worker_types=worker_types)
 
 @app.route('/create-schedule-step2')
 def create_schedule_step2():
@@ -1840,6 +1852,127 @@ def api_create_schedule():
         db.session.rollback()
         logger.error(f"Error creating schedule: {str(e)}")
         return jsonify({'error': 'Failed to create schedule'}), 500
+
+@app.route('/api/delete-schedule/<int:schedule_id>', methods=['DELETE'])
+def api_delete_schedule(schedule_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+
+    try:
+        # Find the schedule
+        schedule = WorkSchedule.query.filter_by(
+            id=schedule_id,
+            organization_id=user.organization_id
+        ).first()
+
+        if not schedule:
+            return jsonify({'error': 'Schedule not found'}), 404
+
+        # Optionally, check if the user has permission to delete
+        # For now, allow any user in the org to delete
+
+        db.session.delete(schedule)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Schedule deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete schedule'}), 500
+
+@app.route('/edit-schedule/<int:schedule_id>')
+def edit_schedule(schedule_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    schedule = WorkSchedule.query.get(schedule_id)
+    if not schedule:
+        return redirect('/settings/time-tracking')
+    user = User.query.get(session['user_id'])
+    worker_types = []
+    if user and user.organization_id:
+        worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+    prefill_data = json.loads(schedule.schedule_data)
+    return render_template('edit_schedule.html', user=user, worker_types=worker_types, prefill_data=prefill_data, schedule_id=schedule_id)
+
+@app.route('/edit-schedule-step2/<int:schedule_id>')
+def edit_schedule_step2(schedule_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    schedule = WorkSchedule.query.get(schedule_id)
+    if not schedule:
+        return redirect('/settings/time-tracking')
+    user = User.query.get(session['user_id'])
+    prefill_data = json.loads(schedule.schedule_data)
+    return render_template('edit_schedule_step2.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
+
+@app.route('/edit-schedule-step3/<int:schedule_id>')
+def edit_schedule_step3(schedule_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    schedule = WorkSchedule.query.get(schedule_id)
+    if not schedule:
+        return redirect('/settings/time-tracking')
+    user = User.query.get(session['user_id'])
+    prefill_data = json.loads(schedule.schedule_data)
+    return render_template('edit_schedule_step3.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
+
+@app.route('/api/edit-schedule', methods=['POST'])
+def api_edit_schedule():
+    if 'user_id' not in session:
+        logger.debug('User not authenticated')
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        logger.debug('User or organization not found')
+        return jsonify({'success': False, 'error': 'User organization not found'}), 400
+    try:
+        data = request.json
+        logger.debug(f'Received data for edit: {data}')
+        logger.debug(f'Data keys: {list(data.keys()) if data else "None"}')
+        logger.debug(f'Data type: {type(data)}')
+        if not data:
+            logger.debug('No data provided')
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        schedule_id = data.get('id') or data.get('schedule_id')
+        logger.debug(f'Editing schedule_id: {schedule_id} (type: {type(schedule_id)})')
+        if not schedule_id:
+            logger.debug('Missing schedule_id')
+            return jsonify({'success': False, 'error': 'Missing schedule_id'}), 400
+        
+        # Convert to integer if it's a string
+        try:
+            schedule_id = int(schedule_id)
+        except (ValueError, TypeError):
+            logger.debug(f'Invalid schedule_id format: {schedule_id}')
+            return jsonify({'success': False, 'error': 'Invalid schedule_id format'}), 400
+        schedule = WorkSchedule.query.filter_by(id=schedule_id, organization_id=user.organization_id).first()
+        logger.debug(f'Found schedule: {schedule.to_dict() if schedule else None}')
+        if not schedule:
+            logger.debug('Schedule not found')
+            return jsonify({'success': False, 'error': 'Schedule not found'}), 404
+        # Update fields
+        schedule_details = data.get('scheduleDetails', {})
+        schedule.name = data.get('scheduleName', schedule.name)
+        # Determine schedule type
+        schedule_type = 'flexible'
+        shifts = schedule_details.get('shifts', {})
+        for shift_data in shifts.values():
+            if shift_data.get('includeTime'):
+                schedule_type = 'fixed'
+                break
+        schedule.schedule_type = schedule_type
+        schedule.schedule_data = json.dumps(data)
+        logger.debug(f'Updated schedule (before commit): {schedule.to_dict()}')
+        db.session.commit()
+        logger.debug('Schedule update committed successfully')
+        return jsonify({'success': True, 'message': 'Schedule updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating schedule: {str(e)}", exc_info=True)
+        return jsonify({'success': False, 'error': f'Failed to update schedule: {str(e)}'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

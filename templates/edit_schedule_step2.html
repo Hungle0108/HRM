@@ -1,0 +1,3116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit schedule - Step 2 - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .close-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: white;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 40px 120px 40px;
+            gap: 60px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: visible;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        .step-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #28a745;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: visible;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .section-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .weekly-duration-summary {
+            margin-bottom: 24px;
+        }
+
+        .duration-summary-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .calculated-duration {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .duration-value {
+            color: #1a1a1a;
+        }
+
+        .duration-label {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .duration-warning {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 4px;
+        }
+
+        .duration-comparison {
+            font-size: 1rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .comparison-value {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .comparison-label {
+            color: #6c757d;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+
+        .form-input, .form-select {
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23666666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 48px;
+            cursor: pointer;
+        }
+
+        .form-input::placeholder {
+            color: #999;
+        }
+
+        .schedule-details {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #1a1a1a;
+        }
+
+        .schedule-icon {
+            width: 20px;
+            height: 20px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+
+
+        .toggle-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .toggle-label {
+            font-size: 0.95rem;
+            color: #495057;
+            flex: 1;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            margin-left: 16px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #1a1a1a;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            width: 100%;
+            max-width: 930px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .btn-continue {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-continue:hover {
+            background: #333;
+        }
+
+        .btn-continue:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .next-step-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .next-step-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .next-step-title {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        /* Weekday Details Styles */
+        .weekday-details {
+            display: block;
+            margin-top: 24px;
+            padding-top: 24px;
+        }
+
+        .weekday-details.show {
+            display: block;
+        }
+
+        .weekday-section {
+            margin-bottom: 32px;
+        }
+
+        .weekday-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .repeat-button {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .repeat-button:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+
+        .repeat-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            gap: 16px;
+        }
+
+        .checkbox-item:hover {
+            border-color: #d1d5db;
+            background: #fafafa;
+        }
+
+        .checkbox-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-item.selected {
+            border-color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .checkbox-item.disabled {
+            background: #f8f9fa;
+            opacity: 0.6;
+        }
+
+        .checkbox-item.disabled .time-input {
+            background: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .day-info {
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day-name {
+            font-size: 0.95rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .day-duration {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .time-input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .time-input-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-input {
+            padding: 20px 14px 8px 14px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #495057;
+            background: white;
+            transition: all 0.2s;
+            width: 130px;
+            max-width: 150px;
+            outline: none;
+        }
+
+        .time-input:hover {
+            border-color: #1a1a1a;
+        }
+
+        .time-input:focus {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+        }
+
+        .time-input::placeholder {
+            color: #adb5bd;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .time-input:focus::placeholder {
+            opacity: 1;
+        }
+
+        .time-input.has-value::placeholder {
+            opacity: 1;
+        }
+
+        .time-label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            color: #6c757d;
+            background: white;
+            padding: 0 4px;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 2;
+            opacity: 1;
+        }
+
+        .time-input:focus + .time-label,
+        .time-input:not(:placeholder-shown) + .time-label,
+        .time-input.has-value + .time-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #1a1a1a;
+            font-weight: 500;
+            opacity: 1;
+        }
+
+        .time-input:focus + .time-label {
+            color: #1a1a1a;
+        }
+
+        .time-input.has-value:not(:focus) + .time-label {
+            color: #6b7280;
+        }
+
+        .time-input.error {
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .time-input.error::placeholder {
+            color: #dc2626;
+        }
+
+        .time-input.error + .time-label {
+            color: #dc2626 !important;
+        }
+
+        .validation-message {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            margin-top: 4px;
+        }
+
+        /* Duration Input Styles */
+        .duration-input {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .duration-input-wrapper {
+            position: relative;
+            height: 52px;
+            display: flex;
+            align-items: center;
+        }
+
+        .duration-warning-icon {
+            position: absolute;
+            right: 65px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-image: url('/static/images/diamond-exclamation (4).png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+            display: none;
+            z-index: 3;
+        }
+
+        .duration-field.warning + .duration-warning-icon,
+        .duration-field.error + .duration-warning-icon {
+            display: block;
+        }
+
+        .duration-field {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #495057;
+            background: white;
+            transition: all 0.2s;
+            outline: none;
+            height: 52px;
+            box-sizing: border-box;
+            line-height: 1.4;
+        }
+
+        .duration-field:hover {
+            border-color: #1a1a1a !important;
+        }
+
+        .duration-field:focus {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+        }
+
+        .duration-field::placeholder {
+            color: #adb5bd;
+        }
+
+        .duration-field.error {
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .duration-field.error::placeholder {
+            color: #dc2626;
+        }
+
+        .duration-field.warning {
+            border-color: #dc2626;
+        }
+
+        .duration-field.warning::placeholder {
+            color: #dc2626;
+        }
+
+        .duration-label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            background: white;
+            padding: 0 4px;
+            z-index: 2;
+        }
+
+        .duration-input-wrapper:hover .duration-label {
+            color: #1a1a1a;
+        }
+
+        .duration-field:focus + .duration-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .duration-field:not(:placeholder-shown) + .duration-label,
+        .duration-field.has-value + .duration-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .duration-field.warning + .duration-label,
+        .duration-field.error + .duration-label {
+            color: #dc2626;
+        }
+
+        .duration-input-wrapper:hover .duration-field.warning + .duration-label,
+        .duration-input-wrapper:hover .duration-field.error + .duration-label {
+            color: #dc2626;
+        }
+
+        .duration-unit {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a1a1a;
+            font-size: 0.9rem;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .duration-error {
+            font-size: 0.8rem;
+            color: #dc2626;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .duration-error.show {
+            display: block;
+        }
+
+        .checkbox-item.checked .duration-field.error {
+            border-color: #dc2626;
+        }
+
+        .checkbox-item:not(.checked) .duration-field {
+            border-color: #e9ecef;
+            color: #adb5bd;
+            background: #f8f9fa;
+            pointer-events: none;
+        }
+
+        .checkbox-item:not(.checked) .duration-error {
+            display: none;
+        }
+
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .checkbox-input:checked {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .checkbox-input:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            color: #e53e3e;
+            font-size: 0.9rem;
+        }
+
+        .error-icon {
+            width: 16px;
+            height: 16px;
+            background: #e53e3e;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Shifts Dropdown Specific Styling */
+        .shifts-dropdown {
+            position: relative;
+            z-index: 1000;
+            margin-bottom: 16px;
+        }
+
+        .custom-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-header {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .dropdown-header:hover {
+            border-color: #80bdff;
+        }
+
+        .dropdown-header.active {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+
+        .dropdown-selected {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #6c757d;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-header.active .dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            margin-top: 4px;
+            overflow: hidden;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e7f3ff;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .check-icon {
+            width: 16px;
+            height: 16px;
+            color: #1a1a1a;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dropdown-option.selected .check-icon {
+            opacity: 1;
+        }
+
+        /* Shift Pagination Bookmarks Styling */
+        .shift-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 24px 0;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .pagination-bookmarks {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bookmark {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bookmark:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .bookmark.active {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .bookmark-number {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+
+        .bookmark.active .bookmark-number {
+            color: white;
+        }
+
+        .pagination-label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        #currentShiftLabel {
+            color: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <div class="logo"></div>
+                <a href="/time-tracking" class="close-btn">
+                    <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Edit schedule</h1>
+                <p class="page-subtitle">Schedules define the weekly work time for a worker.</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="schedule-form-step2">
+                    <div class="form-section">
+                        <h3 class="section-title">Working days and hours per day</h3>
+                        <p class="section-description">Specify number of worked hours per week or specify hours per days, start & end time etc.</p>
+                        
+                        <div class="toggle-section">
+                            <span class="toggle-label">Specify the work duration for each day</span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="specifyDuration">
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="toggle-section" id="includeTimeToggle">
+                            <span class="toggle-label">Include start and end time to schedule</span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="includeTime">
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Shifts Dropdown (appears when Include Time toggle is ON) -->
+                        <div class="shifts-dropdown" id="shiftsDropdown" style="display: none;">
+                            <div class="custom-dropdown-wrapper">
+                                <div class="custom-dropdown" id="customShiftsDropdown">
+                                    <div class="dropdown-header" id="dropdownHeader">
+                                        <span class="dropdown-label">Number of shifts *</span>
+                                        <span class="dropdown-selected" id="dropdownSelected">1 shift</span>
+                                        <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="dropdown-options" id="dropdownOptions" style="display: none;">
+                                        <div class="dropdown-option" data-value="1">
+                                            <span>1 shift</span>
+                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M20 6L9 17l-5-5"/>
+                                            </svg>
+                                        </div>
+                                        <div class="dropdown-option" data-value="2">
+                                            <span>2 shifts</span>
+                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M20 6L9 17l-5-5"/>
+                                            </svg>
+                                        </div>
+                                        <div class="dropdown-option" data-value="3">
+                                            <span>3 shifts</span>
+                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M20 6L9 17l-5-5"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="weekday-details">
+                            <div class="weekday-section">
+                                <h4 class="weekday-section-title">
+                                    Weekdays details
+                                    <button type="button" class="repeat-button" id="repeatFirstButton">
+                                        <img src="/static/images/copy.png" class="repeat-icon" alt="Copy">
+                                        Repeat the first to all
+                                    </button>
+                                </h4>
+                                
+                                <!-- Shift Pagination Bookmarks -->
+                                <div class="shift-pagination" id="shiftPagination" style="display: none;">
+                                    <div class="pagination-bookmarks">
+                                        <div class="bookmark active" data-shift="1">
+                                            <span class="bookmark-number">1</span>
+                                        </div>
+                                        <div class="bookmark" data-shift="2">
+                                            <span class="bookmark-number">2</span>
+                                        </div>
+                                        <div class="bookmark" data-shift="3" style="display: none;">
+                                            <span class="bookmark-number">3</span>
+                                        </div>
+                                    </div>
+                                    <div class="pagination-label">
+                                        <span id="currentShiftLabel">Shift 1</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="checkbox-list">
+                                    <div class="checkbox-item" data-day="monday">
+                                        <input type="checkbox" class="checkbox-input" id="monday" name="weekdays" value="monday">
+                                        <div class="day-info">
+                                            <div class="day-name">Monday</div>
+                                            <div class="day-duration" id="monday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="monday-duration-input">
+                                <label class="duration-label" for="monday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="monday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="monday-start" maxlength="5">
+                                                    <label class="time-label" for="monday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="monday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="monday-end" maxlength="5">
+                                                    <label class="time-label" for="monday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="monday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="tuesday">
+                                        <input type="checkbox" class="checkbox-input" id="tuesday" name="weekdays" value="tuesday">
+                                        <div class="day-info">
+                                            <div class="day-name">Tuesday</div>
+                                            <div class="day-duration" id="tuesday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="tuesday-duration-input">
+                                <label class="duration-label" for="tuesday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="tuesday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="tuesday-start" maxlength="5">
+                                                    <label class="time-label" for="tuesday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="tuesday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="tuesday-end" maxlength="5">
+                                                    <label class="time-label" for="tuesday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="tuesday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="wednesday">
+                                        <input type="checkbox" class="checkbox-input" id="wednesday" name="weekdays" value="wednesday">
+                                        <div class="day-info">
+                                            <div class="day-name">Wednesday</div>
+                                            <div class="day-duration" id="wednesday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="wednesday-duration-input">
+                                <label class="duration-label" for="wednesday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="wednesday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="wednesday-start" maxlength="5">
+                                                    <label class="time-label" for="wednesday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="wednesday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="wednesday-end" maxlength="5">
+                                                    <label class="time-label" for="wednesday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="wednesday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="thursday">
+                                        <input type="checkbox" class="checkbox-input" id="thursday" name="weekdays" value="thursday">
+                                        <div class="day-info">
+                                            <div class="day-name">Thursday</div>
+                                            <div class="day-duration" id="thursday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="thursday-duration-input">
+                                <label class="duration-label" for="thursday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="thursday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="thursday-start" maxlength="5">
+                                                    <label class="time-label" for="thursday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="thursday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="thursday-end" maxlength="5">
+                                                    <label class="time-label" for="thursday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="thursday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="friday">
+                                        <input type="checkbox" class="checkbox-input" id="friday" name="weekdays" value="friday">
+                                        <div class="day-info">
+                                            <div class="day-name">Friday</div>
+                                            <div class="day-duration" id="friday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="friday-duration-input">
+                                <label class="duration-label" for="friday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="friday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="friday-start" maxlength="5">
+                                                    <label class="time-label" for="friday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="friday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="friday-end" maxlength="5">
+                                                    <label class="time-label" for="friday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="friday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="saturday">
+                                        <input type="checkbox" class="checkbox-input" id="saturday" name="weekdays" value="saturday">
+                                        <div class="day-info">
+                                            <div class="day-name">Saturday</div>
+                                            <div class="day-duration" id="saturday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="saturday-duration-input">
+                                <label class="duration-label" for="saturday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="saturday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="saturday-start" maxlength="5">
+                                                    <label class="time-label" for="saturday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="saturday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="saturday-end" maxlength="5">
+                                                    <label class="time-label" for="saturday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="saturday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-item" data-day="sunday">
+                                        <input type="checkbox" class="checkbox-input" id="sunday" name="weekdays" value="sunday">
+                                        <div class="day-info">
+                                            <div class="day-name">Sunday</div>
+                                            <div class="day-duration" id="sunday-duration"></div>
+                                        </div>
+                                                                <!-- Duration Mode (when toggle is ON) -->
+                        <div class="duration-input" style="display: none;">
+                            <div class="duration-input-wrapper">
+                                <input type="text" class="duration-field" placeholder="" id="sunday-duration-input">
+                                <label class="duration-label" for="sunday-duration-input">Work duration</label>
+                                <div class="duration-warning-icon"></div>
+                                <span class="duration-unit" style="display: none;">hours</span>
+                            </div>
+                            <div class="duration-error" id="sunday-duration-error">Duration is required when day checked</div>
+                        </div>
+                                        <!-- Time Mode (when toggle is OFF) -->
+                                        <div class="time-inputs">
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="sunday-start" maxlength="5">
+                                                    <label class="time-label" for="sunday-start">Start time</label>
+                                                </div>
+                                                <div class="validation-message" id="sunday-start-error" style="display: none;">Start time is required</div>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <div class="time-input-wrapper">
+                                                    <input type="text" class="time-input" placeholder="hh:mm" id="sunday-end" maxlength="5">
+                                                    <label class="time-label" for="sunday-end">End time</label>
+                                                </div>
+                                                <div class="validation-message" id="sunday-end-error" style="display: none;">End time is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="error-message" id="weekdayError" style="display: none;">
+                                    <div class="error-icon">!</div>
+                                    <span>The working days are not selected</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weekly Work Duration Summary -->
+                        <div class="weekly-duration-summary" id="weeklyDurationSummary" style="display: none; margin-top: 24px; border-top: 1px solid #e9ecef; padding-top: 24px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4 class="section-title" style="margin: 0; font-size: 1rem;">Weekly work duration</h4>
+                                <div class="duration-summary-content" style="display: flex; align-items: center; gap: 24px;">
+                                    <div class="calculated-duration" style="display: flex; align-items: center; gap: 4px;">
+                                        <span class="duration-value" id="calculatedDuration" style="font-weight: 600;">0</span>
+                                        <span class="duration-label" style="color: #6c757d;"></span>
+                                        <span class="duration-warning" id="durationWarning" style="display: none;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#e74c3c" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 class="sidebar-title">Steps</h3>
+                
+                <ol class="steps-list">
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div>
+                            <div class="step-badge">Completed</div>
+                            <div class="step-text">Name and worker types</div>
+                        </div>
+                    </li>
+                    <li class="step-item active">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Working time details</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Review and finish</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <a href="/edit-schedule/{{ schedule_id }}" class="btn-back" id="backBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </a>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="next-step-info">
+                        <div class="next-step-label">Next step:</div>
+                        <div class="next-step-title">3. Review and finish</div>
+                    </div>
+                    <button type="submit" class="btn-continue" form="schedule-form-step2" id="continueBtn">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Restore form data from step 1
+        const savedData = sessionStorage.getItem('scheduleFormData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+        }
+
+        // Back button handler - save data before navigating
+        document.getElementById('backBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Save current form data before going back
+            saveFormStateToSession();
+            // Navigate to step 1
+            window.location.href = '/create-schedule';
+        });
+
+        // Form validation and submission
+        document.getElementById('schedule-form-step2').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Re-run validation on submit click
+            if (!isFormValid()) {
+                alert('Please turn on "Specify the work duration" and provide details for at least one day before continuing.');
+                return;
+            }
+            
+            // State is already saved by listeners, but we save one last time to be safe.
+            saveFormStateToSession();
+            
+            window.location.href = '/edit-schedule-step3/{{ schedule_id }}';
+        });
+
+
+
+        // Checkbox and time input functionality
+        document.querySelectorAll('.checkbox-input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const timeInputs = dayItem.querySelectorAll('.time-input');
+                const timeInputsContainer = dayItem.querySelector('.time-inputs');
+                const durationInputContainer = dayItem.querySelector('.duration-input');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+                const specifyDurationToggle = document.getElementById('specifyDuration');
+                const includeTimeToggle = document.getElementById('includeTime');
+                
+                if (this.checked) {
+                    dayItem.classList.add('selected');
+                    dayItem.classList.remove('disabled');
+                    timeInputs.forEach(input => {
+                        input.disabled = false;
+                        input.classList.remove('disabled');
+                    });
+                    
+                    // Show appropriate input containers based on toggles
+                    if (specifyDurationToggle.checked) {
+                        if (includeTimeToggle.checked) {
+                            // Show time inputs
+                            if (timeInputsContainer) timeInputsContainer.style.display = 'flex';
+                            if (durationInputContainer) durationInputContainer.style.display = 'none';
+                        } else {
+                            // Show duration input
+                            if (timeInputsContainer) timeInputsContainer.style.display = 'none';
+                            if (durationInputContainer) durationInputContainer.style.display = 'block';
+                        }
+                    }
+                } else {
+                    dayItem.classList.remove('selected');
+                    dayItem.classList.add('disabled');
+                    timeInputs.forEach(input => {
+                        input.disabled = true;
+                        input.classList.add('disabled');
+                        input.value = '';
+                        // Hide validation messages
+                        const errorMsg = input.parentNode.querySelector('.validation-message');
+                        if (errorMsg) errorMsg.style.display = 'none';
+                        input.classList.remove('error');
+                    });
+                    
+                    // Hide all input containers when unchecked
+                    if (timeInputsContainer) timeInputsContainer.style.display = 'none';
+                    if (durationInputContainer) durationInputContainer.style.display = 'none';
+                    
+                    // Hide duration unit when checkbox is unchecked
+                    if (durationUnit) {
+                        durationUnit.style.display = 'none';
+                    }
+                    // Also clear duration input when unchecked
+                    const durationInput = dayItem.querySelector('.duration-field');
+                    if (durationInput) {
+                        durationInput.value = '';
+                        durationInput.classList.remove('has-value', 'error', 'warning');
+                    }
+                }
+                // Update cumulative day durations when checkboxes change
+                updateAllDayDurations();
+                calculateWeeklyDuration();
+            });
+        });
+
+        // Duration input focus/blur functionality for showing/hiding "hour" text
+        document.querySelectorAll('.duration-field').forEach(durationInput => {
+            durationInput.addEventListener('focus', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const checkbox = dayItem.querySelector('.checkbox-input');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+                
+                // Only show "hour" text if checkbox is checked and input is focused
+                if (checkbox.checked && durationUnit) {
+                    durationUnit.style.display = 'inline';
+                }
+            });
+
+            durationInput.addEventListener('blur', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+                
+                // Only hide "hour" text if the input is empty, otherwise keep it visible
+                if (durationUnit) {
+                    if (this.value.trim() === '') {
+                        durationUnit.style.display = 'none';
+                    } else {
+                        durationUnit.style.display = 'inline';
+                    }
+                }
+            });
+
+            // Also handle input changes to show/hide "hour" text based on content
+            durationInput.addEventListener('input', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const checkbox = dayItem.querySelector('.checkbox-input');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+                const dayDuration = dayItem.querySelector('.day-duration');
+                
+                // Show "hour" text if checkbox is checked and input has content
+                if (checkbox.checked && durationUnit) {
+                    if (this.value.trim() !== '') {
+                        durationUnit.style.display = 'inline';
+                        
+                        // Update cumulative day duration indicators
+                        updateAllDayDurations();
+                    } else {
+                        durationUnit.style.display = 'none';
+                        dayDuration.textContent = '';
+                    }
+                }
+                
+                calculateWeeklyDuration();
+            });
+        });
+
+        // Make toggle sliders clickable
+        document.querySelectorAll('.toggle-slider').forEach(slider => {
+            slider.addEventListener('click', function() {
+                const toggleSwitch = this.parentElement;
+                const checkbox = toggleSwitch.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                // Trigger the change event manually
+                checkbox.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Specify Duration toggle functionality
+        document.getElementById('specifyDuration').addEventListener('change', function() {
+            const weekdayDetails = document.querySelector('.weekday-details');
+            const includeTimeToggle = document.getElementById('includeTimeToggle');
+            const includeTimeCheckbox = document.getElementById('includeTime');
+            
+            if (this.checked) {
+                // Show both weekday details and include time toggle when specify duration is ON
+                weekdayDetails.style.display = 'block';
+                includeTimeToggle.style.display = 'flex';
+                
+                // Only reset include time toggle if we're not loading data AND there's no saved state for it
+                if (!isLoadingData) {
+                    const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                    const hasIncludeTimeSaved = savedForm && savedForm.scheduleDetails && 
+                                               savedForm.scheduleDetails.shifts && 
+                                               savedForm.scheduleDetails.shifts[currentShift] &&
+                                               typeof savedForm.scheduleDetails.shifts[currentShift].includeTime !== 'undefined';
+                    
+                    // Only reset to false if there's no saved state
+                    if (!hasIncludeTimeSaved) {
+                        includeTimeCheckbox.checked = false;
+                        includeTimeCheckbox.dispatchEvent(new Event('change'));
+                    }
+                }
+            } else {
+                // Hide both weekday details, include time toggle, shifts dropdown, and pagination when specify duration is OFF
+                weekdayDetails.style.display = 'none';
+                includeTimeToggle.style.display = 'none';
+
+                // Only force checkbox OFF if not during data loading
+                if (!isLoadingData) {
+                    includeTimeCheckbox.checked = false;
+                    includeTimeCheckbox.dispatchEvent(new Event('change'));
+                }
+
+                // Explicitly hide shifts dropdown and shift pagination (in case they were visible)
+                const shiftsDropdown = document.getElementById('shiftsDropdown');
+                if (shiftsDropdown) shiftsDropdown.style.display = 'none';
+                const shiftPagination = document.getElementById('shiftPagination');
+                if (shiftPagination) shiftPagination.style.display = 'none';
+            }
+            calculateWeeklyDuration();
+            
+            // Save state immediately when toggle changes
+            if (!isLoadingData) {
+                saveFormStateToSession();
+            }
+        });
+
+        // Toggle functionality for showing/hiding start and end time inputs
+        document.getElementById('includeTime').addEventListener('change', function() {
+            if (isLoadingData) return;
+            updateInputVisibility();
+            saveFormStateToSession();
+        });
+
+        // Function to update input visibility based on current toggle states
+        function updateInputVisibility() {
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeCheckbox = document.getElementById('includeTime');
+            const shiftsDropdown = document.getElementById('shiftsDropdown');
+            
+            const includeTime = includeTimeCheckbox.checked;
+            const specifyDuration = specifyDurationToggle.checked;
+            
+            // Update shifts dropdown visibility
+            if (shiftsDropdown) {
+                shiftsDropdown.style.display = (includeTime && specifyDuration) ? 'block' : 'none';
+            }
+            
+            // Update input visibility for each day
+            ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                const checkbox = document.getElementById(day);
+                if (!checkbox) return;
+                
+                const dayItem = checkbox.closest('.checkbox-item');
+                const timeInputs = dayItem.querySelector('.time-inputs');
+                const durationInput = dayItem.querySelector('.duration-input');
+                
+                if (checkbox.checked && specifyDuration) {
+                    if (includeTime) {
+                        // Show time inputs (start/end time), hide duration input
+                        if (timeInputs) timeInputs.style.display = 'flex';
+                        if (durationInput) durationInput.style.display = 'none';
+                    } else {
+                        // Show duration input, hide time inputs
+                        if (timeInputs) timeInputs.style.display = 'none';
+                        if (durationInput) durationInput.style.display = 'block';
+                    }
+                } else {
+                    // Day not checked or specify duration is off - hide all inputs
+                    if (timeInputs) timeInputs.style.display = 'none';
+                    if (durationInput) durationInput.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize toggle states on page load
+        function initializeToggleStates() {
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeCheckbox = document.getElementById('includeTime');
+            const weekdayDetails = document.querySelector('.weekday-details');
+            const timeInputs = document.querySelectorAll('.time-inputs');
+            const shiftsDropdown = document.getElementById('shiftsDropdown');
+            
+            // Only set default state if no saved data exists
+            const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            const hasSavedData = savedForm && savedForm.scheduleDetails && savedForm.scheduleDetails.shifts;
+            
+            if (!hasSavedData) {
+                includeTimeCheckbox.checked = false;
+            }
+            
+            // Set initial visibility based on specify duration toggle state
+            if (specifyDurationToggle.checked) {
+                weekdayDetails.style.display = 'block';
+            } else {
+                weekdayDetails.style.display = 'none';
+            }
+            
+            updateInputVisibility();
+        }
+
+        // Initialize "hour" text visibility for duration fields that already have values
+        function initializeDurationUnits() {
+            document.querySelectorAll('.duration-field').forEach(durationInput => {
+                const dayItem = durationInput.closest('.checkbox-item');
+                const checkbox = dayItem.querySelector('.checkbox-input');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+                
+                // Show "hour" text if checkbox is checked and input has content
+                if (checkbox.checked && durationUnit && durationInput.value.trim() !== '') {
+                    durationUnit.style.display = 'inline';
+                }
+            });
+        }
+        
+        // Shift Pagination Functionality
+        function updateShiftPagination(numberOfShifts) {
+            const shiftPagination = document.getElementById('shiftPagination');
+            const bookmark3 = document.querySelector('.bookmark[data-shift="3"]');
+            
+            // Save current shift data before changing the number of shifts
+            saveCurrentShiftData();
+            
+            if (numberOfShifts === 1) {
+                // Hide pagination for single shift
+                shiftPagination.style.display = 'none';
+                // Clear all shift data and reset to single shift data
+                currentShift = 1;
+                // Don't clear the current form data when going to single shift
+            } else {
+                // Show pagination for multiple shifts
+                shiftPagination.style.display = 'flex';
+                
+                // Show/hide third bookmark based on number of shifts
+                if (numberOfShifts === 3) {
+                    bookmark3.style.display = 'flex';
+                } else {
+                    bookmark3.style.display = 'none';
+                    // Clear shift 3 data if we're reducing from 3 to 2 shifts
+                    shiftData[3] = {};
+                }
+                
+                // Reset to first shift and load its data (or keep current form if no data)
+                currentShift = 1;
+                setActiveShift(1);
+                loadShiftData(1);
+            }
+        }
+        
+        function setActiveShift(shiftNumber) {
+            const bookmarks = document.querySelectorAll('.bookmark');
+            const currentShiftLabel = document.getElementById('currentShiftLabel');
+            
+            // Update active bookmark
+            bookmarks.forEach(bookmark => {
+                bookmark.classList.remove('active');
+                if (parseInt(bookmark.getAttribute('data-shift')) === shiftNumber) {
+                    bookmark.classList.add('active');
+                }
+            });
+            
+            // Update label
+            currentShiftLabel.textContent = `Shift ${shiftNumber}`;
+        }
+        
+        // Shift data storage
+        let currentShift = 1;
+        let isLoadingData = false;
+        let shiftData = {
+            1: {},
+            2: {},
+            3: {}
+        };
+        
+        console.log('INITIAL VARIABLES SET - currentShift:', currentShift, 'shiftData:', shiftData);
+        
+
+
+        // --- Main Initialization ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize default states first
+            initializeToggleStates();
+            initializeDurationUnits();
+            
+            // Then restore saved state (which will override defaults)
+            restoreFormState();
+            
+            // Apply the restored/current state to UI
+            toggleInputMode();
+            updateDurationValidation();
+            updateContinueButtonState();
+
+            // Set up all event listeners
+            const elementsToWatch = document.querySelectorAll(
+                '.checkbox-input, .time-input, .duration-field, #specifyDuration, #includeTime, .dropdown-option'
+            );
+            elementsToWatch.forEach(el => {
+                el.addEventListener('change', updateContinueButtonState);
+                el.addEventListener('input', updateContinueButtonState);
+                el.addEventListener('click', updateContinueButtonState); // For dropdown
+            });
+        });
+
+        // Save current shift data
+        function saveCurrentShiftData() {
+            if (isLoadingData) return;
+            
+            const includeTimeToggle = document.getElementById('includeTime');
+            if (!includeTimeToggle) return;
+            
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const includeTime = includeTimeToggle.checked;
+            
+            // --- FIX ---
+            // Ensure the shift data object exists, then update it instead of replacing it.
+            // This preserves properties like 'includeTime' even if we are just saving day data.
+            if (!shiftData[currentShift]) {
+                shiftData[currentShift] = {};
+            }
+            if (!shiftData[currentShift].weekdays) {
+                shiftData[currentShift].weekdays = {};
+            }
+            shiftData[currentShift].includeTime = includeTime;
+            
+            weekdays.forEach(day => {
+                const checkbox = document.getElementById(day);
+                if (!checkbox) return;
+                
+                const dayData = {
+                    checked: checkbox.checked
+                };
+                
+                if (includeTime) {
+                    // Time mode - always save both start and end times
+                    const startInput = document.getElementById(day + '-start');
+                    const endInput = document.getElementById(day + '-end');
+                    dayData.startTime = startInput ? startInput.value : '';
+                    dayData.endTime = endInput ? endInput.value : '';
+                } else {
+                    // Duration mode - save duration
+                    const durationInput = document.getElementById(day + '-duration-input');
+                    dayData.duration = durationInput ? durationInput.value : '';
+                }
+                
+                shiftData[currentShift].weekdays[day] = dayData;
+            });
+        }
+        
+        // Load shift data
+        function loadShiftData(shiftNumber) {
+            isLoadingData = true;
+
+            const data = shiftData[shiftNumber] || {};
+            const weekdaysData = data.weekdays || {};
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeToggle = document.getElementById('includeTime');
+            
+            // Only change toggle state if this shift has saved data, otherwise keep current state
+            let includeTime;
+            if (data.includeTime !== undefined) {
+                includeTime = data.includeTime;
+                includeTimeToggle.checked = includeTime;
+            } else {
+                // No saved data for this shift, keep current toggle state
+                includeTime = includeTimeToggle.checked;
+            }
+
+            // Set state for each day
+            ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                const dayData = weekdaysData[day] || {};
+                const checkbox = document.getElementById(day);
+                if (!checkbox) return;
+
+                const dayItem = checkbox.closest('.checkbox-item');
+                const timeInputs = dayItem.querySelector('.time-inputs');
+                const durationInput = dayItem.querySelector('.duration-input');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+
+                // 1. Restore data from the model to the inputs
+                checkbox.checked = dayData.checked || false;
+                    
+                const startInput = document.getElementById(day + '-start');
+                const endInput = document.getElementById(day + '-end');
+                const durInput = document.getElementById(day + '-duration-input');
+
+                if (startInput) startInput.value = dayData.startTime || '';
+                if (endInput) endInput.value = dayData.endTime || '';
+                if (durInput) durInput.value = dayData.duration || '';
+
+                // 2. Update UI visibility based on the restored state
+                 if (checkbox.checked && specifyDurationToggle.checked) {
+                     // Day is checked AND specify duration is ON, show appropriate inputs
+                     if (includeTime) {
+                         // Show time inputs (start/end time)
+                         if (timeInputs) timeInputs.style.display = 'flex';
+                         if (durationInput) durationInput.style.display = 'none';
+                     } else {
+                         // Show duration input
+                         if (timeInputs) timeInputs.style.display = 'none';
+                         if (durationInput) durationInput.style.display = 'block';
+                     }
+                 } else {
+                     // Day is not checked OR specify duration is OFF, hide all inputs
+                     if (timeInputs) timeInputs.style.display = 'none';
+                     if (durationInput) durationInput.style.display = 'none';
+                 }
+
+                // 3. Reset all visual states and update floating labels
+                if (startInput) {
+                    // Reset all visual states
+                    startInput.classList.remove('error', 'warning', 'disabled');
+                    // Update floating label based on value
+                    startInput.value ? startInput.classList.add('has-value') : startInput.classList.remove('has-value');
+                    // Hide validation messages
+                    const startError = document.getElementById(day + '-start-error');
+                    if (startError) startError.style.display = 'none';
+                }
+                if (endInput) {
+                    // Reset all visual states
+                    endInput.classList.remove('error', 'warning', 'disabled');
+                    // Update floating label based on value
+                    endInput.value ? endInput.classList.add('has-value') : endInput.classList.remove('has-value');
+                    // Hide validation messages
+                    const endError = document.getElementById(day + '-end-error');
+                    if (endError) endError.style.display = 'none';
+                }
+                if (durInput) {
+                    // Reset all visual states
+                    durInput.classList.remove('error', 'warning', 'disabled');
+                    // Update floating label and unit based on value
+                    if (durInput.value) {
+                        durInput.classList.add('has-value');
+                        if (durationUnit) durationUnit.style.display = 'inline';
+                    } else {
+                        durInput.classList.remove('has-value');
+                        if (durationUnit) durationUnit.style.display = 'none';
+                    }
+                    // Hide validation messages
+                    const durationError = document.getElementById(day + '-duration-error');
+                    if (durationError) {
+                        durationError.style.display = 'none';
+                        durationError.classList.remove('show');
+                    }
+                }
+                
+                // Reset day item visual states
+                dayItem.classList.remove('disabled');
+                if (checkbox.checked) {
+                    dayItem.classList.add('selected');
+                    // Manually apply the visual states that the change event would do for checked boxes
+                    const timeInputElements = dayItem.querySelectorAll('.time-input');
+                    timeInputElements.forEach(input => {
+                        input.disabled = false;
+                        input.classList.remove('disabled');
+                    });
+                } else {
+                    dayItem.classList.remove('selected');
+                    // Manually apply the visual states that the change event would do for unchecked boxes
+                    const timeInputElements = dayItem.querySelectorAll('.time-input');
+                    timeInputElements.forEach(input => {
+                        input.disabled = true;
+                        input.classList.add('disabled');
+                    });
+                }
+
+                // Don't fire change event during restoration to avoid clearing data
+                // checkbox.dispatchEvent(new Event('change'));
+            });
+
+            // Manually trigger visibility for shifts dropdown
+             const shiftsDropdown = document.getElementById('shiftsDropdown');
+             if (shiftsDropdown) {
+                 if (includeTime && specifyDurationToggle.checked) {
+                     shiftsDropdown.style.display = 'block';
+                 } else {
+                     shiftsDropdown.style.display = 'none';
+                 }
+             }
+            
+            // Reset any general form validation messages
+            const weekdayError = document.getElementById('weekdayError');
+            if (weekdayError) weekdayError.style.display = 'none';
+            
+            // Update totals
+            updateAllDayDurations();
+            calculateWeeklyDuration();
+
+            isLoadingData = false;
+        }
+        
+        // Clear all form data
+        function clearAllFormData() {
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            weekdays.forEach(day => {
+                // Clear checkbox
+                const checkbox = document.getElementById(day);
+                checkbox.checked = false;
+                checkbox.dispatchEvent(new Event('change'));
+                
+                // Clear time inputs
+                const startInput = document.getElementById(day + '-start');
+                const endInput = document.getElementById(day + '-end');
+                startInput.value = '';
+                endInput.value = '';
+                startInput.classList.remove('has-value', 'error');
+                endInput.classList.remove('has-value', 'error');
+                
+                // Clear duration input
+                const durationInput = document.getElementById(day + '-duration-input');
+                durationInput.value = '';
+                durationInput.classList.remove('has-value', 'error', 'warning');
+                
+                // Hide duration unit
+                const dayItem = durationInput.closest('.checkbox-item');
+                const durationUnit = dayItem.querySelector('.duration-unit');
+                if (durationUnit) {
+                    durationUnit.style.display = 'none';
+                }
+                
+                // Hide validation messages
+                const startError = document.getElementById(day + '-start-error');
+                const endError = document.getElementById(day + '-end-error');
+                const durationError = document.getElementById(day + '-duration-error');
+                
+                if (startError) startError.style.display = 'none';
+                if (endError) endError.style.display = 'none';
+                if (durationError) {
+                    durationError.style.display = 'none';
+                    durationError.classList.remove('show');
+                }
+            });
+            
+            // Update cumulative day durations after clearing (will show totals from other shifts)
+            updateAllDayDurations();
+        }
+        
+        // Initialize bookmark click handlers
+        function initializeShiftPagination() {
+            const bookmarks = document.querySelectorAll('.bookmark');
+            
+            bookmarks.forEach(bookmark => {
+                bookmark.addEventListener('click', function() {
+                    const shiftNumber = parseInt(this.getAttribute('data-shift'));
+                    
+                    // Don't switch if already on this shift
+                    if (currentShift === shiftNumber) {
+                        return;
+                    }
+                    
+                    // Save current shift data before switching
+                    saveCurrentShiftData();
+                    
+                    // Switch to new shift
+                    currentShift = shiftNumber;
+                    setActiveShift(shiftNumber);
+                    
+                    // Load new shift data (or clear if no data exists)
+                    loadShiftData(shiftNumber);
+                    
+                    // Save the form state after switching
+                    saveFormStateToSession();
+                });
+            });
+        }
+        
+        // Custom Shifts Dropdown Functionality
+        function initializeCustomDropdown() {
+            const dropdownHeader = document.getElementById('dropdownHeader');
+            const dropdownOptions = document.getElementById('dropdownOptions');
+            const dropdownSelected = document.getElementById('dropdownSelected');
+            
+            if (!dropdownHeader || !dropdownOptions || !dropdownSelected) {
+                console.log('Dropdown elements not found');
+                return;
+            }
+            
+            // Set default selection
+            const defaultOption = dropdownOptions.querySelector('.dropdown-option[data-value="1"]');
+            if (defaultOption) {
+                defaultOption.classList.add('selected');
+            }
+            
+            // Toggle dropdown
+            dropdownHeader.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isActive = dropdownHeader.classList.contains('active');
+                
+                if (isActive) {
+                    closeDropdown();
+                } else {
+                    openDropdown();
+                }
+            });
+            
+            // Select option
+            dropdownOptions.addEventListener('click', function(e) {
+                const option = e.target.closest('.dropdown-option');
+                if (option) {
+                    const value = option.getAttribute('data-value');
+                    const text = option.querySelector('span').textContent;
+                    
+                    // Update selected option
+                    dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    
+                    // Update display
+                    dropdownSelected.textContent = text;
+                    
+                    // Update shift pagination visibility
+                    updateShiftPagination(parseInt(value));
+                    
+                    // Save the form state after changing shift count
+                    saveFormStateToSession();
+                    
+                    // Close dropdown
+                    closeDropdown();
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdownHeader.contains(e.target) && !dropdownOptions.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+            
+            function openDropdown() {
+                dropdownHeader.classList.add('active');
+                dropdownOptions.style.display = 'block';
+            }
+            
+            function closeDropdown() {
+                dropdownHeader.classList.remove('active');
+                dropdownOptions.style.display = 'none';
+            }
+        }
+        
+        // Initialize custom dropdown
+        initializeCustomDropdown();
+        
+        // Initialize shift pagination
+        initializeShiftPagination();
+
+        // Initialize calculation listeners
+        function addCalculationListeners() {
+            // Listen to checkbox changes
+            document.querySelectorAll('.checkbox-input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateAllDayDurations();
+                    calculateWeeklyDuration();
+                    if (!isLoadingData) {
+                        saveCurrentShiftData();
+                    }
+                });
+            });
+            
+            // Listen to duration input changes
+            document.querySelectorAll('.duration-field').forEach(durationInput => {
+                durationInput.addEventListener('input', function() {
+                    updateAllDayDurations();
+                    calculateWeeklyDuration();
+                    if (!isLoadingData) {
+                        saveCurrentShiftData();
+                    }
+                });
+            });
+            
+            // Time input listeners are now combined with formatting logic below
+        }
+
+        addCalculationListeners();
+
+        // Initial calculation
+        calculateWeeklyDuration();
+
+        // Repeat the first to all functionality
+        document.getElementById('repeatFirstButton').addEventListener('click', function() {
+            const includeTimeToggle = document.getElementById('includeTime');
+            
+            if (includeTimeToggle.checked) {
+                // Time mode: Copy start and end times
+                const mondayStartTime = document.getElementById('monday-start').value;
+                const mondayEndTime = document.getElementById('monday-end').value;
+                
+                if (!mondayStartTime || !mondayEndTime) {
+                    alert('Please fill in Monday\'s start and end times first.');
+                    return;
+                }
+                
+                // Apply to all checked days except Monday
+                const checkedDays = document.querySelectorAll('input[name="weekdays"]:checked');
+                checkedDays.forEach(checkbox => {
+                    if (checkbox.value !== 'monday') {
+                        const day = checkbox.value;
+                        const startInput = document.getElementById(day + '-start');
+                        const endInput = document.getElementById(day + '-end');
+                        
+                        // Set the values
+                        startInput.value = mondayStartTime;
+                        endInput.value = mondayEndTime;
+                        
+                        // Clear all validation errors and styling
+                        const startError = document.getElementById(day + '-start-error');
+                        const endError = document.getElementById(day + '-end-error');
+                        
+                        if (startError) startError.style.display = 'none';
+                        if (endError) endError.style.display = 'none';
+                        
+                        startInput.classList.remove('error');
+                        endInput.classList.remove('error');
+                        
+                        // Update floating label states
+                        startInput.classList.add('has-value');
+                        endInput.classList.add('has-value');
+                    }
+                });
+                
+                // Update cumulative day durations and weekly duration calculation
+                updateAllDayDurations();
+                calculateWeeklyDuration();
+            } else {
+                // Duration mode: Copy work duration
+                const mondayDuration = document.getElementById('monday-duration-input').value;
+                
+                if (!mondayDuration) {
+                    alert('Please fill in Monday\'s work duration first.');
+                    return;
+                }
+                
+                // Apply to all checked days except Monday
+                const checkedDays = document.querySelectorAll('input[name="weekdays"]:checked');
+                checkedDays.forEach(checkbox => {
+                    if (checkbox.value !== 'monday') {
+                        const day = checkbox.value;
+                        const durationInput = document.getElementById(day + '-duration-input');
+                        const durationError = document.getElementById(day + '-duration-error');
+                        
+                        // Set the value
+                        durationInput.value = mondayDuration;
+                        
+                        // Clear all validation errors and styling
+                        if (durationError) {
+                            durationError.style.display = 'none';
+                            durationError.classList.remove('show');
+                        }
+                        
+                        // Remove all error and warning classes
+                        durationInput.classList.remove('error');
+                        durationInput.classList.remove('warning');
+                        
+                        // Update floating label state
+                        durationInput.classList.add('has-value');
+                        
+                        // Show "hour" text since the field now has content
+                        const dayItem = durationInput.closest('.checkbox-item');
+                        const durationUnit = dayItem.querySelector('.duration-unit');
+                        if (durationUnit) {
+                            durationUnit.style.display = 'inline';
+                        }
+                    }
+                });
+                
+                // Update cumulative day durations and weekly duration calculation
+                updateAllDayDurations();
+                calculateWeeklyDuration();
+            }
+        });
+
+        // Time input validation
+        document.querySelectorAll('.time-input').forEach(input => {
+            input.addEventListener('blur', function() {
+                const dayItem = this.closest('.checkbox-item');
+                const checkbox = dayItem.querySelector('.checkbox-input');
+                
+                if (checkbox.checked && !this.value) {
+                    this.classList.add('error');
+                    const errorMsg = this.parentNode.querySelector('.validation-message');
+                    if (errorMsg) errorMsg.style.display = 'block';
+                } else {
+                    this.classList.remove('error');
+                    const errorMsg = this.parentNode.querySelector('.validation-message');
+                    if (errorMsg) errorMsg.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize disabled state for all time inputs
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            const checkbox = item.querySelector('.checkbox-input');
+            const timeInputs = item.querySelectorAll('.time-input');
+            
+            if (!checkbox.checked) {
+                item.classList.add('disabled');
+                timeInputs.forEach(input => {
+                    input.disabled = true;
+                    input.classList.add('disabled');
+                });
+            }
+        });
+
+
+
+        // Initialize button state (function removed since hoursPerWeek input was removed)
+
+        // Simplified time input formatting and floating label functionality
+        document.querySelectorAll('.time-input').forEach(input => {
+            // Handle floating label on focus/blur/input
+            function updateFloatingLabel() {
+                if (input.value.trim() !== '') {
+                    input.classList.add('has-value');
+                } else {
+                    input.classList.remove('has-value');
+                }
+            }
+
+            // Simple time input formatting
+            input.addEventListener('input', function(e) {
+                let value = e.target.value;
+                
+                // Remove all non-digit characters
+                let numbers = value.replace(/\D/g, '');
+                
+                // Limit to 4 digits (HHMM)
+                numbers = numbers.slice(0, 4);
+                
+                // Format as HH:MM
+                if (numbers.length >= 3) {
+                    // If we have 3 or 4 digits, format as HH:MM
+                    let hours = numbers.slice(0, 2);
+                    let minutes = numbers.slice(2, 4);
+                    
+                    // Validate hours (00-23)
+                    if (parseInt(hours) > 23) {
+                        hours = '23';
+                    }
+                    
+                    // Validate minutes (00-59)
+                    if (parseInt(minutes) > 59) {
+                        minutes = '59';
+                    }
+                    
+                    e.target.value = hours + ':' + minutes;
+                } else if (numbers.length === 2) {
+                    // Just hours, do nothing until more numbers are added
+                    e.target.value = numbers;
+                } else {
+                    // Less than 2 digits, just show the numbers
+                    e.target.value = numbers;
+                }
+                updateFloatingLabel();
+                
+                // Trigger calculations and save data
+                updateAllDayDurations();
+                calculateWeeklyDuration();
+                if (!isLoadingData) {
+                    saveCurrentShiftData();
+                }
+            });
+
+            input.addEventListener('focus', updateFloatingLabel);
+            input.addEventListener('blur', updateFloatingLabel);
+        });
+
+        // Calculate and display working hours for each day
+        function calculateWorkingHours(startTime, endTime) {
+            if (!startTime || !endTime || startTime.length !== 5 || endTime.length !== 5) {
+                return null;
+            }
+
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+
+            if (isNaN(startHour) || isNaN(startMin) || isNaN(endHour) || isNaN(endMin)) {
+                return null;
+            }
+
+            // Convert to minutes
+            const startMinutes = startHour * 60 + startMin;
+            let endMinutes = endHour * 60 + endMin;
+
+            // Handle next day scenario (e.g., 23:00 to 07:00)
+            if (endMinutes <= startMinutes) {
+                endMinutes += 24 * 60; // Add 24 hours
+            }
+
+            const diffMinutes = endMinutes - startMinutes;
+            const hours = Math.floor(diffMinutes / 60);
+            const minutes = diffMinutes % 60;
+
+            return { hours, minutes };
+        }
+
+        function formatDuration(hours, minutes) {
+            let result = '';
+            if (hours > 0) {
+                result += `${hours} hr`;
+            }
+            if (minutes > 0) {
+                if (result) result += ' ';
+                result += `${minutes} mins`;
+            }
+            return result || '0 mins';
+        }
+
+        function updateDayDuration(day) {
+            // This function now calculates cumulative hours across all shifts for a single day
+            updateCumulativeDayDuration(day);
+        }
+        
+        // Calculate cumulative duration for a specific day across all shifts
+        function updateCumulativeDayDuration(day) {
+            const durationElement = document.getElementById(day + '-duration');
+            if (!durationElement) return;
+            
+            let totalHours = 0;
+            let totalMinutes = 0;
+            
+            // Get the number of shifts configured
+            const selectedShiftsText = document.getElementById('dropdownSelected').textContent;
+            const numberOfShifts = parseInt(selectedShiftsText.match(/\d+/)[0]) || 1;
+            
+            // Save current shift data first to ensure we have latest data
+            saveCurrentShiftData();
+            
+            // Calculate total hours from all shifts for this day
+            for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
+                const shift = shiftData[shiftNum];
+                if (!shift || !shift.weekdays || !shift.weekdays[day] || !shift.weekdays[day].checked) {
+                    continue; // Skip if this shift doesn't have data for this day
+                }
+                
+                const dayData = shift.weekdays[day];
+                
+                if (shift.includeTime && dayData.startTime && dayData.endTime) {
+                    // Time mode: calculate from start/end times
+                    const duration = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                    if (duration) {
+                        totalHours += duration.hours;
+                        totalMinutes += duration.minutes;
+                    }
+                } else if (!shift.includeTime && dayData.duration) {
+                    // Duration mode: parse duration input
+                    const durationValue = parseFloat(dayData.duration);
+                    if (!isNaN(durationValue) && durationValue > 0) {
+                        const hours = Math.floor(durationValue);
+                        const minutes = Math.round((durationValue - hours) * 60);
+                        totalHours += hours;
+                        totalMinutes += minutes;
+                    }
+                }
+            }
+            
+            // Convert excess minutes to hours
+            totalHours += Math.floor(totalMinutes / 60);
+            totalMinutes = totalMinutes % 60;
+            
+            // Update the display
+            if (totalHours > 0 || totalMinutes > 0) {
+                durationElement.textContent = formatDuration(totalHours, totalMinutes);
+                durationElement.style.display = 'block';
+            } else {
+                durationElement.textContent = '';
+                durationElement.style.display = 'none';
+            }
+        }
+        
+        // Update all day duration indicators (cumulative across all shifts)
+        function updateAllDayDurations() {
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            weekdays.forEach(day => {
+                updateCumulativeDayDuration(day);
+            });
+        }
+
+        // Add event listeners to all time inputs to update cumulative duration
+        const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        weekdays.forEach(day => {
+            const startInput = document.getElementById(day + '-start');
+            const endInput = document.getElementById(day + '-end');
+            
+            if (startInput && endInput) {
+                startInput.addEventListener('input', () => updateAllDayDurations());
+                startInput.addEventListener('blur', () => updateAllDayDurations());
+                endInput.addEventListener('input', () => updateAllDayDurations());
+                endInput.addEventListener('blur', () => updateAllDayDurations());
+            }
+        });
+
+        // Toggle between duration and time modes
+        const specifyDurationToggle = document.getElementById('specifyDuration');
+        
+        function toggleInputMode() {
+            const isDurationMode = specifyDurationToggle.checked;
+            const includeTimeToggle = document.getElementById('includeTime');
+            
+            weekdays.forEach(day => {
+                const timeInputs = document.querySelector(`[data-day="${day}"] .time-inputs`);
+                const durationInput = document.querySelector(`[data-day="${day}"] .duration-input`);
+                const checkbox = document.getElementById(day);
+                
+                if (checkbox.checked && isDurationMode) {
+                    if (includeTimeToggle.checked) {
+                        // Show time inputs for checked days when include time is on
+                        if (timeInputs) timeInputs.style.display = 'flex';
+                        if (durationInput) durationInput.style.display = 'none';
+                } else {
+                        // Show duration inputs for checked days when include time is off
+                        if (timeInputs) timeInputs.style.display = 'none';
+                        if (durationInput) durationInput.style.display = 'block';
+                    }
+                } else {
+                    // Hide all inputs for unchecked days or when duration mode is off
+                    if (timeInputs) timeInputs.style.display = 'none';
+                    if (durationInput) durationInput.style.display = 'none';
+                }
+            });
+        }
+
+        // Handle checkbox state changes for duration validation
+        function updateDurationValidation() {
+            weekdays.forEach(day => {
+                const checkbox = document.getElementById(day);
+                const checkboxItem = document.querySelector(`[data-day="${day}"]`);
+                const durationField = document.getElementById(`${day}-duration-input`);
+                const durationError = document.getElementById(`${day}-duration-error`);
+                
+                if (checkbox.checked) {
+                    checkboxItem.classList.add('checked');
+                    // Show error if duration is empty and toggle is on
+                    if (specifyDurationToggle.checked && !durationField.value.trim()) {
+                        durationField.classList.add('error');
+                        durationError.classList.add('show');
+                    }
+                } else {
+                    checkboxItem.classList.remove('checked');
+                    durationField.classList.remove('error');
+                    durationError.classList.remove('show');
+                }
+            });
+        }
+
+        // Add event listeners
+        specifyDurationToggle.addEventListener('change', toggleInputMode);
+        
+        // Add event listeners for checkboxes
+        weekdays.forEach(day => {
+            const checkbox = document.getElementById(day);
+            const durationField = document.getElementById(`${day}-duration-input`);
+            const durationError = document.getElementById(`${day}-duration-error`);
+            
+            checkbox.addEventListener('change', updateDurationValidation);
+            
+            // Track if user has hovered over the field
+            let hasHovered = false;
+            
+            // Function to update floating label state
+            function updateDurationFloatingLabel() {
+                if (durationField.value.trim()) {
+                    durationField.classList.add('has-value');
+                } else {
+                    durationField.classList.remove('has-value');
+                }
+            }
+            
+            // Mark as hovered when mouse enters
+            durationField.addEventListener('mouseenter', function() {
+                hasHovered = true;
+            });
+            
+            // Show warning when user leaves field empty after hovering
+            durationField.addEventListener('mouseleave', function() {
+                if (specifyDurationToggle.checked && checkbox.checked && hasHovered && !this.value.trim()) {
+                    this.classList.add('warning');
+                    durationError.classList.add('show');
+                }
+            });
+            
+            // Also check on blur in case user focused without hovering
+            durationField.addEventListener('blur', function() {
+                if (specifyDurationToggle.checked && checkbox.checked && hasHovered && !this.value.trim()) {
+                    this.classList.add('warning');
+                    durationError.classList.add('show');
+                } else if (this.value.trim()) {
+                    this.classList.remove('warning');
+                    this.classList.remove('error');
+                    durationError.classList.remove('show');
+                }
+            });
+            
+            // Remove warning on input
+            durationField.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('warning');
+                    this.classList.remove('error');
+                    durationError.classList.remove('show');
+                    hasHovered = false; // Reset hover state when user fills in
+                }
+                updateDurationFloatingLabel();
+            });
+            
+            // Update floating label on focus and blur
+            durationField.addEventListener('focus', updateDurationFloatingLabel);
+            durationField.addEventListener('blur', updateDurationFloatingLabel);
+            
+            // Initialize floating label state
+            updateDurationFloatingLabel();
+            
+            // Reset hover state when checkbox is unchecked
+            checkbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    hasHovered = false;
+                    durationField.classList.remove('warning');
+                    durationField.classList.remove('error');
+                    durationError.classList.remove('show');
+                }
+            });
+        });
+
+        // Helper to calculate total hours for a stored shift object
+        function calculateShiftHours(shiftObj) {
+            if (!shiftObj || !shiftObj.weekdays) return 0;
+            let shiftHours = 0;
+            const includeTime = shiftObj.includeTime;
+            const weekdaysData = shiftObj.weekdays;
+            const dayNames = Object.keys(weekdaysData);
+            dayNames.forEach(day => {
+                const dayData = weekdaysData[day] || {};
+                if (!dayData.checked) return;
+                if (includeTime) {
+                    if (dayData.startTime && dayData.endTime) {
+                        const dur = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                        if (dur) {
+                            shiftHours += dur.hours + dur.minutes / 60;
+                        }
+                    }
+                } else {
+                    if (dayData.duration) {
+                        shiftHours += parseFloat(dayData.duration) || 0;
+                    }
+                }
+            });
+            return shiftHours;
+        }
+
+        // Weekly work duration calculation
+        function calculateWeeklyDuration() {
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const weeklyDurationSummary = document.getElementById('weeklyDurationSummary');
+            const calculatedDurationElement = document.getElementById('calculatedDuration');
+
+            if (!specifyDurationToggle.checked) {
+                weeklyDurationSummary.style.display = 'none';
+                return;
+            }
+            weeklyDurationSummary.style.display = 'block';
+
+            // Total for the currently visible shift (current form state)
+            let totalHours = 0;
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const includeTimeToggle = document.getElementById('includeTime');
+            weekdays.forEach(day => {
+                const checkbox = document.getElementById(day);
+                if (!checkbox || !checkbox.checked) return;
+                if (includeTimeToggle.checked) {
+                    const startInput = document.getElementById(`${day}-start`);
+                    const endInput = document.getElementById(`${day}-end`);
+                    if (startInput && endInput && startInput.value && endInput.value) {
+                        const dur = calculateWorkingHours(startInput.value, endInput.value);
+                        if (dur) totalHours += dur.hours + dur.minutes / 60;
+                    }
+                } else {
+                    const durInput = document.getElementById(`${day}-duration-input`);
+                    if (durInput && durInput.value) totalHours += parseFloat(durInput.value) || 0;
+                }
+            });
+
+            // Add totals from other saved shifts (if multi-shift)
+            const selectedShiftsText = document.getElementById('dropdownSelected').textContent;
+            const numberOfShifts = parseInt(selectedShiftsText.match(/\d+/)[0]) || 1;
+            if (numberOfShifts > 1) {
+                for (let i = 1; i <= numberOfShifts; i++) {
+                    if (i === currentShift) continue; // skip current (already included)
+                    totalHours += calculateShiftHours(shiftData[i]);
+                }
+            }
+
+            calculatedDurationElement.textContent = totalHours.toFixed(2);
+        }
+
+        // Initialize calculation listeners
+        addCalculationListeners();
+
+        // Add event listeners to all time inputs for real-time calculation
+        function addCalculationListeners() {
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            weekdays.forEach(day => {
+                const startInput = document.getElementById(day + '-start');
+                const endInput = document.getElementById(day + '-end');
+                const durationInput = document.getElementById(day + '-duration-input');
+
+                if (startInput) {
+                    startInput.addEventListener('input', () => {
+                        updateAllDayDurations();
+                        calculateWeeklyDuration();
+                    });
+                }
+                if (endInput) {
+                    endInput.addEventListener('input', () => {
+                        updateAllDayDurations();
+                        calculateWeeklyDuration();
+                    });
+                }
+                if(durationInput) {
+                    durationInput.addEventListener('input', () => {
+                        updateAllDayDurations();
+                        calculateWeeklyDuration();
+                    });
+                }
+            });
+        }
+        
+        // Validation function with user feedback
+        function validateForm() {
+            if (!isFormValid()) {
+                // Find specific validation issues and show user-friendly messages
+                const durationToggle = document.getElementById('specifyDuration');
+                if (!durationToggle || !durationToggle.checked) {
+                    alert('Please enable "Specify duration" to continue.');
+                    return false;
+                }
+
+                const includeTimeToggle = document.getElementById('includeTime');
+                const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+                const dayNames = {
+                    'monday': 'Monday',
+                    'tuesday': 'Tuesday', 
+                    'wednesday': 'Wednesday',
+                    'thursday': 'Thursday',
+                    'friday': 'Friday',
+                    'saturday': 'Saturday',
+                    'sunday': 'Sunday'
+                };
+                
+                let missingFields = [];
+                
+                for (const day of weekdaysArr) {
+                    const checkbox = document.getElementById(day);
+                    if (!checkbox || !checkbox.checked) continue;
+
+                    if (includeTimeToggle && includeTimeToggle.checked) {
+                        const startVal = (document.getElementById(`${day}-start`) || {}).value || '';
+                        const endVal = (document.getElementById(`${day}-end`) || {}).value || '';
+                        if (!startVal.trim() || !endVal.trim()) {
+                            missingFields.push(`${dayNames[day]} (start and end time)`);
+                        }
+                    } else {
+                        const durVal = (document.getElementById(`${day}-duration-input`) || {}).value || '';
+                        if (!durVal.trim()) {
+                            missingFields.push(`${dayNames[day]} (duration)`);
+                        }
+                    }
+                }
+                
+                if (missingFields.length > 0) {
+                    alert(`Please fill in the required fields for:\n\n${missingFields.join('\n')}`);
+                }
+                return false;
+            }
+            return true;
+        }
+
+        // Save and Continue button handler
+        document.getElementById('continueBtn').addEventListener('click', function() {
+            if (validateForm()) {
+                saveFormStateToSession();
+                window.location.href = '/edit-schedule-step3/{{ schedule_id }}';
+            }
+        });
+
+        // Helper to calculate total hours for a stored shift object
+        function calculateShiftHours(shiftObj) {
+            if (!shiftObj || !shiftObj.weekdays) return 0;
+            let shiftHours = 0;
+            const includeTime = shiftObj.includeTime;
+            const weekdaysData = shiftObj.weekdays;
+            const dayNames = Object.keys(weekdaysData);
+            dayNames.forEach(day => {
+                const dayData = weekdaysData[day] || {};
+                if (!dayData.checked) return;
+                if (includeTime) {
+                    if (dayData.startTime && dayData.endTime) {
+                        const dur = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                        if (dur) {
+                            shiftHours += dur.hours + dur.minutes / 60;
+                        }
+                    }
+                } else {
+                    if (dayData.duration) {
+                        shiftHours += parseFloat(dayData.duration) || 0;
+                    }
+                }
+            });
+            return shiftHours;
+        }
+        
+        // Note: All initialization is now handled in DOMContentLoaded
+
+        // === Continue button state management ===
+        function isFormValid() {
+            const durationToggle = document.getElementById('specifyDuration');
+            if (!durationToggle || !durationToggle.checked) return false;
+
+            const includeTimeToggle = document.getElementById('includeTime');
+            const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+            
+            let hasAtLeastOneValidDay = false;
+            
+            // Check each day - ALL checked days must have valid input
+            for (const day of weekdaysArr) {
+                const checkbox = document.getElementById(day);
+                if (!checkbox || !checkbox.checked) continue;
+
+                // This day is checked, so it must have valid input
+                if (includeTimeToggle && includeTimeToggle.checked) {
+                    // Time mode: both start and end time must be filled
+                    const startVal = (document.getElementById(`${day}-start`) || {}).value || '';
+                    const endVal = (document.getElementById(`${day}-end`) || {}).value || '';
+                    if (!startVal.trim() || !endVal.trim()) {
+                        return false; // This checked day is missing required fields
+                    }
+                    hasAtLeastOneValidDay = true;
+                } else {
+                    // Duration mode: duration must be filled
+                    const durVal = (document.getElementById(`${day}-duration-input`) || {}).value || '';
+                    if (!durVal.trim()) {
+                        return false; // This checked day is missing required fields
+                    }
+                    hasAtLeastOneValidDay = true;
+                }
+            }
+            
+            // Form is valid only if we have at least one valid day and all checked days are complete
+            return hasAtLeastOneValidDay;
+        }
+
+        function updateContinueButtonState() {
+            const btn = document.getElementById('continueBtn');
+            if (!btn) return;
+            btn.disabled = !isFormValid();
+        }
+
+
+
+        // Helper to save the entire form state to session storage
+        function saveFormStateToSession() {
+            if (isLoadingData) {
+                return;
+            }
+
+            saveCurrentShiftData(); // Updates the global `shiftData` object from UI
+
+            const durationToggle = document.getElementById('specifyDuration');
+            const includeTimeToggle = document.getElementById('includeTime');
+            const selectedShiftsText = document.getElementById('dropdownSelected');
+            const calculatedDurationElement = document.getElementById('calculatedDuration');
+            
+            // Add null checks
+            if (!durationToggle || !selectedShiftsText) {
+                return;
+            }
+
+            const numberOfShifts = parseInt(selectedShiftsText.textContent.match(/\d+/)?.[0]) || 1;
+            const weeklyDuration = calculatedDurationElement ? calculatedDurationElement.textContent : '0';
+
+            const scheduleDetails = {
+                specifyDuration: durationToggle.checked,
+                numberOfShifts: numberOfShifts,
+                weeklyDuration: weeklyDuration,
+                shifts: shiftData,
+                // Save current shift and toggle states for each shift
+                currentShift: currentShift,
+                includeTimePerShift: {}
+            };
+
+            // Save the includeTime state for each shift that has data
+            for (let i = 1; i <= numberOfShifts; i++) {
+                if (shiftData[i] && typeof shiftData[i].includeTime !== 'undefined') {
+                    scheduleDetails.includeTimePerShift[i] = shiftData[i].includeTime;
+                }
+            }
+            
+            const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            const updatedData = { ...existingData, scheduleDetails };
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
+        }
+
+        // Enhanced restoration function with complete state preservation
+        function restoreFormState() {
+            const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            
+            if (!savedForm || !savedForm.scheduleDetails) {
+                return;
+            }
+
+            isLoadingData = true;
+
+            const details = savedForm.scheduleDetails;
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeToggle = document.getElementById('includeTime');
+
+            // Restore main toggles
+            if (specifyDurationToggle) {
+                specifyDurationToggle.checked = details.specifyDuration || false;
+            }
+
+            // Restore shift data
+            if (details.shifts) {
+                shiftData = details.shifts;
+            }
+
+            // Restore current shift
+            if (details.currentShift) {
+                currentShift = details.currentShift;
+            }
+
+            // Restore includeTime toggle state for the current shift
+            if (includeTimeToggle && details.shifts && details.shifts[currentShift]) {
+                const currentShiftData = details.shifts[currentShift];
+                if (typeof currentShiftData.includeTime !== 'undefined') {
+                    includeTimeToggle.checked = currentShiftData.includeTime;
+                }
+            }
+
+            // Restore shift count and pagination
+            if (details.numberOfShifts) {
+                const dropdownSelected = document.getElementById('dropdownSelected');
+                if (dropdownSelected) {
+                    dropdownSelected.textContent = details.numberOfShifts === 1 ? '1 shift' : `${details.numberOfShifts} shifts`;
+                }
+                updateShiftPagination(details.numberOfShifts);
+            }
+
+            // Load the current shift data to populate form fields
+            loadShiftData(currentShift);
+
+            // Update UI visibility
+            updateInputVisibility();
+            
+            // Fire the change event to ensure all dependent UI elements are synced
+            if (specifyDurationToggle) {
+                specifyDurationToggle.dispatchEvent(new Event('change'));
+            }
+
+            // Update calculations
+            updateAllDayDurations();
+            calculateWeeklyDuration();
+
+            isLoadingData = false;
+        }
+
+        // Prefill script for edit mode
+        window.addEventListener('DOMContentLoaded', function() {
+            var prefill = {{ prefill_data|tojson|safe }};
+            if (prefill && prefill.scheduleDetails) {
+                // Prefill toggles
+                if (typeof prefill.scheduleDetails.specifyDuration !== 'undefined') {
+                    var durToggle = document.getElementById('specifyDuration');
+                    if (durToggle) durToggle.checked = prefill.scheduleDetails.specifyDuration;
+                }
+                if (typeof prefill.scheduleDetails.includeTime !== 'undefined') {
+                    var timeToggle = document.getElementById('includeTime');
+                    if (timeToggle) timeToggle.checked = prefill.scheduleDetails.includeTime;
+                }
+                
+                // Prefill days/hours
+                if (prefill.scheduleDetails.shifts) {
+                    Object.values(prefill.scheduleDetails.shifts).forEach(function(shift) {
+                        if (shift.weekdays) {
+                            Object.entries(shift.weekdays).forEach(function(entry) {
+                                var day = entry[0];
+                                var data = entry[1];
+                                var dayCheckbox = document.getElementById(day);
+                                if (dayCheckbox) dayCheckbox.checked = !!data.checked;
+                                
+                                if (data.checked) {
+                                    var dayItem = dayCheckbox.closest('.checkbox-item');
+                                    dayItem.classList.add('selected');
+                                    dayItem.classList.remove('disabled');
+                                    
+                                    if (shift.includeTime) {
+                                        var startInput = document.getElementById(day + '-start');
+                                        var endInput = document.getElementById(day + '-end');
+                                        if (startInput && data.startTime) startInput.value = data.startTime;
+                                        if (endInput && data.endTime) endInput.value = data.endTime;
+                                    } else {
+                                        var durInput = document.getElementById(day + '-duration-input');
+                                        if (durInput && data.duration) durInput.value = data.duration;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                // Store full prefill data in sessionStorage for later steps
+                sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
+                
+                // Trigger change events to update UI
+                var editSpecifyDurationToggle = document.getElementById('specifyDuration');
+                var editIncludeTimeToggle = document.getElementById('includeTime');
+                if (editSpecifyDurationToggle) editSpecifyDurationToggle.dispatchEvent(new Event('change'));
+                if (editIncludeTimeToggle) editIncludeTimeToggle.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+</body>
+</html> 
