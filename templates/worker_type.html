@@ -593,7 +593,7 @@
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         border: 1px solid #e9ecef;
-        overflow: visible;
+        overflow: hidden;
         margin-top: 20px;
         position: relative;
     }
@@ -1135,14 +1135,16 @@
         top: 50%;
         right: 12px;
         transform: translateY(-50%);
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         opacity: 0;
         cursor: pointer;
         transition: opacity 0.2s ease;
         z-index: 2;
-        padding: 6px;
-        margin: -6px;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        vertical-align: middle;
     }
 
     .worker-types-table th:hover .header-menu-icon {
@@ -2122,78 +2124,22 @@
                             <th class="sortable" data-sort="name">
                                 Template name
                                 <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
-                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-name')">
-                                <div class="header-dropdown" id="dropdown-name">
-                                    <div class="dropdown-item" onclick="sortColumn('name', 'asc')">
-                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
-                                        Sort by ASC
-                                    </div>
-                                    <div class="dropdown-item" onclick="sortColumn('name', 'desc')">
-                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
-                                        Sort by DESC
-                                    </div>
-                                    <div class="dropdown-item" onclick="customizeColumns()">
-                                        <img src="/static/images/columns-3.png" alt="Customize">
-                                        Customize columns
-                                    </div>
-                                </div>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'name')">
                             </th>
                             <th class="sortable" data-sort="contracts" style="display: none;">
                                 Active contracts
                                 <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
-                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-contracts')">
-                                <div class="header-dropdown" id="dropdown-contracts">
-                                    <div class="dropdown-item" onclick="sortColumn('contracts', 'asc')">
-                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
-                                        Sort by ASC
-                                    </div>
-                                    <div class="dropdown-item" onclick="sortColumn('contracts', 'desc')">
-                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
-                                        Sort by DESC
-                                    </div>
-                                    <div class="dropdown-item" onclick="customizeColumns()">
-                                        <img src="/static/images/columns-3.png" alt="Customize">
-                                        Customize columns
-                                    </div>
-                                </div>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'contracts')">
                             </th>
                             <th class="sortable" data-sort="created">
                                 Created by
                                 <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
-                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-created')">
-                                <div class="header-dropdown" id="dropdown-created">
-                                    <div class="dropdown-item" onclick="sortColumn('created', 'asc')">
-                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
-                                        Sort by ASC
-                                    </div>
-                                    <div class="dropdown-item" onclick="sortColumn('created', 'desc')">
-                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
-                                        Sort by DESC
-                                    </div>
-                                    <div class="dropdown-item" onclick="customizeColumns()">
-                                        <img src="/static/images/columns-3.png" alt="Customize">
-                                        Customize columns
-                                    </div>
-                                </div>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'created')">
                             </th>
                             <th class="sortable sorted" data-sort="creation">
                                 Creation day
                                 <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
-                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); toggleDropdown(event, 'dropdown-creation')">
-                                <div class="header-dropdown" id="dropdown-creation">
-                                    <div class="dropdown-item" onclick="sortColumn('creation', 'asc')">
-                                        <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
-                                        Sort by ASC
-                                    </div>
-                                    <div class="dropdown-item" onclick="sortColumn('creation', 'desc')">
-                                        <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
-                                        Sort by DESC
-                                    </div>
-                                    <div class="dropdown-item" onclick="customizeColumns()">
-                                        <img src="/static/images/columns-3.png" alt="Customize">
-                                        Customize columns
-                                    </div>
-                                </div>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'creation')">
                             </th>
                             <th style="width: 60px;"></th>
                         </tr>
@@ -4399,6 +4345,71 @@
             console.error('Could not find worker type data for ID:', workerId);
             alert('Worker type not found. Please refresh the page and try again.');
         }
+    }
+
+    // --- Portal Dropdown Utilities ---
+    function openPortalDropdown(triggerElement, dropdownHtml) {
+        const portalRoot = document.getElementById('portal-root');
+        portalRoot.innerHTML = dropdownHtml;
+
+        const rect = triggerElement.getBoundingClientRect();
+        const dropdownWidth = 220;
+        const gap = 4;
+        const minMargin = 8;
+
+        let left;
+        // Prefer left alignment, but if not enough space, align right
+        if (rect.right - dropdownWidth > minMargin) {
+            // Enough space to the left
+            left = rect.right - dropdownWidth;
+        } else if (rect.left + dropdownWidth < window.innerWidth - minMargin) {
+            // Not enough space to the left, so show to the right
+            left = rect.left;
+        } else {
+            // Fallback: stick to minMargin
+            left = minMargin;
+        }
+
+        const dropdown = portalRoot.firstElementChild;
+        dropdown.style.position = 'fixed';
+        dropdown.style.top = (rect.bottom + gap) + 'px';
+        dropdown.style.width = dropdownWidth + 'px';
+        dropdown.style.left = left + 'px';
+        dropdown.style.zIndex = 9999;
+
+        function handleClickOutside(event) {
+            if (!dropdown.contains(event.target) && event.target !== triggerElement) {
+                closePortalDropdown();
+                document.removeEventListener('mousedown', handleClickOutside);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    function closePortalDropdown() {
+        const portalRoot = document.getElementById('portal-root');
+        portalRoot.innerHTML = '';
+    }
+
+    // --- Example: Sort Dropdown Trigger ---
+    function showSortDropdown(trigger, column) {
+        const dropdownHtml = `
+            <div class="header-dropdown show">
+                <div class="dropdown-item" onclick="sortColumn('${column}', 'asc'); closePortalDropdown();">
+                    <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                    Sort by ASC
+                </div>
+                <div class="dropdown-item" onclick="sortColumn('${column}', 'desc'); closePortalDropdown();">
+                    <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                    Sort by DESC
+                </div>
+                <div class="dropdown-item" onclick="customizeColumns(); closePortalDropdown();">
+                    <img src="/static/images/columns-3.png" alt="Customize">
+                    Customize columns
+                </div>
+            </div>
+        `;
+        openPortalDropdown(trigger, dropdownHtml);
     }
 </script>
 {% endblock %} 
