@@ -1967,8 +1967,10 @@ def api_edit_schedule():
         schedule.schedule_data = json.dumps(data)
         logger.debug(f'Updated schedule (before commit): {schedule.to_dict()}')
         db.session.commit()
-        logger.debug('Schedule update committed successfully')
-        return jsonify({'success': True, 'message': 'Schedule updated successfully'})
+        logger.info(f'Schedule updated and committed: {schedule.to_dict()}')
+        response = {'success': True, 'message': 'Schedule updated successfully'}
+        logger.info(f'Response: {response}')
+        return jsonify(response)
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error updating schedule: {str(e)}", exc_info=True)

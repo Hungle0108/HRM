@@ -460,34 +460,85 @@
     <script>
     // Prefill logic for edit schedule step 1
     window.addEventListener('DOMContentLoaded', function() {
-        var prefill = {{ prefill_data|tojson|safe }};
-        if (prefill) {
-            // Prefill schedule name
-            if (prefill.scheduleName && document.getElementById('scheduleName')) {
-                document.getElementById('scheduleName').value = prefill.scheduleName;
-            }
-            // Prefill worker type
-            if (prefill.workerType && document.getElementById('workerType')) {
-                document.getElementById('workerType').value = prefill.workerType;
-                document.getElementById('workerType').setAttribute('data-name', prefill.workerTypeName || '');
-                if (document.getElementById('workerTypeDropdownLabel') && prefill.workerTypeName) {
-                    document.getElementById('workerTypeDropdownLabel').textContent = prefill.workerTypeName;
-                }
-                // Set selected class in dropdown menu
-                if (document.getElementById('workerTypeDropdownMenu')) {
-                    var options = document.querySelectorAll('#workerTypeDropdownMenu .dropdown-option');
-                    options.forEach(function(opt) {
-                        if (opt.getAttribute('data-value') === String(prefill.workerType)) {
-                            opt.classList.add('selected');
-                        } else {
-                            opt.classList.remove('selected');
-                        }
-                    });
+        console.log('Step 1: DOM Content Loaded');
+        
+        // Use setTimeout to ensure all elements are fully loaded
+        setTimeout(function() {
+            // ALWAYS check sessionStorage first - this is the priority
+            const savedData = sessionStorage.getItem('scheduleFormData');
+            console.log('Step 1: Saved data from sessionStorage:', savedData);
+            
+            let dataToUse = null;
+            
+            if (savedData) {
+                // Use saved data from sessionStorage (user's changes) - ALWAYS prioritize this
+                try {
+                    dataToUse = JSON.parse(savedData);
+                    console.log('Step 1: Using sessionStorage data (user changes):', dataToUse);
+                } catch (e) {
+                    console.error('Error parsing saved data:', e);
                 }
             }
-            // Store full prefill data in sessionStorage for later steps
-            sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
-        }
+            
+            // Only use backend data if NO sessionStorage data exists
+            if (!dataToUse) {
+                {% if prefill_data %}
+                dataToUse = {{ prefill_data|tojson|safe }};
+                console.log('Step 1: No sessionStorage data, using backend prefill data:', dataToUse);
+                // Initialize sessionStorage with backend data structure so user changes can be merged
+                if (dataToUse) {
+                    sessionStorage.setItem('scheduleFormData', JSON.stringify(dataToUse));
+                    console.log('Step 1: Initialized sessionStorage with backend data structure');
+                }
+                {% endif %}
+            } else {
+                console.log('Step 1: SessionStorage data found, ignoring backend data');
+            }
+            
+            if (dataToUse) {
+                console.log('Step 1: Final data to use:', dataToUse);
+                
+                // Prefill schedule name
+                const scheduleNameInput = document.getElementById('scheduleName');
+                if (dataToUse.scheduleName && scheduleNameInput) {
+                    scheduleNameInput.value = dataToUse.scheduleName;
+                    console.log('Step 1: Set schedule name to:', dataToUse.scheduleName);
+                }
+                
+                // Prefill worker type
+                const workerTypeInput = document.getElementById('workerType');
+                const workerTypeLabel = document.getElementById('workerTypeDropdownLabel');
+                const workerTypeMenu = document.getElementById('workerTypeDropdownMenu');
+                
+                if (dataToUse.workerType && workerTypeInput) {
+                    workerTypeInput.value = dataToUse.workerType;
+                    workerTypeInput.setAttribute('data-name', dataToUse.workerTypeName || '');
+                    
+                    if (workerTypeLabel && dataToUse.workerTypeName) {
+                        workerTypeLabel.textContent = dataToUse.workerTypeName;
+                        console.log('Step 1: Set worker type label to:', dataToUse.workerTypeName);
+                    }
+                    
+                    // Set selected class in dropdown menu
+                    if (workerTypeMenu) {
+                        var options = workerTypeMenu.querySelectorAll('.dropdown-option');
+                        options.forEach(function(opt) {
+                            if (opt.getAttribute('data-value') === String(dataToUse.workerType)) {
+                                opt.classList.add('selected');
+                                console.log('Step 1: Selected worker type option:', opt.textContent);
+                            } else {
+                                opt.classList.remove('selected');
+                            }
+                        });
+                    }
+                }
+                
+                // Update the continue button state
+                if (typeof updateContinueButton === 'function') {
+                    updateContinueButton();
+                }
+            }
+        }, 100); // Small delay to ensure all elements are ready
     });
     </script>
     <script>
@@ -568,17 +619,6 @@
     document.getElementById('scheduleName').addEventListener('input', updateContinueButton);
     document.getElementById('workerType').addEventListener('change', updateContinueButton);
     updateContinueButton();
-    const savedData = sessionStorage.getItem('scheduleFormData');
-    if (savedData) {
-        const data = JSON.parse(savedData);
-        document.getElementById('scheduleName').value = data.scheduleName || '';
-        document.getElementById('workerType').value = data.workerType || '';
-        if (data.workerTypeName) {
-            document.getElementById('workerType').setAttribute('data-name', data.workerTypeName);
-            document.getElementById('workerTypeDropdownLabel').textContent = data.workerTypeName;
-        }
-        updateContinueButton();
-    }
     </script>
 </body>
 </html> 

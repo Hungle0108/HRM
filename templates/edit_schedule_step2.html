@@ -1520,8 +1520,8 @@
             e.preventDefault();
             // Save current form data before going back
             saveFormStateToSession();
-            // Navigate to step 1
-            window.location.href = '/create-schedule';
+            // Navigate to edit schedule step 1
+            window.location.href = '/edit-schedule/{{ schedule_id }}';
         });
 
         // Form validation and submission
@@ -2876,6 +2876,11 @@
             }
         });
 
+        // Extra safety: Save form state before unloading or navigating away
+        window.addEventListener('beforeunload', function() {
+            saveFormStateToSession();
+        });
+
         // Helper to calculate total hours for a stored shift object
         function calculateShiftHours(shiftObj) {
             if (!shiftObj || !shiftObj.weekdays) return 0;
@@ -2952,11 +2957,15 @@
 
         // Helper to save the entire form state to session storage
         function saveFormStateToSession() {
+            console.log('Step 2: saveFormStateToSession called');
+            
             if (isLoadingData) {
+                console.log('Step 2: Skipping save - loading data');
                 return;
             }
 
             saveCurrentShiftData(); // Updates the global `shiftData` object from UI
+            console.log('Step 2: Current shiftData after saveCurrentShiftData:', shiftData);
 
             const durationToggle = document.getElementById('specifyDuration');
             const includeTimeToggle = document.getElementById('includeTime');
@@ -2965,6 +2974,7 @@
             
             // Add null checks
             if (!durationToggle || !selectedShiftsText) {
+                console.log('Step 2: Missing required elements, skipping save');
                 return;
             }
 
@@ -2989,8 +2999,13 @@
             }
             
             const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            console.log('Step 2: Existing data from sessionStorage:', existingData);
+            
             const updatedData = { ...existingData, scheduleDetails };
+            console.log('Step 2: Updated data to save:', updatedData);
+            
             sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
+            console.log('Step 2: Data saved to sessionStorage');
         }
 
         // Enhanced restoration function with complete state preservation
@@ -3059,8 +3074,17 @@
 
         // Prefill script for edit mode
         window.addEventListener('DOMContentLoaded', function() {
+            // Check if we already have sessionStorage data (user changes)
+            const existingData = sessionStorage.getItem('scheduleFormData');
+            if (existingData) {
+                console.log('Step 2: Found existing sessionStorage data, using that instead of backend data');
+                return; // Don't overwrite user changes with backend data
+            }
+            
             var prefill = {{ prefill_data|tojson|safe }};
             if (prefill && prefill.scheduleDetails) {
+                console.log('Step 2: No sessionStorage data, using backend prefill data');
+                
                 // Prefill toggles
                 if (typeof prefill.scheduleDetails.specifyDuration !== 'undefined') {
                     var durToggle = document.getElementById('specifyDuration');
@@ -3101,8 +3125,9 @@
                     });
                 }
                 
-                // Store full prefill data in sessionStorage for later steps
+                // Only store backend data if no sessionStorage data exists
                 sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
+                console.log('Step 2: Stored backend data in sessionStorage');
                 
                 // Trigger change events to update UI
                 var editSpecifyDurationToggle = document.getElementById('specifyDuration');

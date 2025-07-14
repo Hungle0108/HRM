@@ -769,6 +769,11 @@
         </div>
 
     <script>
+// Define a no-op saveFormStateToSession if not present
+if (typeof saveFormStateToSession !== 'function') {
+    function saveFormStateToSession() {}
+}
+
         // Load and display saved data from previous steps
         function loadSavedData() {
             const savedData = sessionStorage.getItem('scheduleFormData');
@@ -1043,6 +1048,10 @@
 
         document.addEventListener('click', function(e) {
             if (e.target && e.target.id === 'createScheduleBtn') {
+                // Extra safety: Save the latest form state before updating
+                if (typeof saveFormStateToSession === 'function') {
+                    saveFormStateToSession();
+                }
                 console.log('Update button clicked!');
                 const savedData = sessionStorage.getItem('scheduleFormData');
                 console.log('Saved data from sessionStorage:', savedData);
@@ -1053,12 +1062,41 @@
                 }
                 const data = JSON.parse(savedData);
                 data.id = {{ schedule_id }};
+                
+                // Log the complete data being sent to ensure all changes are included
+                console.log('Complete data being sent to backend:', data);
+                console.log('Step 1 data (scheduleName, workerType):', {
+                    scheduleName: data.scheduleName,
+                    workerType: data.workerType,
+                    workerTypeName: data.workerTypeName
+                });
+                console.log('Step 2 data (scheduleDetails):', data.scheduleDetails);
+                console.log('Schedule ID being sent:', data.id);
+                console.log('Data structure keys:', Object.keys(data));
+                
+                // Validate that we have all required data
+                if (!data.scheduleName) {
+                    console.error('Missing scheduleName in data');
+                    alert('Error: Schedule name is missing. Please go back to step 1.');
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    return;
+                }
+                
+                if (!data.scheduleDetails) {
+                    console.error('Missing scheduleDetails in data');
+                    alert('Error: Schedule details are missing. Please go back to step 2.');
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    return;
+                }
+                
                 // Show loading state
                 const button = e.target;
                 const originalText = button.textContent;
                 button.textContent = 'Updating...';
                 button.disabled = true;
-                console.log('About to send update:', data);
+                
                 fetch('/api/edit-schedule', {
                     method: 'POST',
                     headers: {
@@ -1069,9 +1107,11 @@
                 .then(response => response.json())
                 .then(result => {
                     if (result.success) {
+                        console.log('Update successful, clearing sessionStorage and redirecting');
                         sessionStorage.removeItem('scheduleFormData');
                         window.location.href = '/settings/time-tracking';
                     } else {
+                        console.error('Update failed:', result.error);
                         alert('Error: ' + (result.error || 'Failed to update schedule'));
                         button.textContent = originalText;
                         button.disabled = false;
@@ -1088,13 +1128,15 @@
         
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, checking for update button...');
+            console.log('Step 3: DOM loaded, checking for update button...');
             
             // Load saved data first
             loadSavedData();
             
             // Check the schedule type from sessionStorage and update the text
             const saved = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            console.log('Step 3: Loaded saved data:', saved);
+            
             if (saved.scheduleDetails && saved.scheduleDetails.shifts) {
                 const firstShift = saved.scheduleDetails.shifts[1];
                 const scheduleTypeElement = document.querySelector('.schedule-type-value');
@@ -1131,14 +1173,5 @@
             }
         });
     </script>
-    <script>
-window.addEventListener('DOMContentLoaded', function() {
-    var prefill = {{ prefill_data|tojson|safe }};
-    if (prefill && prefill.scheduleDetails) {
-        sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
-        // Optionally trigger UI updates if needed
-    }
-});
-</script>
 </body>
 </html> 
