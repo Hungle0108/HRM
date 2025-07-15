@@ -1,320 +1,117 @@
-<div class="settings-sidebar">
-    <div class="sidebar-header">
-        <h1 class="sidebar-title">Organization settings</h1>
-        <div class="search-container"> 
-        
-            <input type="text" class="search-input" placeholder="Search">
+<div class="settings-sidebar sidebar-modern">
+    <div class="sidebar-logo-area">
+        <div class="sidebar-logo-circle">
+            <img src="/static/images/calendar-lines.png" alt="Logo" style="width: 28px; height: 28px;">
         </div>
+        <span class="sidebar-app-title">Base Schedule</span>
     </div>
-    <nav class="settings-nav">
-        <!-- Organization & security section -->
-        <div class="nav-section">
-            <div class="section-title">Organization & security</div>
-            <div class="nav-item expandable" data-section="organization">
-                <div class="nav-item-content">
-                    <div class="nav-icon icon-organization"></div>
-                    <span>Organization</span>
-                    <span class="dropdown-arrow">
-                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
-                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
-                    </span>
-                </div>
-            </div>
-            <div class="nav-subitems" data-parent="organization">
-                <div class="nav-subitem{% if active_page == 'analytics' %} active{% endif %}"><a href="#">Analytics</a></div>
-                <div class="nav-subitem{% if active_page == 'billing' %} active{% endif %}"><a href="#">Billing & payments</a></div>
-                <div class="nav-subitem{% if active_page == 'branding' %} active{% endif %}"><a href="#">Custom branding</a></div>
-                <div class="nav-subitem{% if active_page == 'entities' %} active{% endif %}"><a href="/settings/entities" style="color:inherit;text-decoration:none;">Entities</a></div>
-                <div class="nav-subitem{% if active_page == 'groups' %} active{% endif %}"><a href="/groups" style="color:inherit;text-decoration:none;">Groups</a></div>
-                <div class="nav-subitem{% if active_page == 'org_chart' %} active{% endif %}"><a href="/settings/org-chart" style="color:inherit;text-decoration:none;">Org chart and structure</a></div>
-                <div class="nav-subitem{% if active_page == 'organization_details' %} active{% endif %}"><a href="/settings" style="color:inherit;text-decoration:none;">Organization details</a></div>
-            </div>
-            <div class="nav-item expandable" data-section="security">
-                <div class="nav-item-content">
-                    <div class="nav-icon icon-security"></div>
-                    <span>Security</span>
-                    <span class="dropdown-arrow">
-                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
-                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
-                    </span>
-                </div>
-            </div>
-            <div class="nav-subitems" data-parent="security">
-                <div class="nav-subitem">Access control</div>
-                <div class="nav-subitem">Authentication</div>
-            </div>
-        </div>
-        <!-- Payroll section -->
-        <div class="nav-section">
-            <div class="section-title">Payroll</div>
-            <div class="nav-item" data-section="expenses">
-                <div class="nav-item-content">
-                    <div class="nav-icon icon-dollar"></div>
-                    <span>Expenses & adjustments</span>
-                </div>
-            </div>
-        </div>
-        <!-- Human Resources section -->
-        <div class="nav-section">
-            <div class="section-title">Human Resources</div>
-            <div class="nav-item expandable" data-section="hr-settings">
-                <div class="nav-item-content">
-                    <div class="nav-icon icon-people"></div>
-                    <span>Settings</span>
-                    <span class="dropdown-arrow">
-                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
-                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
-                    </span>
-                </div>
-            </div>
-            <div class="nav-subitems" data-parent="hr-settings">
-                <div class="nav-subitem">Employee settings</div>
-                <div class="nav-subitem{% if active_page == 'time_tracking' %} active{% endif %}"><a href="/settings/time-tracking" style="color:inherit;text-decoration:none;">Time tracking</a></div>
-                <div class="nav-subitem{% if active_page == 'worker_type' %} active{% endif %}"><a href="/settings/worker-type" style="color:inherit;text-decoration:none;">Worker type</a></div>
-            </div>
-            <div class="nav-item expandable" data-section="customization">
-                <div class="nav-item-content">
-                    <div class="nav-icon icon-customize"></div>
-                    <span>Customization</span>
-                    <span class="dropdown-arrow">
-                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
-                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
-                    </span>
-                </div>
-            </div>
-            <div class="nav-subitems" data-parent="customization">
-                <div class="nav-subitem">Custom fields</div>
-                <div class="nav-subitem">Templates</div>
-            </div>
-        </div>
+    <nav class="sidebar-nav">
+        <ul class="sidebar-list">
+            <li class="sidebar-item active"><span class="sidebar-icon">🏠</span> Trang chủ</li>
+            <li class="sidebar-item"><span class="sidebar-icon">📊</span> Tổng quan</li>
+            <li class="sidebar-item"><span class="sidebar-icon">🕒</span> Phân ca</li>
+            <li class="sidebar-item"><span class="sidebar-icon">🔄</span> Chu kỳ</li>
+            <li class="sidebar-item"><span class="sidebar-icon">📝</span> Đề xuất</li>
+            <li class="sidebar-divider"></li>
+            <li class="sidebar-item"><span class="sidebar-icon">⚙️</span> Cài đặt</li>
+            <li class="sidebar-item"><span class="sidebar-icon">🕑</span> Lịch sử hoạt động</li>
+        </ul>
+        <div class="sidebar-section-title">Chu kỳ tính công</div>
+        <ul class="sidebar-list sidebar-list-cycles">
+            <li class="sidebar-item"><span class="sidebar-icon">📅</span> T07/2025</li>
+            <li class="sidebar-item"><span class="sidebar-icon">📅</span> T06/2025</li>
+            <li class="sidebar-item"><span class="sidebar-icon">📅</span> T05/2025</li>
+            <li class="sidebar-item"><span class="sidebar-icon">📅</span> T04/2025</li>
+            <li class="sidebar-item"><span class="sidebar-icon">📅</span> T03/2025</li>
+        </ul>
     </nav>
 </div>
 
 <style>
-/* Dropdown arrow styles */
-.dropdown-arrow {
+.sidebar-modern {
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    padding: 24px 0 24px 0;
+    width: 270px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: none;
+}
+.sidebar-logo-area {
     display: flex;
     align-items: center;
-    margin-left: auto;
-    transition: transform 0.2s ease;
+    gap: 12px;
+    padding: 0 32px 24px 32px;
+    margin-bottom: 8px;
 }
-
-.dropdown-arrow img {
-    width: 16px;
-    height: 16px;
-    object-fit: contain;
-}
-
-.dropdown-arrow .arrow-up {
-    display: none;
-}
-
-.nav-item.expandable.expanded .dropdown-arrow .arrow-down {
-    display: none;
-}
-
-.nav-item.expandable.expanded .dropdown-arrow .arrow-up {
-    display: inline;
-}
-
-/* Subitems animation */
-.nav-subitems {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    background: transparent;
-}
-
-.nav-subitems.expanded {
-    max-height: 500px;
-    transition: max-height 0.3s ease-in;
-}
-
-/* Expandable items */
-.nav-item.expandable {
-    cursor: pointer;
-    user-select: none;
-}
-
-.nav-item.expandable .nav-item-content {
+.sidebar-logo-circle {
+    background: #4f46e5;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.10);
+}
+.sidebar-app-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: 0.01em;
+}
+.sidebar-nav {
     width: 100%;
 }
-
-.nav-item.expandable:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.sidebar-list {
+    list-style: none;
+    padding: 0 0 0 0;
+    margin: 0 0 8px 0;
 }
-
-/* Helper class to disable animations during page load */
-.settings-sidebar.no-transition .nav-subitems {
-    transition: none !important;
+.sidebar-list-cycles {
+    margin-top: 0;
+    padding-left: 0;
 }
-</style>
-
-<script>
-(function() {
-    // Prevent multiple initialization
-    if (window.orgSidebarInitialized) return;
-    window.orgSidebarInitialized = true;
-
-    function initializeSidebar() {
-        console.log('Initializing organization sidebar with no-transition fix...');
-        
-        const sidebar = document.querySelector('.settings-sidebar');
-        if (!sidebar) return;
-
-        // Add class to disable all transitions during setup
-        sidebar.classList.add('no-transition');
-        
-        // Check if this is the first visit to organization settings in this session
-        const isFirstVisit = !sessionStorage.getItem('orgSettingsVisited');
-        
-        if (isFirstVisit) {
-            // First visit - collapse all dropdowns
-            collapseAllDropdowns();
-            // Mark that user has visited organization settings
-            sessionStorage.setItem('orgSettingsVisited', 'true');
-            console.log('First visit to organization settings - all dropdowns collapsed');
-        } else {
-            // Not first visit - restore previous state and expand active parent
-            restoreExpandedState();
-            expandActiveParent();
-            console.log('Returning to organization settings - restoring previous state');
-        }
-        
-        // Get all expandable items
-        const expandableItems = document.querySelectorAll('.nav-item.expandable');
-        
-        expandableItems.forEach(item => {
-            // Remove any existing event listeners
-            const newItem = item.cloneNode(true);
-            item.parentNode.replaceChild(newItem, item);
-        });
-
-        // Re-select after cloning
-        const freshExpandableItems = document.querySelectorAll('.nav-item.expandable');
-        
-        freshExpandableItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Dropdown clicked:', this.getAttribute('data-section'));
-                
-                const section = this.getAttribute('data-section');
-                const subitems = document.querySelector(`[data-parent="${section}"]`);
-                
-                if (subitems) {
-                    const isExpanded = this.classList.contains('expanded');
-                    
-                    if (isExpanded) {
-                        // Collapse
-                        this.classList.remove('expanded');
-                        subitems.classList.remove('expanded');
-                        console.log('Collapsing:', section);
-                    } else {
-                        // Expand
-                        this.classList.add('expanded');
-                        subitems.classList.add('expanded');
-                        console.log('Expanding:', section);
-                    }
-                    
-                    // Save state to localStorage
-                    saveExpandedState();
-                }
-            });
-        });
-
-        // Force browser to apply the styles before re-enabling transitions
-        // Reading an element's offsetHeight is a common way to trigger a reflow
-        document.body.offsetHeight;
-
-        // Re-enable transitions after the browser has painted the initial state
-        setTimeout(() => {
-            if (sidebar) {
-                sidebar.classList.remove('no-transition');
-                console.log('Sidebar transitions re-enabled.');
-            }
-        }, 0); // A small delay ensures the initial state is rendered
-    }
-
-    function collapseAllDropdowns() {
-        // Remove expanded class from all expandable items
-        document.querySelectorAll('.nav-item.expandable').forEach(item => {
-            item.classList.remove('expanded');
-        });
-        
-        // Remove expanded class from all subitems
-        document.querySelectorAll('.nav-subitems').forEach(item => {
-            item.classList.remove('expanded');
-        });
-        
-        // Clear any previous localStorage state for fresh start
-        localStorage.removeItem('sidebarExpandedSections');
-        
-        console.log('All dropdowns collapsed - clean slate for first visit');
-    }
-
-    function saveExpandedState() {
-        const expandedSections = [];
-        document.querySelectorAll('.nav-item.expandable.expanded').forEach(item => {
-            expandedSections.push(item.getAttribute('data-section'));
-        });
-        localStorage.setItem('sidebarExpandedSections', JSON.stringify(expandedSections));
-    }
-
-    function restoreExpandedState() {
-        try {
-            const expandedSections = JSON.parse(localStorage.getItem('sidebarExpandedSections') || '[]');
-            expandedSections.forEach(section => {
-                const navItem = document.querySelector(`.nav-item.expandable[data-section="${section}"]`);
-                const subitems = document.querySelector(`[data-parent="${section}"]`);
-                if (navItem && subitems) {
-                    navItem.classList.add('expanded');
-                    subitems.classList.add('expanded');
-                }
-            });
-        } catch (e) {
-            console.error('Error restoring expanded state:', e);
-        }
-    }
-
-    function expandActiveParent() {
-        const activeSubitem = document.querySelector('.nav-subitem.active');
-        if (activeSubitem) {
-            const parentSection = activeSubitem.parentElement.getAttribute('data-parent');
-            if (parentSection) {
-                const navItem = document.querySelector(`.nav-item.expandable[data-section="${parentSection}"]`);
-                const subitems = document.querySelector(`[data-parent="${parentSection}"]`);
-                if (navItem && subitems) {
-                    navItem.classList.add('expanded');
-                    subitems.classList.add('expanded');
-                    saveExpandedState();
-                    console.log('Expanded parent section for active page:', parentSection);
-                }
-            }
-        }
-    }
-
-    // Initialize when DOM is ready, without artificial delay
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeSidebar);
-    } else {
-        // DOM is already loaded, run immediately
-        initializeSidebar();
-    }
-})();
-
-// Reset the session flag when user navigates away from organization settings
-// This will be triggered when they go to other sections of the app
-window.addEventListener('beforeunload', function() {
-    // Check if the next page is still within organization settings
-    // If not, we could clear the session flag, but we'll let it persist
-    // until the browser session ends naturally
-});
-
-// Alternative approach: Reset when user visits non-org-settings pages
-// You could add this to your main navigation or other pages:
-// sessionStorage.removeItem('orgSettingsVisited');
-</script> 
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 32px 12px 32px;
+    font-size: 1.05rem;
+    color: #444;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    margin-bottom: 2px;
+}
+.sidebar-item.active, .sidebar-item:hover {
+    background: #e0e7ff;
+    color: #4f46e5;
+    font-weight: 600;
+}
+.sidebar-divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 12px 0;
+    width: 80%;
+    align-self: center;
+}
+.sidebar-section-title {
+    font-size: 0.98rem;
+    color: #6b7280;
+    font-weight: 600;
+    padding: 12px 32px 4px 32px;
+    margin-top: 10px;
+    margin-bottom: 2px;
+    letter-spacing: 0.01em;
+}
+.sidebar-icon {
+    font-size: 1.18rem;
+    width: 22px;
+    text-align: center;
+    opacity: 0.85;
+}
+</style> 
