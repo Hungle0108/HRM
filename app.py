@@ -1976,24 +1976,6 @@ def api_edit_schedule():
         logger.error(f"Error updating schedule: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'error': f'Failed to update schedule: {str(e)}'}), 500
 
-@app.route('/schedule')
-def schedule_overview():
-    if 'user_id' not in session:
-        return redirect('/login')
-    user = User.query.get(session['user_id'])
-    if not user:
-        return redirect('/login')
-    # TODO: Fetch users and attendance/check-in data for the organization
-    # For now, pass empty/fake data for template development
-    organization = None
-    users = []
-    if user.organization_id:
-        organization = Organization.query.get(user.organization_id)
-        # Example: users = User.query.filter_by(organization_id=user.organization_id).all()
-    # Example data structure for template
-    schedule_data = []
-    return render_template('schedule_overview.html', user=user, organization=organization, users=users, schedule_data=schedule_data)
-
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running

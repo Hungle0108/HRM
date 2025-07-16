@@ -736,7 +736,7 @@
             <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
             <a href="/members" class="nav-link {% if request.path == '/members' %}active{% endif %}">Members</a>
             <a href="#" class="nav-link {% if request.path == '/payroll' %}active{% endif %}">Payroll</a>
-            <a href="/schedule" class="nav-link {% if request.path == '/schedule' %}active{% endif %}">Lịch trình</a>
+            <a href="#" class="nav-link {% if request.path == '/schedule' %}active{% endif %}">Schedule</a>
             <a href="#" class="nav-link {% if request.path == '/pit' %}active{% endif %}">PIT</a>
             <a href="#" class="nav-link {% if request.path == '/vss' %}active{% endif %}">VSS</a>
         </div>
@@ -1247,7 +1247,7 @@
                     link.textContent = getTranslation('members');
                 } else if (text === 'Payroll' || text === 'Bảng lương') {
                     link.textContent = getTranslation('payroll');
-                } else if (text === 'Lịch trình' || text === 'Lịch trình') {
+                } else if (text === 'Schedule' || text === 'Lịch trình') {
                     link.textContent = getTranslation('schedule');
                 } else if (text === 'Groups' || text === 'Nhóm') {
                     link.textContent = getTranslation('groups');
