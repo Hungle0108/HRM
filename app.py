@@ -2071,6 +2071,28 @@ def api_get_organization_workers():
         logger.error(f"Error fetching organization workers: {str(e)}")
         return jsonify({'error': 'Failed to fetch workers'}), 500
 
+@app.route('/group/<int:group_id>/settings')
+def group_settings(group_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    group = Group.query.get(group_id)
+    if not group:
+        return redirect('/groups')
+    admin = group.admin_user
+    admin_info = {
+        'id': admin.id,
+        'name': admin.name,
+        'email': admin.email,
+        'initials': (admin.first_name[:1] if admin.first_name else '') + (admin.last_name[:1] if admin.last_name else ''),
+        'role': 'Group Admin',
+        'avatar_url': admin.avatar_url
+    } if admin else None
+    return render_template('group_settings.html', user=user, group=group, admin=admin_info)
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running

@@ -734,6 +734,330 @@
         position: relative;
     }
 
+    /* Header dropdown menu styles (from worker type page) */
+    .header-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+        z-index: 1001;
+        display: none;
+        padding: 6px 0;
+        margin-top: 4px;
+        animation: fadeIn 0.15s ease-out;
+    }
+    
+    .header-dropdown.positioned-above {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.15s ease;
+        position: relative;
+        font-weight: 500;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+        color: #1f2937;
+        padding-left: 16px;
+    }
+
+    .dropdown-item:first-child {
+        margin-top: 2px;
+    }
+
+    .dropdown-item:last-child {
+        margin-bottom: 2px;
+    }
+
+    .dropdown-item img {
+        width: 14px;
+        height: 14px;
+        opacity: 0.7;
+        transition: opacity 0.15s ease;
+    }
+
+    .dropdown-item:hover img {
+        opacity: 1;
+    }
+
+    /* Customize Columns Modal (from worker type page) */
+    .customize-modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 400px;
+        background: white;
+        border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1020;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customize-modal.show {
+        transform: translateX(0);
+    }
+
+    .customize-modal-content {
+        background: white;
+        border-radius: 0;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .customize-modal-header {
+        padding: 24px 24px 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .customize-modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .customize-modal-body {
+        padding: 24px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        color: #6c757d;
+        transition: all 0.2s;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .close-btn:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .column-option {
+        display: flex;
+        align-items: flex-start;
+        padding: 16px 0;
+        border-bottom: 1px solid #f1f3f4;
+        transition: all 0.2s ease;
+    }
+
+    .column-option:last-child {
+        border-bottom: none;
+    }
+
+    .column-option:hover {
+        background: #f8f9fa;
+        margin: 0 -16px;
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .column-option.select-all-option {
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 16px;
+        padding-bottom: 20px;
+    }
+
+    .column-checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        width: 100%;
+    }
+
+    .column-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        appearance: none;
+        cursor: pointer;
+        position: relative;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+        margin: 1px 0 0 0;
+    }
+
+    .column-checkbox:hover {
+        border-color: #9ca3af;
+    }
+
+    .column-checkbox:checked {
+        background-color: #1a1a1a;
+        border-color: #1a1a1a;
+    }
+
+    .column-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .column-checkbox:indeterminate {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:indeterminate::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        background: white;
+        transform: translate(-50%, -50%);
+    }
+
+    .column-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+        margin-left: 12px;
+    }
+
+    .column-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-left: 12px;
+    }
+
+    .column-option .column-name {
+        margin-left: 0;
+    }
+
+    .selection-count {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .customize-modal-footer {
+        padding: 20px 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: white;
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .btn-reset {
+        padding: 10px 20px;
+        background: transparent;
+        color: #6c757d;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .btn-save {
+        padding: 10px 20px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-save:hover {
+        background: #333;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
     /* Actions container */
     .actions-container {
         position: relative;
@@ -741,20 +1065,24 @@
     }
 
     .action-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
+        position: fixed;
         background: white;
         border: 1px solid #e9ecef;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
         min-width: 150px;
-        display: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        overflow: hidden;
     }
 
     .action-menu.show {
-        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
     }
 
     .action-item {
@@ -766,11 +1094,6 @@
         color: #495057;
         cursor: pointer;
         transition: all 0.2s;
-        border-bottom: 1px solid #f1f3f4;
-    }
-
-    .action-item:last-child {
-        border-bottom: none;
     }
 
     .action-item:hover {
@@ -1076,17 +1399,19 @@
                                                 <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
                                             </button>
                                             <div class="action-menu" id="menu-{{ group.id }}">
-                                                <div class="action-item" data-group-id="{{ group.id }}" onclick="editGroup(this.getAttribute('data-group-id'))">
+                                                <div class="action-item" data-group-id="{{ group.id }}">
+                                                    <a href="/group/{{ group.id }}/settings" style="display: flex; align-items: center; color: inherit; text-decoration: none; width: 100%;">
                                                     <img src="/static/images/pen.png" alt="Edit" class="action-icon">
-                                                    <span>Edit</span>
+                                                        <span>Edit group setting</span>
+                                                    </a>
                                                 </div>
                                                 <div class="action-item" data-group-id="{{ group.id }}" onclick="copyGroup(this.getAttribute('data-group-id'))">
                                                     <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
-                                                    <span>Duplicate</span>
+                                                    <span>Duplicate group setting</span>
                                                 </div>
                                                 <div class="action-item delete" data-group-id="{{ group.id }}" onclick="deleteGroup(this.getAttribute('data-group-id'))">
-                                                    <img src="/static/images/trash-bold.png" alt="Delete" class="action-icon">
-                                                    <span>Delete</span>
+                                                    <img src="/static/images/trash.png" alt="Delete" class="action-icon">
+                                                    <span>Delete group setting</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -1107,6 +1432,66 @@
                 </tbody>
             </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <!-- Customize Columns Modal -->
+    <div class="customize-modal" id="customizeModal">
+        <div class="customize-modal-content">
+            <div class="customize-modal-header">
+                <h3 class="customize-modal-title">Customize columns</h3>
+                <button class="close-btn" id="customizeCloseBtn">
+                    <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                </button>
+            </div>
+            
+            <div class="customize-modal-body">
+                <div class="column-option select-all-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" id="selectAllColumns">
+                        <div class="column-info">
+                            <span class="column-name">Select all</span>
+                            <span class="selection-count" id="selectionCount">4 / 4 selected</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="group-name" checked>
+                        <span class="column-name">Group</span>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="status" checked>
+                        <span class="column-name">Status</span>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="admins" checked>
+                        <span class="column-name">Admins assigned</span>
+                    </label>
+                </div>
+
+                <div class="column-option">
+                    <label class="column-checkbox-label">
+                        <input type="checkbox" class="column-checkbox" data-column="contracts" checked>
+                        <span class="column-name">Contracts</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="customize-modal-footer">
+                <button class="btn-reset" id="customizeResetBtn">Reset</button>
+                <button class="btn-save" id="customizeSaveBtn">Save</button>
             </div>
         </div>
     </div>
@@ -1173,6 +1558,13 @@
         
         // Toggle current menu
         const menu = document.getElementById(`menu-${groupId}`);
+        const button = event.currentTarget;
+        const buttonRect = button.getBoundingClientRect();
+        
+        // Position the menu to the left of the button
+        menu.style.top = (buttonRect.bottom + 5) + 'px';
+        menu.style.left = (buttonRect.left - menu.offsetWidth) + 'px';
+        
         menu.classList.toggle('show');
     }
 
@@ -1224,23 +1616,460 @@
 
     // Customize columns button
     document.getElementById('customizeColumnsBtn').addEventListener('click', function() {
-        console.log('Customize columns clicked');
-        // Add column customization functionality here
+        openCustomizeModal();
     });
 
-    // Sort functionality
-    function showSortDropdown(element, sortType) {
-        console.log('Sort dropdown for:', sortType);
-        // Add sort dropdown functionality here
+    // Sorting system variables
+    let currentSort = { field: 'name', direction: 'asc' };
+    let originalData = [];
+
+    // Initialize sorting system
+    function initializeSorting() {
+        // Collect original data from table rows
+        const tbody = document.getElementById('groupsBody');
+        const rows = tbody.querySelectorAll('tr');
+        
+        originalData = [];
+        rows.forEach(row => {
+            if (row.cells.length > 1) { // Skip empty state rows
+                const nameCell = row.querySelector('.group-name');
+                const statusCell = row.cells[1];
+                const adminsCell = row.cells[2];
+                const contractsCell = row.cells[3];
+                
+                originalData.push({
+                    element: row.cloneNode(true),
+                    name: nameCell ? nameCell.textContent.trim().toLowerCase() : '',
+                    status: statusCell ? statusCell.textContent.trim().toLowerCase() : '',
+                    admins: adminsCell ? adminsCell.textContent.trim() : '',
+                    contracts: contractsCell ? contractsCell.textContent.trim() : ''
+                });
+            }
+        });
+        
+        console.log('Initialized sorting with', originalData.length, 'groups');
+        
+        // Setup sorting event listeners
+        setupSorting();
+        
+        // Apply default sort
+        updateSortArrows();
     }
 
-    // Table sorting
+    // Setup sorting event listeners
+    function setupSorting() {
     document.querySelectorAll('.sortable').forEach(header => {
-        header.addEventListener('click', function() {
-            const sortType = this.getAttribute('data-sort');
-            console.log('Sort by:', sortType);
-            // Add sorting functionality here
+            header.addEventListener('click', function(event) {
+                // Only sort when clicking the sort icon
+                if (event.target.closest('.sort-icon')) {
+                    const sortField = this.dataset.sort;
+                    
+                    if (currentSort.field === sortField) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.field = sortField;
+                        currentSort.direction = 'asc';
+                    }
+                    
+                    updateTableView();
+                }
+            });
         });
+    }
+
+    // Update sort arrows
+    function updateSortArrows() {
+        document.querySelectorAll('.sortable').forEach(header => {
+            const sortIcon = header.querySelector('.sort-icon img');
+            const sortField = header.dataset.sort;
+            
+            // Remove sorted class from all headers
+            header.classList.remove('sorted');
+            
+            if (currentSort.field === sortField) {
+                // Add sorted class to active column
+                header.classList.add('sorted');
+                // Set the correct arrow direction for the active column
+                sortIcon.src = currentSort.direction === 'asc' ? 
+                    '/static/images/arrow-small-up.png' : 
+                    '/static/images/arrow-small-down.png';
+            } else {
+                // Other columns default to the 'up' arrow
+                sortIcon.src = '/static/images/arrow-small-up.png';
+            }
+        });
+    }
+
+    // Update table view with sorting
+    function updateTableView() {
+        // Sort the data
+        let sortedData = [...originalData].sort((a, b) => {
+            let aVal, bVal;
+
+            switch (currentSort.field) {
+                case 'name':
+                    aVal = a.name;
+                    bVal = b.name;
+                    break;
+                case 'status':
+                    aVal = a.status;
+                    bVal = b.status;
+                    break;
+                case 'admins':
+                    // Extract number from admin text (e.g., "2 admins" -> 2)
+                    aVal = parseInt(a.admins.match(/\d+/)?.[0] || '0');
+                    bVal = parseInt(b.admins.match(/\d+/)?.[0] || '0');
+                    break;
+                case 'contracts':
+                    // Extract number from contracts text
+                    aVal = parseInt(a.contracts.match(/\d+/)?.[0] || '0');
+                    bVal = parseInt(b.contracts.match(/\d+/)?.[0] || '0');
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (currentSort.direction === 'asc') {
+                return aVal > bVal ? 1 : -1;
+            } else {
+                return aVal < bVal ? 1 : -1;
+            }
+        });
+
+        // Update visual indicators for sorting
+        updateSortArrows();
+
+        // Render the sorted data
+        const tbody = document.getElementById('groupsBody');
+        tbody.innerHTML = '';
+        
+        if (sortedData.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <div class="empty-state-title">No groups yet</div>
+                            <div class="empty-state-description">Create your first group to get started</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            sortedData.forEach(item => {
+                const clonedRow = item.element.cloneNode(true);
+                // Re-attach event listeners to cloned elements
+                attachRowEventListeners(clonedRow);
+                tbody.appendChild(clonedRow);
+            });
+        }
+    }
+
+    // Reattach event listeners to cloned rows
+    function attachRowEventListeners(row) {
+        // Reattach group name click listener
+        const groupName = row.querySelector('.group-name.clickable');
+        if (groupName) {
+            groupName.addEventListener('click', function() {
+                showGroupInfo(this.getAttribute('data-group-id'));
+            });
+        }
+        
+        // Reattach action menu listeners
+        const editBtn = row.querySelector('.edit-btn');
+        if (editBtn) {
+            editBtn.addEventListener('click', function() {
+                const groupId = this.closest('tr').querySelector('[data-group-id]').getAttribute('data-group-id');
+                editGroup(groupId);
+            });
+        }
+    }
+
+    // Portal dropdown utilities (from worker type page)
+    function openPortalDropdown(triggerElement, dropdownHtml) {
+        const portalRoot = document.getElementById('portal-root');
+        portalRoot.innerHTML = dropdownHtml;
+
+        const rect = triggerElement.getBoundingClientRect();
+        const dropdownWidth = 220;
+        const gap = 4;
+        const minMargin = 8;
+
+        let left;
+        // Prefer left alignment, but if not enough space, align right
+        if (rect.right - dropdownWidth > minMargin) {
+            // Enough space to the left
+            left = rect.right - dropdownWidth;
+        } else if (rect.left + dropdownWidth < window.innerWidth - minMargin) {
+            // Not enough space to the left, so show to the right
+            left = rect.left;
+        } else {
+            // Fallback: stick to minMargin
+            left = minMargin;
+        }
+
+        const dropdown = portalRoot.firstElementChild;
+        dropdown.style.position = 'fixed';
+        dropdown.style.top = (rect.bottom + gap) + 'px';
+        dropdown.style.width = dropdownWidth + 'px';
+        dropdown.style.left = left + 'px';
+        dropdown.style.zIndex = 9999;
+
+        function handleClickOutside(event) {
+            if (!dropdown.contains(event.target) && event.target !== triggerElement) {
+                closePortalDropdown();
+                document.removeEventListener('mousedown', handleClickOutside);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    function closePortalDropdown() {
+        const portalRoot = document.getElementById('portal-root');
+        portalRoot.innerHTML = '';
+    }
+
+    // Sort dropdown functionality
+    function showSortDropdown(trigger, column) {
+        const dropdownHtml = `
+            <div class="header-dropdown show">
+                <div class="dropdown-item" onclick="sortColumn('${column}', 'asc'); closePortalDropdown();">
+                    <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                    Sort by ASC
+                </div>
+                <div class="dropdown-item" onclick="sortColumn('${column}', 'desc'); closePortalDropdown();">
+                    <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                    Sort by DESC
+                </div>
+                <div class="dropdown-item" onclick="customizeColumnsFromDropdown(); closePortalDropdown();">
+                    <img src="/static/images/columns-3.png" alt="Customize">
+                    Customize columns
+                </div>
+            </div>
+        `;
+        openPortalDropdown(trigger, dropdownHtml);
+    }
+
+    // Sort column function
+    function sortColumn(field, direction) {
+        console.log('Sorting by', field, direction);
+        
+        // Update current sort state
+        currentSort = { field: field, direction: direction };
+        
+        // Update table view with new sorting
+        updateTableView();
+    }
+
+    // Customize columns functions
+    function customizeColumnsFromDropdown() {
+        openCustomizeModal();
+    }
+
+    function openCustomizeModal() {
+        const modal = document.getElementById('customizeModal');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const settingsContent = document.querySelector('.settings-content');
+        
+        modal.classList.add('show');
+        modalOverlay.classList.add('show');
+        if (settingsContent) {
+            settingsContent.classList.add('modal-open');
+        }
+        
+        // Update selection count
+        updateSelectionCount();
+    }
+
+    function setupCustomizeModal() {
+        const modal = document.getElementById('customizeModal');
+        const closeBtn = document.getElementById('customizeCloseBtn');
+        const resetBtn = document.getElementById('customizeResetBtn');
+        const saveBtn = document.getElementById('customizeSaveBtn');
+        const selectAllCheckbox = document.getElementById('selectAllColumns');
+        const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+        const selectionCount = document.getElementById('selectionCount');
+
+        if (!modal || !closeBtn || !resetBtn || !saveBtn || !selectAllCheckbox || !selectionCount) {
+            console.log('Some customize modal elements not found, skipping setup');
+            return;
+        }
+
+        // Close modal function
+        function closeModal() {
+            modal.classList.remove('show');
+            document.getElementById('modalOverlay').classList.remove('show');
+            const settingsContent = document.querySelector('.settings-content');
+            if (settingsContent) {
+                settingsContent.classList.remove('modal-open');
+            }
+        }
+
+        // Update selection count function
+        function updateSelectionCount() {
+            const totalColumns = columnCheckboxes.length;
+            const checkedColumns = document.querySelectorAll('.column-checkbox[data-column]:checked').length;
+            selectionCount.textContent = `${checkedColumns} / ${totalColumns} selected`;
+            
+            // Update select all checkbox state
+            if (checkedColumns === totalColumns) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedColumns === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        // Function to update table columns visibility
+        function updateTableColumns() {
+            const columnMapping = {
+                'group-name': 0,
+                'status': 1,
+                'admins': 2,
+                'contracts': 3
+                // Actions column (index 4) is always visible
+            };
+            
+            const table = document.getElementById('groupsTable');
+            const rows = table.querySelectorAll('tr');
+            
+            // Update header row
+            const headerRow = rows[0];
+            Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                const headerCell = headerRow.cells[columnIndex];
+                
+                if (checkbox && headerCell) {
+                    if (checkbox.checked) {
+                        headerCell.style.display = 'table-cell';
+                    } else {
+                        headerCell.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Update data rows
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                    const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                    const cell = row.cells[columnIndex];
+                    
+                    if (checkbox && cell) {
+                        if (checkbox.checked) {
+                            cell.style.display = 'table-cell';
+                        } else {
+                            cell.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            // Update empty state colspan
+            updateEmptyStateColspan();
+        }
+
+        // Function to calculate visible columns and update empty state colspan
+        function updateEmptyStateColspan() {
+            const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+            let visibleColumns = 1; // Actions column is always visible
+            
+            columnCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    visibleColumns++;
+                }
+            });
+            
+            // Update all empty state colspans
+            const emptyStateCells = document.querySelectorAll('td[colspan]');
+            emptyStateCells.forEach(cell => {
+                cell.setAttribute('colspan', visibleColumns);
+            });
+        }
+
+        // Initial setup
+        updateSelectionCount();
+        updateEmptyStateColspan();
+
+        // Event listeners
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close on overlay click
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', function(e) {
+                if (modal.classList.contains('show') && e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Select all functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            const shouldCheck = this.checked;
+            columnCheckboxes.forEach(checkbox => {
+                checkbox.checked = shouldCheck;
+            });
+            updateSelectionCount();
+        });
+
+        // Individual checkbox changes
+        columnCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectionCount();
+            });
+        });
+
+        // Reset button
+        resetBtn.addEventListener('click', function() {
+            // Reset to default state (all checked)
+            columnCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateSelectionCount();
+        });
+
+        // Save button
+        saveBtn.addEventListener('click', function() {
+            // Apply column visibility changes
+            console.log('Saving column preferences...');
+            
+            // Get selected columns
+            const selectedColumns = [];
+            columnCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedColumns.push(checkbox.dataset.column);
+                }
+            });
+            
+            console.log('Selected columns:', selectedColumns);
+            
+            // Apply the table column changes
+            updateTableColumns();
+            
+            // Close the modal
+            closeModal();
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+    }
+
+    // Initialize sorting and customize modal when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Small delay to ensure all content is loaded
+        setTimeout(() => {
+            initializeSorting();
+            setupCustomizeModal();
+        }, 100);
     });
 </script>
 {% endblock %} 
