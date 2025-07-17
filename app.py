@@ -119,17 +119,20 @@ class Organization(db.Model):
         }
 
 # Group model
+group_admins = db.Table('group_admins',
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     status = db.Column(db.String(20), default='ACTIVE')
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
-    admin_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     contracts_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    admin_user = db.relationship('User', backref='administered_groups')
+
+    admins = db.relationship('User', secondary=group_admins, backref=db.backref('admin_groups', lazy='dynamic'))
 
     def to_dict(self):
         return {
@@ -137,10 +140,8 @@ class Group(db.Model):
             'name': self.name,
             'status': self.status,
             'organization_id': self.organization_id,
-            'admin_user_id': self.admin_user_id,
             'contracts_count': self.contracts_count,
-            'admin_name': self.admin_user.name if self.admin_user else None,
-            'admin_email': self.admin_user.email if self.admin_user else None
+            'admins': [admin.id for admin in self.admins]
         }
 
 # Organization Structure Model
@@ -615,7 +616,17 @@ def groups():
         organization = Organization.query.get(user.organization_id)
         # Get all groups for this organization
         user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
-    return render_template('groups.html', user=user, organization=organization, groups=user_groups, active_page='groups')
+    # Add admin_count to each group for template
+    groups_with_admin_count = []
+    for group in user_groups:
+        group_dict = group.to_dict()
+        group_dict['admin_count'] = len(group.admins)
+        group_dict['status'] = group.status
+        group_dict['name'] = group.name
+        group_dict['contracts_count'] = group.contracts_count
+        group_dict['id'] = group.id
+        groups_with_admin_count.append(group_dict)
+    return render_template('groups.html', user=user, organization=organization, groups=groups_with_admin_count, active_page='groups')
 
 @app.route('/create-office')
 def create_office():
@@ -650,10 +661,12 @@ def create_office_step2():
         return redirect('/login')
     
     organization = None
+    org_workers = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
+        org_workers = User.query.filter_by(organization_id=user.organization_id).all()
     
-    return render_template('create_office_step2.html', user=user, organization=organization)
+    return render_template('create_office_step2.html', user=user, organization=organization, org_workers=org_workers)
 
 @app.route('/create-office-step3')
 def create_office_step3():
@@ -709,7 +722,6 @@ def create_office_replicate():
             name=office_name,
             status='ACTIVE',
             organization_id=user.organization_id,
-            admin_user_id=source_group.admin_user_id,  # Replicate admin
             contracts_count=0  # Start with 0 contracts
         )
         
@@ -749,7 +761,6 @@ def create_group():
             name=group_name,
             status='ACTIVE',
             organization_id=user.organization_id,
-            admin_user_id=user.id,
             contracts_count=0
         )
         
@@ -764,7 +775,9 @@ def create_group():
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to create group'}), 500
+        logger.error(f"Error creating group: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'Failed to create group: {str(e)}'}), 500
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -2052,8 +2065,8 @@ def api_get_organization_workers():
         
         workers_data = []
         for worker in workers:
-            # Check if user is admin of any groups
-            is_admin = Group.query.filter_by(admin_user_id=worker.id).first() is not None
+            # Check if user is admin of any groups using the many-to-many relationship
+            is_admin = len(worker.admin_groups.all()) > 0
             
             workers_data.append({
                 'id': worker.id,
@@ -2082,16 +2095,120 @@ def group_settings(group_id):
     group = Group.query.get(group_id)
     if not group:
         return redirect('/groups')
-    admin = group.admin_user
-    admin_info = {
-        'id': admin.id,
-        'name': admin.name,
-        'email': admin.email,
-        'initials': (admin.first_name[:1] if admin.first_name else '') + (admin.last_name[:1] if admin.last_name else ''),
-        'role': 'Group Admin',
-        'avatar_url': admin.avatar_url
-    } if admin else None
-    return render_template('group_settings.html', user=user, group=group, admin=admin_info)
+    admins = [
+        {
+            'id': admin.id,
+            'name': admin.name,
+            'email': admin.email,
+            'initials': (admin.first_name[:1] if admin.first_name else '') + (admin.last_name[:1] if admin.last_name else ''),
+            'role': 'Group Admin',
+            'avatar_url': admin.avatar_url
+        }
+        for admin in group.admins
+    ]
+    return render_template('group_settings.html', user=user, group=group, admins=admins)
+
+@app.route('/api/group/<int:group_id>/admin/<int:user_id>', methods=['DELETE'])
+def remove_group_admin(group_id, user_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    if user not in group.admins:
+        return jsonify({'error': 'User is not an admin of this group'}), 400
+    group.admins.remove(user)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Admin removed from group'})
+
+@app.route('/assign-admin/<int:group_id>')
+def assign_admin(group_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    org_workers = []
+    current_admin_ids = []
+    group = None
+    if user.organization_id:
+        org_workers = User.query.filter_by(organization_id=user.organization_id).all()
+        group = Group.query.get(group_id)
+        if group:
+            current_admin_ids = [admin.id for admin in group.admins]
+    return render_template('assign_admin.html', user=user, org_workers=org_workers, current_admin_ids=current_admin_ids, group=group)
+
+@app.route('/api/get-organization-workers')
+def get_organization_workers():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    
+    if not user.organization_id:
+        return jsonify({'success': False, 'error': 'User not in an organization'}), 400
+    
+    # Get all workers in the same organization
+    workers = User.query.filter_by(organization_id=user.organization_id).all()
+    
+    workers_data = []
+    for worker in workers:
+        workers_data.append({
+            'id': worker.id,
+            'name': worker.name,
+            'email': worker.email,
+            'first_name': worker.first_name,
+            'last_name': worker.last_name,
+            'avatar_url': worker.avatar_url
+        })
+    
+    return jsonify({'success': True, 'workers': workers_data})
+
+@app.route('/api/group/<int:group_id>/admins', methods=['POST'])
+def add_group_admins(group_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    data = request.get_json()
+    user_ids = data.get('user_ids', [])
+    if not isinstance(user_ids, list) or not user_ids:
+        return jsonify({'error': 'No user IDs provided'}), 400
+    added = []
+    for user_id in user_ids:
+        user = User.query.get(user_id)
+        if user and user not in group.admins:
+            group.admins.append(user)
+            added.append(user_id)
+    db.session.commit()
+    return jsonify({'success': True, 'added': added})
+
+@app.route('/api/group/<int:group_id>/admin/bulk-remove', methods=['POST'])
+def bulk_remove_group_admins(group_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    data = request.get_json()
+    user_ids = data.get('user_ids', [])
+    if not isinstance(user_ids, list) or not user_ids:
+        return jsonify({'error': 'No user IDs provided'}), 400
+    removed = []
+    for user_id in user_ids:
+        user = User.query.get(user_id)
+        if user and user in group.admins:
+            group.admins.remove(user)
+            removed.append(user_id)
+    db.session.commit()
+    return jsonify({'success': True, 'removed': removed})
 
 if __name__ == '__main__':
     with app.app_context():

@@ -587,11 +587,16 @@
     display: block;
 }
 .remove-admin-modal-header {
-    padding: 28px 32px 0 32px;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    padding: 28px 32px 0 32px;
     position: relative;
+}
+.remove-admin-modal-header-spacer {
+    width: 24px;
+    height: 24px;
+    display: flex;
 }
 .remove-admin-modal-header-content {
     flex: 1;
@@ -703,7 +708,7 @@
 {% block content %}
 <div class="group-settings-container">
     <div class="group-settings-header">
-        <a href="#" class="group-settings-back">&larr; Back to Groups</a>
+        <a href="/groups" class="group-settings-back">&larr; Back to Groups</a>
         <div class="group-settings-title-row">
             <span class="group-settings-title">fdsfasd</span>
             <span class="status-badge">ACTIVE</span>
@@ -750,7 +755,7 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <button class="group-card-edit-btn" style="background: #222; color: #fff; font-weight: 600;">Assign admins</button>
+                    <button id="adminActionBtn" class="group-card-edit-btn" style="background: #222; color: #fff; font-weight: 600; margin-left: 12px;">Assign admins</button>
                     <button class="group-card-edit-btn" style="padding: 6px 10px; background: #f5f5f5; color: #222;">
                         <img src="/static/images/expand.png" alt="Fullscreen" style="width: 18px; height: 18px;">
                     </button>
@@ -773,8 +778,8 @@
                     </tr>
                 </thead>
                 <tbody id="adminTableBody">
-                    {% if admin %}
-                    <tr>
+                    {% for admin in admins %}
+                    <tr data-admin-id="{{ admin.id }}">
                         <td><input type="checkbox" class="admin-checkbox admin-row-checkbox"></td>
                         <td style="display: flex; align-items: center; gap: 10px;">
                             <span style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #e5e7eb; border-radius: 50%; font-weight: 700; color: #7c3aed;">{{ admin.initials }}</span>
@@ -790,13 +795,9 @@
                                     <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
                                 </button>
                                 <div class="action-menu" id="admin-menu-{{ admin.id }}">
-                                    <div class="action-item" onclick="editAdmin({{ admin.id }})">
-                                        <img src="/static/images/pen.png" alt="Edit" class="action-icon">
-                                        <span>Edit</span>
-                                    </div>
-                                    <div class="action-item remove-access" onclick="deleteAdmin({{ admin.id }})">
+                                    <div class="action-item remove-access" data-admin-id="{{ admin.id }}">
                                         <span style="display:inline-block;width:16px;height:16px;vertical-align:middle;margin-right:8px;">
-                                            <svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="7.25" width="10" height="1.5" rx="0.75" fill="black"/></svg>
+                                            <img src="/static/images/minus-small.png" alt="Remove" style="width:16px;height:16px;vertical-align:middle;" />
                                         </span>
                                         <span>Remove access</span>
                                     </div>
@@ -804,30 +805,24 @@
                             </div>
                         </td>
                     </tr>
-                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 
-<!-- Remove Admin Modal -->
+<!-- Update Remove Admin Modal to support single and bulk removal -->
 <div class="remove-admin-modal-overlay" id="removeAdminModalOverlay"></div>
 <div class="remove-admin-modal" id="removeAdminModal">
     <div class="remove-admin-modal-header">
+        <span class="remove-admin-modal-header-spacer" aria-hidden="true"></span>
         <div class="remove-admin-modal-header-content">
-            <div class="remove-admin-modal-title">Remove admins</div>
-            <div class="remove-admin-modal-subtitle">From {{ group.name }}</div>
+            <div class="remove-admin-modal-title" id="removeAdminModalTitle">Remove admins</div>
+            <div class="remove-admin-modal-subtitle" id="removeAdminModalSubtitle">From {{ group.name }}</div>
         </div>
         <button class="remove-admin-modal-close" id="removeAdminModalClose">&times;</button>
     </div>
-    <!-- Yellow warning box removed -->
-    <div class="remove-admin-modal-admin">
-        <div class="remove-admin-modal-avatar" id="removeAdminAvatar">{{ admin.initials }}</div>
-        <div class="remove-admin-modal-admin-info">
-            <div class="remove-admin-modal-admin-name" id="removeAdminName">{{ admin.name }}</div>
-            <div class="remove-admin-modal-admin-role">Role: {{ admin.role }}</div>
-        </div>
-    </div>
+    <div class="remove-admin-modal-admin" id="removeAdminModalAdminInfo"></div>
     <div class="remove-admin-modal-footer">
         <button class="remove-admin-modal-remove-btn" id="removeAdminModalRemove">Remove</button>
     </div>
@@ -902,6 +897,7 @@ document.getElementById('adminSelectAll').addEventListener('change', function() 
         cb.checked = this.checked;
     });
     updateSelectAllState();
+    updateAdminActionBtn(); // Ensure button updates on select all/none
 });
 
 // Call updateSelectAllState on page load
@@ -987,23 +983,145 @@ adminSearchInput.addEventListener('input', function() {
 // This function is no longer needed as the table is rendered by Jinja.
 // The initial render logic is handled by the Jinja template.
 
-// Show the remove admin modal when Remove access is clicked
-function showRemoveAdminModal() {
-    document.getElementById('removeAdminModalOverlay').classList.add('show');
-    document.getElementById('removeAdminModal').classList.add('show');
+let removeAdminMode = 'single'; // 'single' or 'bulk'
+let adminsToRemove = [];
+
+function showRemoveAdminModal(adminIds) {
+    removeAdminMode = Array.isArray(adminIds) && adminIds.length > 1 ? 'bulk' : 'single';
+    adminsToRemove = Array.isArray(adminIds) ? adminIds : [adminIds];
+    const modal = document.getElementById('removeAdminModal');
+    const overlay = document.getElementById('removeAdminModalOverlay');
+    const adminInfoDiv = document.getElementById('removeAdminModalAdminInfo');
+    const title = document.getElementById('removeAdminModalTitle');
+    if (removeAdminMode === 'bulk') {
+        title.textContent = 'Remove admins';
+        adminInfoDiv.innerHTML = `<div style='font-size:1rem;color:#222;'>Are you sure you want to remove access for <b>${adminsToRemove.length}</b> selected admins?</div>`;
+    } else {
+        title.textContent = 'Remove admin';
+        // Find admin info from table row
+        const row = document.querySelector(`tr[data-admin-id='${adminsToRemove[0]}']`);
+        if (row) {
+            const avatar = row.querySelector('span[style*="border-radius: 50%"]');
+            const name = row.querySelector('div[style*="font-weight: 600"]');
+            const role = row.querySelector('div[style*="font-size: 0.95rem"]');
+            adminInfoDiv.innerHTML = `<div class='remove-admin-modal-avatar'>${avatar ? avatar.outerHTML : ''}</div><div class='remove-admin-modal-admin-info'><div class='remove-admin-modal-admin-name'>${name ? name.textContent : ''}</div><div class='remove-admin-modal-admin-role'>${role ? role.textContent : ''}</div></div>`;
+        } else {
+            adminInfoDiv.innerHTML = '';
+        }
+    }
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
 }
 function hideRemoveAdminModal() {
-    document.getElementById('removeAdminModalOverlay').classList.remove('show');
-    document.getElementById('removeAdminModal').classList.remove('show');
+    document.getElementById('removeAdminModal').style.display = 'none';
+    document.getElementById('removeAdminModalOverlay').style.display = 'none';
+    adminsToRemove = [];
 }
-document.querySelectorAll('.remove-access').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        showRemoveAdminModal();
-    });
+document.getElementById('removeAdminModalClose').onclick = hideRemoveAdminModal;
+document.getElementById('removeAdminModalOverlay').onclick = hideRemoveAdminModal;
+document.getElementById('removeAdminModalRemove').onclick = function() {
+    if (!adminsToRemove.length) return;
+    fetch(`/api/group/${groupId}/admin/bulk-remove`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_ids: adminsToRemove })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to remove admin(s)');
+        }
+    })
+    .catch(() => alert('Failed to remove admin(s)'));
+};
+// Dropdown Remove access
+// Use modal for single admin
+// Remove previous onclick assignment
+document.querySelectorAll('.action-item.remove-access').forEach(item => {
+    item.onclick = function() {
+        const adminId = this.getAttribute('data-admin-id');
+        if (!adminId) return;
+        showRemoveAdminModal(adminId);
+    };
 });
-document.getElementById('removeAdminModalClose').addEventListener('click', hideRemoveAdminModal);
-document.getElementById('removeAdminModalOverlay').addEventListener('click', hideRemoveAdminModal);
-// You can add logic for the Remove button here
+// Bulk Remove access button
+adminActionBtn.onclick = function() {
+    const checked = document.querySelectorAll('.admin-row-checkbox:checked');
+    if (checked.length > 0) {
+        const ids = Array.from(checked).map(cb => cb.closest('tr').getAttribute('data-admin-id'));
+        showRemoveAdminModal(ids);
+    } else {
+        window.location.href = `/assign-admin/${groupId}`;
+    }
+};
+
+// Dynamic admin action button logic
+const adminActionBtn = document.getElementById('adminActionBtn');
+const adminCheckboxes = document.querySelectorAll('.admin-row-checkbox');
+// Only declare groupId ONCE at the top
+let groupId = {{ group.id }};
+
+function updateAdminActionBtn() {
+    const checked = document.querySelectorAll('.admin-row-checkbox:checked');
+    if (checked.length > 0) {
+        adminActionBtn.textContent = 'Remove access';
+        adminActionBtn.style.background = '#f5f5f5';
+        adminActionBtn.style.color = '#222';
+        adminActionBtn.style.fontWeight = '500';
+        adminActionBtn.style.border = 'none';
+        adminActionBtn.style.boxShadow = 'none';
+        adminActionBtn.style.borderRadius = '12px';
+        adminActionBtn.style.padding = '8px 18px';
+        adminActionBtn.onclick = function() {
+            const ids = Array.from(document.querySelectorAll('.admin-row-checkbox:checked')).map(cb => cb.closest('tr').getAttribute('data-admin-id'));
+            showRemoveAdminModal(ids);
+        };
+    } else {
+        adminActionBtn.textContent = 'Assign admins';
+        adminActionBtn.style.background = '#222';
+        adminActionBtn.style.color = '#fff';
+        adminActionBtn.style.fontWeight = '600';
+        adminActionBtn.style.border = '';
+        adminActionBtn.style.boxShadow = '';
+        adminActionBtn.style.borderRadius = '';
+        adminActionBtn.style.padding = '';
+        adminActionBtn.onclick = function() {
+            window.location.href = `/assign-admin/${groupId}`;
+        };
+    }
+}
+document.querySelectorAll('.admin-row-checkbox').forEach(cb => cb.addEventListener('change', updateAdminActionBtn));
+document.getElementById('adminSelectAll').addEventListener('change', function() {
+    document.querySelectorAll('.admin-row-checkbox').forEach(cb => {
+        cb.checked = this.checked;
+    });
+    updateSelectAllState();
+    updateAdminActionBtn();
+});
+updateAdminActionBtn();
+
+document.querySelectorAll('.action-item.remove-access').forEach(item => {
+    item.onclick = function() {
+        const adminId = this.getAttribute('data-admin-id');
+        if (!adminId) return;
+        if (!confirm('Are you sure you want to remove access for this admin?')) return;
+        fetch(`/api/group/${groupId}/admin/bulk-remove`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_ids: [adminId] })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.error || 'Failed to remove admin');
+            }
+        })
+        .catch(() => alert('Failed to remove admin'));
+    };
+});
 </script>
 {% endblock %} 

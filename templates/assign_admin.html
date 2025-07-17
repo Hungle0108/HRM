@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Admin | HRM</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { margin: 0; padding: 0; background: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        .page-container { min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { background: white; border-bottom: 1px solid #e9ecef; padding: 20px 40px; display: flex; justify-content: flex-start; align-items: center; padding-left: calc(50% - 460px); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+        .top-bar-content { max-width: 930px; width: 100%; display: flex; justify-content: flex-end; align-items: center; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 8px; border-radius: 4px; transition: all 0.2s; }
+        .close-btn:hover { background: #f5f5f5; color: #333; }
+        .page-header { background: #f8f9fa; padding: 40px 40px 20px 40px; display: flex; justify-content: center; margin-top: 80px; border: none; box-shadow: none; }
+        .page-header-content { max-width: 600px; width: 100%; text-align: left; }
+        .page-title { font-size: 2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+        .page-subtitle { font-size: 1rem; color: #6c757d; line-height: 1.4; }
+        .main-container { flex: 1; display: flex; background: #f8f9fa; justify-content: center; align-items: flex-start; padding: 20px 40px 120px 40px; gap: 60px; }
+        .content-area { flex: 0 0 auto; max-width: 600px; width: 100%; background: white; border: 1px solid #e9ecef; border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
+        .step-header { margin-bottom: 32px; }
+        .step-title { font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .step-description { color: #6c757d; font-size: 1rem; margin-bottom: 32px; }
+        .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; }
+        .search-wrapper { flex: 1; max-width: none; position: relative; }
+        .search-input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 0.875rem; background: white; transition: all 0.2s; }
+        .search-input:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 16px; width: 16px; height: 16px; }
+        
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+        }
+
+        .user-item:hover {
+            background: #f8f9fa;
+            border-color: #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .user-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #495057;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        .empty-state-description {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        
+        .bottom-navigation { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e9ecef; padding: 20px 40px; display: flex; justify-content: center; z-index: 1000; }
+        .bottom-nav-content { max-width: 930px; width: 100%; display: flex; justify-content: flex-end; align-items: center; }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .btn-continue { background: #1a1a1a; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .btn-continue:hover { background: #333; }
+        .btn-continue:disabled { background: #e9ecef; color: #6c757d; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="window.history.back()">✕</button>
+            </div>
+        </div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Assign admin</h1>
+                <p class="page-subtitle">Assign admins to this group</p>
+            </div>
+        </div>
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="assign-admin-form">
+                    <!-- Step Header -->
+                    <div class="step-header">
+                        <h2 class="step-title">Select admins</h2>
+                        <p class="step-description">Select users to assign as group admins.</p>
+                    </div>
+                    <!-- Controls -->
+                    <div class="controls-section">
+                        <div class="search-wrapper">
+                            <input type="text" class="search-input" placeholder="Search" id="workerSearchInput">
+                            <img src="/static/images/search.png" alt="Search" class="search-icon">
+                        </div>
+                    </div>
+                    <!-- Organization Workers List -->
+                    <div class="users-list" id="orgWorkersList">
+                        <!-- Workers will be populated by JavaScript -->
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <div class="nav-right">
+                    <button type="submit" class="btn-continue" id="assignAdminContinueBtn" form="assign-admin-form" disabled>Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real organization workers data from backend
+        const orgWorkers = [
+            {% if org_workers and org_workers|length > 0 %}
+                {% for worker in org_workers %}
+                {
+                    id: {{ worker.id }},
+                    name: "{{ worker.name|replace('"', '\\"') }}",
+                    email: "{{ worker.email|replace('"', '\\"') }}"
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            {% endif %}
+        ];
+        // List of user IDs who are already admins for this group
+        const currentAdminIds = new Set([
+            {% for admin_id in current_admin_ids %}{{ admin_id }}{% if not loop.last %}, {% endif %}{% endfor %}
+        ]);
+
+        // Function to get avatar color based on user ID
+        function getAvatarColor(userId) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+            ];
+            return colors[userId % colors.length];
+        }
+
+        // Function to populate users list
+        function populateUsersList() {
+            const usersList = document.getElementById('orgWorkersList');
+            
+            if (!orgWorkers || orgWorkers.length === 0) {
+                usersList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <div class="empty-state-title">No workers found</div>
+                        <div class="empty-state-description">There are currently no workers in this organization.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            usersList.innerHTML = '';
+            
+            orgWorkers.forEach(worker => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.setAttribute('data-worker-id', worker.id);
+                
+                const initials = worker.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+                const avatarColor = getAvatarColor(worker.id);
+
+                // Check if this worker is already an admin
+                const isAlreadyAdmin = currentAdminIds.has(worker.id);
+
+                userItem.innerHTML = `
+                    <input type="checkbox" name="selectedUsers" class="user-checkbox" value="${worker.id}" ${isAlreadyAdmin ? 'checked disabled' : ''}>
+                    <div class="user-avatar" style="background: ${avatarColor};">${initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${worker.name}</div>
+                        <div class="user-email">${worker.email}</div>
+                        ${isAlreadyAdmin ? '<div class="user-already-admin-msg" style="color:#6c757d;font-size:0.85em;margin-top:2px;">This admin is already part of the group.</div>' : ''}
+                    </div>
+                `;
+                
+                usersList.appendChild(userItem);
+            });
+            
+            // Add click event listeners
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Only toggle if not clicking directly on the checkbox or if disabled
+                    const checkbox = this.querySelector('.user-checkbox');
+                    if (!e.target.classList.contains('user-checkbox') && checkbox && !checkbox.disabled) {
+                        checkbox.checked = !checkbox.checked;
+                        updateContinueButton();
+                    }
+                });
+            });
+            
+            // Add change event listeners to checkboxes
+            document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateContinueButton);
+            });
+        }
+
+        // Function to update continue button state
+        function updateContinueButton() {
+            const continueBtn = document.getElementById('assignAdminContinueBtn');
+            // Only count checkboxes that are not disabled
+            const checkedUsers = document.querySelectorAll('.user-checkbox:checked:not(:disabled)');
+            continueBtn.disabled = checkedUsers.length === 0;
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('workerSearchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const userItems = document.querySelectorAll('.user-item');
+                
+                userItems.forEach(item => {
+                    const name = item.querySelector('.user-name').textContent.toLowerCase();
+                    const email = item.querySelector('.user-email').textContent.toLowerCase();
+                    
+                    if (name.includes(query) || email.includes(query)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateUsersList();
+            setupSearch();
+        });
+
+        // Handle form submission
+        document.getElementById('assign-admin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const checkedUsers = document.querySelectorAll('.user-checkbox:checked:not(:disabled)');
+            if (checkedUsers.length > 0) {
+                const userIds = Array.from(checkedUsers).map(cb => cb.value);
+                const groupId = {{ group.id }};
+                fetch(`/api/group/${groupId}/admins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_ids: userIds })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = `/group/${groupId}/settings`;
+                    } else {
+                        alert(data.error || 'Failed to add admins');
+                    }
+                })
+                .catch(() => alert('Failed to add admins'));
+            }
+        });
+    </script>
+</body>
+</html> 
