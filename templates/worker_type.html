@@ -291,7 +291,7 @@
     }
 
     .content-header {
-        margin-bottom: 0;
+        margin-bottom: 32px;
     }
 
     .content-title {
@@ -1531,7 +1531,7 @@
         margin-bottom: 8px;
     }
 
-    .form-label.required::after {
+    .form-label.required.error::after {
         content: " *";
         color: #dc3545;
     }
@@ -1773,23 +1773,7 @@
         gap: 12px;
     }
 
-    .info-edit-btn {
-        padding: 6px 12px;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #495057;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
 
-    .info-edit-btn:hover {
-        background: #e9ecef;
-        border-color: #adb5bd;
-        color: #1a1a1a;
-    }
 
     .info-modal-footer {
         padding: 20px 24px;
@@ -2233,7 +2217,6 @@
         <div class="info-modal-header">
             <h2 class="info-modal-title" id="infoModalTitle">Details</h2>
             <div class="info-modal-actions">
-                <button class="info-edit-btn" id="infoEditBtn">Edit</button>
                 <button class="close-btn" id="infoModalCloseBtn">
                     <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
                 </button>
@@ -2242,7 +2225,6 @@
         
         <div class="info-modal-content">
             <div class="info-section-box">
-                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Template Name</label>
                     <div class="info-value" id="infoTemplateName">-</div>
@@ -2250,7 +2232,6 @@
             </div>
 
             <div class="info-section-box">
-                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Description</label>
                     <div class="info-value" id="infoDescription">-</div>
@@ -2258,7 +2239,6 @@
             </div>
 
             <div class="info-section-box">
-                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Created By</label>
                     <div class="info-value" id="infoCreatedBy">-</div>
@@ -2266,7 +2246,6 @@
             </div>
 
             <div class="info-section-box">
-                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="box-menu-icon">
                 <div class="info-section">
                     <label class="info-label">Creation Date</label>
                     <div class="info-value" id="infoCreationDate">-</div>
@@ -3094,7 +3073,6 @@
     function setupInfoModal() {
         const infoModal = document.getElementById('infoModal');
         const infoModalCloseBtn = document.getElementById('infoModalCloseBtn');
-        const infoEditBtn = document.getElementById('infoEditBtn');
         const infoDuplicateBtn = document.getElementById('infoDuplicateBtn');
         const infoDeleteBtn = document.getElementById('infoDeleteBtn');
         const modalOverlay = document.getElementById('modalOverlay');
@@ -3104,19 +3082,6 @@
             infoModal.classList.remove('show');
             modalOverlay.classList.remove('show');
             document.getElementById('settingsContent').classList.remove('modal-open');
-        });
-
-        // Edit button functionality
-        infoEditBtn.addEventListener('click', function() {
-            const currentWorkerId = infoModal.getAttribute('data-worker-id');
-            if (currentWorkerId) {
-                // Close info modal
-                infoModal.classList.remove('show');
-                modalOverlay.classList.remove('show');
-                document.getElementById('settingsContent').classList.remove('modal-open');
-                // Open edit modal with pre-filled data
-                editWorkerType(currentWorkerId);
-            }
         });
 
         // Duplicate button functionality
@@ -3251,6 +3216,7 @@
         const settingsContent = document.getElementById('settingsContent');
         const form = document.getElementById('createWorkerTypeForm');
         const templateNameInput = document.getElementById('templateName');
+        const templateNameLabel = document.querySelector('label[for="templateName"]');
         const workDescriptionInput = document.getElementById('workDescription');
         const charCountElement = document.getElementById('charCount');
 
@@ -3337,6 +3303,7 @@
                 showError('templateNameError');
                     hideError('templateNameDuplicateError');
                 templateNameInput.classList.add('error');
+                templateNameLabel.classList.add('error');
                 }
                 isValid = false;
             } else {
@@ -3349,15 +3316,18 @@
                     if (isDuplicate) {
                         showError('templateNameDuplicateError');
                         templateNameInput.classList.add('error');
+                        templateNameLabel.classList.add('error');
                         isValid = false;
                     } else {
                         hideError('templateNameDuplicateError');
                 templateNameInput.classList.remove('error');
+                templateNameLabel.classList.remove('error');
                     }
                 } else {
                     // Don't show duplicate error during typing, but keep existing state
                     if (!document.getElementById('templateNameDuplicateError').classList.contains('show')) {
                         templateNameInput.classList.remove('error');
+                        templateNameLabel.classList.remove('error');
                     }
                 }
             }
@@ -3509,6 +3479,7 @@
             hideError('templateNameDuplicateError');
             hideError('workDescriptionError');
             templateNameInput.classList.remove('error');
+            templateNameLabel.classList.remove('error');
             workDescriptionInput.classList.remove('error');
             
             // Reset touched state

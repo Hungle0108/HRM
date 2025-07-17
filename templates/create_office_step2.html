@@ -25,7 +25,7 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
@@ -64,12 +64,14 @@
         }
 
         .page-header {
-            background: white;
+            background: #f8f9fa;
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
             padding-left: calc(50% - 470px);
             margin-top: 80px;
+            border: none;
+            box-shadow: none;
         }
 
         .page-header-content {
@@ -94,7 +96,7 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 20px 40px 120px 40px;
@@ -105,23 +107,23 @@
             flex: 0 0 auto;
             max-width: 600px;
             width: 100%;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
-        }
-
-        .sidebar-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
         }
 
         .steps-list {
@@ -133,8 +135,11 @@
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
         }
 
         .step-number {
@@ -629,8 +634,8 @@
 
         .modal-header {
             padding: 24px 24px 16px 24px;
-            border-bottom: 1px solid #e9ecef;
             position: relative;
+            text-align: center;
         }
 
         .modal-title {
@@ -818,7 +823,6 @@
 
         .modal-footer {
             padding: 16px 24px;
-            border-top: 1px solid #e9ecef;
             display: flex;
             justify-content: flex-end;
         }
@@ -871,6 +875,129 @@
             max-width: 300px;
             margin: 0 auto;
         }
+
+        /* Workers Table Styles */
+        .workers-table {
+            background: white;
+            border:1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .worker-row {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom:1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .worker-row:last-child {
+            border-bottom: none;
+        }
+
+        .worker-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .worker-checkbox {
+            width:18px;
+            height:18px;
+            margin-right:16px;
+            cursor: pointer;
+        }
+
+        .worker-avatar {
+            width:32px;
+            height:32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-right:16px;
+            flex-shrink: 0;
+        }
+
+        .worker-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .worker-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .worker-email {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .worker-status {
+            background: #e1bee7;
+            color: #7b1fa2;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right:16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .worker-edit {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .worker-edit:hover {
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .empty-workers {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-workers-icon {
+            font-size:48px;
+            margin-bottom:16px;
+            opacity: 0.5;
+        }
+
+        .empty-workers-title {
+            font-size:1rem;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .empty-workers-description {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        /* Already invited worker style */
+        .already-invited {
+            background: #f1f3f4 !important;
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -878,7 +1005,7 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-content">
-                <button class="close-btn" onclick="window.location.href='/groups'">✕</button>
+                <button class="close-btn" onclick="closeAndClearData()">✕</button>
             </div>
         </div>
 
@@ -898,7 +1025,6 @@
                     <!-- Step Header -->
                     <div class="step-header">
                         <h2 class="step-title">
-                            <span class="step-number-badge">1</span>
                             Select admins
                         </h2>
                         <p class="step-description">Office creator needs to be selected as an office member.</p>
@@ -913,39 +1039,10 @@
                         <button type="button" class="invite-btn">Invite admin</button>
                     </div>
 
-                    <!-- Admin Selection Boxes -->
-                    <div class="admin-selection-section">
-                        <!-- All Admins Box -->
-                        <div class="admin-selection-box" data-admin-type="all">
-                            <div class="admin-box-header">
-                                <div class="admin-box-left">
-                                    <input type="checkbox" class="admin-checkbox" id="all-admins">
-                                    <div class="admin-box-title">
-                                        All<span class="admin-box-count">(1)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Organization Admins Box -->
-                        <div class="admin-selection-box selected" data-admin-type="organization">
-                            <div class="admin-box-header">
-                                <div class="admin-box-left">
-                                    <input type="checkbox" class="admin-checkbox" id="org-admins" checked>
-                                    <div class="admin-box-icon">🏢</div>
-                                    <div class="admin-box-title">Organization admins<span class="admin-box-count">(1)</span></div>
-                                </div>
-                                <button type="button" class="admin-box-dropdown">
-                                    <img src="/static/images/angle-small-down.png" alt="Dropdown" style="width: 16px; height: 16px;">
-                                </button>
-                            </div>
-                            <div class="admin-box-description">
-                                All the admins in the organization are part of the group. Organization admins can invite admins from the <a href="#">admins tab</a>.
-                            </div>
-                            <div class="admin-box-note">
-                                <span class="note-warning-icon">⚠️</span>
-                                <div>All the admins in the organization are part of the group. Organization admins can invite admins from the <a href="#">admins tab</a>.</div>
-                            </div>
+                    <!-- Invited Workers Table -->
+                    <div class="invited-workers-section" id="invitedWorkersSection" style="margin-top: 32px; display: none;">
+                        <div class="workers-table" id="mainWorkersTable">
+                            <!-- Workers will be dynamically added here -->
                         </div>
                     </div>
                 </form>
@@ -953,7 +1050,6 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Create office workflow</h3>
                 <ol class="steps-list">
                     <li class="step-item completed">
                         <div class="step-number">✓</div>
@@ -995,28 +1091,13 @@
             <div class="modal-header">
                 <div>
                     <h2 class="modal-title">Invite admin</h2>
-                    <p class="modal-subtitle">For CATSKY</p>
+                    <p class="modal-subtitle">For {{ organization.name if organization else 'Organization' }}</p>
                 </div>
                 <button class="modal-close" id="closeModal">✕</button>
             </div>
 
-            <!-- Modal Tabs -->
-            <div class="modal-tabs">
-                <button class="modal-tab" id="newUserTab">New user</button>
-                <button class="modal-tab active" id="existingWorkerTab">Existing worker</button>
-            </div>
-
             <!-- Modal Body -->
             <div class="modal-body">
-                <!-- Invitation Info -->
-                <div class="modal-info">
-                    <span class="modal-info-icon">⏸️</span>
-                    <div>
-                        <strong>Invitation on hold</strong><br>
-                        Invitations will be sent out once you've completed the group creation process. Users will then receive a confirmation email to accept.
-                    </div>
-                </div>
-
                 <!-- Search Bar -->
                 <div class="modal-search">
                     <input type="text" class="modal-search-input" placeholder="Search for workers" id="modalSearchInput">
@@ -1046,8 +1127,10 @@
     </div>
 
     <script>
-        // Form submission
-        document.getElementById('office-form-step2').addEventListener('submit', function(e) {
+        // Form submission - with null check
+        const officeFormStep2 = document.getElementById('office-form-step2');
+        if (officeFormStep2) {
+            officeFormStep2.addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Get existing office data
@@ -1059,11 +1142,15 @@
                 selectedAdmins.push(checkbox.id);
             });
             
+            // Get invited workers
+            const invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+            
             // Update with step 2 data
             const updatedData = {
                 ...existingData,
                 step: 2,
-                selectedAdmins: selectedAdmins
+                selectedAdmins: selectedAdmins,
+                invitedWorkers: invitedWorkers
             };
             
             // Store updated data
@@ -1072,21 +1159,82 @@
             // Navigate to next step
             window.location.href = '/create-office-step3';
         });
+        }
 
-        // Search functionality
+        // Search functionality - with null check
         const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             // Add search functionality here if needed
             console.log('Search term:', searchTerm);
         });
+        }
 
-        // Invite admin button
-        document.querySelector('.invite-btn').addEventListener('click', function() {
-            // Populate users list when modal opens
+        // Load invited workers from session storage on page load
+        function loadInvitedWorkers() {
+            const invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+            const mainWorkersTable = document.getElementById('mainWorkersTable');
+            const invitedWorkersSection = document.getElementById('invitedWorkersSection');
+            
+            console.log('Loading invited workers:', invitedWorkers);
+            
+            if (invitedWorkers.length > 0) {
+                // Show the section and clear existing content
+                invitedWorkersSection.style.display = 'block';
+                mainWorkersTable.innerHTML = '';
+                
+                // Add each invited worker to the table
+                invitedWorkers.forEach(worker => {
+                    addWorkerToTable(worker.id, worker.name, worker.email);
+                });
+            } else {
+                // Hide the section if no workers
+                invitedWorkersSection.style.display = 'none';
+            }
+        }
+
+        // Initialize modal when opened
+        function initializeModal() {
+            try {
+                // Clear the users list first
+                const usersList = document.getElementById('usersList');
+                if (usersList) {
+                    usersList.innerHTML = '';
+                    
+                    // Populate with available workers
             populateUsersList();
+                }
+            } catch (error) {
+                console.error('Error initializing modal:', error);
+            }
+        }
+
+        // Load invited workers when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load invited workers
+            loadInvitedWorkers();
+            
+            // Set up invite button event listener
+            const inviteBtn = document.querySelector('.invite-btn');
+            if (inviteBtn) {
+                inviteBtn.addEventListener('click', function() {
+                    console.log('Invite button clicked');
+                    try {
+                        // Initialize the modal content in invite mode (editMode = false)
+                        initializeModalWithPreselection(null, false);
             // Show the modal
-            document.getElementById('inviteAdminModal').classList.add('show');
+                        const modal = document.getElementById('inviteAdminModal');
+                        if (modal) {
+                            modal.classList.add('show');
+                        }
+                    } catch (error) {
+                        console.error('Error opening modal:', error);
+                    }
+                });
+            } else {
+                console.error('Invite button not found');
+            }
         });
 
         // Close modal functionality
@@ -1104,32 +1252,25 @@
             }
         }
 
-        // Close modal event listeners
-        document.getElementById('closeModal').addEventListener('click', closeModal);
-        document.getElementById('inviteAdminModal').addEventListener('click', function(e) {
+        // Close modal event listeners - with null checks
+        const closeModalBtn = document.getElementById('closeModal');
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+        
+        const inviteAdminModal = document.getElementById('inviteAdminModal');
+        if (inviteAdminModal) {
+            inviteAdminModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
+        }
 
-        // Tab switching
-        document.getElementById('newUserTab').addEventListener('click', function() {
-            document.querySelectorAll('.modal-tab').forEach(tab => tab.classList.remove('active'));
-            this.classList.add('active');
-            // Here you would switch to new user form content
-            console.log('Switched to New User tab');
-        });
-
-        document.getElementById('existingWorkerTab').addEventListener('click', function() {
-            document.querySelectorAll('.modal-tab').forEach(tab => tab.classList.remove('active'));
-            this.classList.add('active');
-            // Repopulate existing worker content
-            populateUsersList();
-            console.log('Switched to Existing Worker tab');
-        });
-
-        // Search functionality
-        document.getElementById('modalSearchInput').addEventListener('input', function() {
+        // Search functionality - with null check
+        const modalSearchInput = document.getElementById('modalSearchInput');
+        if (modalSearchInput) {
+            modalSearchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             const emptyState = document.getElementById('emptyState');
             let hasVisibleUsers = false;
@@ -1163,25 +1304,258 @@
                 emptyState.querySelector('.empty-state-description').textContent = 'There are currently no workers available to invite as admins. You can invite new users using the "New user" tab.';
             }
         });
+        }
 
-        // Add user button
-        document.getElementById('addUserBtn').addEventListener('click', function() {
+        // Add user button - with null check
+        const addUserBtn = document.getElementById('addUserBtn');
+        if (addUserBtn) {
+            addUserBtn.addEventListener('click', function() {
             const selectedUser = document.querySelector('.user-radio:checked');
             if (selectedUser) {
                 const userItem = selectedUser.closest('.user-item');
                 const userName = userItem.querySelector('.user-name').textContent;
                 const userEmail = userItem.querySelector('.user-email').textContent;
+                const userId = selectedUser.value;
                 
                 console.log('Adding user:', userName, userEmail);
                 
-                // Here you would add the user to your admin list
-                // For now, just close the modal
-                closeModal();
+                // Add worker to the table
+                addWorkerToTable(userId, userName, userEmail);
                 
-                // Show success message or update UI
-                alert(`Added ${userName} as admin`);
+                // Store in session storage
+                const invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+                invitedWorkers.push({
+                    id: userId,
+                    name: userName,
+                    email: userEmail
+                });
+                sessionStorage.setItem('invitedWorkers', JSON.stringify(invitedWorkers));
+                
+                // Close the modal
+                closeModal();
             }
         });
+        }
+
+        // Function to add worker to the table
+        function addWorkerToTable(userId, userName, userEmail) {
+            const mainWorkersTable = document.getElementById('mainWorkersTable');
+            const invitedWorkersSection = document.getElementById('invitedWorkersSection');
+            
+            // Show the invited workers section
+            invitedWorkersSection.style.display = 'block';
+            
+            // Generate avatar initials and color
+            const initials = userName.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+            const avatarColor = getAvatarColor(userId);
+            
+            const workerRow = document.createElement('div');
+            workerRow.className = 'worker-row';
+            workerRow.dataset.userId = userId;
+            
+            workerRow.innerHTML = `
+                <div class="worker-avatar" style="background: ${avatarColor};">${initials}</div>
+                <div class="worker-info">
+                    <div class="worker-name">${userName}</div>
+                    <div class="worker-email">${userEmail}</div>
+                </div>
+                <button type="button" class="worker-edit" onclick="editWorker('${userId}', event)">
+                    <img src="/static/images/pen.png" alt="Edit" style="width: 16px; height: 16px;">
+                </button>
+            `;
+            
+            mainWorkersTable.appendChild(workerRow);
+        }
+
+        // Function to edit worker (placeholder)
+        function editWorker(userId, event) {
+            console.log('=== EDIT WORKER CALLED ===');
+            console.log('Edit worker userId:', userId);
+            
+            // Prevent any default behavior and stop event propagation
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // Get the worker data from the table - fix the selector
+            const workerRow = document.querySelector(`[data-user-id="${userId}"]`);
+            console.log('Found worker row:', workerRow);
+            
+            if (!workerRow) {
+                console.error('Worker row not found for userId:', userId);
+                // Debug: log all available worker rows
+                const allRows = document.querySelectorAll('.worker-row');
+                console.log('All worker rows:', allRows);
+                allRows.forEach(row => {
+                    console.log('Row data-user-id:', row.getAttribute('data-user-id'));
+                    console.log('Row dataset.userId:', row.dataset.userId);
+                });
+                    return;
+                }
+                
+            const workerName = workerRow.querySelector('.worker-name').textContent;
+            const workerEmail = workerRow.querySelector('.worker-email').textContent;
+            
+            console.log('Editing worker:', workerName, workerEmail);
+            
+            // Open the modal and pre-select this worker
+            openModalWithPreselectedWorker(userId, workerName, workerEmail);
+        }
+
+        // Add a variable to track the original selected worker in edit mode
+        let originalEditWorkerId = null;
+
+        // Function to open modal with pre-selected worker
+        function openModalWithPreselectedWorker(userId, userName, userEmail) {
+            console.log('Opening modal with pre-selected worker:', userId, userName, userEmail);
+            // Store the original worker ID for change detection
+            originalEditWorkerId = String(userId);
+            // Show the modal first
+            const modal = document.getElementById('inviteAdminModal');
+            if (modal) {
+                modal.classList.add('show');
+                console.log('Modal should be visible now');
+                } else {
+                console.error('Modal element not found');
+                return;
+            }
+            // Initialize the modal content with the pre-selected worker and edit mode
+            initializeModalWithPreselection(userId, true);
+        }
+        
+        // New function to initialize modal with immediate pre-selection
+        function initializeModalWithPreselection(preselectedUserId, editMode) {
+            console.log('Initializing modal with preselection for userId:', preselectedUserId, 'editMode:', editMode);
+            
+            const usersList = document.getElementById('usersList');
+            const emptyState = document.getElementById('emptyState');
+            const addUserBtn = document.getElementById('addUserBtn');
+            if (addUserBtn) {
+                addUserBtn.textContent = editMode ? 'Save' : 'Add';
+            }
+            
+            if (!usersList) {
+                console.error('usersList element not found');
+                return;
+            }
+            
+            // Clear existing content except empty state
+            const existingUsers = usersList.querySelectorAll('.user-item');
+            existingUsers.forEach(user => user.remove());
+            
+            // Fetch real workers from API first, fallback to sample data
+            fetch('/api/get-organization-workers')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API response:', data);
+                    if (data.success && data.workers && data.workers.length > 0) {
+                        console.log('Using real workers from API');
+                        displayWorkersWithPreselection(data.workers, preselectedUserId, editMode);
+                        } else {
+                        console.log('No workers from API, using sample data');
+                        displayWorkersWithPreselection(existingWorkers, preselectedUserId, editMode);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching workers:', error);
+                    console.log('API failed, using sample data');
+                    displayWorkersWithPreselection(existingWorkers, preselectedUserId, editMode);
+                });
+        }
+        
+        // Function to display workers with immediate pre-selection
+        function displayWorkersWithPreselection(workers, preselectedUserId, editMode) {
+            console.log('displayWorkersWithPreselection called with:', workers, 'preselectedUserId:', preselectedUserId, 'editMode:', editMode);
+            const usersList = document.getElementById('usersList');
+            const emptyState = document.getElementById('emptyState');
+
+            // Get already invited workers from sessionStorage (only in invite mode)
+            let invitedWorkerIds = [];
+            if (!editMode) {
+                const invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+                invitedWorkerIds = invitedWorkers.map(w => String(w.id));
+            }
+
+            if (workers.length === 0) {
+                console.log('No workers, showing empty state');
+                if (emptyState) {
+                    emptyState.style.display = 'block';
+                }
+                return;
+            }
+
+            // Hide empty state and show users
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+
+            workers.forEach((worker, index) => {
+                console.log('Creating worker item', index, ':', worker);
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.dataset.userId = worker.id;
+
+                // Generate avatar initials from name
+                const initials = worker.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+                const avatarColor = getAvatarColor(worker.id);
+
+                // Check if this worker should be pre-selected
+                const isPreselected = (String(worker.id) === String(preselectedUserId)) || (Number(worker.id) === Number(preselectedUserId));
+                // Check if this worker is already invited (in invite mode)
+                const isAlreadyInvited = !editMode && invitedWorkerIds.includes(String(worker.id));
+
+                userItem.innerHTML = `
+                    <input type="radio" name="selectedUser" class="user-radio" value="${worker.id}"
+                        ${isPreselected || isAlreadyInvited ? 'checked' : ''}
+                        ${isAlreadyInvited ? 'disabled' : ''}>
+                    <div class="user-avatar" style="background: ${avatarColor};">${initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${worker.name}</div>
+                        <div class="user-email">${worker.email}</div>
+                    </div>
+                `;
+                if (isAlreadyInvited) {
+                    userItem.classList.add('already-invited');
+                }
+                usersList.appendChild(userItem);
+            });
+
+            // Enable add button if a worker is pre-selected (and not already invited)
+            if (preselectedUserId && !editMode) {
+                const addUserBtn = document.getElementById('addUserBtn');
+                if (addUserBtn) {
+                    // Only enable if the preselected user is not already invited
+                    addUserBtn.disabled = invitedWorkerIds.includes(String(preselectedUserId));
+                }
+            }
+
+            console.log('Re-attaching event listeners');
+            // Re-attach event listeners for new user items
+            attachUserEventListeners();
+
+            // If in edit mode, disable the Save button initially
+            if (preselectedUserId && typeof editMode !== 'undefined' && editMode) {
+                const addUserBtn = document.getElementById('addUserBtn');
+                if (addUserBtn) {
+                    addUserBtn.disabled = true;
+                }
+                // Add change listeners to all radios to enable Save only if changed
+                document.querySelectorAll('input[name="selectedUser"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const selectedId = this.value;
+                        const addUserBtn = document.getElementById('addUserBtn');
+                        if (addUserBtn) {
+                            if (selectedId !== originalEditWorkerId) {
+                                addUserBtn.disabled = false;
+                            } else {
+                                addUserBtn.disabled = true;
+                        }
+                    }
+                });
+                });
+            }
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
@@ -1190,175 +1564,118 @@
             }
         });
 
-        // Admin box selection functionality
-        document.querySelectorAll('.admin-selection-box').forEach(box => {
-            box.addEventListener('click', function(e) {
-                // Don't trigger if clicking on dropdown button
-                if (e.target.closest('.admin-box-dropdown')) {
-                    return;
-                }
-                
-                const checkbox = this.querySelector('.admin-checkbox');
-                const isCurrentlyChecked = checkbox.checked;
-                
-                // Toggle checkbox
-                checkbox.checked = !isCurrentlyChecked;
-                
-                // Toggle selected class
-                if (checkbox.checked) {
-                    this.classList.add('selected');
-                } else {
-                    this.classList.remove('selected');
-                }
-                
-                // Update "All" checkbox based on other selections
-                updateAllCheckbox();
-            });
-        });
-
-        // Checkbox change handlers
-        document.querySelectorAll('.admin-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const box = this.closest('.admin-selection-box');
-                
-                if (this.checked) {
-                    box.classList.add('selected');
-                } else {
-                    box.classList.remove('selected');
-                }
-                
-                // Handle "All" checkbox logic
-                if (this.id === 'all-admins') {
-                    const allChecked = this.checked;
-                    document.querySelectorAll('.admin-checkbox:not(#all-admins)').forEach(cb => {
-                        cb.checked = allChecked;
-                        const cbBox = cb.closest('.admin-selection-box');
-                        if (allChecked) {
-                            cbBox.classList.add('selected');
-                        } else {
-                            cbBox.classList.remove('selected');
-                        }
-                    });
-                } else {
-                    updateAllCheckbox();
-                }
-            });
-        });
-
-        // Function to update "All" checkbox based on other selections
-        function updateAllCheckbox() {
-            const allCheckbox = document.getElementById('all-admins');
-            const otherCheckboxes = document.querySelectorAll('.admin-checkbox:not(#all-admins)');
-            const checkedOthers = document.querySelectorAll('.admin-checkbox:not(#all-admins):checked');
-            
-            if (checkedOthers.length === 0) {
-                allCheckbox.checked = false;
-                allCheckbox.closest('.admin-selection-box').classList.remove('selected');
-            } else if (checkedOthers.length === otherCheckboxes.length) {
-                allCheckbox.checked = true;
-                allCheckbox.closest('.admin-selection-box').classList.add('selected');
-            } else {
-                allCheckbox.checked = false;
-                allCheckbox.closest('.admin-selection-box').classList.remove('selected');
-            }
-        }
-
-        // Dropdown button handlers
-        document.querySelectorAll('.admin-box-dropdown').forEach(dropdown => {
-            dropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Add dropdown functionality here if needed
-                console.log('Dropdown clicked for:', this.closest('.admin-selection-box').dataset.adminType);
-            });
-        });
-
-        // Initialize the form state
-        updateAllCheckbox();
-
-        // Initialize form with existing data when page loads
-        function initializeFormStep2() {
-            const existingData = JSON.parse(sessionStorage.getItem('officeData') || '{}');
-            
-            if (existingData.selectedAdmins && Array.isArray(existingData.selectedAdmins)) {
-                // Restore selected admin checkboxes
-                existingData.selectedAdmins.forEach(adminId => {
-                    const checkbox = document.getElementById(adminId);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        const box = checkbox.closest('.admin-selection-box');
-                        if (box) {
-                            box.classList.add('selected');
-                        }
-                    }
-                });
-                
-                // Update "All" checkbox state based on restored selections
-                updateAllCheckbox();
-            }
-        }
-
-        // Initialize form when page loads
-        document.addEventListener('DOMContentLoaded', initializeFormStep2);
-
         // Sample data - replace this with actual data from your backend
         const existingWorkers = [
-            // Uncomment these if you have workers to display:
-            // {
-            //     id: 'hung-le',
-            //     name: 'Hung Le',
-            //     email: 'duyphudang2007@gmail.com',
-            //     avatar: 'HL',
-            //     avatarColor: '#e1bee7',
-            //     isAdmin: false
-            // },
-            // {
-            //     id: 'unassigned-employee',
-            //     name: 'Unassigned Employee',
-            //     email: '71cb547a-6f47-4b9a-baaa@deeldraft.com',
-            //     avatar: 'UE',
-            //     avatarColor: '#c8e6c9',
-            //     isAdmin: true
-            // }
+            {
+                id: '{{ user.id if user else "1" }}',
+                name: '{{ user.name if user else "Your Account" }}',
+                email: '{{ user.email if user else "your.email@example.com" }}',
+                is_admin: false
+            },
+            {
+                id: '2',
+                name: 'Hung Le',
+                email: 'dangngoduyphu122007@gmail.com',
+                is_admin: false
+            },
+            {
+                id: '3',
+                name: 'Test User',
+                email: 'test@example.com',
+                is_admin: false
+            }
         ];
 
         // Function to populate users list
         function populateUsersList() {
+            console.log('populateUsersList called');
             const usersList = document.getElementById('usersList');
             const emptyState = document.getElementById('emptyState');
+            
+            console.log('usersList element:', usersList);
+            console.log('emptyState element:', emptyState);
             
             // Clear existing content except empty state
             const existingUsers = usersList.querySelectorAll('.user-item');
             existingUsers.forEach(user => user.remove());
             
-            if (existingWorkers.length === 0) {
+            // Fetch real workers from API first, fallback to sample data
+            fetch('/api/get-organization-workers')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API response:', data);
+                    if (data.success && data.workers && data.workers.length > 0) {
+                        console.log('Using real workers from API');
+                        displayWorkers(data.workers);
+                    } else {
+                        console.log('No workers from API, using sample data');
+                        displayWorkers(existingWorkers);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching workers:', error);
+                    console.log('API failed, using sample data');
+                    displayWorkers(existingWorkers);
+                });
+        }
+
+        // Function to display workers
+        function displayWorkers(workers) {
+            console.log('displayWorkers called with:', workers);
+            const usersList = document.getElementById('usersList');
+            const emptyState = document.getElementById('emptyState');
+            
+            console.log('usersList in displayWorkers:', usersList);
+            console.log('emptyState in displayWorkers:', emptyState);
+            
+            if (workers.length === 0) {
+                console.log('No workers, showing empty state');
                 // Show empty state
+                if (emptyState) {
                 emptyState.style.display = 'block';
+                }
             } else {
+                console.log('Displaying', workers.length, 'workers');
                 // Hide empty state and show users
+                if (emptyState) {
                 emptyState.style.display = 'none';
+                }
                 
-                existingWorkers.forEach(worker => {
+                workers.forEach((worker, index) => {
+                    console.log('Creating worker item', index, ':', worker);
                     const userItem = document.createElement('div');
                     userItem.className = 'user-item';
                     userItem.dataset.userId = worker.id;
                     
+                    // Generate avatar initials from name
+                    const initials = worker.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+                    const avatarColor = getAvatarColor(worker.id);
+                    
+                    console.log('Generated initials:', initials, 'color:', avatarColor);
+                    
                     userItem.innerHTML = `
                         <input type="radio" name="selectedUser" class="user-radio" value="${worker.id}">
-                        <div class="user-avatar" style="background: ${worker.avatarColor};">${worker.avatar}</div>
+                        <div class="user-avatar" style="background: ${avatarColor};">${initials}</div>
                         <div class="user-info">
                             <div class="user-name">${worker.name}</div>
                             <div class="user-email">${worker.email}</div>
                         </div>
-                        ${worker.isAdmin ? '<div class="user-badge">ALREADY AN ADMIN</div>' : ''}
                     `;
                     
+                    console.log('Appending worker item to usersList');
                     usersList.appendChild(userItem);
                 });
                 
+                console.log('Re-attaching event listeners');
                 // Re-attach event listeners for new user items
                 attachUserEventListeners();
             }
+        }
+
+        // Function to generate consistent avatar colors
+        function getAvatarColor(userId) {
+            const colors = ['#e1bee7', '#c8e6c9', '#ffcdd2', '#bbdefb', '#d1e9c5', '#ffe066', '#fff3e0', '#fce4ec'];
+            return colors[userId % colors.length];
         }
 
         // Function to attach event listeners to user items
@@ -1378,6 +1695,15 @@
                     document.getElementById('addUserBtn').disabled = false;
                 });
             });
+        }
+
+        // Function to clear data and close the page
+        function closeAndClearData() {
+            // Clear all session storage data
+            sessionStorage.removeItem('officeData');
+            sessionStorage.removeItem('invitedWorkers'); // Also clear invited workers
+            // Navigate back to groups page
+            window.location.href = '/groups';
         }
     </script>
 </body>

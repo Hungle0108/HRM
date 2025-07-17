@@ -1,26 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Groups - HR Management System{% endblock %}
+{% block title %}Groups | Canvascript{% endblock %}
+
+{% block head %}
+<!-- Backend sets current user information -->
+<meta name="current-user" content="{{ user.name if user else 'Current User' }}">
+{% endblock %}
 
 {% block styles %}
 <style>
-    /* Reset and base styles */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        background: #f8f9fa;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    /* Main container */
+    /* Settings layout */
     .settings-layout {
         display: flex;
         min-height: calc(100vh - 80px);
         margin-top: 80px;
+        position: relative;
     }
 
     /* Sidebar styles */
@@ -36,6 +30,7 @@
         overflow-y: auto;
         border-radius: 0 0 12px 0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        z-index: 100;
     }
 
     .sidebar-header {
@@ -58,7 +53,7 @@
     .search-input {
         width: 100%;
         padding: 10px 16px 10px 40px;
-        border: 1px solid #e9ecef;
+        border: none;
         border-radius: 8px;
         font-size: 0.875rem;
         background: #f8f9fa;
@@ -67,7 +62,6 @@
 
     .search-input:focus {
         outline: none;
-        border-color: #80bdff;
         background: white;
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
@@ -77,8 +71,9 @@
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        color: #6c757d;
-        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
     }
 
     /* Navigation sections */
@@ -227,6 +222,12 @@
         flex: 1;
         margin-left: 280px;
         padding: 32px 40px;
+        background: #f8f9fa;
+    }
+
+    .modal-open {
+        filter: blur(2px);
+        pointer-events: none;
     }
 
     .content-header {
@@ -246,115 +247,148 @@
         margin-bottom: 24px;
     }
 
-    /* Tabs */
-    .tabs-container {
-        border-bottom: 1px solid #e9ecef;
-        margin-bottom: 24px;
-    }
-
-    .tabs {
+    /* Groups section */
+    .groups-section {
         display: flex;
-        gap: 32px;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 40px;
     }
 
-    .tab {
-        padding: 12px 0;
-        color: #6c757d;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s;
-        cursor: pointer;
+    /* Filters box */
+    .filters-box {
+        background: white;
+        border-radius: 12px;
+        padding: 24px 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Table box */
+    .table-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+        margin-top: 20px;
         position: relative;
     }
 
-    .tab:hover {
-        color: #495057;
-    }
-
-    .tab.active {
-        color: #1a1a1a;
-        border-bottom-color: #1a1a1a;
-    }
-
-    .tab .new-badge {
-        background: #6366f1;
-        color: white;
-        font-size: 0.6rem;
-        font-weight: 600;
-        padding: 2px 6px;
-        border-radius: 4px;
-        margin-left: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* Groups controls */
-    .groups-controls {
+    .section-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+        margin-bottom: 32px;
+    }
+
+    .section-info {
+        flex: 1;
+    }
+
+    .section-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .section-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+        line-height: 1.5;
         margin-bottom: 24px;
     }
 
-    .controls-left {
+    .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 16px;
+    }
+
+    .create-btn {
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .create-btn:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        text-decoration: none;
+        color: #495057;
+    }
+
+    /* Filters section */
+    .filters-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .filters-left {
         display: flex;
         align-items: center;
         gap: 16px;
     }
 
-    .groups-search {
-        position: relative;
-        width: 250px;
-    }
-
-    .groups-search input {
-        width: 100%;
-        padding: 8px 16px 8px 40px;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        background: white;
-        transition: all 0.2s;
-    }
-
-    .groups-search input:focus {
-        outline: none;
-        border-color: #80bdff;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-    }
-
-    .groups-search .search-icon {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6c757d;
-        font-size: 14px;
-    }
-
-    .filter-dropdown {
+    /* Filter dropdown styles */
+    .status-filter, .admin-filter {
         position: relative;
     }
 
-    .filter-btn {
+    .status-filter .dropdown-toggle, .admin-filter .dropdown-toggle {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 12px;
-        background: white;
+        padding: 10px 16px;
+        background: #f8f9fa;
         border: 1px solid #e9ecef;
-        border-radius: 6px;
+        border-radius: 8px;
         font-size: 0.875rem;
         color: #495057;
         cursor: pointer;
         transition: all 0.2s;
+        min-width: 120px;
+        justify-content: space-between;
     }
 
-    .filter-btn:hover {
+    .status-filter .dropdown-toggle:hover, .admin-filter .dropdown-toggle:hover {
+        background: #e9ecef;
         border-color: #adb5bd;
-        background: #f8f9fa;
+    }
+
+    .status-filter .dropdown-toggle.active, .admin-filter .dropdown-toggle.active {
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .status-filter .dropdown-label, .admin-filter .dropdown-label {
+        font-weight: 500;
+    }
+
+    .dropdown-arrow {
+        width: 12px;
+        height: 12px;
+        opacity: 0.7;
+        transition: transform 0.2s ease;
+    }
+
+    .dropdown-toggle.active .dropdown-arrow {
+        transform: rotate(180deg);
     }
 
     .status-badge {
@@ -381,69 +415,251 @@
         background: currentColor;
     }
 
-    .create-group-btn {
+    /* Action buttons group */
+    .action-buttons-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .customize-columns-btn {
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .customize-columns-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .action-button {
         padding: 10px 16px;
         background: #1a1a1a;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         font-size: 0.875rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
     }
 
-    .create-group-btn:hover {
+    .action-button:hover {
         background: #333;
+        text-decoration: none;
+        color: white;
     }
 
-    .expand-btn {
-        padding: 8px 12px;
-        background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        color: #495057;
+    /* Search container styles */
+    .filters-section .search-container {
+        position: relative;
+        height: 44px;
+        width: 44px;
+        max-width: 300px;
+        transition: width 0.3s ease;
         cursor: pointer;
-        transition: all 0.2s;
-        margin-left: 8px;
-    }
-
-    .expand-btn:hover {
-        border-color: #adb5bd;
-        background: #f8f9fa;
-    }
-
-    /* Table */
-    .groups-table-container {
-        background: white;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
         overflow: hidden;
     }
 
+    /* Expanded state */
+    .filters-section .search-container.expanded {
+        width: 300px;
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .filters-section .search-container:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .filters-section .search-container.expanded:hover {
+        background: white;
+        border-color: #80bdff;
+    }
+
+    .filters-section .search-input {
+        width: 0;
+        padding: 0;
+        border: none !important;
+        outline: none !important;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        opacity: 0;
+        margin-left: 40px;
+        box-shadow: none !important;
+    }
+
+    /* Visible input in expanded state */
+    .filters-section .search-container.expanded .search-input {
+        width: calc(100% - 50px);
+        padding: 10px 16px 10px 0;
+        opacity: 1;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .filters-section .search-input:focus {
+        outline: none !important;
+        background: transparent;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .filters-section .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+
+    .filters-section .search-container.expanded .search-icon {
+        opacity: 0.8;
+    }
+
+    .filters-section .search-icon:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 3;
+        display: none;
+    }
+
+    .search-clear-btn:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn.show {
+        display: block;
+        opacity: 0.6;
+    }
+
+    /* Table styles */
     .groups-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: none;
+        border-radius: 0;
+        overflow: visible;
     }
 
     .groups-table th {
-        background: #f8f9fa;
-        padding: 16px 20px;
+        padding: 16px;
         text-align: left;
-        font-size: 0.75rem;
+        font-size: 0.875rem;
         font-weight: 600;
         color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        background: #f8f9fa;
+        user-select: none;
+        position: relative;
+        transition: background-color 0.2s ease;
+    }
+
+    .groups-table th .sort-icon {
+        display: inline-block;
+        margin-left: 8px;
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        vertical-align: baseline;
+        transform: translateY(-2px);
+        cursor: pointer;
+    }
+
+    .groups-table th .sort-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        vertical-align: middle;
+        transition: none;
+    }
+
+    .groups-table th.sortable:hover .sort-icon,
+    .groups-table th.sorted .sort-icon {
+        opacity: 1;
+    }
+
+    .header-menu-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        z-index: 2;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .groups-table th:hover .header-menu-icon {
+        opacity: 0.7;
+    }
+
+    .header-menu-icon:hover {
+        opacity: 1;
     }
 
     .groups-table td {
-        padding: 16px 20px;
-        border-bottom: 1px solid #f1f3f4;
+        padding: 16px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
         font-size: 0.875rem;
         color: #495057;
+        vertical-align: top;
+    }
+
+    .groups-table td:last-child {
+        border-right: none;
     }
 
     .groups-table tr:last-child td {
@@ -454,6 +670,249 @@
         background: #f8f9fa;
     }
 
+    /* Ensure rounded corners are respected */
+    .groups-table thead tr:first-child th:first-child {
+        border-top-left-radius: 0;
+    }
+    
+    .groups-table thead tr:first-child th:last-child {
+        border-top-right-radius: 0;
+    }
+    
+    .groups-table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+    }
+    
+    .groups-table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
+    }
+
+    .group-name {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .group-name.clickable {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .group-name.clickable:hover {
+        color: #8b5cf6;
+    }
+
+    /* Edit button styles */
+    .edit-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+    }
+
+    .edit-btn:hover {
+        background: #f8f9fa;
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .edit-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Actions column width */
+    .groups-table td:last-child,
+    .groups-table th:last-child {
+        width: 60px;
+        text-align: center;
+        padding: 12px 8px;
+        position: relative;
+    }
+
+    /* Actions container */
+    .actions-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .action-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        min-width: 150px;
+        display: none;
+    }
+
+    .action-menu.show {
+        display: block;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+    .action-item:last-child {
+        border-bottom: none;
+    }
+
+    .action-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .action-item.delete:hover {
+        background: #fdf2f2;
+        color: #dc3545;
+    }
+
+    .action-icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.7;
+    }
+
+    .action-item:hover .action-icon {
+        opacity: 1;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        margin-bottom: 16px;
+    }
+
+    .empty-state-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+        line-height: 1.5;
+    }
+
+    .table-wrapper {
+        border-radius: 12px;
+        overflow: visible;
+    }
+
+    .table-summary {
+        background: white;
+        color: #6c757d;
+        font-size: 0.875rem;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e9ecef;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+        .settings-sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            height: calc(100vh - 80px);
+        }
+
+        .settings-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .settings-content {
+            margin-left: 0;
+        }
+
+        .filters-section {
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: 16px;
+        }
+
+        .filters-left {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filters-section .search-container {
+            max-width: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .groups-table {
+            font-size: 0.8rem;
+        }
+
+        .groups-table th,
+        .groups-table td {
+            padding: 12px 8px;
+        }
+
+        .section-header {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-actions {
+            margin-left: 0;
+        }
+    }
+
+    /* Scrollbar styling */
+    .settings-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    .dropdown-arrow img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    /* Group info styles */
     .group-info {
         display: flex;
         align-items: center;
@@ -486,37 +945,7 @@
         line-height: 1.3;
     }
 
-    .table-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .action-btn {
-        background: none;
-        border: none;
-        color: #6c757d;
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 4px;
-        font-size: 16px;
-        line-height: 1;
-        transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-        background: #f8f9fa;
-        color: #495057;
-    }
-
-    /* Item count */
-    .item-count {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-bottom: 16px;
-    }
-
-    /* Icons */
+    /* Sidebar navigation icons */
     .icon-organization {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'/%3e%3c/svg%3e");
     }
@@ -539,55 +968,6 @@
     .icon-customize {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3e%3c/svg%3e");
     }
-
-    /* Navigation adjustments */
-    .settings-nav {
-        padding-bottom: 16px;
-    }
-
-    /* Responsive design */
-    @media (max-width: 1024px) {
-        .settings-sidebar {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            height: calc(100vh - 80px);
-        }
-
-        .settings-sidebar.open {
-            transform: translateX(0);
-        }
-
-        .settings-content {
-            margin-left: 0;
-        }
-    }
-
-    /* Scrollbar styling */
-    .settings-sidebar::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .settings-sidebar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-
-    .settings-sidebar::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-
-    .settings-sidebar::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-
-    .dropdown-arrow img {
-        width: 16px;
-        height: 16px;
-        object-fit: contain;
-        display: inline-block;
-        vertical-align: middle;
-    }
 </style>
 {% endblock %}
 
@@ -595,68 +975,81 @@
 <div class="settings-layout">
     <!-- Sidebar -->
     {% include 'org_settings_sidebar.html' %}
+
     <!-- Main Content -->
-    <div class="settings-content">
+    <div class="settings-content" id="settingsContent">
+        <!-- Header -->
         <div class="content-header">
-            <h2 class="content-title">Groups</h2>
-            <p class="content-subtitle">Define working groups that reflect the organization's structure.</p>
+            <h1 class="content-title">Groups</h1>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs-container">
-            <div class="tabs">
-                <div class="tab active">Groups</div>
+        <!-- Groups section -->
+        <div class="groups-section">
+            <!-- Filters Box -->
+            <div class="filters-box">
+                <div class="filters-section">
+                    <div class="filters-left">
+                        <div class="search-container" id="searchContainer">
+                            <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                            <input type="text" class="search-input" placeholder="Search by group name..." id="searchInput">
+                            <button class="search-clear-btn" id="searchClearBtn">
+                                <img src="/static/images/cross.png" alt="Clear" style="width: 16px; height: 16px;">
+                            </button>
             </div>
-        </div>
-
-        <!-- Groups Controls -->
-        <div class="groups-controls">
-            <div class="controls-left">
-                <div class="groups-search">
-                    <input type="text" placeholder="Search">
-                    <span class="search-icon">🔍</span>
-                </div>
-                
-                <div class="filter-dropdown">
-                    <button class="filter-btn">
-                        Status
-                        <span class="status-badge active">
-                            <span class="status-dot"></span>
-                        </span>
-                        ▼
+                        <div class="status-filter">
+                            <button class="dropdown-toggle" id="statusDropdown">
+                                <span class="dropdown-label">Status</span>
+                                <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
                     </button>
                 </div>
-                
-                <div class="filter-dropdown">
-                    <button class="filter-btn">
-                        Admins
-                        ▼
+                        <div class="admin-filter">
+                            <button class="dropdown-toggle" id="adminDropdown">
+                                <span class="dropdown-label">Admins</span>
+                                <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
                     </button>
                 </div>
             </div>
-            
-            <div class="controls-right">
-                <button class="create-group-btn">Create group</button>
-                <button class="expand-btn">⚏</button>
+                    <div class="action-buttons-group">
+                        <button class="customize-columns-btn" id="customizeColumnsBtn">
+                            Customize columns
+                        </button>
+                        <button class="action-button" id="headerCreateBtn">Create group</button>
+                    </div>
             </div>
         </div>
 
-        <!-- Item Count -->
-        <div class="item-count">Total {{ groups|length }} items</div>
-
-        <!-- Groups Table -->
-        <div class="groups-table-container">
-            <table class="groups-table">
+            <!-- Table Box -->
+            <div class="table-box">
+                <div class="table-wrapper">
+                    <div class="table-summary" id="tableSummary">Total {{ groups|length }} items</div>
+                    <!-- Data table -->
+                    <table class="groups-table" id="groupsTable">
                 <thead>
                     <tr>
-                        <th>Group</th>
-                        <th>Status</th>
-                        <th>Admins assigned</th>
-                        <th>Contracts</th>
-                        <th></th>
+                                <th class="sortable" data-sort="name">
+                                    Group
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'name')">
+                                </th>
+                                <th class="sortable" data-sort="status">
+                                    Status
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'status')">
+                                </th>
+                                <th class="sortable" data-sort="admins">
+                                    Admins assigned
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'admins')">
+                                </th>
+                                <th class="sortable" data-sort="contracts">
+                                    Contracts
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'contracts')">
+                                </th>
+                                <th style="width: 60px;"></th>
                     </tr>
                 </thead>
-                <tbody>
+                        <tbody id="groupsBody">
                     {% if groups %}
                         {% for group in groups %}
                         <tr>
@@ -664,7 +1057,7 @@
                                 <div class="group-info">
                                     <div class="group-icon">👥</div>
                                     <div class="group-details">
-                                        <h4>{{ group.name }}</h4>
+                                                <h4 class="group-name clickable" data-group-id="{{ group.id }}" onclick="showGroupInfo(this.getAttribute('data-group-id'))" title="Click to view details">{{ group.name }}</h4>
                                         <p>You are assigned as Group Admin</p>
                                     </div>
                                 </div>
@@ -678,23 +1071,43 @@
                             <td>1 admin</td>
                             <td>{{ group.contracts_count }} contracts</td>
                             <td>
-                                <button class="action-btn">⋮</button>
+                                        <div class="actions-container">
+                                            <button class="edit-btn" data-group-id="{{ group.id }}" onclick="toggleActionMenu(event, this.getAttribute('data-group-id'))" title="More actions">
+                                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                                            </button>
+                                            <div class="action-menu" id="menu-{{ group.id }}">
+                                                <div class="action-item" data-group-id="{{ group.id }}" onclick="editGroup(this.getAttribute('data-group-id'))">
+                                                    <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                                    <span>Edit</span>
+                                                </div>
+                                                <div class="action-item" data-group-id="{{ group.id }}" onclick="copyGroup(this.getAttribute('data-group-id'))">
+                                                    <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
+                                                    <span>Duplicate</span>
+                                                </div>
+                                                <div class="action-item delete" data-group-id="{{ group.id }}" onclick="deleteGroup(this.getAttribute('data-group-id'))">
+                                                    <img src="/static/images/trash-bold.png" alt="Delete" class="action-icon">
+                                                    <span>Delete</span>
+                                                </div>
+                                            </div>
+                                        </div>
                             </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                                <div style="font-size: 2rem;">🏢</div>
-                                    <div style="font-weight: 500;">No groups created yet</div>
-                                    <div style="font-size: 0.875rem;">Create your first group to get started</div>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><img src="/static/images/users-alt.png" alt="Groups" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                                        <div class="empty-state-title">No groups yet</div>
+                                        <div class="empty-state-description">Create your first group to organize your team members</div>
                             </div>
                         </td>
                     </tr>
                     {% endif %}
                 </tbody>
             </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -702,37 +1115,132 @@
 
 {% block scripts %}
 <script>
-    // Handle tab clicks
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tab
-            this.classList.add('active');
-        });
+    // Search functionality
+    const searchContainer = document.getElementById('searchContainer');
+    const searchInput = document.getElementById('searchInput');
+    const searchIcon = document.getElementById('searchIcon');
+    const searchClearBtn = document.getElementById('searchClearBtn');
+
+    // Search container click handler
+    searchContainer.addEventListener('click', function() {
+        if (!this.classList.contains('expanded')) {
+            this.classList.add('expanded');
+            searchInput.focus();
+        }
     });
 
-    // Handle search functionality
-    const searchInput = document.querySelector('.groups-search input');
-    if (searchInput) {
+    // Search input handlers
         searchInput.addEventListener('input', function() {
+        const hasValue = this.value.trim().length > 0;
+        searchClearBtn.classList.toggle('show', hasValue);
+        
+        // Add search functionality here
             const searchTerm = this.value.toLowerCase();
-            // Add search functionality here if needed
             console.log('Search term:', searchTerm);
         });
-    }
 
-    // Handle filter dropdown clicks
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Add dropdown functionality here
-            console.log('Filter clicked:', this.textContent.trim());
-        });
+    searchInput.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            searchContainer.classList.remove('expanded');
+        }
     });
 
-    // Handle create group button
-    document.querySelector('.create-group-btn')?.addEventListener('click', function() {
+    // Clear search button
+    searchClearBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        searchInput.value = '';
+        searchContainer.classList.remove('expanded');
+        this.classList.remove('show');
+    });
+
+    // Click outside to collapse search
+    document.addEventListener('click', function(e) {
+        if (!searchContainer.contains(e.target) && !searchInput.value.trim()) {
+            searchContainer.classList.remove('expanded');
+        }
+    });
+
+    // Action menu functionality
+    function toggleActionMenu(event, groupId) {
+        event.stopPropagation();
+        
+        // Close all other menus
+        document.querySelectorAll('.action-menu').forEach(menu => {
+            if (menu.id !== `menu-${groupId}`) {
+                menu.classList.remove('show');
+            }
+        });
+        
+        // Toggle current menu
+        const menu = document.getElementById(`menu-${groupId}`);
+        menu.classList.toggle('show');
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.actions-container')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+
+    // Action handlers
+    function showGroupInfo(groupId) {
+        console.log('Show group info for ID:', groupId);
+        // Add info modal functionality here
+    }
+
+    function editGroup(groupId) {
+        console.log('Edit group with ID:', groupId);
+        // Add edit functionality here
+    }
+
+    function copyGroup(groupId) {
+        console.log('Copy group with ID:', groupId);
+        // Add copy functionality here
+    }
+
+    function deleteGroup(groupId) {
+        console.log('Delete group with ID:', groupId);
+        // Add delete functionality here
+    }
+
+    // Filter dropdown handlers
+    document.getElementById('statusDropdown').addEventListener('click', function() {
+        console.log('Status filter clicked');
+            // Add dropdown functionality here
+        });
+
+    document.getElementById('adminDropdown').addEventListener('click', function() {
+        console.log('Admin filter clicked');
+        // Add dropdown functionality here
+    });
+
+    // Create group button
+    document.getElementById('headerCreateBtn').addEventListener('click', function() {
         window.location.href = '/create-office';
+    });
+
+    // Customize columns button
+    document.getElementById('customizeColumnsBtn').addEventListener('click', function() {
+        console.log('Customize columns clicked');
+        // Add column customization functionality here
+    });
+
+    // Sort functionality
+    function showSortDropdown(element, sortType) {
+        console.log('Sort dropdown for:', sortType);
+        // Add sort dropdown functionality here
+    }
+
+    // Table sorting
+    document.querySelectorAll('.sortable').forEach(header => {
+        header.addEventListener('click', function() {
+            const sortType = this.getAttribute('data-sort');
+            console.log('Sort by:', sortType);
+            // Add sorting functionality here
+        });
     });
 </script>
 {% endblock %} 

@@ -25,7 +25,7 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
@@ -64,7 +64,7 @@
         }
 
         .page-header {
-            background: white;
+            background: #f8f9fa;
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -94,34 +94,34 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 20px 40px 120px 40px;
             gap: 60px;
+            margin-bottom: 60px;
         }
 
         .content-area {
             flex: 0 0 auto;
             max-width: 600px;
             width: 100%;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
-        }
-
-        .sidebar-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .steps-list {
@@ -133,8 +133,11 @@
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
         }
 
         .step-number {
@@ -213,10 +216,13 @@
         }
 
         .group-info-card {
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -229,14 +235,14 @@
         }
 
         .group-icon {
-            width: 40px;
-            height: 40px;
+            width: 56px;
+            height: 56px;
             background: #e9ecef;
-            border-radius: 8px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 32px;
             color: #6c757d;
         }
 
@@ -515,6 +521,347 @@
             color: #6c757d;
             cursor: not-allowed;
         }
+
+        /* Admin list styles */
+        .admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .admin-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 16px;
+            gap: 12px;
+        }
+
+        .admin-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .admin-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .admin-email {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .assign-role-btn {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .assign-role-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        .org-admins-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+            border: 1px solid #e9ecef;
+            padding: 0 0 16px 0;
+            margin-bottom: 24px;
+        }
+        .org-admins-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: transparent;
+            border-bottom: none;
+        }
+        .org-admins-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 1rem;
+        }
+        .org-admins-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .org-admins-info-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+        .org-admins-role-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        .org-admins-edit-btn, .org-admins-dropdown-btn {
+            background: none;
+            border: none;
+            padding: 2px;
+            margin-left: 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .org-admins-edit-btn:hover, .org-admins-dropdown-btn:hover {
+            background: #f0f0f0;
+        }
+        .admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px 24px 0 24px;
+        }
+        .admin-item {
+            display: flex;
+            align-items: center;
+            background: #f3f0fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px 20px;
+            gap: 16px;
+        }
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e6dbfa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #6c63ff;
+            flex-shrink: 0;
+        }
+        .admin-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+        .admin-email {
+            color: #6c757d;
+            font-size: 0.92rem;
+        }
+        .assign-role-btn {
+            background: white;
+            border: 1.5px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .assign-role-btn:hover {
+            background: #f8f9fa;
+            border-color: #6c63ff;
+            color: #6c63ff;
+        }
+        .warning-section {
+            margin-bottom: 18px;
+        }
+        .warning-message {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .warning-icon {
+            color: #6c757d;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        /* Add the missing CSS classes from step 2 */
+        .invited-admins-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px 24px;
+        }
+        .invited-admin-item {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            padding: 10px 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            gap: 12px;
+        }
+        .invited-admin-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #555;
+            margin-right: 10px;
+        }
+        .invited-admin-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .invited-admin-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .invited-admin-email {
+            color: #6c757d;
+            font-size: 0.92rem;
+        }
+        .invited-admin-edit {
+            margin-left: 12px;
+            cursor: pointer;
+            color: #888;
+            font-size: 1.1rem;
+            border: none;
+            background: none;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .invited-admin-edit:hover {
+            background: #f0f0f0;
+            color: #222;
+        }
+        .invited-admin-edit img {
+            display: block;
+            margin: 0 auto;
+            vertical-align: middle;
+        }
+
+        /* Workers Table Styles (matching group box) */
+        .workers-table {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .worker-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .worker-row:last-child {
+            border-bottom: none;
+        }
+
+        .worker-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .worker-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .worker-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .worker-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .worker-email {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .worker-edit {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .worker-edit:hover {
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
     </style>
 </head>
 <body>
@@ -522,7 +869,7 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-content">
-                <button class="close-btn" onclick="window.location.href='/groups'">✕</button>
+                <button class="close-btn" onclick="sessionStorage.removeItem('officeData'); window.location.href='/groups'">✕</button>
             </div>
         </div>
 
@@ -550,7 +897,7 @@
                     <div class="group-info-section">
                         <div class="group-info-card">
                             <div class="group-info-left">
-                                <div class="group-icon">👥</div>
+                                <div class="group-icon"><img src="/static/images/users-alt.png" alt="Group" style="width: 32px; height: 32px;"></div>
                                 <div class="group-details">
                                     <div class="group-name">kotifdfdsfaf</div>
                                 </div>
@@ -560,45 +907,10 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Warning Message -->
-                    <div class="warning-section">
-                        <div class="warning-message">
-                            <div class="warning-icon">ℹ️</div>
-                            <div class="warning-text">
-                                Organization admins can manage this group. If no specific group admins are assigned, organization admins will have administrative access.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Admin Roles Section -->
-                    <div class="admin-roles-section">
-                        <div class="admin-role-card">
-                            <div class="admin-role-header">
-                                <div class="admin-role-left">
-                                    <div class="admin-role-icon">🏢</div>
-                                    <div class="admin-role-title">Organization admins</div>
-                                </div>
-                                <div class="admin-role-right">
-                                    <button type="button" class="dropdown-btn" id="dropdownBtn">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M6 9l6 6 6-6"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- Dropdown Content -->
-                            <div class="admin-dropdown-content" id="adminDropdown" style="display: none;">
-                                <div class="admin-list">
-                                    <div class="admin-item">
-                                        <div class="admin-avatar">PD</div>
-                                        <div class="admin-info">
-                                            <div class="admin-name">Phu Dang</div>
-                                            <div class="admin-email">duyphudang2007@gmail.com</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Invited Workers Table (similar to page 2) -->
+                    <div class="invited-workers-section" id="invitedWorkersSection" style="margin-top: 32px; display: none;">
+                        <div class="workers-table" id="mainWorkersTable">
+                            <!-- Workers will be dynamically added here -->
                         </div>
                     </div>
                 </form>
@@ -606,7 +918,6 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Create office workflow</h3>
                 <ol class="steps-list">
                     <li class="step-item completed">
                         <div class="step-number">✓</div>
@@ -642,8 +953,147 @@
     </div>
 
     <script>
-        // Form submission
-        document.getElementById('office-form-step3').addEventListener('submit', function(e) {
+        // Save form data on change
+        function saveOfficeStep3Data() {
+            const groupName = document.querySelector('.group-name')?.textContent || '';
+            const data = JSON.parse(sessionStorage.getItem('officeData') || '{}');
+            data.name = groupName;
+            data.step = 3;
+            sessionStorage.setItem('officeData', JSON.stringify(data));
+        }
+
+        // Restore form data on page load
+        function restoreOfficeStep3Data() {
+            const data = JSON.parse(sessionStorage.getItem('officeData') || '{}');
+            if (data.name && document.querySelector('.group-name')) {
+                document.querySelector('.group-name').textContent = data.name;
+            }
+            
+            // Get invited workers from both sources
+            const invitedWorkersFromData = Array.isArray(data.invitedWorkers) ? data.invitedWorkers : [];
+            const invitedWorkersFromSession = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+            
+            // Use session storage data if available, otherwise use data from officeData
+            const invitedWorkers = invitedWorkersFromSession.length > 0 ? invitedWorkersFromSession : invitedWorkersFromData;
+            
+            // Update group-status with total number of admins
+            const groupStatus = document.querySelector('.group-status');
+            if (groupStatus) {
+                const selected = Array.isArray(data.selectedAdmins) ? data.selectedAdmins.length : 0;
+                const total = selected + invitedWorkers.length;
+                if (total > 0) {
+                    groupStatus.textContent = `${total} admin${total > 1 ? 's' : ''} selected`;
+                } else {
+                    groupStatus.textContent = 'No admins selected';
+                }
+            }
+            // Only render worker table (remove duplicate admin list)
+            renderWorkerTable(invitedWorkers);
+        }
+
+        function renderAdminList(invitedWorkers) {
+            const adminListContainer = document.getElementById('invitedAdminsListStep3');
+            if (!adminListContainer) return;
+            adminListContainer.innerHTML = '';
+            
+            if (!Array.isArray(invitedWorkers)) {
+                return;
+            }
+            
+            invitedWorkers.forEach(worker => {
+                // Generate avatar initials from name
+                const initials = worker.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+                const avatarColor = getAvatarColor(worker.id);
+                
+                const item = document.createElement('div');
+                item.className = 'invited-admin-item';
+                item.innerHTML = `
+                    <div class="invited-admin-avatar" style="background: ${avatarColor};">${initials}</div>
+                    <div class="invited-admin-info">
+                        <div class="invited-admin-name">${worker.name}</div>
+                        <div class="invited-admin-email">${worker.email}</div>
+                    </div>
+                    <button class="invited-admin-edit" title="Edit"><img src="/static/images/pen.png" alt="Edit" style="width: 18px; height: 18px;"></button>
+                `;
+                adminListContainer.appendChild(item);
+            });
+        }
+        
+        // Function to generate consistent avatar colors (same as page 2)
+        function getAvatarColor(userId) {
+            const colors = ['#e1bee7', '#c8e6c9', '#ffcdd2', '#bbdefb', '#d1e9c5', '#ffe066', '#fff3e0', '#fce4ec'];
+            return colors[userId % colors.length];
+        }
+
+        // Function to render worker table (similar to page 2)
+        function renderWorkerTable(invitedWorkers) {
+            const mainWorkersTable = document.getElementById('mainWorkersTable');
+            const invitedWorkersSection = document.getElementById('invitedWorkersSection');
+            
+            if (!mainWorkersTable || !invitedWorkersSection) return;
+            
+            // Clear existing content
+            mainWorkersTable.innerHTML = '';
+            
+            if (!Array.isArray(invitedWorkers) || invitedWorkers.length === 0) {
+                invitedWorkersSection.style.display = 'none';
+                return;
+            }
+            
+            // Show the section
+            invitedWorkersSection.style.display = 'block';
+            
+            invitedWorkers.forEach(worker => {
+                // Generate avatar initials and color
+                const initials = worker.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+                const avatarColor = getAvatarColor(worker.id);
+                
+                const workerRow = document.createElement('div');
+                workerRow.className = 'worker-row';
+                workerRow.dataset.userId = worker.id;
+                
+                workerRow.innerHTML = `
+                    <div class="worker-avatar" style="background: ${avatarColor};">${initials}</div>
+                    <div class="worker-info">
+                        <div class="worker-name">${worker.name}</div>
+                        <div class="worker-email">${worker.email}</div>
+                    </div>
+                `;
+                
+                mainWorkersTable.appendChild(workerRow);
+            });
+        }
+
+        function assignRole(adminId) {
+            // Handle assign role functionality
+            console.log('Assign role for admin:', adminId);
+            // You can add role assignment logic here
+        }
+
+        // Function to edit worker (redirect to page 2)
+        function editWorker(userId, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            console.log('Edit worker:', userId);
+            // Redirect back to page 2 for editing
+            window.location.href = '/create-office-step2';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            restoreOfficeStep3Data();
+            // If group name is editable, add event listeners to save changes
+            const groupNameEl = document.querySelector('.group-name');
+            if (groupNameEl && groupNameEl.isContentEditable) {
+                groupNameEl.addEventListener('input', saveOfficeStep3Data);
+            }
+        });
+
+        // Form submission - with null check
+        const officeFormStep3 = document.getElementById('office-form-step3');
+        if (officeFormStep3) {
+            officeFormStep3.addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Get the group name from step 1 data or current form
@@ -679,13 +1129,15 @@
                 console.error('Error:', error);
                 alert('An error occurred while creating the group');
             });
-        });
+            });
+        }
 
         // Role selection change handlers
         document.querySelectorAll('.role-select').forEach(select => {
             select.addEventListener('change', function() {
                 // Update the "Add group" button state based on selections
                 updateAddGroupButton();
+                saveOfficeStep3Data(); // Save on change
             });
         });
 
@@ -693,7 +1145,9 @@
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const roleSelect = this.parentElement.querySelector('.role-select');
-                roleSelect.focus();
+                if (roleSelect) {
+                    roleSelect.focus();
+                }
             });
         });
 
@@ -719,10 +1173,8 @@
                 }
             }
             
-            // Keep admin status as "No admins selected" since no group admins were selected
-            // The selectedAdmins from step 2 are organization admins, not group admins
-            const adminStatus = document.querySelector('.group-status');
-            adminStatus.textContent = "No admins selected";
+            // Use restoreOfficeStep3Data to properly set admin count
+            restoreOfficeStep3Data();
             
             // Initial button state check
             updateAddGroupButton();
@@ -732,7 +1184,9 @@
         document.addEventListener('DOMContentLoaded', initializePage);
 
         // Dropdown toggle functionality
-        document.getElementById('dropdownBtn').addEventListener('click', function() {
+        const dropdownBtn = document.getElementById('dropdownBtn');
+        if (dropdownBtn) {
+            dropdownBtn.addEventListener('click', function() {
             const dropdown = document.getElementById('adminDropdown');
             const isVisible = dropdown.style.display !== 'none';
             
@@ -745,7 +1199,8 @@
                 // Rotate arrow to up position
                 this.querySelector('svg').style.transform = 'rotate(180deg)';
             }
-        });
+            });
+        }
     </script>
 </body>
 </html> 

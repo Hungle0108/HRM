@@ -628,10 +628,16 @@ def create_office():
         return redirect('/login')
     
     organization = None
+    available_groups = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
+        # Get all active groups for this organization
+        available_groups = Group.query.filter_by(
+            organization_id=user.organization_id, 
+            status='ACTIVE'
+        ).order_by(Group.name).all()
     
-    return render_template('create_office.html', user=user, organization=organization)
+    return render_template('create_office.html', user=user, organization=organization, groups=available_groups)
 
 @app.route('/create-office-step2')
 def create_office_step2():
@@ -664,6 +670,63 @@ def create_office_step3():
         organization = Organization.query.get(user.organization_id)
     
     return render_template('create_office_step3.html', user=user, organization=organization)
+
+@app.route('/create-office-replicate', methods=['POST'])
+def create_office_replicate():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User not found or no organization'}), 400
+    
+    office_name = request.form.get('name')
+    setup_method = request.form.get('setupMethod')
+    replicate_from_group_id = request.form.get('replicateFromGroup')
+    
+    if not office_name:
+        return jsonify({'error': 'Office name is required'}), 400
+        
+    if setup_method != 'replicate':
+        return jsonify({'error': 'Invalid setup method'}), 400
+        
+    if not replicate_from_group_id:
+        return jsonify({'error': 'Group to replicate from is required'}), 400
+    
+    try:
+        # Find the group to replicate from
+        source_group = Group.query.filter_by(
+            id=replicate_from_group_id,
+            organization_id=user.organization_id,
+            status='ACTIVE'
+        ).first()
+        
+        if not source_group:
+            return jsonify({'error': 'Source group not found'}), 400
+        
+        # Create new group with replicated settings
+        new_group = Group(
+            name=office_name,
+            status='ACTIVE',
+            organization_id=user.organization_id,
+            admin_user_id=source_group.admin_user_id,  # Replicate admin
+            contracts_count=0  # Start with 0 contracts
+        )
+        
+        db.session.add(new_group)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Office created successfully with replicated settings',
+            'group': new_group.to_dict(),
+            'redirect': '/groups'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating office with replicated settings: {str(e)}")
+        return jsonify({'error': 'Failed to create office'}), 500
 
 @app.route('/api/create-group', methods=['POST'])
 def create_group():
@@ -1975,6 +2038,38 @@ def api_edit_schedule():
         db.session.rollback()
         logger.error(f"Error updating schedule: {str(e)}", exc_info=True)
         return jsonify({'success': False, 'error': f'Failed to update schedule: {str(e)}'}), 500
+
+@app.route('/api/get-organization-workers', methods=['GET'])
+def api_get_organization_workers():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    try:
+        # Get all users in the organization
+        workers = User.query.filter_by(organization_id=user.organization_id).all()
+        
+        workers_data = []
+        for worker in workers:
+            # Check if user is admin of any groups
+            is_admin = Group.query.filter_by(admin_user_id=worker.id).first() is not None
+            
+            workers_data.append({
+                'id': worker.id,
+                'name': worker.name,
+                'email': worker.email,
+                'is_admin': is_admin
+            })
+        
+        return jsonify({
+            'success': True,
+            'workers': workers_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching organization workers: {str(e)}")
+        return jsonify({'error': 'Failed to fetch workers'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
