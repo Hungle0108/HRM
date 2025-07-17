@@ -1036,6 +1036,13 @@ document.getElementById('removeAdminModalRemove').onclick = function() {
     })
     .catch(() => alert('Failed to remove admin(s)'));
 };
+// Only declare groupId ONCE at the top
+let groupId = {{ group.id }};
+
+// Dynamic admin action button logic
+const adminActionBtn = document.getElementById('adminActionBtn');
+const adminCheckboxes = document.querySelectorAll('.admin-row-checkbox');
+
 // Dropdown Remove access
 // Use modal for single admin
 // Remove previous onclick assignment
@@ -1056,12 +1063,6 @@ adminActionBtn.onclick = function() {
         window.location.href = `/assign-admin/${groupId}`;
     }
 };
-
-// Dynamic admin action button logic
-const adminActionBtn = document.getElementById('adminActionBtn');
-const adminCheckboxes = document.querySelectorAll('.admin-row-checkbox');
-// Only declare groupId ONCE at the top
-let groupId = {{ group.id }};
 
 function updateAdminActionBtn() {
     const checked = document.querySelectorAll('.admin-row-checkbox:checked');
@@ -1102,26 +1103,6 @@ document.getElementById('adminSelectAll').addEventListener('change', function() 
 });
 updateAdminActionBtn();
 
-document.querySelectorAll('.action-item.remove-access').forEach(item => {
-    item.onclick = function() {
-        const adminId = this.getAttribute('data-admin-id');
-        if (!adminId) return;
-        if (!confirm('Are you sure you want to remove access for this admin?')) return;
-        fetch(`/api/group/${groupId}/admin/bulk-remove`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_ids: [adminId] })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                alert(data.error || 'Failed to remove admin');
-            }
-        })
-        .catch(() => alert('Failed to remove admin'));
-    };
-});
+
 </script>
 {% endblock %} 
