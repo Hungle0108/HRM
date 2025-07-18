@@ -153,7 +153,10 @@
                         </div>
                     </div>
                     <!-- Organization Workers List -->
-                    <div class="users-list" id="orgWorkersList">
+                    <div class="users-list" id="orgWorkersList" 
+                         data-workers='{{ org_workers|tojson|safe }}'
+                         data-current-admins='{{ current_admin_ids|tojson|safe }}'
+                         data-group-id="{{ group.id }}">
                         <!-- Workers will be populated by JavaScript -->
                     </div>
                 </form>
@@ -169,23 +172,16 @@
         </div>
     </div>
 
-    <script>
-        // Real organization workers data from backend
-        const orgWorkers = [
-            {% if org_workers and org_workers|length > 0 %}
-                {% for worker in org_workers %}
-                {
-                    id: {{ worker.id }},
-                    name: "{{ worker.name|replace('"', '\\"') }}",
-                    email: "{{ worker.email|replace('"', '\\"') }}"
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            {% endif %}
-        ];
-        // List of user IDs who are already admins for this group
-        const currentAdminIds = new Set([
-            {% for admin_id in current_admin_ids %}{{ admin_id }}{% if not loop.last %}, {% endif %}{% endfor %}
-        ]);
+    <script type="text/javascript">
+        // Get data from data attributes
+        const orgWorkersData = document.getElementById('orgWorkersList').getAttribute('data-workers');
+        const currentAdminIdsData = document.getElementById('orgWorkersList').getAttribute('data-current-admins');
+        const groupIdData = document.getElementById('orgWorkersList').getAttribute('data-group-id');
+        
+        // Parse the data
+        const orgWorkers = JSON.parse(orgWorkersData || '[]');
+        const currentAdminIds = new Set(JSON.parse(currentAdminIdsData || '[]'));
+        const groupId = parseInt(groupIdData || '0');
 
         // Function to get avatar color based on user ID
         function getAvatarColor(userId) {
@@ -295,7 +291,6 @@
             const checkedUsers = document.querySelectorAll('.user-checkbox:checked:not(:disabled)');
             if (checkedUsers.length > 0) {
                 const userIds = Array.from(checkedUsers).map(cb => cb.value);
-                const groupId = {{ group.id }};
                 fetch(`/api/group/${groupId}/admins`, {
                     method: 'POST',
                     headers: {
@@ -306,7 +301,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = `/group/${groupId}/settings`;
+                        window.location.href = `/group/${groupId}/settings?tab=admins`;
                     } else {
                         alert(data.error || 'Failed to add admins');
                     }

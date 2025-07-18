@@ -107,6 +107,12 @@
             gap: 60px;
         }
 
+        /* When sidebar is hidden, center the content area */
+        .main-container:has(.sidebar.hidden),
+        .main-container.single-step {
+            justify-content: center;
+        }
+
         .content-area {
             flex: 0 0 auto;
             max-width: 600px;
@@ -131,9 +137,7 @@
         }
 
         .sidebar.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+            display: none;
         }
 
         .sidebar-title {
@@ -576,26 +580,69 @@
         }
 
         .dropdown-option {
-            padding: 12px 20px;
+            padding: 12px 16px;
             cursor: pointer;
-            font-size: 0.95rem;
-            color: #495057;
-            transition: background 0.2s, color 0.2s;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #f1f3f4;
         }
 
-        .dropdown-option:hover, .dropdown-option.selected {
-            background: #f8f9fa;
-            color: #1a1a1a;
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e3f2fd;
         }
 
         .dropdown-option.disabled {
-            color: #6c757d !important;
-            cursor: not-allowed !important;
-            background: #f8f9fa !important;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
-        .dropdown-option.disabled:hover {
-            background: #f8f9fa !important;
+        .option-main {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .option-subtitle {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .admin-info-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .admin-info-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .admin-list {
+            font-size: 0.875rem;
+            color: #495057;
+        }
+
+        .admin-list.empty {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Single-step replicate mode – hide sidebar & step info, but keep layout space */
+        body.single-step .sidebar {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        body.single-step .step-info {
+            display: none;
         }
     </style>
 </head>
@@ -678,7 +725,16 @@
                                         <div class="dropdown-menu" id="groupDropdownMenu">
                                             {% if groups %}
                                                 {% for group in groups %}
-                                                <div class="dropdown-option" data-value="{{ group.id }}">{{ group.name }}</div>
+                                                <div class="dropdown-option" data-value="{{ group.id }}" data-admin-names="{{ group.admin_names|tojson }}">
+                                                    <div class="option-main">{{ group.name }}</div>
+                                                    <div class="option-subtitle">
+                                                        {% if group.admin_names %}
+                                                            Admins: {{ group.admin_names|join(', ') }}
+                                                        {% else %}
+                                                            No admins assigned
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
                                                 {% endfor %}
                                             {% else %}
                                                 <div class="dropdown-option disabled" style="color: #6c757d; cursor: not-allowed;">
@@ -688,6 +744,12 @@
                                         </div>
                                         <input type="hidden" id="selectedGroup" name="selectedGroup">
                                     </div>
+                                </div>
+
+                                <!-- Admin information display -->
+                                <div class="admin-info-section" id="adminInfoSection" style="display: none;">
+                                    <div class="admin-info-title">Current admins for this group:</div>
+                                    <div class="admin-list" id="adminList">No admins assigned</div>
                                 </div>
                             </div>
                         </div>
@@ -736,6 +798,36 @@
     </div>
 
     <script>
+        (function() {
+            // Detect replicate mode from URL and switch to single-step UI immediately
+            const params = new URLSearchParams(window.location.search);
+            const replicateMode = params.get('mode') === 'replicate';
+            if (replicateMode) {
+                document.body.classList.add('single-step');
+                // Pre-select replicate radio, unselect manual
+                const replicateRadio = document.querySelector("input[name='setupMethod'][value='replicate']");
+                const manualRadio    = document.querySelector("input[name='setupMethod'][value='manual']");
+                if (replicateRadio) replicateRadio.checked = true;
+                if (manualRadio)    manualRadio.checked    = false;
+                // Update primary action button label
+                const primaryBtn = document.getElementById('continueBtn');
+                if (primaryBtn) primaryBtn.textContent = 'Create office';
+            }
+
+            // Toggle single-step class whenever user switches setup method
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll("input[name='setupMethod']").forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        if (radio.value === 'replicate' && radio.checked) {
+                            document.body.classList.add('single-step');
+                        } else if (radio.value === 'manual' && radio.checked) {
+                            document.body.classList.remove('single-step');
+                        }
+                    });
+                });
+            });
+        })();
+
         // Track which fields have been interacted with
         const interactedFields = new Set();
         
@@ -862,9 +954,9 @@
                 if (this.value === 'replicate' && this.checked) {
                     console.log('Showing replicate section');
                     replicateSection.style.display = 'block';
-                    // Change button text to "Add group"
+                    // Change button text to "Create office"
                     if (continueBtn) {
-                        continueBtn.textContent = 'Add group';
+                        continueBtn.textContent = 'Create office';
                     }
                     // Hide step info description
                     if (stepInfo) {
@@ -873,6 +965,11 @@
                     // Hide sidebar but maintain layout space
                     if (sidebar) {
                         sidebar.classList.add('hidden');
+                    }
+                    // Add single-step class to main container
+                    const mainContainer = document.querySelector('.main-container');
+                    if (mainContainer) {
+                        mainContainer.classList.add('single-step');
                     }
                     // Revalidate form since requirements changed
                     validateForm();
@@ -892,6 +989,11 @@
                     // Show sidebar
                     if (sidebar) {
                         sidebar.classList.remove('hidden');
+                    }
+                    // Remove single-step class from main container
+                    const mainContainer = document.querySelector('.main-container');
+                    if (mainContainer) {
+                        mainContainer.classList.remove('single-step');
                     }
                     // Revalidate form since requirements changed
                     validateForm();
@@ -916,9 +1018,9 @@
                 if (radioValue === 'replicate') {
                     console.log('Showing replicate section via option click');
                     replicateSection.style.display = 'block';
-                    // Change button text to "Add group"
+                    // Change button text to "Create office"
                     if (continueBtn) {
-                        continueBtn.textContent = 'Add group';
+                        continueBtn.textContent = 'Create office';
                     }
                     // Hide step info description
                     if (stepInfo) {
@@ -927,6 +1029,11 @@
                     // Hide sidebar but maintain layout space
                     if (sidebar) {
                         sidebar.classList.add('hidden');
+                    }
+                    // Add single-step class to main container
+                    const mainContainer = document.querySelector('.main-container');
+                    if (mainContainer) {
+                        mainContainer.classList.add('single-step');
                     }
                     // Revalidate form since requirements changed
                     validateForm();
@@ -946,6 +1053,11 @@
                     // Show sidebar
                     if (sidebar) {
                         sidebar.classList.remove('hidden');
+                    }
+                    // Remove single-step class from main container
+                    const mainContainer = document.querySelector('.main-container');
+                    if (mainContainer) {
+                        mainContainer.classList.remove('single-step');
                     }
                     // Revalidate form since requirements changed
                     validateForm();
@@ -1028,6 +1140,67 @@
             }
         });
 
+        // Check URL parameters for replicate mode
+        function checkUrlParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            const groupId = urlParams.get('group_id');
+            
+            if (mode === 'replicate') {
+                // Set replicate option as default
+                const replicateRadio = document.querySelector('input[name="setupMethod"][value="replicate"]');
+                const manualRadio = document.querySelector('input[name="setupMethod"][value="manual"]');
+                
+                if (replicateRadio && manualRadio) {
+                    // Uncheck manual and check replicate
+                    manualRadio.checked = false;
+                    replicateRadio.checked = true;
+                    
+                    // Update option styling
+                    const options = document.querySelectorAll('.option');
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    const replicateOption = replicateRadio.closest('.option');
+                    if (replicateOption) {
+                        replicateOption.classList.add('selected');
+                    }
+                    
+                    // Show replicate section
+                    const replicateSection = document.getElementById('replicateSection');
+                    if (replicateSection) {
+                        replicateSection.style.display = 'block';
+                    }
+                    
+                    // Update UI for replicate mode
+                    const continueBtn = document.getElementById('continueBtn');
+                    const sidebar = document.querySelector('.sidebar');
+                    const stepInfo = document.querySelector('.step-info');
+                    const mainContainer = document.querySelector('.main-container');
+                    
+                    if (continueBtn) {
+                        continueBtn.textContent = 'Create office';
+                    }
+                    
+                    if (sidebar) {
+                        sidebar.classList.add('hidden');
+                    }
+                    
+                    if (mainContainer) {
+                        mainContainer.classList.add('single-step');
+                    }
+                    
+                    if (stepInfo) {
+                        stepInfo.style.display = 'none';
+                    }
+                    
+                    // If group_id is provided, it will be handled in the dropdown setup
+                    // after the page is fully loaded
+                    
+                    // Validate form
+                    validateForm();
+                }
+            }
+        }
+
         // Initialize form with existing data when page loads
         function initializeForm() {
             const existingData = JSON.parse(sessionStorage.getItem('officeData') || '{}');
@@ -1045,16 +1218,25 @@
                 validateForm();
             }
             
-            // Always ensure "Configure manually" is selected by default
-            const manualRadio = document.querySelector('input[name="setupMethod"][value="manual"]');
-            if (manualRadio) {
-                manualRadio.checked = true;
-                
-                // Update option styling
-                options.forEach(opt => opt.classList.remove('selected'));
-                const manualOption = manualRadio.closest('.option');
-                if (manualOption) {
-                    manualOption.classList.add('selected');
+            // Check URL parameters first
+            checkUrlParameters();
+            
+            // If no URL parameters, ensure "Configure manually" is selected by default
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            
+            if (!mode || mode !== 'replicate') {
+                const manualRadio = document.querySelector('input[name="setupMethod"][value="manual"]');
+                if (manualRadio) {
+                    manualRadio.checked = true;
+                    
+                    // Update option styling
+                    const options = document.querySelectorAll('.option');
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    const manualOption = manualRadio.closest('.option');
+                    if (manualOption) {
+                        manualOption.classList.add('selected');
+                    }
                 }
             }
             
@@ -1107,8 +1289,22 @@
                     options.forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
                     
-                    label.textContent = this.textContent;
+                    label.textContent = this.querySelector('.option-main').textContent;
                     hiddenInput.value = this.getAttribute('data-value');
+                    
+                    // Show admin information
+                    const adminInfoSection = document.getElementById('adminInfoSection');
+                    const adminList = document.getElementById('adminList');
+                    const adminNames = JSON.parse(this.getAttribute('data-admin-names') || '[]');
+                    
+                    if (adminNames.length > 0) {
+                        adminList.textContent = adminNames.join(', ');
+                        adminList.classList.remove('empty');
+                    } else {
+                        adminList.textContent = 'No admins assigned';
+                        adminList.classList.add('empty');
+                    }
+                    adminInfoSection.style.display = 'block';
                     
                     // Revalidate form when group is selected
                     validateForm();
@@ -1125,6 +1321,8 @@
                     btn.classList.remove('open');
                 }
             });
+
+
         }
 
 
@@ -1132,6 +1330,63 @@
         // Initialize dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
             setupDropdown();
+            
+            // Check for pre-selected group after dropdown is set up
+            setTimeout(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const groupId = urlParams.get('group_id');
+                const mode = urlParams.get('mode');
+                
+                if (mode === 'replicate' && groupId) {
+                    const label = document.getElementById('groupDropdownLabel');
+                    const hiddenInput = document.getElementById('selectedGroup');
+                    const options = document.querySelectorAll('.dropdown-option');
+                    
+                    let found = false;
+                    options.forEach(option => {
+                        const optionValue = option.getAttribute('data-value');
+                        
+                        if (optionValue === groupId) {
+                            found = true;
+                            
+                            // Select this option
+                            options.forEach(opt => opt.classList.remove('selected'));
+                            option.classList.add('selected');
+                            
+                            // Update the label and hidden input
+                            label.textContent = option.querySelector('.option-main').textContent;
+                            hiddenInput.value = groupId;
+                            
+                            // Show admin information
+                            const adminInfoSection = document.getElementById('adminInfoSection');
+                            const adminList = document.getElementById('adminList');
+                            const adminNames = JSON.parse(option.getAttribute('data-admin-names') || '[]');
+                            
+                            if (adminNames.length > 0) {
+                                adminList.textContent = adminNames.join(', ');
+                                adminList.classList.remove('empty');
+                            } else {
+                                adminList.textContent = 'No admins assigned';
+                                adminList.classList.add('empty');
+                            }
+                            adminInfoSection.style.display = 'block';
+                            
+                            // Revalidate form
+                            validateForm();
+                        }
+                    });
+                    
+                    if (!found) {
+                        // If the specific group isn't found, just keep replicate mode selected
+                        // but don't pre-select any group
+                        const label = document.getElementById('groupDropdownLabel');
+                        if (label) {
+                            label.textContent = 'Select a group';
+                            label.style.color = '#dc3545'; // Red color to indicate an issue
+                        }
+                    }
+                }
+            }, 500);
         });
 
         // Info modal functionality

@@ -616,11 +616,13 @@ def groups():
         organization = Organization.query.get(user.organization_id)
         # Get all groups for this organization
         user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
-    # Add admin_count to each group for template
+    # Add admin_count and admin names to each group for template
     groups_with_admin_count = []
     for group in user_groups:
         group_dict = group.to_dict()
         group_dict['admin_count'] = len(group.admins)
+        group_dict['admin_names'] = [admin.name for admin in group.admins]
+        print(f"Group {group.name}: admin_names = {group_dict['admin_names']}")  # Debug print
         group_dict['status'] = group.status
         group_dict['name'] = group.name
         group_dict['contracts_count'] = group.contracts_count
@@ -642,11 +644,15 @@ def create_office():
     available_groups = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
-        # Get all active groups for this organization
+        # Get all active groups for this organization with admin information
         available_groups = Group.query.filter_by(
             organization_id=user.organization_id, 
             status='ACTIVE'
         ).order_by(Group.name).all()
+        
+        # Add admin information to each group
+        for group in available_groups:
+            group.admin_names = [admin.name for admin in group.admins]
     
     return render_template('create_office.html', user=user, organization=organization, groups=available_groups)
 
@@ -722,8 +728,11 @@ def create_office_replicate():
             name=office_name,
             status='ACTIVE',
             organization_id=user.organization_id,
-            contracts_count=0  # Start with 0 contracts
+            contracts_count=source_group.contracts_count
         )
+        # Copy admins
+        for admin in source_group.admins:
+            new_group.admins.append(admin)
         
         db.session.add(new_group)
         db.session.commit()
@@ -2209,6 +2218,86 @@ def bulk_remove_group_admins(group_id):
             removed.append(user_id)
     db.session.commit()
     return jsonify({'success': True, 'removed': removed})
+
+@app.route('/api/group/<int:group_id>/update-name', methods=['PUT'])
+def update_group_name(group_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    
+    # Check if user is admin of this group
+    if user not in group.admins:
+        return jsonify({'error': 'Unauthorized - not an admin of this group'}), 403
+    
+    data = request.get_json()
+    new_name = data.get('name', '').strip()
+    
+    if not new_name:
+        return jsonify({'error': 'Group name cannot be empty'}), 400
+    
+    if len(new_name) > 120:
+        return jsonify({'error': 'Group name too long (max 120 characters)'}), 400
+    
+    # Check if name already exists in the organization
+    existing_group = Group.query.filter_by(
+        name=new_name, 
+        organization_id=group.organization_id
+    ).filter(Group.id != group_id).first()
+    
+    if existing_group:
+        return jsonify({'error': 'A group with this name already exists'}), 400
+    
+    try:
+        group.name = new_name
+        db.session.commit()
+        return jsonify({
+            'success': True, 
+            'message': 'Group name updated successfully',
+            'group': group.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating group name: {str(e)}")
+        return jsonify({'error': 'Failed to update group name'}), 500
+
+@app.route('/api/group/<int:group_id>/archive', methods=['PUT'])
+def archive_group(group_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    
+    # Check if user is admin of this group
+    if user not in group.admins:
+        return jsonify({'error': 'Unauthorized - not an admin of this group'}), 403
+    
+    try:
+        # Archive the group by changing its status
+        group.status = 'ARCHIVED'
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Group archived successfully',
+            'group': group.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error archiving group: {str(e)}")
+        return jsonify({'error': 'Failed to archive group'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

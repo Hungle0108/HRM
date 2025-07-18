@@ -349,10 +349,17 @@
         position: relative;
     }
 
-    .status-filter .dropdown-toggle, .admin-filter .dropdown-toggle {
+    /* Filter dropdown button layout */
+    .status-filter .dropdown-toggle,
+    .admin-filter  .dropdown-toggle {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px; /* space between label, badge, arrow */
+    }
+    .filter-badge { margin-left: 0; }
+    .dropdown-arrow { flex-shrink: 0; }
+
+    .status-filter .dropdown-toggle, .admin-filter .dropdown-toggle {
         padding: 10px 16px;
         background: #f8f9fa;
         border: 1px solid #e9ecef;
@@ -389,6 +396,348 @@
 
     .dropdown-toggle.active .dropdown-arrow {
         transform: rotate(180deg);
+    }
+
+    /* Status filter dropdown menu styles (matching worker type page) */
+    .status-filter .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        z-index: 1000;
+        width: 400px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .status-filter .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .status-filter .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: none !important;
+    }
+
+    .status-filter .dropdown-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .status-filter .dropdown-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: all 0.2s;
+    }
+
+    .status-filter .dropdown-close:hover {
+        background: #f8f9fa;
+        opacity: 1;
+    }
+
+    .status-filter .dropdown-content {
+        padding: 0 20px 16px 20px;
+        max-height: 200px;
+        overflow-y: auto;
+        border-top: none !important;
+    }
+
+    .status-filter .dropdown-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+        margin-bottom: 8px;
+    }
+
+    .status-filter .dropdown-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .status-filter .dropdown-option:first-child {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 16px;
+    }
+
+    .status-filter .dropdown-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .status-filter .dropdown-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .status-filter .dropdown-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .status-filter .option-text {
+        font-size: 0.875rem;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    /* Make "Select all" text bolder */
+    .status-filter #selectAllStatus + .option-text {
+        font-weight: 600;
+    }
+
+    .status-filter .dropdown-footer {
+        display: flex;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .status-filter .btn-reset {
+        flex: 1;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .status-filter .btn-reset:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .status-filter .btn-show-results {
+        flex: 1;
+        padding: 10px 16px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .status-filter .btn-show-results:hover {
+        background: #333;
+        border-color: #333;
+    }
+
+    /* Admin filter dropdown menu styles (matching status filter) */
+    .admin-filter .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        z-index: 1000;
+        width: 400px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .admin-filter .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .admin-filter .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: none !important;
+    }
+
+    .admin-filter .dropdown-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .admin-filter .dropdown-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: all 0.2s;
+    }
+
+    .admin-filter .dropdown-close:hover {
+        background: #f8f9fa;
+        opacity: 1;
+    }
+
+    .admin-filter .dropdown-content {
+        padding: 0 20px 16px 20px;
+        max-height: 200px;
+        overflow-y: auto;
+        border-top: none !important;
+    }
+
+    .admin-filter .dropdown-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+        margin-bottom: 8px;
+    }
+
+    .admin-filter .dropdown-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .admin-filter .dropdown-option:first-child {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 16px;
+    }
+
+    .admin-filter .dropdown-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .admin-filter .dropdown-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .admin-filter .dropdown-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .admin-filter .option-text {
+        font-size: 0.875rem;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    /* Make "Select all" text bolder */
+    .admin-filter #selectAllAdmins + .option-text {
+        font-weight: 600;
+    }
+
+    .admin-filter .dropdown-footer {
+        display: flex;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .admin-filter .btn-reset {
+        flex: 1;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .admin-filter .btn-reset:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .admin-filter .btn-show-results {
+        flex: 1;
+        padding: 10px 16px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .admin-filter .btn-show-results:hover {
+        background: #333;
+        border-color: #333;
     }
 
     .status-badge {
@@ -658,6 +1007,14 @@
         vertical-align: top;
     }
 
+    /* Center content vertically in specific columns */
+    .groups-table td:nth-child(2), /* Status column */
+    .groups-table td:nth-child(3), /* Admin assigned column */
+    .groups-table td:nth-child(4), /* Contracts column */
+    .groups-table td:last-child { /* Actions column */
+        vertical-align: middle;
+    }
+
     .groups-table td:last-child {
         border-right: none;
     }
@@ -887,59 +1244,73 @@
     }
 
     .column-option {
-        display: flex;
-        align-items: flex-start;
-        padding: 16px 0;
-        border-bottom: 1px solid #f1f3f4;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
         transition: all 0.2s ease;
-    }
-
-    .column-option:last-child {
-        border-bottom: none;
     }
 
     .column-option:hover {
         background: #f8f9fa;
-        margin: 0 -16px;
-        padding: 16px;
-        border-radius: 8px;
     }
 
-    .column-option.select-all-option {
-        border-bottom: 1px solid #e9ecef;
+    .column-option:last-child {
+        margin-bottom: 0;
+    }
+
+    .select-all-option {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
         margin-bottom: 16px;
-        padding-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .select-all-option .column-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 0;
+    }
+    .select-all-option .column-name {
+        margin-left: 0;
+    }
+
+    .select-all-option:hover {
+        background: #e9ecef;
     }
 
     .column-checkbox-label {
         display: flex;
-        align-items: flex-start;
-        gap: 12px;
+        align-items: center;
         cursor: pointer;
-        font-size: 0.875rem;
-        width: 100%;
+        gap: 0;
     }
 
     .column-checkbox {
-        width: 18px;
-        height: 18px;
-        border: 2px solid #d1d5db;
-        border-radius: 4px;
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
         appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
         cursor: pointer;
         position: relative;
-        flex-shrink: 0;
-        transition: all 0.2s ease;
-        margin: 1px 0 0 0;
-    }
-
-    .column-checkbox:hover {
-        border-color: #9ca3af;
     }
 
     .column-checkbox:checked {
+        background-image: none;
         background-color: #1a1a1a;
-        border-color: #1a1a1a;
+        border-radius: 3px;
     }
 
     .column-checkbox:checked::after {
@@ -951,7 +1322,7 @@
         height: 8px;
         border: solid white;
         border-width: 0 2px 2px 0;
-        transform: translate(-50%, -50%) rotate(45deg);
+        transform: translate(-50%, -65%) rotate(45deg);
     }
 
     .column-checkbox:indeterminate {
@@ -984,10 +1355,6 @@
         font-weight: 500;
         color: #1a1a1a;
         margin-left: 12px;
-    }
-
-    .column-option .column-name {
-        margin-left: 0;
     }
 
     .selection-count {
@@ -1291,6 +1658,42 @@
     .icon-customize {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3e%3c/svg%3e");
     }
+    .status-badge.archived {
+        background: #e9ecef !important;
+        color: #6c757d !important;
+        border-radius: 16px;
+        padding: 4px 14px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .status-badge.archived .status-dot {
+        background: #6c757d !important;
+    }
+
+    /* Prevent body scroll when dropdown menus are open */
+    body.no-scroll {
+        overflow: hidden;
+    }
+
+    .filter-badge {
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: 9999px;
+        margin-left: 6px;
+        display: inline-block;
+        min-width: 18px;
+        text-align: center;
+    }
+
+    .status-filter .dropdown-toggle .dropdown-arrow,
+    .admin-filter  .dropdown-toggle .dropdown-arrow {
+        margin-left: auto; /* push arrow to the right */
+    }
+    .filter-badge { flex-shrink: 0; }
 </style>
 {% endblock %}
 
@@ -1322,15 +1725,66 @@
                         <div class="status-filter">
                             <button class="dropdown-toggle" id="statusDropdown">
                                 <span class="dropdown-label">Status</span>
+                                <span class="filter-badge" id="statusBadge" style="display:none;">0</span>
                                 <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
-                    </button>
-                </div>
+                            </button>
+                            <div class="dropdown-menu" id="statusDropdownMenu">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-title">Status</span>
+                                    <button class="dropdown-close" id="statusDropdownClose">
+                                        <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                                    </button>
+                                </div>
+                                <div class="dropdown-content">
+                                    <label class="dropdown-option">
+                                        <input type="checkbox" class="dropdown-checkbox" id="selectAllStatus" data-value="all">
+                                        <span class="option-text">Select all</span>
+                                    </label>
+                                    <div class="dropdown-options-list" id="statusOptionsList">
+                                        <label class="dropdown-option">
+                                            <input type="checkbox" class="dropdown-checkbox" data-value="ACTIVE">
+                                            <span class="option-text">Active</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="checkbox" class="dropdown-checkbox" data-value="ARCHIVED">
+                                            <span class="option-text">Archived</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="dropdown-footer">
+                                    <button class="btn-reset" id="resetStatusFilters">Reset</button>
+                                    <button class="btn-show-results" id="showStatusResults">Show results</button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="admin-filter">
                             <button class="dropdown-toggle" id="adminDropdown">
                                 <span class="dropdown-label">Admins</span>
+                                <span class="filter-badge" id="adminBadge" style="display:none;">0</span>
                                 <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
-                    </button>
-                </div>
+                            </button>
+                            <div class="dropdown-menu" id="adminDropdownMenu">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-title">Admins</span>
+                                    <button class="dropdown-close" id="adminDropdownClose">
+                                        <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                                    </button>
+                                </div>
+                                <div class="dropdown-content">
+                                    <label class="dropdown-option">
+                                        <input type="checkbox" class="dropdown-checkbox" id="selectAllAdmins" data-value="all">
+                                        <span class="option-text">Select all</span>
+                                    </label>
+                                    <div class="dropdown-options-list" id="adminOptionsList">
+                                        <!-- Dynamic admin options will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                <div class="dropdown-footer">
+                                    <button class="btn-reset" id="resetAdminFilters">Reset</button>
+                                    <button class="btn-show-results" id="showAdminResults">Show results</button>
+                                </div>
+                            </div>
+                        </div>
             </div>
                     <div class="action-buttons-group">
                         <button class="customize-columns-btn" id="customizeColumnsBtn">
@@ -1375,7 +1829,7 @@
                         <tbody id="groupsBody">
                     {% if groups %}
                         {% for group in groups %}
-                        <tr>
+                        <tr data-group-id="{{ group.id }}">
                             <td>
                                 <div class="group-info">
                                     <div class="group-icon">👥</div>
@@ -1386,7 +1840,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="status-badge active">
+                                <span class="status-badge{% if group.status == 'ARCHIVED' %} archived{% else %} active{% endif %}">
                                     <span class="status-dot"></span>
                                     {{ group.status }}
                                 </span>
@@ -1497,6 +1951,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script type="application/json" id="groups-data">{{ groups|tojson }}</script>
 <script>
     // Search functionality
     const searchContainer = document.getElementById('searchContainer');
@@ -1513,14 +1968,13 @@
     });
 
     // Search input handlers
-        searchInput.addEventListener('input', function() {
+    searchInput.addEventListener('input', function() {
         const hasValue = this.value.trim().length > 0;
         searchClearBtn.classList.toggle('show', hasValue);
         
-        // Add search functionality here
-            const searchTerm = this.value.toLowerCase();
-            console.log('Search term:', searchTerm);
-        });
+        // Filter table based on search term
+        updateTableView();
+    });
 
     searchInput.addEventListener('blur', function() {
         if (!this.value.trim()) {
@@ -1534,6 +1988,7 @@
         searchInput.value = '';
         searchContainer.classList.remove('expanded');
         this.classList.remove('show');
+        updateTableView();
     });
 
     // Click outside to collapse search
@@ -1546,24 +2001,70 @@
     // Action menu functionality
     function toggleActionMenu(event, groupId) {
         event.stopPropagation();
-        
-        // Close all other menus
-        document.querySelectorAll('.action-menu').forEach(menu => {
-            if (menu.id !== `menu-${groupId}`) {
-                menu.classList.remove('show');
+
+        // Close all other action menus
+        document.querySelectorAll('.action-menu.show').forEach(openMenu => {
+            if (openMenu.id !== `menu-${groupId}`) {
+                openMenu.classList.remove('show');
             }
         });
-        
-        // Toggle current menu
+
+        // Also close column-header dropdown (portal)
+        if (typeof closePortalDropdown === 'function') {
+            closePortalDropdown();
+        }
         const menu = document.getElementById(`menu-${groupId}`);
         const button = event.currentTarget;
+
+        // If the clicked menu is already open, close it and re-enable scrolling.
+        if (menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            document.body.classList.remove('no-scroll');
+            return;
+        }
+
+        // --- The Correct Way to Measure a Hidden Element ---
+        // 1. Make the menu measurable but keep it invisible and off-screen.
+        // This forces the browser to calculate its true dimensions.
+        menu.style.visibility = 'hidden';
+        menu.style.position = 'fixed'; // Prevents page jump during measurement
+        menu.style.top = '-9999px';
+        menu.classList.add('show');
+
+        // 2. Now that it's rendered (but off-screen), we can get its actual width and height.
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+
+        // 3. Hide it again before we calculate the final position.
+        menu.classList.remove('show');
+        menu.style.visibility = '';
+        menu.style.position = '';
+        menu.style.top = '';
+        // --- End of Measurement Technique ---
+
         const buttonRect = button.getBoundingClientRect();
         
-        // Position the menu to the left of the button
-        menu.style.top = (buttonRect.bottom + 5) + 'px';
-        menu.style.left = (buttonRect.left - menu.offsetWidth) + 'px';
+        // Reset any previous positioning class
+        menu.classList.remove('positioned-above');
+
+        // Calculate final position, defaulting to below the button
+        let top = buttonRect.bottom + 5;
+        const rightOffset = window.innerWidth - buttonRect.right;
         
-        menu.classList.toggle('show');
+        // If it overflows the bottom of the viewport, flip it to be above the button
+        if (top + menuHeight > window.innerHeight) {
+            top = buttonRect.top - menuHeight - 5;
+            menu.classList.add('positioned-above');
+        }
+
+        // Apply the final, correct coordinates and show the menu
+        menu.style.top = `${top}px`;
+        menu.style.left = '';
+        menu.style.right = `${rightOffset}px`;
+        menu.classList.add('show');
+
+        // Lock body scrolling
+        document.body.classList.add('no-scroll');
     }
 
     // Close menus when clicking outside
@@ -1572,13 +2073,15 @@
             document.querySelectorAll('.action-menu').forEach(menu => {
                 menu.classList.remove('show');
             });
+            document.body.classList.remove('no-scroll');
         }
     });
 
     // Action handlers
     function showGroupInfo(groupId) {
-        console.log('Show group info for ID:', groupId);
-        // Add info modal functionality here
+        if (groupId) {
+            window.location.href = `/group/${groupId}/settings`;
+        }
     }
 
     function editGroup(groupId) {
@@ -1588,7 +2091,8 @@
 
     function copyGroup(groupId) {
         console.log('Copy group with ID:', groupId);
-        // Add copy functionality here
+        // Navigate to create group page with replicate group as default choice
+        window.location.href = '/create-office?mode=replicate&group_id=' + groupId;
     }
 
     function deleteGroup(groupId) {
@@ -1635,13 +2139,32 @@
                 const adminsCell = row.cells[2];
                 const contractsCell = row.cells[3];
                 
-                originalData.push({
-                    element: row.cloneNode(true),
-                    name: nameCell ? nameCell.textContent.trim().toLowerCase() : '',
-                    status: statusCell ? statusCell.textContent.trim().toLowerCase() : '',
-                    admins: adminsCell ? adminsCell.textContent.trim() : '',
-                    contracts: contractsCell ? contractsCell.textContent.trim() : ''
-                });
+                        // Get admin names from groups data using group ID
+                const groupId = row.getAttribute('data-group-id');
+                let adminNames = [];
+                if (groupId) {
+                    const groupsDataScript = document.getElementById('groups-data');
+                    if (groupsDataScript) {
+                        try {
+                            const groupsData = JSON.parse(groupsDataScript.textContent);
+                            const group = groupsData.find(g => g.id == groupId);
+                            if (group && group.admin_names) {
+                                adminNames = group.admin_names;
+                            }
+                        } catch (error) {
+                            console.warn('Error parsing groups data:', error);
+                        }
+                    }
+                }
+
+        originalData.push({
+            element: row.cloneNode(true),
+            name: nameCell ? nameCell.textContent.trim().toLowerCase() : '',
+            status: statusCell ? statusCell.textContent.trim().toLowerCase() : '',
+            admins: adminsCell ? adminsCell.textContent.trim() : '',
+            contracts: contractsCell ? contractsCell.textContent.trim() : '',
+            admin_names: adminNames
+        });
             }
         });
         
@@ -1698,10 +2221,50 @@
         });
     }
 
-    // Update table view with sorting
+    // Update table view with sorting and filtering
     function updateTableView() {
-        // Sort the data
-        let sortedData = [...originalData].sort((a, b) => {
+        // Get search term
+        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+        const selectedStatuses = window.getCurrentStatusFilter ? window.getCurrentStatusFilter() : new Set();
+        const selectedAdmins = window.getCurrentAdminFilter ? window.getCurrentAdminFilter() : new Set();
+        
+        // Filter data based on search term, status, and admins
+        let filteredData = originalData.filter(item => {
+            // Search by group name
+            const matchesSearch = !searchTerm || 
+                (item.name && item.name.includes(searchTerm));
+            
+            // Status filter - if nothing selected, show all
+            let matchesStatus = true;
+            if (selectedStatuses && selectedStatuses.size > 0) {
+                matchesStatus = false;
+                for (const status of selectedStatuses) {
+                    if (item.status.includes(status.toLowerCase())) {
+                        matchesStatus = true;
+                        break;
+                    }
+                }
+            }
+            
+            // Admin filter - if nothing selected, show all
+            let matchesAdmin = true;
+            if (selectedAdmins && selectedAdmins.size > 0) {
+                matchesAdmin = false;
+                
+                for (const selectedAdmin of selectedAdmins) {
+                    // Check if the selected admin is in this group's admins
+                    if (item.admin_names && item.admin_names.includes(selectedAdmin)) {
+                        matchesAdmin = true;
+                        break;
+                    }
+                }
+            }
+            
+            return matchesSearch && matchesStatus && matchesAdmin;
+        });
+        
+        // Sort the filtered data
+        let sortedData = [...filteredData].sort((a, b) => {
             let aVal, bVal;
 
             switch (currentSort.field) {
@@ -1737,22 +2300,38 @@
         // Update visual indicators for sorting
         updateSortArrows();
 
-        // Render the sorted data
+        // Render the filtered and sorted data
         const tbody = document.getElementById('groupsBody');
         tbody.innerHTML = '';
         
         if (sortedData.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">👥</div>
-                            <div class="empty-state-title">No groups yet</div>
-                            <div class="empty-state-description">Create your first group to get started</div>
-                        </div>
-                    </td>
-                </tr>
-            `;
+            if (originalData.length === 0) {
+                // Show empty state if no groups exist
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">👥</div>
+                                <div class="empty-state-title">No groups yet</div>
+                                <div class="empty-state-description">Create your first group to get started</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Show no results message if search doesn't match
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div class="empty-state-title">No results found</div>
+                                <div class="empty-state-description">Try adjusting your search criteria</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
         } else {
             sortedData.forEach(item => {
                 const clonedRow = item.element.cloneNode(true);
@@ -1761,6 +2340,9 @@
                 tbody.appendChild(clonedRow);
             });
         }
+        
+        // Update table summary
+        updateTableSummary(sortedData.length);
     }
 
     // Reattach event listeners to cloned rows
@@ -1784,11 +2366,27 @@
     }
 
     // Portal dropdown utilities (from worker type page)
-    function openPortalDropdown(triggerElement, dropdownHtml) {
-        const portalRoot = document.getElementById('portal-root');
-        portalRoot.innerHTML = dropdownHtml;
+    let currentPortalTrigger = null; // keep track of which header icon opened dropdown
 
-        const rect = triggerElement.getBoundingClientRect();
+    function openPortalDropdown(trigger, html) {
+        // Close any open action menus
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show'));
+        document.body.classList.remove('no-scroll');
+
+        // If the same trigger clicked again, simply close dropdown (toggle)
+        if (currentPortalTrigger === trigger) {
+            closePortalDropdown();
+            currentPortalTrigger = null;
+            return;
+        }
+        // Otherwise close any existing portal dropdown and open a new one
+        closePortalDropdown();
+        currentPortalTrigger = trigger;
+
+        const portalRoot = document.getElementById('portal-root');
+        portalRoot.innerHTML = html;
+
+        const rect = trigger.getBoundingClientRect();
         const dropdownWidth = 220;
         const gap = 4;
         const minMargin = 8;
@@ -1814,17 +2412,24 @@
         dropdown.style.zIndex = 9999;
 
         function handleClickOutside(event) {
-            if (!dropdown.contains(event.target) && event.target !== triggerElement) {
+            if (!dropdown.contains(event.target) && event.target !== trigger) {
                 closePortalDropdown();
+                currentPortalTrigger = null;
                 document.removeEventListener('mousedown', handleClickOutside);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
+
+        // Lock body scroll while header dropdown is open
+        document.body.classList.add('no-scroll');
     }
 
     function closePortalDropdown() {
         const portalRoot = document.getElementById('portal-root');
         portalRoot.innerHTML = '';
+        // Re-enable body scroll
+        document.body.classList.remove('no-scroll');
+        currentPortalTrigger = null;
     }
 
     // Sort dropdown functionality
@@ -1857,6 +2462,31 @@
         
         // Update table view with new sorting
         updateTableView();
+    }
+
+    // Update selection count function (global)
+    function updateSelectionCount() {
+        const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+        const selectionCount = document.getElementById('selectionCount');
+        const selectAllCheckbox = document.getElementById('selectAllColumns');
+        
+        if (!selectionCount || !selectAllCheckbox) return;
+        
+        const totalColumns = columnCheckboxes.length;
+        const checkedColumns = document.querySelectorAll('.column-checkbox[data-column]:checked').length;
+        selectionCount.textContent = `${checkedColumns} / ${totalColumns} selected`;
+        
+        // Update select all checkbox state
+        if (checkedColumns === totalColumns) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedColumns === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
     }
 
     // Customize columns functions
@@ -1903,24 +2533,7 @@
             }
         }
 
-        // Update selection count function
-        function updateSelectionCount() {
-            const totalColumns = columnCheckboxes.length;
-            const checkedColumns = document.querySelectorAll('.column-checkbox[data-column]:checked').length;
-            selectionCount.textContent = `${checkedColumns} / ${totalColumns} selected`;
-            
-            // Update select all checkbox state
-            if (checkedColumns === totalColumns) {
-                selectAllCheckbox.checked = true;
-                selectAllCheckbox.indeterminate = false;
-            } else if (checkedColumns === 0) {
-                selectAllCheckbox.checked = false;
-                selectAllCheckbox.indeterminate = false;
-            } else {
-                selectAllCheckbox.checked = false;
-                selectAllCheckbox.indeterminate = true;
-            }
-        }
+
 
         // Function to update table columns visibility
         function updateTableColumns() {
@@ -2029,6 +2642,10 @@
                 checkbox.checked = true;
             });
             updateSelectionCount();
+            
+            // Immediately update table and close popup
+            updateTableColumns();
+            closeModal();
         });
 
         // Save button
@@ -2061,12 +2678,338 @@
         });
     }
 
+    // Update table summary with count
+    function updateTableSummary(count) {
+        const summaryEl = document.getElementById('tableSummary');
+        if (summaryEl) {
+            summaryEl.textContent = `Total ${count} items`;
+        }
+    }
+
+    // Global function to close all dropdowns
+    function closeAllDropdownsGlobal() {
+        // Close status dropdown
+        const statusDropdown = document.getElementById('statusDropdown');
+        const statusDropdownMenu = document.getElementById('statusDropdownMenu');
+        let anyOpen = false;
+        if (statusDropdown && statusDropdown.classList.contains('active')) anyOpen = true;
+        if (statusDropdown) {
+            statusDropdown.classList.remove('active');
+            const arrow = statusDropdown.querySelector('.dropdown-arrow');
+            if (arrow) arrow.src = '/static/images/angle-small-down.png';
+        }
+        if (statusDropdownMenu) {
+            statusDropdownMenu.classList.remove('show');
+        }
+
+        // Close admin dropdown
+        const adminDropdown = document.getElementById('adminDropdown');
+        const adminDropdownMenu = document.getElementById('adminDropdownMenu');
+        if (adminDropdown && adminDropdown.classList.contains('active')) anyOpen = true;
+        if (adminDropdown) {
+            adminDropdown.classList.remove('active');
+            const arrow = adminDropdown.querySelector('.dropdown-arrow');
+            if (arrow) arrow.src = '/static/images/angle-small-down.png';
+        }
+        if (adminDropdownMenu) {
+            adminDropdownMenu.classList.remove('show');
+        }
+        // Re-enable body scroll if nothing left open
+        if (!statusDropdownMenu?.classList.contains('show') && !adminDropdownMenu?.classList.contains('show')) {
+            document.body.classList.remove('no-scroll');
+        }
+    }
+
+    // Status dropdown functionality
+    function setupStatusDropdown() {
+        const statusDropdown = document.getElementById('statusDropdown');
+        const statusDropdownMenu = document.getElementById('statusDropdownMenu');
+        const statusDropdownClose = document.getElementById('statusDropdownClose');
+        const selectAllStatusCheckbox = document.getElementById('selectAllStatus');
+        const resetStatusFilters = document.getElementById('resetStatusFilters');
+        const showStatusResults = document.getElementById('showStatusResults');
+        const statusOptionsList = document.getElementById('statusOptionsList');
+        
+        let selectedStatuses = new Set(); // Start with nothing selected
+
+        // Toggle dropdown
+        statusDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = statusDropdown.classList.contains('active');
+            
+            // Close all other dropdowns first
+            closeAllDropdownsGlobal();
+            
+            if (!isActive) {
+                statusDropdown.classList.add('active');
+                statusDropdownMenu.classList.add('show');
+                // Change arrow to up
+                const arrow = statusDropdown.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+                // Disable body scroll
+                document.body.classList.add('no-scroll');
+            }
+        });
+
+        // Close button functionality
+        statusDropdownClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeAllDropdowns();
+        });
+
+        // Select all functionality
+        selectAllStatusCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+            
+            if (isChecked) {
+                selectedStatuses.clear();
+                statusCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedStatuses.add(checkbox.dataset.value);
+                });
+            } else {
+                selectedStatuses.clear();
+                statusCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            updateStatusDropdownLabel();
+        });
+
+        // Reset button functionality
+        resetStatusFilters.addEventListener('click', function() {
+            selectedStatuses.clear();
+            selectAllStatusCheckbox.checked = false;
+            const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+            statusCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateStatusDropdownLabel();
+            
+            // Immediately update table and close popup
+            updateTableView();
+            closeAllDropdowns();
+        });
+
+        // Show results button functionality
+        showStatusResults.addEventListener('click', function() {
+            closeAllDropdowns();
+            updateTableView();
+        });
+
+        // Individual checkbox changes
+        const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+        statusCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    selectedStatuses.add(this.dataset.value);
+                } else {
+                    selectedStatuses.delete(this.dataset.value);
+                }
+                updateStatusDropdownLabel();
+            });
+        });
+
+        // Update dropdown label
+        function updateStatusDropdownLabel() {
+            const badge = document.getElementById('statusBadge');
+            if (selectedStatuses.size === 0) {
+                badge.style.display = 'none';
+            } else {
+                badge.textContent = selectedStatuses.size;
+                badge.style.display = 'inline-block';
+            }
+        }
+
+        // Close all dropdowns function
+        function closeAllDropdowns() {
+            statusDropdown.classList.remove('active');
+            statusDropdownMenu.classList.remove('show');
+            const arrow = statusDropdown.querySelector('.dropdown-arrow');
+            arrow.src = '/static/images/angle-small-down.png';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!statusDropdown.contains(e.target) && !statusDropdownMenu.contains(e.target)) {
+                closeAllDropdownsGlobal();
+            }
+        });
+
+        // Store selected statuses for filtering
+        window.getCurrentStatusFilter = function() {
+            return selectedStatuses;
+        };
+    }
+
+    // Admin dropdown functionality
+    function setupAdminDropdown() {
+        const adminDropdown = document.getElementById('adminDropdown');
+        const adminDropdownMenu = document.getElementById('adminDropdownMenu');
+        const adminDropdownClose = document.getElementById('adminDropdownClose');
+        const selectAllAdminsCheckbox = document.getElementById('selectAllAdmins');
+        const resetAdminFilters = document.getElementById('resetAdminFilters');
+        const showAdminResults = document.getElementById('showAdminResults');
+        const adminOptionsList = document.getElementById('adminOptionsList');
+        
+        let selectedAdmins = new Set(); // Start with nothing selected
+
+        // Populate admin options from groups data
+        function populateAdminOptions() {
+            const allAdminNames = new Set();
+            
+            // Collect all unique admin names from groups
+            originalData.forEach(item => {
+                if (item.admin_names) {
+                    item.admin_names.forEach(name => {
+                        allAdminNames.add(name);
+                    });
+                }
+            });
+            
+            // Clear existing options
+            adminOptionsList.innerHTML = '';
+            
+            // Add individual admin options
+            allAdminNames.forEach(adminName => {
+                const adminOption = document.createElement('label');
+                adminOption.className = 'dropdown-option';
+                adminOption.innerHTML = `
+                    <input type="checkbox" class="dropdown-checkbox" data-value="${adminName}">
+                    <span class="option-text">${adminName}</span>
+                `;
+                adminOptionsList.appendChild(adminOption);
+            });
+            
+            // Re-attach event listeners
+            attachAdminCheckboxListeners();
+        }
+
+        // Toggle dropdown
+        adminDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = adminDropdown.classList.contains('active');
+            
+            // Close all other dropdowns first
+            closeAllDropdownsGlobal();
+            
+            if (!isActive) {
+                adminDropdown.classList.add('active');
+                adminDropdownMenu.classList.add('show');
+                // Change arrow to up
+                const arrow = adminDropdown.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+                // Disable body scroll
+                document.body.classList.add('no-scroll');
+            }
+        });
+
+        // Close button functionality
+        adminDropdownClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeAllAdminDropdowns();
+        });
+
+        // Select all functionality
+        selectAllAdminsCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            const adminCheckboxes = adminOptionsList.querySelectorAll('.dropdown-checkbox');
+            
+            if (isChecked) {
+                selectedAdmins.clear();
+                adminCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedAdmins.add(checkbox.dataset.value);
+                });
+            } else {
+                selectedAdmins.clear();
+                adminCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            updateAdminDropdownLabel();
+        });
+
+        // Reset button functionality
+        resetAdminFilters.addEventListener('click', function() {
+            selectedAdmins.clear();
+            selectAllAdminsCheckbox.checked = false;
+            const adminCheckboxes = adminOptionsList.querySelectorAll('.dropdown-checkbox');
+            adminCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateAdminDropdownLabel();
+            
+            // Immediately update table and close popup
+            updateTableView();
+            closeAllAdminDropdowns();
+        });
+
+        // Show results button functionality
+        showAdminResults.addEventListener('click', function() {
+            closeAllAdminDropdowns();
+            updateTableView();
+        });
+
+        // Attach event listeners to admin checkboxes
+        function attachAdminCheckboxListeners() {
+            const adminCheckboxes = adminOptionsList.querySelectorAll('.dropdown-checkbox');
+            adminCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedAdmins.add(this.dataset.value);
+                    } else {
+                        selectedAdmins.delete(this.dataset.value);
+                    }
+                    updateAdminDropdownLabel();
+                });
+            });
+        }
+
+        // Individual checkbox changes
+        attachAdminCheckboxListeners();
+
+        // Update dropdown label
+        function updateAdminDropdownLabel() {
+            const badge = document.getElementById('adminBadge');
+            if (selectedAdmins.size === 0) {
+                badge.style.display = 'none';
+            } else {
+                badge.textContent = selectedAdmins.size;
+                badge.style.display = 'inline-block';
+            }
+        }
+
+        // Close all dropdowns function
+        function closeAllAdminDropdowns() {
+            closeAllDropdownsGlobal();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!adminDropdown.contains(e.target) && !adminDropdownMenu.contains(e.target)) {
+                closeAllDropdownsGlobal();
+            }
+        });
+
+        // Store selected admins for filtering
+        window.getCurrentAdminFilter = function() {
+            return selectedAdmins;
+        };
+
+        // Populate admin options after data is loaded
+        populateAdminOptions();
+    }
+
     // Initialize sorting and customize modal when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Small delay to ensure all content is loaded
         setTimeout(() => {
             initializeSorting();
             setupCustomizeModal();
+            setupStatusDropdown();
+            setupAdminDropdown();
         }, 100);
     });
 </script>

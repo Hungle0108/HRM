@@ -328,6 +328,352 @@
     position: relative;
 }
 
+/* Header menu icon styles */
+.header-menu-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.worker-types-table th:hover .header-menu-icon {
+    opacity: 0.7;
+}
+
+.header-menu-icon:hover {
+    opacity: 1;
+}
+
+/* Header dropdown menu styles */
+.header-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 180px;
+    z-index: 1001;
+    display: none;
+    padding: 6px 0;
+    margin-top: 4px;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.header-dropdown.positioned-above {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header-dropdown.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s ease;
+    position: relative;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: #f8fafc;
+    color: #1f2937;
+    padding-left: 16px;
+}
+
+.dropdown-item:first-child {
+    margin-top: 2px;
+}
+
+.dropdown-item:last-child {
+    margin-bottom: 2px;
+}
+
+.dropdown-item img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.dropdown-item:hover img {
+    opacity: 1;
+}
+
+/* Edit Group Name Modal Styles */
+.edit-group-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 2000;
+    display: none;
+}
+
+.edit-group-modal-overlay.show {
+    display: block;
+}
+
+.edit-group-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+    width: 400px;
+    max-width: 95vw;
+    z-index: 2100;
+    padding: 0;
+    display: none;
+}
+
+.edit-group-modal.show {
+    display: block;
+}
+
+.edit-group-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 32px 0 32px;
+    position: relative;
+}
+
+.edit-group-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.edit-group-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    position: absolute;
+    top: 28px;
+    right: 32px;
+}
+
+.edit-group-modal-content {
+    padding: 24px 32px;
+}
+
+.edit-group-current {
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    color: #666;
+    text-align: center;
+}
+
+.edit-group-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-group-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 4px;
+}
+
+.edit-group-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.edit-group-input:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.edit-group-char-count {
+    font-size: 0.85rem;
+    color: #666;
+    text-align: right;
+    margin-top: 4px;
+}
+
+.edit-group-modal-footer {
+    padding: 0 32px 32px 32px;
+}
+
+.edit-group-save-btn {
+    width: 100%;
+    background: #e0e0e0;
+    color: #999;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-group-save-btn:enabled {
+    background: #222;
+    color: #fff;
+    cursor: pointer;
+}
+
+.edit-group-save-btn:enabled:hover {
+    background: #333;
+}
+
+/* Archive Group Modal Styles */
+.archive-group-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 2000;
+    display: none;
+}
+
+.archive-group-modal-overlay.show {
+    display: block;
+}
+
+.archive-group-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+    width: 400px;
+    max-width: 95vw;
+    z-index: 2100;
+    padding: 0;
+    display: none;
+}
+
+.archive-group-modal.show {
+    display: block;
+}
+
+.archive-group-modal-content {
+    padding: 32px;
+    text-align: center;
+}
+
+.archive-group-modal-icon {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.archive-group-modal-icon-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.archive-group-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 16px 0;
+}
+
+.archive-group-modal-message {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+}
+
+.archive-group-modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.archive-group-modal-cancel-btn {
+    background: #fff;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    color: #222;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.archive-group-modal-cancel-btn:hover {
+    background: #f8f9fa;
+    border-color: #c1c5c9;
+}
+
+.archive-group-modal-confirm-btn {
+    background: #222;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.archive-group-modal-confirm-btn:hover {
+    background: #333;
+}
+
 /* Actions container */
 .actions-container {
     position: relative;
@@ -557,6 +903,7 @@
 }
 #adminSelectAll.admin-checkbox:checked {
     /* Hide the checkmark for select all */
+    background-color: #1a1a1a;
 }
 
 /* Remove Admin Modal Styles */
@@ -702,6 +1049,10 @@
 .remove-admin-modal-remove-btn:hover {
     background: #c62828;
 }
+.status-badge.archived {
+    background: #e9ecef !important;
+    color: #6c757d !important;
+}
 </style>
 {% endblock %}
 
@@ -710,13 +1061,12 @@
     <div class="group-settings-header">
         <a href="/groups" class="group-settings-back">&larr; Back to Groups</a>
         <div class="group-settings-title-row">
-            <span class="group-settings-title">fdsfasd</span>
-            <span class="status-badge">ACTIVE</span>
+            <span class="group-settings-title">{{ group.name }}</span>
+            <span class="status-badge{% if group.status == 'ARCHIVED' %} archived{% endif %}">{{ group.status }}</span>
         </div>
         <div class="group-settings-tabs" id="groupSettingsTabs">
-            <button class="group-settings-tab active" data-tab="details">Group Details</button>
-            <button class="group-settings-tab" data-tab="payment">Payment Methods</button>
-            <button class="group-settings-tab" data-tab="admins">Admins (1)</button>
+            <button class="group-settings-tab" data-tab="details">Group Details</button>
+            <button class="group-settings-tab" data-tab="admins">Admins ({{ admins|length }})</button>
         </div>
     </div>
     <div id="tab-content-details">
@@ -724,11 +1074,11 @@
             <div class="group-card">
                 <div class="group-card-header">
                     <span class="group-card-title">Group details</span>
-                    <button class="group-card-edit-btn">Edit</button>
+                    <button class="group-card-edit-btn" onclick="showEditGroupNameModal()">Edit</button>
                 </div>
                 <div class="group-card-row group-name-row">
                     <span class="group-card-row-label">Group name</span>
-                    <span class="group-card-row-value">fdsfasd</span>
+                    <span class="group-card-row-value">{{ group.name }}</span>
                 </div>
             </div>
             <div class="group-card">
@@ -738,7 +1088,7 @@
                 <div class="group-card-info">
                     Archived groups are hidden from your main view but can be accessed by enabling the 'Archived' filter on your groups page. You can restore it at any time.
                 </div>
-                <button class="group-card-archive-btn">Archive group</button>
+                <button class="group-card-archive-btn" onclick="showArchiveGroupModal()">Archive group</button>
             </div>
         </div>
     </div>
@@ -756,28 +1106,48 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <button id="adminActionBtn" class="group-card-edit-btn" style="background: #222; color: #fff; font-weight: 600; margin-left: 12px;">Assign admins</button>
-                    <button class="group-card-edit-btn" style="padding: 6px 10px; background: #f5f5f5; color: #222;">
-                        <img src="/static/images/expand.png" alt="Fullscreen" style="width: 18px; height: 18px;">
-                    </button>
                 </div>
             </div>
         </div>
         <div class="table-wrapper" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <div class="table-summary" id="adminTableSummary">Total 1 item</div>
+            <div class="table-summary" id="adminTableSummary">Total {{ admins|length }} item{% if admins|length != 1 %}s{% endif %}</div>
             <table class="worker-types-table" id="adminTable">
                 <thead>
                     <tr>
                         <th style="width: 40px;"><input type="checkbox" class="admin-checkbox" id="adminSelectAll"></th>
-                        <th class="sortable" data-sort="name">Admin
+                        <th class="sortable" data-sort="name" style="position: relative;">Admin
                             <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                            <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showHeaderDropdown(this, 'admin')">
+                            <div class="header-dropdown" id="header-dropdown-admin">
+                                <div class="dropdown-item" onclick="sortColumn('name', 'asc')">
+                                    <img src="/static/images/arrow-small-up.png" alt="Sort Ascending">
+                                    <span>Sort Ascending</span>
+                                </div>
+                                <div class="dropdown-item" onclick="sortColumn('name', 'desc')">
+                                    <img src="/static/images/arrow-small-down.png" alt="Sort Descending">
+                                    <span>Sort Descending</span>
+                                </div>
+                            </div>
                         </th>
-                        <th class="sortable" data-sort="role">Role
+                        <th class="sortable" data-sort="role" style="position: relative;">Role
                             <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                            <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showHeaderDropdown(this, 'role')">
+                            <div class="header-dropdown" id="header-dropdown-role">
+                                <div class="dropdown-item" onclick="sortColumn('role', 'asc')">
+                                    <img src="/static/images/arrow-small-up.png" alt="Sort Ascending">
+                                    <span>Sort Ascending</span>
+                                </div>
+                                <div class="dropdown-item" onclick="sortColumn('role', 'desc')">
+                                    <img src="/static/images/arrow-small-down.png" alt="Sort Descending">
+                                    <span>Sort Descending</span>
+                                </div>
+                            </div>
                         </th>
                         <th style="width: 40px;"></th>
                     </tr>
                 </thead>
                 <tbody id="adminTableBody">
+                    {% if admins %}
                     {% for admin in admins %}
                     <tr data-admin-id="{{ admin.id }}">
                         <td><input type="checkbox" class="admin-checkbox admin-row-checkbox"></td>
@@ -791,7 +1161,7 @@
                         <td style="color: #222; font-weight: 600;">{{ admin.role }}</td>
                         <td>
                             <div class="actions-container">
-                                <button class="edit-btn" onclick="toggleAdminActionMenu(event, {{ admin.id }})" title="More actions">
+                                    <button class="edit-btn" onclick="toggleAdminActionMenu(event, '{{ admin.id }}')" title="More actions">
                                     <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
                                 </button>
                                 <div class="action-menu" id="admin-menu-{{ admin.id }}">
@@ -806,6 +1176,17 @@
                         </td>
                     </tr>
                     {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon"><img src="/static/images/admin.png" alt="Admin" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                                    <div class="empty-state-title">No admins yet</div>
+                                    <div class="empty-state-description">Assign admins to manage this group and its members</div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
@@ -828,24 +1209,106 @@
     </div>
 </div>
 
+<!-- Edit Group Name Modal -->
+<div class="edit-group-modal-overlay" id="editGroupModalOverlay"></div>
+<div class="edit-group-modal" id="editGroupModal">
+    <div class="edit-group-modal-header">
+        <h3 class="edit-group-modal-title">Edit group name</h3>
+        <button class="edit-group-modal-close" id="editGroupModalClose">&times;</button>
+    </div>
+    <div class="edit-group-modal-content">
+        <div class="edit-group-current">
+            <span>Current: {{ group.name }}</span>
+        </div>
+        <div class="edit-group-form">
+            <label for="editGroupNameInput" class="edit-group-label">Group name</label>
+            <input type="text" id="editGroupNameInput" class="edit-group-input" value="{{ group.name }}" maxlength="48">
+            <div class="edit-group-char-count">
+                <span id="editGroupCharCount">{{ group.name|length }}</span>/48
+            </div>
+        </div>
+    </div>
+    <div class="edit-group-modal-footer">
+        <button class="edit-group-save-btn" id="editGroupSaveBtn" disabled>Save changes</button>
+    </div>
+</div>
+
+<!-- Archive Group Confirmation Modal -->
+<div class="archive-group-modal-overlay" id="archiveGroupModalOverlay"></div>
+<div class="archive-group-modal" id="archiveGroupModal">
+    <div class="archive-group-modal-content">
+        <div class="archive-group-modal-icon">
+            <img src="/static/images/triangle-warning.png" alt="Warning" class="archive-group-modal-icon-img">
+        </div>
+        <h3 class="archive-group-modal-title">Confirm group archiving</h3>
+        <p class="archive-group-modal-message">Are you sure you want to archive this group?</p>
+        <div class="archive-group-modal-footer">
+            <button class="archive-group-modal-cancel-btn" id="archiveGroupModalCancel">Cancel</button>
+            <button class="archive-group-modal-confirm-btn" id="archiveGroupModalConfirm">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <script>
-// Simple tab switching logic
+// Declare groupId at the top
+let groupId = '{{ group.id }}';
+
+// Tab persistence and switching logic
 const tabs = document.querySelectorAll('.group-settings-tab');
 const tabDetails = document.getElementById('tab-content-details');
 const tabAdmins = document.getElementById('tab-content-admins');
-tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
+
+// Function to get URL parameter
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Function to set URL parameter
+function setUrlParameter(name, value) {
+    const url = new URL(window.location);
+    url.searchParams.set(name, value);
+    window.history.replaceState({}, '', url);
+}
+
+// Function to switch tabs
+function switchTab(tabName) {
+    // Remove active class from all tabs
         tabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        if (this.dataset.tab === 'admins') {
+    
+    // Hide all tab contents
             tabDetails.style.display = 'none';
+    tabAdmins.style.display = 'none';
+    
+    // Show selected tab content and add active class
+    if (tabName === 'admins') {
             tabAdmins.style.display = '';
+        document.querySelector('[data-tab="admins"]').classList.add('active');
         } else {
             tabDetails.style.display = '';
-            tabAdmins.style.display = 'none';
-        }
+        document.querySelector('[data-tab="details"]').classList.add('active');
+    }
+    
+    // Update URL parameter
+    setUrlParameter('tab', tabName);
+}
+
+// Add click event listeners to tabs
+tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        switchTab(tabName);
     });
 });
+
+// Initialize tab based on URL parameter or default to 'details'
+function initializeTab() {
+    const activeTab = getUrlParameter('tab') || 'details';
+    switchTab(activeTab);
+}
+
+// Initialize tabs on page load
+initializeTab();
 
 // Admin table interactivity (sorting, searching, selection, action menu)
 // Remove the renderAdminTable function and all code that references adminData, since the table is now rendered by Jinja and does not need JS for static data.
@@ -878,6 +1341,19 @@ function updateSelectAllState() {
     const rowCheckboxes = document.querySelectorAll('.admin-row-checkbox');
     const checkedCount = document.querySelectorAll('.admin-row-checkbox:checked').length;
     
+    if (!selectAllCheckbox) {
+        console.warn('Select all checkbox not found');
+        return;
+    }
+    
+    // Hide select all checkbox if no admin rows exist
+    if (rowCheckboxes.length === 0) {
+        selectAllCheckbox.style.display = 'none';
+        return;
+    } else {
+        selectAllCheckbox.style.display = 'inline-block';
+    }
+    
     if (checkedCount === 0) {
         selectAllCheckbox.checked = false;
         selectAllCheckbox.indeterminate = false;
@@ -887,21 +1363,230 @@ function updateSelectAllState() {
     }
 }
 
-// Add event listeners to individual row checkboxes
-document.querySelectorAll('.admin-row-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', updateSelectAllState);
-});
-
-document.getElementById('adminSelectAll').addEventListener('change', function() {
-    document.querySelectorAll('.admin-row-checkbox').forEach(cb => {
-        cb.checked = this.checked;
-    });
-    updateSelectAllState();
-    updateAdminActionBtn(); // Ensure button updates on select all/none
-});
+// Event listeners are now handled in initializeAdminFunctionality()
 
 // Call updateSelectAllState on page load
 updateSelectAllState();
+
+// Handle empty state for admin table
+function updateAdminTableState() {
+    const adminTableBody = document.getElementById('adminTableBody');
+    const adminActionBtn = document.getElementById('adminActionBtn');
+    const adminSearchContainer = document.getElementById('adminSearchContainer');
+    
+    if (!adminTableBody) {
+        console.warn('Admin table body not found');
+        return;
+    }
+    
+    // Check if there are any admin rows (excluding empty state row)
+    const adminRows = adminTableBody.querySelectorAll('tr[data-admin-id]');
+    
+    if (adminRows.length === 0) {
+        // No admins - disable search and action button
+        if (adminSearchContainer) {
+            adminSearchContainer.style.opacity = '0.5';
+            adminSearchContainer.style.pointerEvents = 'none';
+        }
+        if (adminActionBtn) {
+            adminActionBtn.textContent = 'Assign admins';
+            adminActionBtn.style.background = '#222';
+            adminActionBtn.style.color = '#fff';
+            adminActionBtn.style.fontWeight = '600';
+        }
+    } else {
+        // Has admins - enable search and action button
+        if (adminSearchContainer) {
+            adminSearchContainer.style.opacity = '1';
+            adminSearchContainer.style.pointerEvents = 'auto';
+        }
+        if (adminActionBtn) {
+            // Don't call updateAdminActionBtn here to avoid circular calls
+            // The button state will be updated by the checkbox event listeners
+        }
+    }
+}
+
+// Call updateAdminTableState after DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateAdminTableState);
+} else {
+    updateAdminTableState();
+}
+
+// Header dropdown functionality
+function showHeaderDropdown(button, column) {
+    // Hide all other dropdowns
+    document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+        dropdown.classList.remove('show');
+    });
+    
+    // Show the clicked dropdown
+    const dropdown = document.getElementById(`header-dropdown-${column}`);
+    if (dropdown) {
+        dropdown.classList.add('show');
+        
+        // Position the dropdown
+        const buttonRect = button.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+        
+        // Check if dropdown would go below viewport
+        if (buttonRect.bottom + dropdownRect.height > window.innerHeight) {
+            dropdown.classList.add('positioned-above');
+        } else {
+            dropdown.classList.remove('positioned-above');
+        }
+    }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.header-menu-icon') && !e.target.closest('.header-dropdown')) {
+        document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+    }
+});
+
+// Sort column functionality
+function sortColumn(column, direction) {
+    console.log(`Sorting ${column} column in ${direction} direction`);
+    // Add your sorting logic here
+    // For now, just close the dropdown
+    document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+        dropdown.classList.remove('show');
+    });
+}
+
+// Edit Group Name Modal functionality
+function showEditGroupNameModal() {
+    const modal = document.getElementById('editGroupModal');
+    const overlay = document.getElementById('editGroupModalOverlay');
+    const input = document.getElementById('editGroupNameInput');
+    const charCount = document.getElementById('editGroupCharCount');
+    const saveBtn = document.getElementById('editGroupSaveBtn');
+    
+    // Reset input to current group name
+    input.value = '{{ group.name }}';
+    charCount.textContent = input.value.length;
+    updateSaveButton();
+    
+    // Show modal
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+    
+    // Focus input
+    setTimeout(() => {
+        input.focus();
+        input.select();
+    }, 100);
+}
+
+function hideEditGroupModal() {
+    document.getElementById('editGroupModal').style.display = 'none';
+    document.getElementById('editGroupModalOverlay').style.display = 'none';
+}
+
+function updateSaveButton() {
+    const input = document.getElementById('editGroupNameInput');
+    const saveBtn = document.getElementById('editGroupSaveBtn');
+    const currentName = '{{ group.name }}';
+    
+    // Enable save button only if name has changed and is not empty
+    const hasChanged = input.value.trim() !== currentName;
+    const isValid = input.value.trim().length > 0;
+    
+    saveBtn.disabled = !hasChanged || !isValid;
+}
+
+function saveGroupName() {
+    const input = document.getElementById('editGroupNameInput');
+    const newName = input.value.trim();
+    const saveBtn = document.getElementById('editGroupSaveBtn');
+    
+    if (newName.length === 0) {
+        alert('Group name cannot be empty');
+        return;
+    }
+    
+    // Disable save button to prevent double submission
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    
+    // Make API call to update group name
+    fetch(`/api/group/${groupId}/update-name`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: newName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the displayed group name on the page
+            const groupNameElements = document.querySelectorAll('.group-settings-title, .edit-group-current span');
+            groupNameElements.forEach(element => {
+                if (element.textContent.includes('{{ group.name }}') || element.textContent.includes('Current:')) {
+                    element.textContent = element.textContent.replace('{{ group.name }}', newName).replace(/Current: .*/, `Current: ${newName}`);
+                }
+            });
+            
+            // Close modal and show success message
+            hideEditGroupModal();
+            alert('Group name updated successfully!');
+        } else {
+            // Show error message
+            alert(data.error || 'Failed to update group name');
+            // Re-enable save button
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save changes';
+        }
+    })
+    .catch(error => {
+        console.error('Error updating group name:', error);
+        alert('Failed to update group name. Please try again.');
+        // Re-enable save button
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save changes';
+    });
+}
+
+// Add event listeners for edit group modal
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('editGroupNameInput');
+    const saveBtn = document.getElementById('editGroupSaveBtn');
+    const closeBtn = document.getElementById('editGroupModalClose');
+    const overlay = document.getElementById('editGroupModalOverlay');
+    
+    if (input) {
+        input.addEventListener('input', function() {
+            const charCount = document.getElementById('editGroupCharCount');
+            charCount.textContent = this.value.length;
+            updateSaveButton();
+        });
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !saveBtn.disabled) {
+                saveGroupName();
+            } else if (e.key === 'Escape') {
+                hideEditGroupModal();
+            }
+        });
+    }
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveGroupName);
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', hideEditGroupModal);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', hideEditGroupModal);
+    }
+});
 
 function toggleAdminActionMenu(event, adminId) {
     event.stopPropagation();
@@ -999,7 +1684,7 @@ function showRemoveAdminModal(adminIds) {
     } else {
         title.textContent = 'Remove admin';
         // Find admin info from table row
-        const row = document.querySelector(`tr[data-admin-id='${adminsToRemove[0]}']`);
+        const row = document.querySelector(`tr[data-admin-id="${adminsToRemove[0]}"]`);
         if (row) {
             const avatar = row.querySelector('span[style*="border-radius: 50%"]');
             const name = row.querySelector('div[style*="font-weight: 600"]');
@@ -1021,7 +1706,7 @@ document.getElementById('removeAdminModalClose').onclick = hideRemoveAdminModal;
 document.getElementById('removeAdminModalOverlay').onclick = hideRemoveAdminModal;
 document.getElementById('removeAdminModalRemove').onclick = function() {
     if (!adminsToRemove.length) return;
-    fetch(`/api/group/${groupId}/admin/bulk-remove`, {
+    fetch(`/api/group/${parseInt(groupId)}/admin/bulk-remove`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_ids: adminsToRemove })
@@ -1036,16 +1721,19 @@ document.getElementById('removeAdminModalRemove').onclick = function() {
     })
     .catch(() => alert('Failed to remove admin(s)'));
 };
-// Only declare groupId ONCE at the top
-let groupId = {{ group.id }};
 
-// Dynamic admin action button logic
+// Initialize admin functionality when DOM is ready
+function initializeAdminFunctionality() {
 const adminActionBtn = document.getElementById('adminActionBtn');
 const adminCheckboxes = document.querySelectorAll('.admin-row-checkbox');
+    const adminSelectAll = document.getElementById('adminSelectAll');
+    
+    if (!adminActionBtn) {
+        console.warn('Admin action button not found');
+        return;
+    }
 
 // Dropdown Remove access
-// Use modal for single admin
-// Remove previous onclick assignment
 document.querySelectorAll('.action-item.remove-access').forEach(item => {
     item.onclick = function() {
         const adminId = this.getAttribute('data-admin-id');
@@ -1053,6 +1741,7 @@ document.querySelectorAll('.action-item.remove-access').forEach(item => {
         showRemoveAdminModal(adminId);
     };
 });
+
 // Bulk Remove access button
 adminActionBtn.onclick = function() {
     const checked = document.querySelectorAll('.admin-row-checkbox:checked');
@@ -1060,7 +1749,7 @@ adminActionBtn.onclick = function() {
         const ids = Array.from(checked).map(cb => cb.closest('tr').getAttribute('data-admin-id'));
         showRemoveAdminModal(ids);
     } else {
-        window.location.href = `/assign-admin/${groupId}`;
+            window.location.href = `/assign-admin/${parseInt(groupId)}`;
     }
 };
 
@@ -1089,19 +1778,127 @@ function updateAdminActionBtn() {
         adminActionBtn.style.borderRadius = '';
         adminActionBtn.style.padding = '';
         adminActionBtn.onclick = function() {
-            window.location.href = `/assign-admin/${groupId}`;
-        };
+                window.location.href = `/assign-admin/${parseInt(groupId)}`;
+            };
+        }
     }
-}
-document.querySelectorAll('.admin-row-checkbox').forEach(cb => cb.addEventListener('change', updateAdminActionBtn));
-document.getElementById('adminSelectAll').addEventListener('change', function() {
+
+    // Add event listeners to individual row checkboxes
+    adminCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            updateAdminActionBtn();
+            updateSelectAllState();
+        });
+    });
+
+    // Add event listener to select all checkbox
+    if (adminSelectAll) {
+        adminSelectAll.addEventListener('change', function() {
     document.querySelectorAll('.admin-row-checkbox').forEach(cb => {
         cb.checked = this.checked;
     });
     updateSelectAllState();
     updateAdminActionBtn();
 });
+    }
+
+    // Initialize button state
 updateAdminActionBtn();
+}
+
+// Call initialization when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAdminFunctionality);
+} else {
+    initializeAdminFunctionality();
+}
+
+// Archive Group Modal functionality
+function showArchiveGroupModal() {
+    const modal = document.getElementById('archiveGroupModal');
+    const overlay = document.getElementById('archiveGroupModalOverlay');
+    
+    // Show modal
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+}
+
+function hideArchiveGroupModal() {
+    const modal = document.getElementById('archiveGroupModal');
+    const overlay = document.getElementById('archiveGroupModalOverlay');
+    
+    // Hide modal
+    modal.style.display = 'none';
+    overlay.style.display = 'none';
+}
+
+function archiveGroup() {
+    const confirmBtn = document.getElementById('archiveGroupModalConfirm');
+    
+    // Disable confirm button to prevent double submission
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Archiving...';
+    
+    // Make API call to archive group
+    fetch(`/api/group/${groupId}/archive`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the group status on the page
+            const statusBadge = document.querySelector('.status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = 'ARCHIVED';
+                statusBadge.classList.add('archived');
+            }
+            
+            // Close modal and show success message
+            hideArchiveGroupModal();
+            alert('Group archived successfully!');
+            
+            // Redirect to groups page after a short delay
+            setTimeout(() => {
+                window.location.href = '/groups';
+            }, 1500);
+        } else {
+            // Show error message
+            alert(data.error || 'Failed to archive group');
+            // Re-enable confirm button
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm';
+        }
+    })
+    .catch(error => {
+        console.error('Error archiving group:', error);
+        alert('Failed to archive group. Please try again.');
+        // Re-enable confirm button
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm';
+    });
+}
+
+// Add event listeners for archive group modal
+document.addEventListener('DOMContentLoaded', function() {
+    const cancelBtn = document.getElementById('archiveGroupModalCancel');
+    const confirmBtn = document.getElementById('archiveGroupModalConfirm');
+    const overlay = document.getElementById('archiveGroupModalOverlay');
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', hideArchiveGroupModal);
+    }
+    
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', archiveGroup);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', hideArchiveGroupModal);
+    }
+});
 
 
 </script>
