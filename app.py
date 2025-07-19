@@ -760,12 +760,13 @@ def create_group():
     
     data = request.get_json()
     group_name = data.get('groupName')
+    invited_workers = data.get('invitedWorkers', [])
     
     if not group_name:
         return jsonify({'error': 'Group name is required'}), 400
     
     try:
-        # Create new group with the user as the admin
+        # Create new group
         new_group = Group(
             name=group_name,
             status='ACTIVE',
@@ -774,11 +775,30 @@ def create_group():
         )
         
         db.session.add(new_group)
+        db.session.flush()  # Flush to get the group ID
+        
+        # Add invited workers as admins to the group
+        admin_count = 0
+        if invited_workers:
+            for worker_data in invited_workers:
+                worker_id = worker_data.get('id')
+                if worker_id:
+                    admin_user = User.query.filter_by(
+                        id=worker_id, 
+                        organization_id=user.organization_id
+                    ).first()
+                    if admin_user and admin_user not in new_group.admins:
+                        new_group.admins.append(admin_user)
+                        admin_count += 1
+        
         db.session.commit()
+        
+        logger.info(f"Created group '{group_name}' with {admin_count} admin(s)")
         
         return jsonify({
             'message': 'Group created successfully',
             'group': new_group.to_dict(),
+            'admins_added': admin_count,
             'redirect': '/groups'
         }), 201
         

@@ -992,6 +992,201 @@
             line-height: 1.4;
         }
 
+        /* Admin Management Modal */
+        .admin-manage-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .admin-manage-modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .admin-manage-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-manage-modal.show .admin-manage-content {
+            transform: scale(1);
+        }
+
+        .admin-manage-header {
+            padding: 24px 24px 16px 24px;
+            position: relative;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .admin-manage-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .admin-manage-subtitle {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .admin-manage-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .admin-manage-close:hover {
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .admin-manage-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .admin-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .admin-item:hover {
+            border-color: #adb5bd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .admin-item.selected {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .admin-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #dc3545;
+        }
+
+        .admin-item-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+            margin-right: 12px;
+        }
+
+        .admin-item-info {
+            flex: 1;
+        }
+
+        .admin-item-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .admin-item-email {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .admin-manage-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selected-count {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .admin-manage-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-cancel {
+            background: white;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .btn-delete:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
         /* Already invited worker style */
         .already-invited {
             background: #f1f3f4 !important;
@@ -1126,6 +1321,34 @@
         </div>
     </div>
 
+    <!-- Admin Management Modal -->
+    <div id="adminManageModal" class="admin-manage-modal">
+        <div class="admin-manage-content">
+            <!-- Modal Header -->
+            <div class="admin-manage-header">
+                <div>
+                    <h2 class="admin-manage-title">Manage Admins</h2>
+                    <p class="admin-manage-subtitle">Select admins to remove from this office</p>
+                </div>
+                <button class="admin-manage-close" id="closeAdminManageModal">✕</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="admin-manage-body" id="adminManageBody">
+                <!-- Admin items will be populated here -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="admin-manage-footer">
+                <span class="selected-count" id="selectedCount">0 selected</span>
+                <div class="admin-manage-actions">
+                    <button class="btn-cancel" id="cancelAdminManage">Cancel</button>
+                    <button class="btn-delete" id="deleteSelectedAdmins" disabled>Remove Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Form submission - with null check
         const officeFormStep2 = document.getElementById('office-form-step2');
@@ -1234,6 +1457,45 @@
                 });
             } else {
                 console.error('Invite button not found');
+            }
+        });
+
+        // Add event listeners for admin management modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Admin management modal event listeners
+            const closeAdminManageModalBtn = document.getElementById('closeAdminManageModal');
+            const cancelAdminManageBtn = document.getElementById('cancelAdminManage');
+            const deleteSelectedAdminsBtn = document.getElementById('deleteSelectedAdmins');
+            const adminManageModal = document.getElementById('adminManageModal');
+            
+            if (closeAdminManageModalBtn) {
+                closeAdminManageModalBtn.addEventListener('click', function() {
+                    console.log('Close admin manage modal button clicked');
+                    closeAdminManageModal();
+                });
+            }
+            
+            if (cancelAdminManageBtn) {
+                cancelAdminManageBtn.addEventListener('click', function() {
+                    console.log('Cancel admin manage button clicked');
+                    closeAdminManageModal();
+                });
+            }
+            
+            if (deleteSelectedAdminsBtn) {
+                deleteSelectedAdminsBtn.addEventListener('click', function() {
+                    console.log('Delete selected admins button clicked');
+                    deleteSelectedAdmins();
+                });
+            }
+            
+            if (adminManageModal) {
+                adminManageModal.addEventListener('click', function(e) {
+                    if (e.target === adminManageModal) {
+                        console.log('Admin manage modal overlay clicked');
+                        closeAdminManageModal();
+                    }
+                });
             }
         });
 
@@ -1358,7 +1620,7 @@
                 <div class="worker-info">
                     <div class="worker-name">${userName}</div>
                     <div class="worker-email">${userEmail}</div>
-                </div>
+            </div>
                 <button type="button" class="worker-edit" onclick="editWorker('${userId}', event)">
                     <img src="/static/images/pen.png" alt="Edit" style="width: 16px; height: 16px;">
                 </button>
@@ -1367,7 +1629,7 @@
             mainWorkersTable.appendChild(workerRow);
         }
 
-        // Function to edit worker (placeholder)
+        // Function to edit worker - now opens admin management modal
         function editWorker(userId, event) {
             console.log('=== EDIT WORKER CALLED ===');
             console.log('Edit worker userId:', userId);
@@ -1378,29 +1640,162 @@
                 event.stopPropagation();
             }
             
-            // Get the worker data from the table - fix the selector
-            const workerRow = document.querySelector(`[data-user-id="${userId}"]`);
-            console.log('Found worker row:', workerRow);
+            // Open the admin management modal
+            openAdminManageModal();
+        }
+
+        // Function to open the admin management modal
+        function openAdminManageModal() {
+            const modal = document.getElementById('adminManageModal');
+            if (modal) {
+                modal.classList.add('show');
+                populateAdminManageModal();
+            }
+        }
+
+        // Function to close the admin management modal
+        function closeAdminManageModal() {
+            const modal = document.getElementById('adminManageModal');
+            if (modal) {
+                modal.classList.remove('show');
+                // Reset the modal state
+                resetAdminManageModal();
+            }
+        }
+
+        // Function to populate the admin management modal with current admins
+        function populateAdminManageModal() {
+            const adminManageBody = document.getElementById('adminManageBody');
+            const selectedCount = document.getElementById('selectedCount');
+            const deleteBtn = document.getElementById('deleteSelectedAdmins');
             
-            if (!workerRow) {
-                console.error('Worker row not found for userId:', userId);
-                // Debug: log all available worker rows
-                const allRows = document.querySelectorAll('.worker-row');
-                console.log('All worker rows:', allRows);
-                allRows.forEach(row => {
-                    console.log('Row data-user-id:', row.getAttribute('data-user-id'));
-                    console.log('Row dataset.userId:', row.dataset.userId);
-                });
-                    return;
-                }
+            if (!adminManageBody) return;
+            
+            // Clear existing content
+            adminManageBody.innerHTML = '';
+            
+            // Get invited workers from sessionStorage
+            const invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+            
+            if (invitedWorkers.length === 0) {
+                adminManageBody.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <div style="font-size: 2rem; margin-bottom: 16px;">👥</div>
+                        <div style="font-weight: 500; margin-bottom: 8px;">No admins found</div>
+                        <div style="font-size: 0.875rem;">There are no admins to manage in this office.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create admin items
+            invitedWorkers.forEach((worker, index) => {
+                const initials = worker.name.split(' ').map(n => n.charAt(0)).join('').toUpperCase();
+                const avatarColor = getAvatarColor(worker.id);
                 
-            const workerName = workerRow.querySelector('.worker-name').textContent;
-            const workerEmail = workerRow.querySelector('.worker-email').textContent;
+                const adminItem = document.createElement('div');
+                adminItem.className = 'admin-item';
+                adminItem.dataset.workerId = worker.id;
+                
+                adminItem.innerHTML = `
+                    <input type="checkbox" class="admin-checkbox" data-worker-id="${worker.id}">
+                    <div class="admin-item-avatar" style="background: ${avatarColor};">${initials}</div>
+                    <div class="admin-item-info">
+                        <div class="admin-item-name">${worker.name}</div>
+                        <div class="admin-item-email">${worker.email}</div>
+                    </div>
+                `;
+                
+                adminManageBody.appendChild(adminItem);
+            });
             
-            console.log('Editing worker:', workerName, workerEmail);
+            // Add event listeners to checkboxes
+            const checkboxes = adminManageBody.querySelectorAll('.admin-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateAdminSelection);
+            });
             
-            // Open the modal and pre-select this worker
-            openModalWithPreselectedWorker(userId, workerName, workerEmail);
+            // Update initial state
+            updateAdminSelection();
+        }
+
+        // Function to update admin selection state
+        function updateAdminSelection() {
+            const checkboxes = document.querySelectorAll('.admin-checkbox');
+            const selectedCount = document.getElementById('selectedCount');
+            const deleteBtn = document.getElementById('deleteSelectedAdmins');
+            
+            let selectedCount_value = 0;
+            
+            checkboxes.forEach(checkbox => {
+                const adminItem = checkbox.closest('.admin-item');
+                if (checkbox.checked) {
+                    selectedCount_value++;
+                    adminItem.classList.add('selected');
+                } else {
+                    adminItem.classList.remove('selected');
+                }
+            });
+            
+            // Update UI
+            if (selectedCount) {
+                selectedCount.textContent = `${selectedCount_value} selected`;
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.disabled = selectedCount_value === 0;
+            }
+        }
+
+        // Function to delete selected admins
+        function deleteSelectedAdmins() {
+            const checkboxes = document.querySelectorAll('.admin-checkbox:checked');
+            const selectedWorkerIds = Array.from(checkboxes).map(cb => cb.dataset.workerId);
+            
+            if (selectedWorkerIds.length === 0) return;
+            
+            // Get current invited workers
+            let invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+            
+            // Remove selected workers
+            invitedWorkers = invitedWorkers.filter(worker => !selectedWorkerIds.includes(String(worker.id)));
+            
+            // Update sessionStorage
+            sessionStorage.setItem('invitedWorkers', JSON.stringify(invitedWorkers));
+            
+            // Remove workers from the main table
+            selectedWorkerIds.forEach(workerId => {
+                const workerRow = document.querySelector(`[data-user-id="${workerId}"]`);
+                if (workerRow) {
+                    workerRow.remove();
+                }
+            });
+            
+            // Hide the invited workers section if no workers left
+            const mainWorkersTable = document.getElementById('mainWorkersTable');
+            const invitedWorkersSection = document.getElementById('invitedWorkersSection');
+            if (mainWorkersTable && mainWorkersTable.children.length === 0 && invitedWorkersSection) {
+                invitedWorkersSection.style.display = 'none';
+            }
+            
+            // Close the modal
+            closeAdminManageModal();
+            
+            console.log(`Removed ${selectedWorkerIds.length} admin(s) from the office`);
+        }
+
+        // Function to reset the admin management modal
+        function resetAdminManageModal() {
+            const checkboxes = document.querySelectorAll('.admin-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                const adminItem = checkbox.closest('.admin-item');
+                if (adminItem) {
+                    adminItem.classList.remove('selected');
+                }
+            });
+            
+            updateAdminSelection();
         }
 
         // Add a variable to track the original selected worker in edit mode
@@ -1659,7 +2054,7 @@
                         <div class="user-info">
                             <div class="user-name">${worker.name}</div>
                             <div class="user-email">${worker.email}</div>
-                        </div>
+                </div>
                     `;
                     
                     console.log('Appending worker item to usersList');

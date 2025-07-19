@@ -1105,6 +1105,9 @@
                 return;
             }
             
+            // Get invited workers from sessionStorage
+            const invitedWorkers = JSON.parse(sessionStorage.getItem('invitedWorkers') || '[]');
+            
             // Submit group data to API
             fetch('/api/create-group', {
                 method: 'POST',
@@ -1112,7 +1115,8 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    groupName: groupName
+                    groupName: groupName,
+                    invitedWorkers: invitedWorkers
                 })
             })
             .then(response => response.json())
@@ -1120,9 +1124,11 @@
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
+                    console.log('Group created successfully with', data.admins_added, 'admin(s)');
                     // Clear session storage
                     sessionStorage.removeItem('officeData');
-            window.location.href = '/groups';
+                    sessionStorage.removeItem('invitedWorkers');
+                    window.location.href = '/groups';
                 }
             })
             .catch(error => {

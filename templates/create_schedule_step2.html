@@ -1083,6 +1083,98 @@
         #currentShiftLabel {
             color: #1a1a1a;
         }
+
+        /* Template Cards Styles */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .template-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .template-card:hover {
+            border-color: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .template-card.selected {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .template-header {
+            margin-bottom: 16px;
+        }
+
+        .template-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .template-details {
+            margin-bottom: 20px;
+        }
+
+        .template-hours {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        .template-days {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .template-total {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #28a745;
+            background: #e8f5e8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .template-apply-btn {
+            width: 100%;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-apply-btn:hover {
+            background: #333;
+        }
+
+        .template-card.selected .template-apply-btn {
+            background: #28a745;
+        }
+
+        .template-card.selected .template-apply-btn:hover {
+            background: #218838;
+        }
     </style>
 </head>
 <body>
@@ -1110,6 +1202,62 @@
             <!-- Content Area -->
             <div class="content-area">
                 <form id="schedule-form-step2">
+                    <!-- Vietnam Default Working Hours Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">Quick Start Templates (Vietnam)</h3>
+                        <p class="section-description">Choose from common working hour templates in Vietnam to quickly set up your schedule.</p>
+                        
+                        <div class="templates-grid">
+                            <div class="template-card" data-template="office">
+                                <div class="template-header">
+                                    <h4 class="template-title">Standard Office Hours</h4>
+                                </div>
+                                <div class="template-details">
+                                    <div class="template-hours">8:00 AM - 5:00 PM</div>
+                                    <div class="template-days">Monday - Friday</div>
+                                    <div class="template-total">40 hours/week</div>
+                                </div>
+                                <button type="button" class="template-apply-btn">Apply Template</button>
+                            </div>
+                            
+                            <div class="template-card" data-template="shift">
+                                <div class="template-header">
+                                    <h4 class="template-title">2-Shift Work</h4>
+                                </div>
+                                <div class="template-details">
+                                    <div class="template-hours">6:00 AM - 2:00 PM / 2:00 PM - 10:00 PM</div>
+                                    <div class="template-days">Monday - Saturday</div>
+                                    <div class="template-total">48 hours/week</div>
+                                </div>
+                                <button type="button" class="template-apply-btn">Apply Template</button>
+                            </div>
+                            
+                            <div class="template-card" data-template="overtime">
+                                <div class="template-header">
+                                    <h4 class="template-title">Extended Hours</h4>
+                                </div>
+                                <div class="template-details">
+                                    <div class="template-hours">7:00 AM - 7:00 PM</div>
+                                    <div class="template-days">Monday - Saturday</div>
+                                    <div class="template-total">60 hours/week</div>
+                                </div>
+                                <button type="button" class="template-apply-btn">Apply Template</button>
+                            </div>
+                            
+                            <div class="template-card" data-template="retail">
+                                <div class="template-header">
+                                    <h4 class="template-title">Retail Hours</h4>
+                                </div>
+                                <div class="template-details">
+                                    <div class="template-hours">9:00 AM - 9:00 PM</div>
+                                    <div class="template-days">7 days/week</div>
+                                    <div class="template-total">42 hours/week</div>
+                                </div>
+                                <button type="button" class="template-apply-btn">Apply Template</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-section">
                         <h3 class="section-title">Working days and hours per day</h3>
                         <p class="section-description">Specify number of worked hours per week or specify hours per days, start & end time etc.</p>
@@ -1896,7 +2044,245 @@
                 el.addEventListener('input', updateContinueButtonState);
                 el.addEventListener('click', updateContinueButtonState); // For dropdown
             });
+
+            // Initialize template functionality
+            initializeTemplates();
         });
+
+        // Template definitions with Vietnam working hours
+        const vietnamTemplates = {
+            office: {
+                name: 'Standard Office Hours',
+                description: 'Standard 8-hour office work schedule in Vietnam',
+                specifyDuration: true,
+                includeTime: true,
+                shifts: {
+                    1: {
+                        includeTime: true,
+                        weekdays: {
+                            monday: { checked: true, startTime: '08:00', endTime: '17:00' },
+                            tuesday: { checked: true, startTime: '08:00', endTime: '17:00' },
+                            wednesday: { checked: true, startTime: '08:00', endTime: '17:00' },
+                            thursday: { checked: true, startTime: '08:00', endTime: '17:00' },
+                            friday: { checked: true, startTime: '08:00', endTime: '17:00' },
+                            saturday: { checked: false, startTime: '', endTime: '' },
+                            sunday: { checked: false, startTime: '', endTime: '' }
+                        }
+                    }
+                }
+            },
+            shift: {
+                name: '2-Shift Work',
+                description: 'Two-shift manufacturing schedule common in Vietnam',
+                specifyDuration: true,
+                includeTime: true,
+                numberOfShifts: 2,
+                shifts: {
+                    1: {
+                        includeTime: true,
+                        weekdays: {
+                            monday: { checked: true, startTime: '06:00', endTime: '14:00' },
+                            tuesday: { checked: true, startTime: '06:00', endTime: '14:00' },
+                            wednesday: { checked: true, startTime: '06:00', endTime: '14:00' },
+                            thursday: { checked: true, startTime: '06:00', endTime: '14:00' },
+                            friday: { checked: true, startTime: '06:00', endTime: '14:00' },
+                            saturday: { checked: true, startTime: '06:00', endTime: '14:00' },
+                            sunday: { checked: false, startTime: '', endTime: '' }
+                        }
+                    },
+                    2: {
+                        includeTime: true,
+                        weekdays: {
+                            monday: { checked: true, startTime: '14:00', endTime: '22:00' },
+                            tuesday: { checked: true, startTime: '14:00', endTime: '22:00' },
+                            wednesday: { checked: true, startTime: '14:00', endTime: '22:00' },
+                            thursday: { checked: true, startTime: '14:00', endTime: '22:00' },
+                            friday: { checked: true, startTime: '14:00', endTime: '22:00' },
+                            saturday: { checked: true, startTime: '14:00', endTime: '22:00' },
+                            sunday: { checked: false, startTime: '', endTime: '' }
+                        }
+                    }
+                }
+            },
+            overtime: {
+                name: 'Extended Hours',
+                description: 'Extended working hours with overtime in Vietnam',
+                specifyDuration: true,
+                includeTime: true,
+                shifts: {
+                    1: {
+                        includeTime: true,
+                        weekdays: {
+                            monday: { checked: true, startTime: '07:00', endTime: '19:00' },
+                            tuesday: { checked: true, startTime: '07:00', endTime: '19:00' },
+                            wednesday: { checked: true, startTime: '07:00', endTime: '19:00' },
+                            thursday: { checked: true, startTime: '07:00', endTime: '19:00' },
+                            friday: { checked: true, startTime: '07:00', endTime: '19:00' },
+                            saturday: { checked: true, startTime: '07:00', endTime: '15:00' },
+                            sunday: { checked: false, startTime: '', endTime: '' }
+                        }
+                    }
+                }
+            },
+            retail: {
+                name: 'Retail Hours',
+                description: 'Retail and service industry schedule in Vietnam',
+                specifyDuration: true,
+                includeTime: true,
+                shifts: {
+                    1: {
+                        includeTime: true,
+                        weekdays: {
+                            monday: { checked: true, startTime: '09:00', endTime: '15:00' },
+                            tuesday: { checked: true, startTime: '09:00', endTime: '15:00' },
+                            wednesday: { checked: true, startTime: '09:00', endTime: '15:00' },
+                            thursday: { checked: true, startTime: '09:00', endTime: '15:00' },
+                            friday: { checked: true, startTime: '09:00', endTime: '15:00' },
+                            saturday: { checked: true, startTime: '09:00', endTime: '21:00' },
+                            sunday: { checked: true, startTime: '09:00', endTime: '21:00' }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Show success message when template is applied
+        function showTemplateSuccessMessage(templateName) {
+            // Remove any existing messages
+            const existingMessage = document.querySelector('.template-success-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            // Create success message
+            const message = document.createElement('div');
+            message.className = 'template-success-message';
+            message.innerHTML = `
+                <div style="
+                    background: #d4edda;
+                    color: #155724;
+                    padding: 12px 16px;
+                    border: 1px solid #c3e6cb;
+                    border-radius: 8px;
+                    margin-bottom: 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 0.9rem;
+                ">
+                    <span style="color: #28a745; font-weight: bold;">✓</span>
+                    Successfully applied "${templateName}" template
+                </div>
+            `;
+
+            // Insert message at the top of the template section
+            const templatesGrid = document.querySelector('.templates-grid');
+            if (templatesGrid && templatesGrid.parentNode) {
+                templatesGrid.parentNode.insertBefore(message, templatesGrid);
+                
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    if (message && message.parentNode) {
+                        message.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize template functionality
+        function initializeTemplates() {
+            const templateCards = document.querySelectorAll('.template-card');
+            const applyButtons = document.querySelectorAll('.template-apply-btn');
+
+            // Add click listeners to template cards
+            templateCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('template-apply-btn')) {
+                        return; // Let the button handle this
+                    }
+                    
+                    // Visual selection
+                    templateCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Add click listeners to apply buttons
+            applyButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    console.log('Apply button clicked');
+                    e.stopPropagation();
+                    const card = this.closest('.template-card');
+                    const templateType = card.dataset.template;
+                    console.log('Template type:', templateType);
+                    applyTemplate(templateType);
+                    
+                    // Visual feedback
+                    templateCards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                });
+            });
+        }
+
+        // Apply a template to the form
+        function applyTemplate(templateType) {
+            console.log('Applying template:', templateType);
+            const template = vietnamTemplates[templateType];
+            if (!template) {
+                console.error('Template not found:', templateType);
+                return;
+            }
+            console.log('Template data:', template);
+
+            isLoadingData = true; // Prevent saving during template application
+
+            try {
+                // Set basic toggles
+                const specifyDurationToggle = document.getElementById('specifyDuration');
+                const includeTimeToggle = document.getElementById('includeTime');
+                
+                if (specifyDurationToggle) {
+                    specifyDurationToggle.checked = template.specifyDuration;
+                }
+                if (includeTimeToggle) {
+                    includeTimeToggle.checked = template.includeTime;
+                }
+
+                // Set number of shifts if applicable
+                if (template.numberOfShifts && template.numberOfShifts > 1) {
+                    const dropdownSelected = document.getElementById('dropdownSelected');
+                    if (dropdownSelected) {
+                        dropdownSelected.textContent = `${template.numberOfShifts} shifts`;
+                    }
+                    updateShiftPagination(template.numberOfShifts);
+                }
+
+                // Apply shift data
+                shiftData = { ...template.shifts };
+                currentShift = 1;
+
+                // Update UI visibility
+                toggleInputMode();
+                
+                // Load the first shift data
+                loadShiftData(1);
+
+                // Update calculations
+                updateAllDayDurations();
+                calculateWeeklyDuration();
+
+                // Update continue button state
+                updateContinueButtonState();
+
+                console.log(`Applied ${template.name} template`);
+                
+                // Show success feedback to user
+                showTemplateSuccessMessage(template.name);
+                
+            } finally {
+                isLoadingData = false;
+            }
+        }
 
         // Save current shift data
         function saveCurrentShiftData() {
