@@ -2342,6 +2342,37 @@ def restore_group(group_id):
         logger.error(f"Error restoring group: {str(e)}")
         return jsonify({'error': 'Failed to restore group'}), 500
 
+@app.route('/api/delete-group/<int:group_id>', methods=['DELETE'])
+def delete_group(group_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    
+    # Check if user is admin of this group
+    if user not in group.admins:
+        return jsonify({'error': 'Unauthorized - not an admin of this group'}), 403
+    
+    try:
+        # Delete the group from the database
+        db.session.delete(group)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Group deleted successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting group: {str(e)}")
+        return jsonify({'error': 'Failed to delete group'}), 500
+
 if __name__ == '__main__':
     with app.app_context():
         init_db()  # Initialize database tables before running

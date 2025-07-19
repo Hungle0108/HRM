@@ -1697,6 +1697,136 @@
         flex-shrink: 0; 
         margin-right: 8px; /* add space between badge and arrow */
     }
+
+    /* Delete Modal Styles */
+    .delete-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .delete-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .delete-modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+
+    .delete-modal.show .delete-modal-content {
+        transform: scale(1);
+    }
+
+    .delete-modal-header {
+        margin-bottom: 24px;
+    }
+
+    .delete-icon {
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+
+    .delete-main-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .delete-modal-body {
+        margin-bottom: 32px;
+    }
+
+    .delete-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .delete-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .template-info {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .template-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .template-creator {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .delete-modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-cancel-delete {
+        padding: 12px 24px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 120px;
+    }
+
+    .btn-cancel-delete:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .btn-delete-confirm {
+        padding: 12px 24px;
+        background: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 120px;
+    }
+
+    .btn-delete-confirm:hover {
+        background: #c82333;
+        border-color: #bd2130;
+    }
 </style>
 {% endblock %}
 
@@ -1900,6 +2030,29 @@
 
     <!-- Modal Overlay -->
     <div class="modal-overlay" id="modalOverlay"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <div class="delete-icon">
+                    <img src="/static/images/delete.png" alt="Delete" class="delete-main-icon">
+                </div>
+            </div>
+            <div class="delete-modal-body">
+                <h3 class="delete-title">Delete group</h3>
+                <p class="delete-message">Are you sure you want to delete this group?</p>
+                <div class="template-info">
+                    <div class="template-name" id="deleteGroupName"></div>
+                    <div class="template-creator" id="deleteGroupStatus"></div>
+                </div>
+            </div>
+            <div class="delete-modal-footer">
+                <button class="btn-cancel-delete" id="cancelDeleteBtn">Cancel</button>
+                <button class="btn-delete-confirm" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Customize Columns Modal -->
     <div class="customize-modal" id="customizeModal">
@@ -2107,7 +2260,28 @@
 
     function deleteGroup(groupId) {
         console.log('Delete group with ID:', groupId);
-        // Add delete functionality here
+        
+        // Find the group data to populate the modal
+        const groupsDataScript = document.getElementById('groups-data');
+        if (groupsDataScript) {
+            try {
+                const groupsData = JSON.parse(groupsDataScript.textContent);
+                const group = groupsData.find(g => g.id == groupId);
+                
+                if (group) {
+                    // Populate the delete modal
+                    document.getElementById('deleteGroupName').textContent = group.name;
+                    document.getElementById('deleteGroupStatus').textContent = group.status;
+                    document.getElementById('deleteModal').setAttribute('data-group-id', groupId);
+                    
+                    // Show delete modal
+                    document.getElementById('deleteModal').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error parsing groups data:', error);
+                alert('Error loading group data. Please try again.');
+            }
+        }
     }
 
     function restoreGroup(groupId) {
@@ -2232,7 +2406,7 @@
                     '/static/images/arrow-small-up.png' : 
                     '/static/images/arrow-small-down.png';
             } else {
-                // Other columns default to the 'up' arrow
+                // Other columns default to the 'up' arrow when no sorting is active
                 sortIcon.src = '/static/images/arrow-small-up.png';
             }
         });
@@ -2281,38 +2455,43 @@
         });
         
         // Sort the filtered data
-        let sortedData = [...filteredData].sort((a, b) => {
-            let aVal, bVal;
+        let sortedData = [...filteredData];
+        
+        // Only sort if a sort field is specified
+        if (currentSort.field) {
+            sortedData = sortedData.sort((a, b) => {
+                let aVal, bVal;
 
-            switch (currentSort.field) {
-                case 'name':
-                    aVal = a.name;
-                    bVal = b.name;
-                    break;
-                case 'status':
-                    aVal = a.status;
-                    bVal = b.status;
-                    break;
-                case 'admins':
-                    // Extract number from admin text (e.g., "2 admins" -> 2)
-                    aVal = parseInt(a.admins.match(/\d+/)?.[0] || '0');
-                    bVal = parseInt(b.admins.match(/\d+/)?.[0] || '0');
-                    break;
-                case 'contracts':
-                    // Extract number from contracts text
-                    aVal = parseInt(a.contracts.match(/\d+/)?.[0] || '0');
-                    bVal = parseInt(b.contracts.match(/\d+/)?.[0] || '0');
-                    break;
-                default:
-                    return 0;
-            }
+                switch (currentSort.field) {
+                    case 'name':
+                        aVal = a.name;
+                        bVal = b.name;
+                        break;
+                    case 'status':
+                        aVal = a.status;
+                        bVal = b.status;
+                        break;
+                    case 'admins':
+                        // Extract number from admin text (e.g., "2 admins" -> 2)
+                        aVal = parseInt(a.admins.match(/\d+/)?.[0] || '0');
+                        bVal = parseInt(b.admins.match(/\d+/)?.[0] || '0');
+                        break;
+                    case 'contracts':
+                        // Extract number from contracts text
+                        aVal = parseInt(a.contracts.match(/\d+/)?.[0] || '0');
+                        bVal = parseInt(b.contracts.match(/\d+/)?.[0] || '0');
+                        break;
+                    default:
+                        return 0;
+                }
 
-            if (currentSort.direction === 'asc') {
-                return aVal > bVal ? 1 : -1;
-            } else {
-                return aVal < bVal ? 1 : -1;
-            }
-        });
+                if (currentSort.direction === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+        }
 
         // Update visual indicators for sorting
         updateSortArrows();
@@ -2372,35 +2551,46 @@
             });
         }
         
-        // Reattach action menu listeners
-        const editBtn = row.querySelector('.edit-btn');
-        if (editBtn) {
-            editBtn.addEventListener('click', function() {
-                const groupId = this.closest('tr').querySelector('[data-group-id]').getAttribute('data-group-id');
-                editGroup(groupId);
-            });
-        }
+        // Reattach action menu listeners - but don't override the existing onclick handler
+        // The edit button already has onclick="toggleActionMenu(event, this.getAttribute('data-group-id'))"
+        // so we don't need to add another event listener
     }
 
     // Portal dropdown utilities (from worker type page)
     let currentPortalTrigger = null; // keep track of which header icon opened dropdown
+    let portalOutsideHandler = null; // keep reference to active outside-click listener
 
     function openPortalDropdown(trigger, html) {
         // Close any open action menus
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show'));
         document.body.classList.remove('no-scroll');
 
-        // If the same trigger clicked again, simply close dropdown (toggle)
-        if (currentPortalTrigger === trigger) {
-            closePortalDropdown();
-            currentPortalTrigger = null;
-            return;
+        // If an old outside-click handler exists, remove it to avoid stacking
+        if (portalOutsideHandler) {
+            document.removeEventListener('mousedown', portalOutsideHandler);
+            portalOutsideHandler = null;
         }
-        // Otherwise close any existing portal dropdown and open a new one
-        closePortalDropdown();
+
+        // Check if there's already an open dropdown
+        const portalRoot = document.getElementById('portal-root');
+        const existingDropdown = portalRoot.querySelector('.header-dropdown');
+        
+        // If a dropdown is already open, decide whether to close or replace it
+        if (existingDropdown && existingDropdown.classList.contains('show')) {
+            if (currentPortalTrigger === trigger) {
+                // Same trigger was clicked again → just close (toggle off)
+                closePortalDropdown();
+                currentPortalTrigger = null;
+                return;
+            } else {
+                // Different trigger → close existing then proceed to open a new one
+                closePortalDropdown();
+            }
+        }
+
+        // Remember which trigger opened the dropdown
         currentPortalTrigger = trigger;
 
-        const portalRoot = document.getElementById('portal-root');
         portalRoot.innerHTML = html;
 
         const rect = trigger.getBoundingClientRect();
@@ -2428,14 +2618,15 @@
         dropdown.style.left = left + 'px';
         dropdown.style.zIndex = 9999;
 
-        function handleClickOutside(event) {
+        portalOutsideHandler = function(event) {
             if (!dropdown.contains(event.target) && event.target !== trigger) {
                 closePortalDropdown();
                 currentPortalTrigger = null;
-                document.removeEventListener('mousedown', handleClickOutside);
+                document.removeEventListener('mousedown', portalOutsideHandler);
+                portalOutsideHandler = null;
             }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
+        };
+        document.addEventListener('mousedown', portalOutsideHandler);
 
         // Lock body scroll while header dropdown is open
         document.body.classList.add('no-scroll');
@@ -2447,27 +2638,88 @@
         // Re-enable body scroll
         document.body.classList.remove('no-scroll');
         currentPortalTrigger = null;
+        // Remove any lingering outside-click handler
+        if (portalOutsideHandler) {
+            document.removeEventListener('mousedown', portalOutsideHandler);
+            portalOutsideHandler = null;
+        }
     }
 
     // Sort dropdown functionality
     function showSortDropdown(trigger, column) {
-        const dropdownHtml = `
-            <div class="header-dropdown show">
-                <div class="dropdown-item" onclick="sortColumn('${column}', 'asc'); closePortalDropdown();">
+        // Check if this column is currently sorted
+        const isCurrentlySorted = currentSort.field === column;
+        const currentDirection = currentSort.direction;
+        
+        let dropdownHtml = `
+            <div class="header-dropdown show" id="sort-dropdown-${column}">`;
+        
+        if (isCurrentlySorted && currentSort.field !== null) {
+            // If column is sorted, show opposite sort option and unsort
+            const oppositeDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            const oppositeText = oppositeDirection === 'asc' ? 'Sort by ASC' : 'Sort by DESC';
+            const oppositeIcon = oppositeDirection === 'asc' ? 'arrow-small-up.png' : 'arrow-small-down.png';
+            
+            dropdownHtml += `
+                <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="${oppositeDirection}">
+                    <img src="/static/images/${oppositeIcon}" alt="Sort ${oppositeDirection.toUpperCase()}">
+                    ${oppositeText}
+                </div>
+                <div class="dropdown-item" data-action="unsort">
+                    <img src="/static/images/cross.png" alt="Unsort">
+                    Unsort
+                </div>`;
+        } else {
+            // If column is not sorted, show both sort options
+            dropdownHtml += `
+                <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="asc">
                     <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
                     Sort by ASC
                 </div>
-                <div class="dropdown-item" onclick="sortColumn('${column}', 'desc'); closePortalDropdown();">
+                <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="desc">
                     <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
                     Sort by DESC
-                </div>
-                <div class="dropdown-item" onclick="customizeColumnsFromDropdown(); closePortalDropdown();">
+                </div>`;
+        }
+        
+        dropdownHtml += `
+                <div class="dropdown-item" data-action="customize">
                     <img src="/static/images/columns-3.png" alt="Customize">
                     Customize columns
                 </div>
             </div>
         `;
+        
         openPortalDropdown(trigger, dropdownHtml);
+        
+        // Add event listeners after the dropdown is created
+        setTimeout(() => {
+            const dropdown = document.getElementById(`sort-dropdown-${column}`);
+            if (dropdown) {
+                dropdown.addEventListener('click', function(e) {
+                    const item = e.target.closest('.dropdown-item');
+                    if (!item) return;
+                    
+                    e.stopPropagation();
+                    
+                    const action = item.getAttribute('data-action');
+                    const col = item.getAttribute('data-column');
+                    const direction = item.getAttribute('data-direction');
+                    
+                    // Close dropdown first
+                    closePortalDropdown();
+                    
+                    // Then execute action
+                    if (action === 'sort') {
+                        sortColumn(col, direction);
+                    } else if (action === 'unsort') {
+                        unsortColumn();
+                    } else if (action === 'customize') {
+                        customizeColumnsFromDropdown();
+                    }
+                });
+            }
+        }, 50);
     }
 
     // Sort column function
@@ -2478,6 +2730,17 @@
         currentSort = { field: field, direction: direction };
         
         // Update table view with new sorting
+        updateTableView();
+    }
+
+    // Unsort column function
+    function unsortColumn() {
+        console.log('Unsorting - removing all sorting');
+        
+        // Reset current sort state to no sorting
+        currentSort = { field: null, direction: null };
+        
+        // Update table view without sorting
         updateTableView();
     }
 
@@ -3125,7 +3388,110 @@
             setupCustomizeModal();
             setupStatusDropdown();
             setupAdminDropdown();
+            setupDeleteModal();
         }, 100);
     });
+
+    // Delete Modal functionality
+    function setupDeleteModal() {
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        // Cancel delete
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('show');
+        });
+
+        // Confirm delete
+        confirmDeleteBtn.addEventListener('click', function() {
+            const groupId = deleteModal.getAttribute('data-group-id');
+            
+            if (groupId) {
+                // Show loading state
+                confirmDeleteBtn.textContent = 'Deleting...';
+                confirmDeleteBtn.disabled = true;
+                
+                // Call delete API
+                fetch(`/api/delete-group/${groupId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Group deleted successfully:', groupId);
+                        
+                        // Remove from table and originalData
+                        removeGroupFromTable(groupId);
+                        
+                        // Close modal
+                        deleteModal.classList.remove('show');
+                        
+                        // Reset button
+                        confirmDeleteBtn.textContent = 'Delete';
+                        confirmDeleteBtn.disabled = false;
+                        
+                    } else {
+                        console.error('Delete failed:', data.error);
+                        alert('Error: ' + (data.error || 'Failed to delete group'));
+                        
+                        // Reset button
+                        confirmDeleteBtn.textContent = 'Delete';
+                        confirmDeleteBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting group:', error);
+                    alert('Error deleting group. Please try again.');
+                    
+                    // Reset button
+                    confirmDeleteBtn.textContent = 'Delete';
+                    confirmDeleteBtn.disabled = false;
+                });
+            }
+        });
+
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('show');
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+                deleteModal.classList.remove('show');
+            }
+        });
+    }
+
+    function removeGroupFromTable(groupId) {
+        console.log('Removing group from table:', groupId);
+        
+        // Find and remove from originalData
+        const index = originalData.findIndex(item => {
+            // Find by checking if this row contains the groupId in its data attribute
+            const row = item.element;
+            return row && row.getAttribute('data-group-id') == groupId;
+        });
+        
+        if (index !== -1) {
+            // Remove from originalData
+            originalData.splice(index, 1);
+            
+            // Remove from DOM
+            const row = document.querySelector(`tr[data-group-id="${groupId}"]`);
+            if (row) {
+                row.remove();
+            }
+            
+            // Update table summary
+            updateTableSummary(originalData.length);
+        }
+    }
 </script>
 {% endblock %} 

@@ -1642,53 +1642,77 @@ function deleteAdmin(id) {
     // (No alert or notification)
 }
 
-// Admin search bar expand/collapse logic
+// Admin search functionality (like groups page)
 const adminSearchContainer = document.getElementById('adminSearchContainer');
 const adminSearchInput = document.getElementById('adminSearchInput');
 const adminSearchIcon = document.getElementById('adminSearchIcon');
+const adminSearchClearBtn = document.getElementById('adminSearchClearBtn');
 
-function expandAdminSearch() {
-    adminSearchContainer.classList.add('expanded');
-    setTimeout(() => {
+// Admin search container click handler
+adminSearchContainer.addEventListener('click', function() {
+    if (!this.classList.contains('expanded')) {
+        this.classList.add('expanded');
         adminSearchInput.focus();
-    }, 150);
-}
-function collapseAdminSearch() {
-    if (adminSearchInput.value.trim() === '') {
+    }
+});
+
+// Admin search input handlers
+adminSearchInput.addEventListener('input', function() {
+    const hasValue = this.value.trim().length > 0;
+    adminSearchClearBtn.classList.toggle('show', hasValue);
+    
+    // Filter admin table based on search term
+    filterAdminTable();
+});
+
+adminSearchInput.addEventListener('blur', function() {
+    if (!this.value.trim()) {
         adminSearchContainer.classList.remove('expanded');
     }
-}
+});
 
-adminSearchContainer.addEventListener('click', function(e) {
-    if (!adminSearchContainer.classList.contains('expanded')) {
-        expandAdminSearch();
-    }
-});
-adminSearchIcon.addEventListener('click', function(e) {
+// Clear admin search button
+adminSearchClearBtn.addEventListener('click', function(e) {
     e.stopPropagation();
-    if (!adminSearchContainer.classList.contains('expanded')) {
-        expandAdminSearch();
+    adminSearchInput.value = '';
+    adminSearchContainer.classList.remove('expanded');
+    this.classList.remove('show');
+    filterAdminTable();
+});
+
+// Click outside to collapse admin search
+document.addEventListener('click', function(e) {
+    if (!adminSearchContainer.contains(e.target) && !adminSearchInput.value.trim()) {
+        adminSearchContainer.classList.remove('expanded');
     }
 });
-adminSearchInput.addEventListener('focus', function() {
-    expandAdminSearch();
-});
-adminSearchInput.addEventListener('blur', function() {
-    setTimeout(() => {
-        collapseAdminSearch();
-    }, 200);
-});
-adminSearchInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        adminSearchInput.blur();
-        collapseAdminSearch();
+
+// Filter admin table function
+function filterAdminTable() {
+    const searchTerm = adminSearchInput.value.trim().toLowerCase();
+    const adminRows = document.querySelectorAll('#adminTableBody tr');
+    let visibleCount = 0;
+    
+    adminRows.forEach(row => {
+        const nameCell = row.querySelector('div div:first-child'); // Admin name
+        const emailCell = row.querySelector('div div:last-child'); // Admin email
+        
+        if (nameCell && emailCell) {
+            const name = nameCell.textContent.toLowerCase();
+            const email = emailCell.textContent.toLowerCase();
+            const matchesSearch = !searchTerm || name.includes(searchTerm) || email.includes(searchTerm);
+            
+            row.style.display = matchesSearch ? 'table-row' : 'none';
+            if (matchesSearch) visibleCount++;
+        }
+    });
+    
+    // Update table summary
+    const tableSummary = document.getElementById('adminTableSummary');
+    if (tableSummary) {
+        tableSummary.textContent = `Total ${visibleCount} item${visibleCount !== 1 ? 's' : ''}`;
     }
-});
-adminSearchInput.addEventListener('input', function() {
-    if (this.value.trim() !== '') {
-        adminSearchContainer.classList.add('expanded');
-    }
-});
+}
 
 // Initial render
 // This function is no longer needed as the table is rendered by Jinja.

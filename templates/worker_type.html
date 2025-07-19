@@ -995,6 +995,11 @@
         border-color: #80bdff;
     }
 
+    /* Prevent body scroll when dropdown menus are open */
+    body.no-scroll {
+        overflow: hidden;
+    }
+
     .filters-section .search-input {
         width: 0;
         padding: 0;
@@ -2855,6 +2860,8 @@
                 // Change arrow to up
                 const arrow = dropdownToggle.querySelector('.dropdown-arrow');
                 arrow.src = '/static/images/angle-small-up.png';
+                // Lock body scrolling
+                document.body.classList.add('no-scroll');
             }
         });
 
@@ -2941,6 +2948,8 @@
             // Change arrow back to down
             const arrow = dropdownToggle.querySelector('.dropdown-arrow');
             arrow.src = '/static/images/angle-small-down.png';
+            // Re-enable body scrolling
+            document.body.classList.remove('no-scroll');
         }
 
         function populateCreatorDropdown() {
@@ -3610,6 +3619,24 @@
 
     function sortTable() {
         const tbody = document.getElementById('workerTypesBody');
+        
+        // If no sorting is applied, just use the original order
+        if (!currentSort.field) {
+            const unsortedData = [...originalData];
+            
+            // Clear and rebuild table with original order
+            tbody.innerHTML = '';
+            unsortedData.forEach(item => {
+                tbody.appendChild(item.element);
+            });
+            
+            // Apply current column visibility to unsorted rows
+            if (window.updateTableColumns) {
+                window.updateTableColumns();
+            }
+            return;
+        }
+        
         const sortedData = [...originalData].sort((a, b) => {
             let aVal, bVal;
 
@@ -3734,6 +3761,11 @@
     function editWorkerType(workerId) {
         console.log('Edit worker type with ID:', workerId, 'Type:', typeof workerId);
         
+        // Close the menu
+        document.getElementById(`menu-${workerId}`).classList.remove('show');
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
+        
         if (workerId === 'new') {
             alert('Edit functionality for newly created items will be implemented soon.');
             return;
@@ -3853,6 +3885,11 @@
             }
             
             menu.classList.add('show');
+            // Lock body scrolling
+            document.body.classList.add('no-scroll');
+        } else {
+            // Re-enable body scrolling when closing dropdown
+            document.body.classList.remove('no-scroll');
         }
     }
 
@@ -3862,6 +3899,8 @@
             document.querySelectorAll('.action-menu').forEach(menu => {
                 menu.classList.remove('show');
             });
+            // Re-enable body scrolling when action menus are closed
+            document.body.classList.remove('no-scroll');
         }
         
         // Close header dropdowns when clicking outside
@@ -3869,6 +3908,8 @@
             document.querySelectorAll('.header-dropdown').forEach(dropdown => {
                 dropdown.classList.remove('show');
             });
+            // Re-enable body scrolling when header dropdowns are closed
+            document.body.classList.remove('no-scroll');
         }
     });
 
@@ -3889,6 +3930,8 @@
         
         if (isCurrentlyVisible) {
             dropdown.classList.remove('show');
+            // Re-enable body scrolling when closing dropdown
+            document.body.classList.remove('no-scroll');
         } else {
             // Reset any previous positioning
             dropdown.style.top = '';
@@ -3899,6 +3942,8 @@
             
             // Always position dropdown below the header
             dropdown.classList.add('show');
+            // Lock body scrolling when opening dropdown
+            document.body.classList.add('no-scroll');
         }
     }
 
@@ -3916,6 +3961,26 @@
         document.querySelectorAll('.header-dropdown').forEach(dropdown => {
             dropdown.classList.remove('show');
         });
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
+    }
+
+    function unsortColumn() {
+        // Reset current sort state to no sorting
+        currentSort = { field: null, direction: null };
+        
+        // Update sort icons
+        updateSortIcons();
+        
+        // Re-sort the table
+        sortTable();
+        
+        // Close dropdown
+        document.querySelectorAll('.header-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
     }
 
     function customizeColumns() {
@@ -3923,6 +3988,8 @@
         document.querySelectorAll('.header-dropdown').forEach(dropdown => {
             dropdown.classList.remove('show');
         });
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
         
         // Show customize modal
         const customizeModal = document.getElementById('customizeModal');
@@ -4155,6 +4222,8 @@
         
         // Close the menu
         document.getElementById(`menu-${workerId}`).classList.remove('show');
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
         
         if (workerId === 'new') {
             alert('Duplicate functionality for newly created items will be implemented soon.');
@@ -4239,6 +4308,8 @@
         
         // Close the menu
         document.getElementById(`menu-${workerId}`).classList.remove('show');
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
         
         if (workerId === 'new') {
             alert('Delete functionality for newly created items will be implemented soon.');
@@ -4319,7 +4390,15 @@
     }
 
     // --- Portal Dropdown Utilities ---
+    let portalOutsideHandler = null; // keep reference to active outside-click listener
+
     function openPortalDropdown(triggerElement, dropdownHtml) {
+        // If an old outside-click handler exists, remove it to avoid stacking
+        if (portalOutsideHandler) {
+            document.removeEventListener('mousedown', portalOutsideHandler);
+            portalOutsideHandler = null;
+        }
+
         const portalRoot = document.getElementById('portal-root');
         portalRoot.innerHTML = dropdownHtml;
 
@@ -4348,24 +4427,68 @@
         dropdown.style.left = left + 'px';
         dropdown.style.zIndex = 9999;
 
-        function handleClickOutside(event) {
+        portalOutsideHandler = function(event) {
             if (!dropdown.contains(event.target) && event.target !== triggerElement) {
                 closePortalDropdown();
-                document.removeEventListener('mousedown', handleClickOutside);
+                document.removeEventListener('mousedown', portalOutsideHandler);
+                portalOutsideHandler = null;
             }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
+        };
+        document.addEventListener('mousedown', portalOutsideHandler);
+        
+        // Lock body scrolling
+        document.body.classList.add('no-scroll');
     }
 
     function closePortalDropdown() {
         const portalRoot = document.getElementById('portal-root');
         portalRoot.innerHTML = '';
+        // Re-enable body scrolling
+        document.body.classList.remove('no-scroll');
+        // Remove any lingering outside-click handler
+        if (portalOutsideHandler) {
+            document.removeEventListener('mousedown', portalOutsideHandler);
+            portalOutsideHandler = null;
+        }
     }
 
     // --- Example: Sort Dropdown Trigger ---
     function showSortDropdown(trigger, column) {
-        const dropdownHtml = `
-            <div class="header-dropdown show">
+        // Check if there's already a portal dropdown open
+        const portalRoot = document.getElementById('portal-root');
+        const existingDropdown = portalRoot.querySelector('.header-dropdown');
+        
+        if (existingDropdown) {
+            // If dropdown is already open, close it
+            closePortalDropdown();
+            return;
+        }
+        
+        // Check if this column is currently sorted
+        const isCurrentlySorted = currentSort.field === column;
+        const currentDirection = currentSort.direction;
+        
+        let dropdownHtml = `
+            <div class="header-dropdown show">`;
+        
+        if (isCurrentlySorted) {
+            // If column is sorted, show opposite sort option and unsort
+            const oppositeDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            const oppositeText = oppositeDirection === 'asc' ? 'Sort by ASC' : 'Sort by DESC';
+            const oppositeIcon = oppositeDirection === 'asc' ? 'arrow-small-up.png' : 'arrow-small-down.png';
+            
+            dropdownHtml += `
+                <div class="dropdown-item" onclick="sortColumn('${column}', '${oppositeDirection}'); closePortalDropdown();">
+                    <img src="/static/images/${oppositeIcon}" alt="Sort ${oppositeDirection.toUpperCase()}">
+                    ${oppositeText}
+                </div>
+                <div class="dropdown-item" onclick="unsortColumn(); closePortalDropdown();">
+                    <img src="/static/images/cross.png" alt="Unsort">
+                    Unsort
+                </div>`;
+        } else {
+            // If column is not sorted, show both sort options
+            dropdownHtml += `
                 <div class="dropdown-item" onclick="sortColumn('${column}', 'asc'); closePortalDropdown();">
                     <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
                     Sort by ASC
@@ -4373,13 +4496,17 @@
                 <div class="dropdown-item" onclick="sortColumn('${column}', 'desc'); closePortalDropdown();">
                     <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
                     Sort by DESC
-                </div>
+                </div>`;
+        }
+        
+        dropdownHtml += `
                 <div class="dropdown-item" onclick="customizeColumns(); closePortalDropdown();">
                     <img src="/static/images/columns-3.png" alt="Customize">
                     Customize columns
                 </div>
             </div>
         `;
+        
         openPortalDropdown(trigger, dropdownHtml);
     }
 </script>
