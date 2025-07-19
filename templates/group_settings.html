@@ -1082,13 +1082,23 @@
                 </div>
             </div>
             <div class="group-card">
-                <div class="group-card-header">
-                    <span class="group-card-title">Archive this group</span>
-                </div>
-                <div class="group-card-info">
-                    Archived groups are hidden from your main view but can be accessed by enabling the 'Archived' filter on your groups page. You can restore it at any time.
-                </div>
-                <button class="group-card-archive-btn" onclick="showArchiveGroupModal()">Archive group</button>
+                {% if group.status == 'ARCHIVED' %}
+                    <div class="group-card-header">
+                        <span class="group-card-title">Restore this group</span>
+                    </div>
+                    <div class="group-card-info">
+                        Restored groups will be visible again in your main view and can be used normally.
+                    </div>
+                    <button class="group-card-archive-btn" onclick="showRestoreGroupModal()">Restore group</button>
+                {% else %}
+                    <div class="group-card-header">
+                        <span class="group-card-title">Archive this group</span>
+                    </div>
+                    <div class="group-card-info">
+                        Archived groups are hidden from your main view but can be accessed by enabling the 'Archived' filter on your groups page. You can restore it at any time.
+                    </div>
+                    <button class="group-card-archive-btn" onclick="showArchiveGroupModal()">Archive group</button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -1245,6 +1255,22 @@
         <div class="archive-group-modal-footer">
             <button class="archive-group-modal-cancel-btn" id="archiveGroupModalCancel">Cancel</button>
             <button class="archive-group-modal-confirm-btn" id="archiveGroupModalConfirm">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Group Confirmation Modal -->
+<div class="archive-group-modal-overlay" id="restoreGroupModalOverlay"></div>
+<div class="archive-group-modal" id="restoreGroupModal">
+    <div class="archive-group-modal-content">
+        <div class="archive-group-modal-icon">
+            <img src="/static/images/exchange.png" alt="Restore" class="archive-group-modal-icon-img" style="width: 48px; height: 48px;">
+        </div>
+        <h3 class="archive-group-modal-title">Confirm group restoration</h3>
+        <p class="archive-group-modal-message">Are you sure you want to restore this group?</p>
+        <div class="archive-group-modal-footer">
+            <button class="archive-group-modal-cancel-btn" id="restoreGroupModalCancel">Cancel</button>
+            <button class="archive-group-modal-confirm-btn" id="restoreGroupModalConfirm">Confirm</button>
         </div>
     </div>
 </div>
@@ -1897,6 +1923,93 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (overlay) {
         overlay.addEventListener('click', hideArchiveGroupModal);
+    }
+});
+
+// Restore Group Modal functionality
+function showRestoreGroupModal() {
+    const modal = document.getElementById('restoreGroupModal');
+    const overlay = document.getElementById('restoreGroupModalOverlay');
+    
+    // Show modal
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+}
+
+function hideRestoreGroupModal() {
+    const modal = document.getElementById('restoreGroupModal');
+    const overlay = document.getElementById('restoreGroupModalOverlay');
+    
+    // Hide modal
+    modal.style.display = 'none';
+    overlay.style.display = 'none';
+}
+
+function restoreGroup() {
+    const confirmBtn = document.getElementById('restoreGroupModalConfirm');
+    
+    // Disable confirm button to prevent double submission
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Restoring...';
+    
+    // Make API call to restore group
+    fetch(`/api/group/${groupId}/restore`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the group status on the page
+            const statusBadge = document.querySelector('.status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = 'ACTIVE';
+                statusBadge.classList.remove('archived');
+            }
+            
+            // Close modal and show success message
+            hideRestoreGroupModal();
+            alert('Group restored successfully!');
+            
+            // Redirect to groups page after a short delay
+            setTimeout(() => {
+                window.location.href = '/groups';
+            }, 1500);
+        } else {
+            // Show error message
+            alert(data.error || 'Failed to restore group');
+            // Re-enable confirm button
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm';
+        }
+    })
+    .catch(error => {
+        console.error('Error restoring group:', error);
+        alert('Failed to restore group. Please try again.');
+        // Re-enable confirm button
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm';
+    });
+}
+
+// Add event listeners for restore group modal
+document.addEventListener('DOMContentLoaded', function() {
+    const restoreCancelBtn = document.getElementById('restoreGroupModalCancel');
+    const restoreConfirmBtn = document.getElementById('restoreGroupModalConfirm');
+    const restoreOverlay = document.getElementById('restoreGroupModalOverlay');
+    
+    if (restoreCancelBtn) {
+        restoreCancelBtn.addEventListener('click', hideRestoreGroupModal);
+    }
+    
+    if (restoreConfirmBtn) {
+        restoreConfirmBtn.addEventListener('click', restoreGroup);
+    }
+    
+    if (restoreOverlay) {
+        restoreOverlay.addEventListener('click', hideRestoreGroupModal);
     }
 });
 

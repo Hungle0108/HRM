@@ -371,6 +371,7 @@
         min-width: 120px;
         justify-content: space-between;
     }
+    .filter-badge { margin-left: 0; }
 
     .status-filter .dropdown-toggle:hover, .admin-filter .dropdown-toggle:hover {
         background: #e9ecef;
@@ -392,10 +393,6 @@
         height: 12px;
         opacity: 0.7;
         transition: transform 0.2s ease;
-    }
-
-    .dropdown-toggle.active .dropdown-arrow {
-        transform: rotate(180deg);
     }
 
     /* Status filter dropdown menu styles (matching worker type page) */
@@ -1687,13 +1684,19 @@
         display: inline-block;
         min-width: 18px;
         text-align: center;
+        position: relative;
+        z-index: 0;
     }
 
     .status-filter .dropdown-toggle .dropdown-arrow,
     .admin-filter  .dropdown-toggle .dropdown-arrow {
         margin-left: auto; /* push arrow to the right */
+        flex-shrink: 0; /* prevent arrow from shrinking */
     }
-    .filter-badge { flex-shrink: 0; }
+    .filter-badge { 
+        flex-shrink: 0; 
+        margin-right: 8px; /* add space between badge and arrow */
+    }
 </style>
 {% endblock %}
 
@@ -1853,18 +1856,25 @@
                                                 <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
                                             </button>
                                             <div class="action-menu" id="menu-{{ group.id }}">
-                                                <a href="/group/{{ group.id }}/settings" class="action-item" style="text-decoration: none; color: inherit;">
-                                                    <img src="/static/images/pen.png" alt="Edit" class="action-icon">
-                                                    <span>Edit group setting</span>
-                                                </a>
-                                                <div class="action-item" data-group-id="{{ group.id }}" onclick="copyGroup(this.getAttribute('data-group-id'))">
-                                                    <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
-                                                    <span>Duplicate group setting</span>
-                                                </div>
-                                                <div class="action-item delete" data-group-id="{{ group.id }}" onclick="deleteGroup(this.getAttribute('data-group-id'))">
+                                                {% if group.status == 'ARCHIVED' %}
+                                                    <div class="action-item" data-group-id="{{ group.id }}" onclick="restoreGroup(this.getAttribute('data-group-id'))">
+                                                        <img src="/static/images/exchange.png" alt="Restore" class="action-icon">
+                                                        <span>Restore group</span>
+                                                    </div>
+                                                {% else %}
+                                                    <a href="/group/{{ group.id }}/settings" class="action-item" style="text-decoration: none; color: inherit;">
+                                                        <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                                        <span>Edit group setting</span>
+                                                    </a>
+                                                    <div class="action-item" data-group-id="{{ group.id }}" onclick="copyGroup(this.getAttribute('data-group-id'))">
+                                                        <img src="/static/images/copy.png" alt="Duplicate" class="action-icon">
+                                                        <span>Duplicate group setting</span>
+                                                    </div>
+                                                                                                    <div class="action-item delete" data-group-id="{{ group.id }}" onclick="deleteGroup(this.getAttribute('data-group-id'))">
                                                     <img src="/static/images/trash.png" alt="Delete" class="action-icon">
-                                                    <span>Delete group setting</span>
+                                                    <span>Delete</span>
                                                 </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                             </td>
@@ -2098,6 +2108,13 @@
     function deleteGroup(groupId) {
         console.log('Delete group with ID:', groupId);
         // Add delete functionality here
+    }
+
+    function restoreGroup(groupId) {
+        console.log('Restore group with ID:', groupId);
+        
+        // Redirect to group settings page instead of restoring directly
+        window.location.href = `/group/${groupId}/settings`;
     }
 
     // Filter dropdown handlers
@@ -2714,8 +2731,8 @@
         if (adminDropdownMenu) {
             adminDropdownMenu.classList.remove('show');
         }
-        // Re-enable body scroll if nothing left open
-        if (!statusDropdownMenu?.classList.contains('show') && !adminDropdownMenu?.classList.contains('show')) {
+        // Re-enable body scroll only if any dropdown was actually closed
+        if (anyOpen) {
             document.body.classList.remove('no-scroll');
         }
     }
@@ -2758,7 +2775,8 @@
         });
 
         // Select all functionality
-        selectAllStatusCheckbox.addEventListener('change', function() {
+        selectAllStatusCheckbox.addEventListener('change', function(e) {
+            e.stopPropagation(); // Prevent event from bubbling up
             const isChecked = this.checked;
             const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
             
@@ -2775,6 +2793,12 @@
                 });
             }
             updateStatusDropdownLabel();
+            // Don't close dropdown - let user continue selecting or click "Show results"
+        });
+        
+        // Also prevent click propagation for select all checkbox
+        selectAllStatusCheckbox.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
 
         // Reset button functionality
@@ -2801,14 +2825,30 @@
         // Individual checkbox changes
         const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
         statusCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling up
                 if (this.checked) {
                     selectedStatuses.add(this.dataset.value);
                 } else {
                     selectedStatuses.delete(this.dataset.value);
                 }
                 updateStatusDropdownLabel();
+                updateSelectAllStatusState();
+                // Don't close dropdown - let user continue selecting or click "Show results"
             });
+            
+            // Also add click event to prevent propagation
+            checkbox.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Add click event to the parent option to prevent propagation
+            const parentOption = checkbox.closest('.dropdown-option');
+            if (parentOption) {
+                parentOption.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
         });
 
         // Update dropdown label
@@ -2822,16 +2862,43 @@
             }
         }
 
+        // Update select all checkbox state
+        function updateSelectAllStatusState() {
+            const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+            const checkedCount = selectedStatuses.size;
+            const totalCount = statusCheckboxes.length;
+            
+            if (checkedCount === 0) {
+                selectAllStatusCheckbox.checked = false;
+                selectAllStatusCheckbox.indeterminate = false;
+            } else if (checkedCount === totalCount) {
+                selectAllStatusCheckbox.checked = true;
+                selectAllStatusCheckbox.indeterminate = false;
+            } else {
+                selectAllStatusCheckbox.checked = false;
+                selectAllStatusCheckbox.indeterminate = true;
+            }
+        }
+
         // Close all dropdowns function
         function closeAllDropdowns() {
             statusDropdown.classList.remove('active');
             statusDropdownMenu.classList.remove('show');
             const arrow = statusDropdown.querySelector('.dropdown-arrow');
             arrow.src = '/static/images/angle-small-down.png';
+            // Re-enable body scroll
+            document.body.classList.remove('no-scroll');
         }
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
+            // Don't close if clicking on checkboxes or their labels
+            if (e.target.classList.contains('dropdown-checkbox') || 
+                e.target.closest('.dropdown-option') ||
+                e.target.closest('.dropdown-menu')) {
+                return;
+            }
+            
             if (!statusDropdown.contains(e.target) && !statusDropdownMenu.contains(e.target)) {
                 closeAllDropdownsGlobal();
             }
@@ -2912,7 +2979,8 @@
         });
 
         // Select all functionality
-        selectAllAdminsCheckbox.addEventListener('change', function() {
+        selectAllAdminsCheckbox.addEventListener('change', function(e) {
+            e.stopPropagation(); // Prevent event from bubbling up
             const isChecked = this.checked;
             const adminCheckboxes = adminOptionsList.querySelectorAll('.dropdown-checkbox');
             
@@ -2929,6 +2997,12 @@
                 });
             }
             updateAdminDropdownLabel();
+            // Don't close dropdown - let user continue selecting or click "Show results"
+        });
+        
+        // Also prevent click propagation for select all checkbox
+        selectAllAdminsCheckbox.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
 
         // Reset button functionality
@@ -2956,14 +3030,30 @@
         function attachAdminCheckboxListeners() {
             const adminCheckboxes = adminOptionsList.querySelectorAll('.dropdown-checkbox');
             adminCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
+                checkbox.addEventListener('change', function(e) {
+                    e.stopPropagation(); // Prevent event from bubbling up
                     if (this.checked) {
                         selectedAdmins.add(this.dataset.value);
                     } else {
                         selectedAdmins.delete(this.dataset.value);
                     }
                     updateAdminDropdownLabel();
+                    updateSelectAllAdminState();
+                    // Don't close dropdown - let user continue selecting or click "Show results"
                 });
+                
+                // Also add click event to prevent propagation
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                // Add click event to the parent option to prevent propagation
+                const parentOption = checkbox.closest('.dropdown-option');
+                if (parentOption) {
+                    parentOption.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
             });
         }
 
@@ -2981,6 +3071,24 @@
             }
         }
 
+        // Update select all checkbox state
+        function updateSelectAllAdminState() {
+            const adminCheckboxes = adminOptionsList.querySelectorAll('.dropdown-checkbox');
+            const checkedCount = selectedAdmins.size;
+            const totalCount = adminCheckboxes.length;
+            
+            if (checkedCount === 0) {
+                selectAllAdminsCheckbox.checked = false;
+                selectAllAdminsCheckbox.indeterminate = false;
+            } else if (checkedCount === totalCount) {
+                selectAllAdminsCheckbox.checked = true;
+                selectAllAdminsCheckbox.indeterminate = false;
+            } else {
+                selectAllAdminsCheckbox.checked = false;
+                selectAllAdminsCheckbox.indeterminate = true;
+            }
+        }
+
         // Close all dropdowns function
         function closeAllAdminDropdowns() {
             closeAllDropdownsGlobal();
@@ -2988,6 +3096,13 @@
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
+            // Don't close if clicking on checkboxes or their labels
+            if (e.target.classList.contains('dropdown-checkbox') || 
+                e.target.closest('.dropdown-option') ||
+                e.target.closest('.dropdown-menu')) {
+                return;
+            }
+            
             if (!adminDropdown.contains(e.target) && !adminDropdownMenu.contains(e.target)) {
                 closeAllDropdownsGlobal();
             }

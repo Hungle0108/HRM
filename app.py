@@ -2145,7 +2145,18 @@ def assign_admin(group_id):
     current_admin_ids = []
     group = None
     if user.organization_id:
-        org_workers = User.query.filter_by(organization_id=user.organization_id).all()
+        workers = User.query.filter_by(organization_id=user.organization_id).all()
+        # Convert User objects to dictionaries for JSON serialization
+        org_workers = []
+        for worker in workers:
+            org_workers.append({
+                'id': worker.id,
+                'name': worker.name,
+                'email': worker.email,
+                'first_name': worker.first_name,
+                'last_name': worker.last_name,
+                'avatar_url': worker.avatar_url
+            })
         group = Group.query.get(group_id)
         if group:
             current_admin_ids = [admin.id for admin in group.admins]
@@ -2298,6 +2309,38 @@ def archive_group(group_id):
         db.session.rollback()
         logger.error(f"Error archiving group: {str(e)}")
         return jsonify({'error': 'Failed to archive group'}), 500
+
+@app.route('/api/group/<int:group_id>/restore', methods=['PUT'])
+def restore_group(group_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    group = Group.query.get(group_id)
+    if not group:
+        return jsonify({'error': 'Group not found'}), 404
+    
+    # Check if user is admin of this group
+    if user not in group.admins:
+        return jsonify({'error': 'Unauthorized - not an admin of this group'}), 403
+    
+    try:
+        # Restore the group by changing its status back to ACTIVE
+        group.status = 'ACTIVE'
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Group restored successfully',
+            'group': group.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error restoring group: {str(e)}")
+        return jsonify({'error': 'Failed to restore group'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
