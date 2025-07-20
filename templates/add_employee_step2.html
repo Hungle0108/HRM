@@ -82,7 +82,7 @@
         }
 
         .page-header {
-            background: white;
+            background: #f8f9fa;
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -112,10 +112,10 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
-            padding: 20px 40px 120px 40px;
+            padding: 40px 40px 120px 40px;
             gap: 60px;
         }
 
@@ -128,11 +128,12 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-title {
@@ -153,6 +154,14 @@
             align-items: center;
             margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+
+        .step-item:first-child {
+            margin-top: 20px;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 20px;
         }
 
         .step-number {
@@ -338,12 +347,13 @@
             justify-content: space-between;
             cursor: pointer;
             transition: border-color 0.2s;
+            min-height: 52px;
+            position: relative;
         }
 
-        .dropdown-toggle:focus {
-            outline: none;
-            border-color: #80bdff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        .dropdown-toggle.has-tags {
+            align-items: center;
+            padding: 8px 16px;
         }
 
         .dropdown-arrow {
@@ -351,6 +361,17 @@
             height: 18px;
             margin-left: 8px;
             opacity: 0.7;
+            flex-shrink: 0;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .dropdown-toggle:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
         .dropdown-menu {
@@ -377,6 +398,18 @@
             padding: 12px 16px;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dropdown-option .option-main {
+            flex: 1;
+        }
+
+        .dropdown-option .checkmark {
+            flex-shrink: 0;
+            margin-left: 8px;
         }
 
         .dropdown-option:hover {
@@ -385,6 +418,8 @@
 
         .dropdown-option.selected {
             background-color: #e3f2fd;
+            color: #1a1a1a;
+            font-weight: 500;
         }
 
         .dropdown-option.disabled {
@@ -531,24 +566,9 @@
             gap: 16px;
         }
 
+        /* Position dropdown specific styles - extending custom dropdown */
         .position-dropdown-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .position-dropdown-selected {
-            padding: 14px 16px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            height: 72px;
-            flex-wrap: wrap;
-            gap: 6px;
+            margin-bottom: 16px;
         }
 
         .position-dropdown-selected.has-selection {
@@ -625,7 +645,7 @@
             color: #495057;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
             border: 1px solid #dee2e6;
         }
 
@@ -742,6 +762,67 @@
         .position-level-4 { padding-left: 76px; }
         .position-level-5 { padding-left: 96px; }
 
+        /* Selected tags styling */
+        .selected-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+            min-height: 20px;
+            margin-right: 30px; /* Leave space for the arrow */
+            justify-content: flex-start;
+        }
+
+        .selected-tag {
+            background-color: #e9ecef;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #dee2e6;
+            max-width: 200px;
+            gap: 8px;
+            position: relative;
+        }
+
+        .selected-tag .tag-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .selected-tag .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #adb5bd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            line-height: 1;
+            text-align: center;
+            flex-shrink: 0;
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .selected-tag .tag-remove:hover {
+            background: #6c757d;
+        }
+
         .position-dropdown-selected:hover {
             border-color: #adb5bd;
         }
@@ -802,6 +883,12 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="workerIdInput" placeholder="Worker ID" name="workerId">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-section">
@@ -809,46 +896,39 @@
                         <div class="position-selection-container">
                             {% if org_structures %}
                                 {% for structure in org_structures %}
-                                    <div class="position-dropdown-wrapper" 
+                                    <div class="custom-dropdown position-dropdown-wrapper" 
                                          data-structure-id="{{ structure.id }}" 
                                          data-allow-multiple="{{ 'true' if structure.allow_multiple_assignments else 'false' }}">
-                                        <div class="position-dropdown-selected">
-                                            <div class="position-dropdown-label">{{ structure.name }} (optional)</div>
-                                            <div class="position-dropdown-content">
-                                            <span class="position-dropdown-text">{{ structure.name }} (optional)</span>
-                                                <div class="position-selected-tags"></div>
-                                            </div>
-                                            <div class="position-dropdown-controls">
-                                                <div class="position-dropdown-delete"></div>
-                                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="position-dropdown-arrow" style="width: 16px; height: 16px;">
-                                            </div>
-                                        </div>
-                                        <div class="position-dropdown-menu">
+                                        <button type="button" class="dropdown-toggle position-dropdown-toggle" id="positionDropdownBtn{{ structure.id }}">
+                                            <span id="positionDropdownLabel{{ structure.id }}">{{ structure.name }} (optional)</span>
+                                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                                        </button>
+                                        <div class="dropdown-menu position-dropdown-menu" id="positionDropdownMenu{{ structure.id }}">
                                             {% if structure['items'] %}
                                                 {% for item in structure['items'] %}
-                                                    <div class="position-dropdown-item position-level-1" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}">
-                                                        <span>{{ item.name }}</span>
+                                                    <div class="dropdown-option position-dropdown-item position-level-1" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}">
+                                                        <div class="option-main">{{ item.name }}</div>
                                                         <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
-                                                </div>
+                                                    </div>
                                                     {% if item.children %}
                                                         {% for child in item.children %}
-                                                            <div class="position-dropdown-item position-level-2" data-item-id="{{ child.id }}" data-item-name="{{ child.name }}">
-                                                                <span>{{ child.name }}</span>
+                                                            <div class="dropdown-option position-dropdown-item position-level-2" data-item-id="{{ child.id }}" data-item-name="{{ child.name }}">
+                                                                <div class="option-main">{{ child.name }}</div>
                                                                 <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
                                                             </div>
                                                             {% if child.children %}
                                                                 {% for grandchild in child.children %}
-                                                                    <div class="position-dropdown-item position-level-3" data-item-id="{{ grandchild.id }}" data-item-name="{{ grandchild.name }}">
-                                                                        <span>{{ grandchild.name }}</span>
+                                                                    <div class="dropdown-option position-dropdown-item position-level-3" data-item-id="{{ grandchild.id }}" data-item-name="{{ grandchild.name }}">
+                                                                        <div class="option-main">{{ grandchild.name }}</div>
                                                                         <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
                                                                     </div>
-                                            {% endfor %}
+                                                                {% endfor %}
                                                             {% endif %}
                                                         {% endfor %}
                                                     {% endif %}
                                                 {% endfor %}
                                             {% else %}
-                                                <div class="position-dropdown-empty">No items in this structure</div>
+                                                <div class="dropdown-option disabled">No items in this structure</div>
                                             {% endif %}
                                         </div>
                                         <input type="hidden" name="structure-{{ structure.id }}" class="selected-items-input">
@@ -866,11 +946,9 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
-                
                 <ol class="steps-list">
                     <li class="step-item completed">
-                        <div class="step-number">✓</div>
+                        <div class="step-number">1</div>
                         <div class="step-text">Personal details</div>
                     </li>
                     <li class="step-item active">
@@ -894,20 +972,6 @@
                         <div class="step-text">Review</div>
                     </li>
                 </ol>
-
-                <div class="help-section">
-                    <div class="help-title" onclick="toggleHelp()">
-                        Help and support
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </div>
-                    <div class="help-content" id="helpContent">
-                        <p class="help-text">This form is automatically saved.</p>
-                        <p class="help-text">This form was saved to your drafts. If you no longer need it, you can delete it.</p>
-                        <button class="delete-draft-btn" onclick="deleteDraft()">Delete draft</button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1045,16 +1109,15 @@
         });
     }
 
-    // Function to save form data to sessionStorage
+    // Function to save form data to session storage
     function saveFormData() {
-        const selectedWorkerType = document.querySelector('#workerTypeOptionsList .dropdown-option.selected');
-        const workerTypeValue = selectedWorkerType ? selectedWorkerType.dataset.value : '';
-        
         const formData = {
-            workerType: workerTypeValue
+            workerType: document.getElementById('workerTypeDropdownLabel').textContent === 'Select worker type' ? '' : document.getElementById('workerTypeDropdownLabel').textContent,
+            workerId: document.getElementById('workerIdInput').value,
+            // Add position data for each structure
         };
-        
-        // Add position dropdown data
+
+        // Add position data for each structure
         const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
         positionDropdowns.forEach(wrapper => {
             const structureId = wrapper.dataset.structureId;
@@ -1063,10 +1126,8 @@
                 formData[`structure-${structureId}`] = hiddenInput.value;
             }
         });
-        
+
         sessionStorage.setItem('employeeFormStep2', JSON.stringify(formData));
-        
-        // Show auto-save indicator (if you want to add visual feedback)
         console.log('Step 2 form data auto-saved');
     }
 
@@ -1076,7 +1137,85 @@
         if (savedData) {
             const formData = JSON.parse(savedData);
             
-            // Worker type will be restored when loadWorkerTypes is called
+            // Restore worker type
+            if (formData.workerType) {
+                updateWorkerTypeDropdownLabel(formData.workerType);
+            }
+            
+            // Restore worker ID
+            if (formData.workerId) {
+                document.getElementById('workerIdInput').value = formData.workerId;
+            }
+            
+            // Restore position data for each structure
+            const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
+            positionDropdowns.forEach(wrapper => {
+                const structureId = wrapper.dataset.structureId;
+                const savedStructureData = formData[`structure-${structureId}`];
+                
+                if (savedStructureData) {
+                    const itemIds = savedStructureData.split(',');
+                    const selectedItems = [];
+                    
+                    itemIds.forEach(itemId => {
+                        const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
+                        if (itemElement) {
+                            const itemName = itemElement.dataset.itemName;
+                            selectedItems.push({ id: itemId, name: itemName });
+                            itemElement.classList.add('selected');
+                            const checkmark = itemElement.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'block';
+                        }
+                    });
+                    
+                    // Update display for this wrapper
+                    const label = wrapper.querySelector('span[id^="positionDropdownLabel"]');
+                    if (selectedItems.length > 0) {
+                        const tagsContainer = wrapper.querySelector('.selected-tags-container') || createTagsContainer();
+                        tagsContainer.innerHTML = '';
+                        
+                        const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+                        toggleBtn.classList.add('has-tags');
+                        
+                        selectedItems.forEach(item => {
+                            const tag = document.createElement('div');
+                            tag.className = 'selected-tag';
+                            tag.innerHTML = `
+                                <span class="tag-text">${item.name}</span>
+                                <span class="tag-remove" data-item-id="${item.id}">×</span>
+                            `;
+                            
+                            // Add remove functionality to tag
+                            tag.querySelector('.tag-remove').addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                e.stopImmediatePropagation();
+                                
+                                const itemId = this.dataset.itemId;
+                                const itemIndex = selectedItems.findIndex(selected => selected.id === itemId);
+                                
+                                if (itemIndex > -1) {
+                                    selectedItems.splice(itemIndex, 1);
+                                    
+                                    const itemElements = wrapper.querySelectorAll(`[data-item-id="${itemId}"]`);
+                                    itemElements.forEach(itemElement => {
+                                        itemElement.classList.remove('selected');
+                                        const checkmark = itemElement.querySelector('.checkmark');
+                                        if (checkmark) checkmark.style.display = 'none';
+                                    });
+                                    
+                                    updateDisplay();
+                                    saveFormData();
+                                }
+                            });
+                            
+                            tagsContainer.appendChild(tag);
+                        });
+                        
+                        label.style.display = 'none';
+                    }
+                }
+            });
         }
     }
 
@@ -1111,14 +1250,23 @@
         }
     }
 
-    // Initialize form data restoration
-    restoreFormData();
-    
-    // Setup worker type dropdown
-    setupWorkerTypeDropdown();
-    
-    // Load worker types when page loads
-    loadWorkerTypes();
+    // Initialize form when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load worker types
+        loadWorkerTypes();
+        
+        // Restore form data
+        restoreFormData();
+        
+        // Add event listeners for form inputs
+        document.getElementById('workerIdInput').addEventListener('input', saveFormData);
+        
+        // Initialize position dropdowns
+        initializePositionDropdowns();
+        
+        // Initialize worker type dropdown
+        setupWorkerTypeDropdown();
+    });
 
     // Save form data whenever inputs change (with debouncing)
     let saveTimeout;
@@ -1160,20 +1308,21 @@
         const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
         
         positionDropdowns.forEach(wrapper => {
-            const selected = wrapper.querySelector('.position-dropdown-selected');
-            const menu = wrapper.querySelector('.position-dropdown-menu');
-            const items = wrapper.querySelectorAll('.position-dropdown-item');
-            const text = wrapper.querySelector('.position-dropdown-text');
-            const label = wrapper.querySelector('.position-dropdown-label');
-            const deleteBtn = wrapper.querySelector('.position-dropdown-delete');
-            const tagsContainer = wrapper.querySelector('.position-selected-tags');
+            const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+            const menu = wrapper.querySelector('.dropdown-menu');
+            const items = wrapper.querySelectorAll('.dropdown-option');
+            const label = wrapper.querySelector('span[id^="positionDropdownLabel"]');
             const hiddenInput = wrapper.querySelector('.selected-items-input');
             const allowMultiple = wrapper.dataset.allowMultiple === 'true';
+            
+            console.log('Label element found:', label);
+            console.log('Label text content:', label ? label.textContent : 'No label found');
             
             let selectedItems = [];
             
             // Toggle dropdown
-            selected.addEventListener('click', function(e) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 e.stopPropagation();
                 
                 const isOpen = menu.classList.contains('show');
@@ -1187,7 +1336,10 @@
             
             // Handle item selection
             items.forEach(item => {
+                if (item.classList.contains('disabled')) return;
+                
                 item.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     
                     const itemId = this.dataset.itemId;
@@ -1201,12 +1353,16 @@
                             // Remove item
                             selectedItems.splice(existingIndex, 1);
                             this.classList.remove('selected');
-                            this.querySelector('.checkmark').style.display = 'none';
+                            const checkmark = this.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'none';
+                            console.log('Removed item from selection:', itemId);
                         } else {
                             // Add item
                             selectedItems.push({ id: itemId, name: itemName });
                             this.classList.add('selected');
-                            this.querySelector('.checkmark').style.display = 'block';
+                            const checkmark = this.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'block';
+                            console.log('Added item to selection:', itemId);
                         }
                     } else {
                         // Single selection logic
@@ -1215,12 +1371,15 @@
                         // Remove selected class from all items
                         items.forEach(item => {
                             item.classList.remove('selected');
-                            item.querySelector('.checkmark').style.display = 'none';
+                            const checkmark = item.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'none';
                         });
                         
                         // Add selected class to clicked item
                         this.classList.add('selected');
-                        this.querySelector('.checkmark').style.display = 'block';
+                        const checkmark = this.querySelector('.checkmark');
+                        if (checkmark) checkmark.style.display = 'block';
+                        console.log('Single item selected:', itemId);
                     }
                     
                     updateDisplay();
@@ -1232,12 +1391,6 @@
                 });
             });
             
-            // Delete button functionality
-            deleteBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                clearSelection();
-            });
-            
             // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!wrapper.contains(e.target)) {
@@ -1247,61 +1400,83 @@
             
             function openDropdown() {
                 menu.classList.add('show');
-                selected.classList.add('active');
+                const arrow = toggleBtn.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
             }
             
             function closeDropdown() {
                 menu.classList.remove('show');
-                selected.classList.remove('active');
+                const arrow = toggleBtn.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-down.png';
             }
             
             function updateDisplay() {
+                console.log('=== updateDisplay called ===');
+                console.log('Wrapper ID:', wrapper.id);
+                console.log('Label element:', label);
+                console.log('Label current text:', label ? label.textContent : 'No label');
+                console.log('selectedItems:', selectedItems);
+                console.log('selectedItems.length:', selectedItems.length);
+                
                 if (selectedItems.length === 0) {
-                    // No selection
-                    text.textContent = wrapper.querySelector('.position-dropdown-label').textContent;
-                    text.classList.remove('selected');
-                    selected.classList.remove('has-selection');
-                    label.classList.remove('show');
-                    deleteBtn.classList.remove('show');
-                    tagsContainer.innerHTML = '';
-                } else if (selectedItems.length === 1) {
-                    // Single selection
-                    text.textContent = selectedItems[0].name;
-                    text.classList.add('selected');
-                    selected.classList.add('has-selection');
-                    label.classList.add('show');
-                    deleteBtn.classList.add('show');
-                    tagsContainer.innerHTML = '';
-                } else {
-                    // Multiple selections
-                    text.classList.remove('selected');
-                    selected.classList.add('has-selection');
-                    label.classList.add('show');
-                    deleteBtn.classList.add('show');
+                    console.log('No selection - showing placeholder');
+                    // No selection - show original placeholder
+                    label.textContent = wrapper.querySelector('.dropdown-toggle span').getAttribute('data-original-text') || label.textContent;
+                    console.log('Label text after update:', label.textContent);
                     
-                    // Create tags
+                    // Remove tags container if it exists
+                    const tagsContainer = wrapper.querySelector('.selected-tags-container');
+                    if (tagsContainer) {
+                        tagsContainer.remove();
+                    }
+                    
+                    // Show the label
+                    label.style.display = 'block';
+                    
+                    // Remove has-tags class from toggle button
+                    const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+                    toggleBtn.classList.remove('has-tags');
+                } else {
+                    // One or more selections - show as tags
+                    console.log('Selections - creating tags for:', selectedItems.length, 'items');
+                    const tagsContainer = wrapper.querySelector('.selected-tags-container') || createTagsContainer();
                     tagsContainer.innerHTML = '';
+                    
+                    // Add has-tags class to toggle button
+                    const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+                    toggleBtn.classList.add('has-tags');
+                    
                     selectedItems.forEach(item => {
+                        console.log('Creating tag for item:', item);
                         const tag = document.createElement('div');
-                        tag.className = 'position-selected-tag';
+                        tag.className = 'selected-tag';
                         tag.innerHTML = `
-                            <span>${item.name}</span>
-                            <span class="remove-tag" data-item-id="${item.id}">×</span>
+                            <span class="tag-text">${item.name}</span>
+                            <span class="tag-remove" data-item-id="${item.id}">×</span>
                         `;
                         
                         // Add remove functionality to tag
-                        tag.querySelector('.remove-tag').addEventListener('click', function(e) {
+                        tag.querySelector('.tag-remove').addEventListener('click', function(e) {
+                            e.preventDefault();
                             e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            
                             const itemId = this.dataset.itemId;
                             const itemIndex = selectedItems.findIndex(selected => selected.id === itemId);
                             
                             if (itemIndex > -1) {
+                                // Remove from selectedItems array
                                 selectedItems.splice(itemIndex, 1);
-                                const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
-                                if (itemElement) {
+                                
+                                // Remove selected class and hide checkmark from all dropdown options with this itemId
+                                const itemElements = wrapper.querySelectorAll(`[data-item-id="${itemId}"]`);
+                                itemElements.forEach(itemElement => {
                                     itemElement.classList.remove('selected');
-                                    itemElement.querySelector('.checkmark').style.display = 'none';
-                                }
+                                    const checkmark = itemElement.querySelector('.checkmark');
+                                    if (checkmark) checkmark.style.display = 'none';
+                                });
+                                
+                                // Update display and save
                                 updateDisplay();
                                 saveFormData();
                             }
@@ -1309,6 +1484,10 @@
                         
                         tagsContainer.appendChild(tag);
                     });
+                    
+                    // Hide the label when showing tags
+                    label.style.display = 'none';
+                    return;
                 }
                 
                 // Update hidden input
@@ -1317,15 +1496,17 @@
                 }
             }
             
-            function clearSelection() {
-                selectedItems = [];
-                items.forEach(item => {
-                    item.classList.remove('selected');
-                    item.querySelector('.checkmark').style.display = 'none';
-                });
-                updateDisplay();
-                saveFormData();
+            function createTagsContainer() {
+                const container = document.createElement('div');
+                container.className = 'selected-tags-container';
+                const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+                toggleBtn.appendChild(container);
+                return container;
             }
+            
+            // Store original text for restoration
+            const originalText = label.textContent;
+            label.setAttribute('data-original-text', originalText);
             
             // Restore saved selection if exists
             const savedData = sessionStorage.getItem('employeeFormStep2');
@@ -1344,7 +1525,8 @@
                             const itemName = itemElement.dataset.itemName;
                             selectedItems.push({ id: itemId, name: itemName });
                             itemElement.classList.add('selected');
-                            itemElement.querySelector('.checkmark').style.display = 'block';
+                            const checkmark = itemElement.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'block';
                         }
                     });
                     
@@ -1355,7 +1537,7 @@
     }
 
     // Initialize position dropdowns when DOM is loaded
-    document.addEventListener('DOMContentLoaded', initializePositionDropdowns);
+    // document.addEventListener('DOMContentLoaded', initializePositionDropdowns); // This line is now handled by the new_code
     </script>
 </body>
 </html> 

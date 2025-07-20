@@ -128,11 +128,12 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-title {
@@ -153,6 +154,12 @@
             align-items: center;
             margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+        .step-item:first-child {
+            margin-top: 20px;
+        }
+        .step-item:last-child {
+            margin-bottom: 20px;
         }
 
         .step-number {
@@ -534,7 +541,6 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
                 
                 <ol class="steps-list">
                     <li class="step-item completed">
@@ -563,19 +569,7 @@
                     </li>
                 </ol>
 
-                <div class="help-section">
-                    <div class="help-title" onclick="toggleHelp()">
-                        Help and support
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </div>
-                    <div class="help-content" id="helpContent">
-                        <p class="help-text">This form is automatically saved.</p>
-                        <p class="help-text">This form was saved to your drafts. If you no longer need it, you can delete it.</p>
-                        <button class="delete-draft-btn" onclick="deleteDraft()">Delete draft</button>
-                    </div>
-                </div>
+                
             </div>
         </div>
 

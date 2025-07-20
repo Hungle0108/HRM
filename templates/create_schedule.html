@@ -417,7 +417,7 @@
         <div class="top-bar">
             <div class="top-bar-content">
                 <div class="logo"></div>
-                <a href="/settings/time-tracking" class="close-btn">
+                <a href="/settings/time-tracking" class="close-btn" onclick="clearScheduleFormData()">
                     <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
                 </a>
             </div>
@@ -511,6 +511,12 @@
     </div>
 
     <script>
+    // Function to clear all schedule form data
+    function clearScheduleFormData() {
+        sessionStorage.removeItem('scheduleFormData');
+        console.log('Schedule form data cleared');
+    }
+    
     window.addEventListener('DOMContentLoaded', function() {
         // Form validation and submission
         document.getElementById('schedule-form').addEventListener('submit', function(e) {

@@ -128,11 +128,12 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-title {
@@ -153,6 +154,12 @@
             align-items: center;
             margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+        .step-item:first-child {
+            margin-top: 20px;
+        }
+        .step-item:last-child {
+            margin-bottom: 20px;
         }
 
         .step-number {
@@ -511,7 +518,7 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 12px;
             transition: all 0.2s;
         }
 
@@ -811,39 +818,14 @@
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h3 class="section-title">Employment type</h3>
-                        
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="fulltime" name="employment_type" value="fulltime" checked>
-                                        <label for="fulltime" class="radio-label">
-                                            <span class="radio-circle"></span>
-                                            <span class="radio-text">Full-time</span>
-                                        </label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="parttime" name="employment_type" value="parttime">
-                                        <label for="parttime" class="radio-label">
-                                            <span class="radio-circle"></span>
-                                            <span class="radio-text">Part-time</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Employment type section removed -->
 
                     <div class="form-section">
                         <div class="section-header">
                             <h3 class="section-title">Work schedule</h3>
-                            <button type="button" class="create-schedule-btn">
+                            <button type="button" class="create-schedule-btn" onclick="window.location.href='/create-schedule'">
                                 Create new schedule
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                                </svg>
+                                <img src="{{ url_for('static', filename='images/new.png') }}" alt="Add" style="width: 14px; height: 14px;">
                             </button>
                         </div>
                         
@@ -858,24 +840,7 @@
                             </div>
                         </div>
 
-                        <div class="schedule-info">
-                            <div class="info-icon">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M12 16v-4M12 8h.01"/>
-                                </svg>
-                            </div>
-                            <div class="info-content">
-                                <p class="info-title">No schedules available</p>
-                                <p class="info-text">No available schedules that fit this same worker type, employment type, and country. Create one to be assigned for each applicable for calculation.</p>
-                                <button type="button" class="create-schedule-link">
-                                    Create new schedule
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                        <!-- schedule-info box removed -->
                     </div>
 
                     <!-- Agreement details section -->
@@ -924,37 +889,12 @@
                         </div>
                     </div>
 
-                    <!-- Employment terms section -->
-                    <div class="form-section">
-                        <h3 class="section-title">Employment terms</h3>
-                        
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" id="indefinite" name="employment_terms" value="indefinite" checked>
-                                        <label for="indefinite" class="radio-label">
-                                            <span class="radio-circle"></span>
-                                            <span class="radio-text">Indefinite</span>
-                                        </label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" id="definite" name="employment_terms" value="definite">
-                                        <label for="definite" class="radio-label">
-                                            <span class="radio-circle"></span>
-                                            <span class="radio-text">Definite</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Employment terms section removed -->
                 </form>
             </div>
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
                 
                 <ol class="steps-list">
                     <li class="step-item completed">
@@ -983,19 +923,7 @@
                     </li>
                 </ol>
 
-                <div class="help-section">
-                    <div class="help-title" onclick="toggleHelp()">
-                        Help and support
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </div>
-                    <div class="help-content" id="helpContent">
-                        <p class="help-text">This form is automatically saved.</p>
-                        <p class="help-text">This form was saved to your drafts. If you no longer need it, you can delete it.</p>
-                        <button class="delete-draft-btn" onclick="deleteDraft()">Delete draft</button>
-                    </div>
-                </div>
+                
             </div>
         </div>
 
@@ -1172,7 +1100,7 @@
 
     // Add event handlers for create schedule buttons
     document.querySelector('.create-schedule-btn').addEventListener('click', function() {
-        alert('Create new schedule functionality would be implemented here');
+        window.location.href = '/create-schedule';
     });
 
     document.querySelector('.create-schedule-link').addEventListener('click', function() {
