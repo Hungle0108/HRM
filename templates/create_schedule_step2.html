@@ -1215,7 +1215,7 @@
                                 <div class="template-details">
                                     <div class="template-hours">8:00 AM - 5:00 PM</div>
                                     <div class="template-days">Monday - Friday</div>
-                                    <div class="template-total">40 hours/week</div>
+                                    <div class="template-total">45 hours/week</div>
                                 </div>
                                 <button type="button" class="template-apply-btn">Apply Template</button>
                             </div>
@@ -1227,7 +1227,7 @@
                                 <div class="template-details">
                                     <div class="template-hours">6:00 AM - 2:00 PM / 2:00 PM - 10:00 PM</div>
                                     <div class="template-days">Monday - Saturday</div>
-                                    <div class="template-total">48 hours/week</div>
+                                    <div class="template-total">96 hours/week</div>
                                 </div>
                                 <button type="button" class="template-apply-btn">Apply Template</button>
                             </div>
@@ -1239,7 +1239,7 @@
                                 <div class="template-details">
                                     <div class="template-hours">7:00 AM - 7:00 PM</div>
                                     <div class="template-days">Monday - Saturday</div>
-                                    <div class="template-total">60 hours/week</div>
+                                    <div class="template-total">68 hours/week</div>
                                 </div>
                                 <button type="button" class="template-apply-btn">Apply Template</button>
                             </div>
@@ -1251,7 +1251,7 @@
                                 <div class="template-details">
                                     <div class="template-hours">9:00 AM - 9:00 PM</div>
                                     <div class="template-days">7 days/week</div>
-                                    <div class="template-total">42 hours/week</div>
+                                    <div class="template-total">54 hours/week</div>
                                 </div>
                                 <button type="button" class="template-apply-btn">Apply Template</button>
                             </div>
@@ -1657,10 +1657,62 @@
     </div>
 
     <script>
-        // Restore form data from step 1
+        // Restore form data from step 1 and step 2
         const savedData = sessionStorage.getItem('scheduleFormData');
         if (savedData) {
             const data = JSON.parse(savedData);
+            console.log('Restored data from session:', data);
+            
+            // Restore step 2 data if available
+            if (data.scheduleDetails) {
+                console.log('Restoring step 2 data:', data.scheduleDetails);
+                
+                // Restore toggles
+                const specifyDurationToggle = document.getElementById('specifyDuration');
+                const includeTimeToggle = document.getElementById('includeTime');
+                
+                if (specifyDurationToggle && typeof data.scheduleDetails.specifyDuration !== 'undefined') {
+                    specifyDurationToggle.checked = data.scheduleDetails.specifyDuration;
+                }
+                
+                if (includeTimeToggle && typeof data.scheduleDetails.includeTime !== 'undefined') {
+                    includeTimeToggle.checked = data.scheduleDetails.includeTime;
+                }
+                
+                // Restore shift data
+                if (data.scheduleDetails.shifts) {
+                    shiftData = { ...data.scheduleDetails.shifts };
+                    console.log('Restored shift data:', shiftData);
+                }
+                
+                // Update UI based on restored data
+                setTimeout(() => {
+                    toggleInputMode();
+                    if (shiftData && Object.keys(shiftData).length > 0) {
+                        loadShiftData(1);
+                        updateAllDayDurations();
+                        calculateWeeklyDuration();
+                    }
+                }, 100);
+            }
+        }
+
+        // Function to save current form state to session storage
+        function saveFormStateToSession() {
+            const currentData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            
+            // Save current form state
+            const formState = {
+                ...currentData,
+                scheduleDetails: {
+                    specifyDuration: document.getElementById('specifyDuration')?.checked || false,
+                    includeTime: document.getElementById('includeTime')?.checked || false,
+                    shifts: shiftData || {}
+                }
+            };
+            
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(formState));
+            console.log('Saved form state to session:', formState);
         }
 
         // Back button handler - save data before navigating
@@ -1816,6 +1868,40 @@
                 checkbox.dispatchEvent(new Event('change'));
             });
         });
+
+        // Auto-save form state when important elements change
+        function addAutoSaveListeners() {
+            // Save when toggles change
+            const specifyDurationToggle = document.getElementById('specifyDuration');
+            const includeTimeToggle = document.getElementById('includeTime');
+            
+            if (specifyDurationToggle) {
+                specifyDurationToggle.addEventListener('change', saveFormStateToSession);
+            }
+            
+            if (includeTimeToggle) {
+                includeTimeToggle.addEventListener('change', saveFormStateToSession);
+            }
+            
+            // Save when form inputs change (debounced)
+            let saveTimeout;
+            const elementsToWatch = document.querySelectorAll(
+                '.checkbox-input, .time-input, .duration-field, #specifyDuration, #includeTime, .dropdown-option'
+            );
+            elementsToWatch.forEach(el => {
+                el.addEventListener('change', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(saveFormStateToSession, 500);
+                });
+                el.addEventListener('input', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(saveFormStateToSession, 500);
+                });
+            });
+        }
+
+        // Initialize auto-save after a short delay
+        setTimeout(addAutoSaveListeners, 1000);
 
         // Specify Duration toggle functionality
         document.getElementById('specifyDuration').addEventListener('change', function() {
@@ -2045,8 +2131,22 @@
                 el.addEventListener('click', updateContinueButtonState); // For dropdown
             });
 
-            // Initialize template functionality
+            // Initialize template functionality immediately
             initializeTemplates();
+            
+            // Also initialize after a short delay to ensure everything is ready
+            setTimeout(() => {
+                console.log('Delayed template initialization...');
+                initializeTemplates();
+                
+                // Test if first template is clickable
+                const firstTemplate = document.querySelector('.template-card');
+                if (firstTemplate) {
+                    console.log('Testing first template clickability...');
+                    console.log('First template data-template:', firstTemplate.dataset.template);
+                    console.log('First template clickable:', firstTemplate.onclick !== null);
+                }
+            }, 200);
         });
 
         // Template definitions with Vietnam working hours
@@ -2191,37 +2291,54 @@
 
         // Initialize template functionality
         function initializeTemplates() {
+            console.log('Initializing templates...');
+            
+            // Remove any existing event listeners by removing and re-adding the entire template section
+            const templateSection = document.querySelector('.templates-section');
+            if (templateSection) {
+                const templateSectionClone = templateSection.cloneNode(true);
+                templateSection.parentNode.replaceChild(templateSectionClone, templateSection);
+            }
+            
+            // Now get fresh template cards
             const templateCards = document.querySelectorAll('.template-card');
-            const applyButtons = document.querySelectorAll('.template-apply-btn');
+            console.log('Found template cards:', templateCards.length);
 
-            // Add click listeners to template cards
-            templateCards.forEach(card => {
-                card.addEventListener('click', function(e) {
+            // Simple event delegation for all template interactions
+            document.addEventListener('click', function(e) {
+                // Handle template card clicks
+                if (e.target.closest('.template-card')) {
+                    const card = e.target.closest('.template-card');
+                    const templateType = card.dataset.template;
+                    
+                    console.log('Template interaction detected:', templateType);
+                    
+                    // Don't handle button clicks here - let them bubble up
                     if (e.target.classList.contains('template-apply-btn')) {
-                        return; // Let the button handle this
+                        console.log('Button click detected, applying template:', templateType);
+                        applyTemplate(templateType);
+                        
+                        // Visual feedback
+                        const allCards = document.querySelectorAll('.template-card');
+                        allCards.forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        return;
                     }
                     
-                    // Visual selection
-                    templateCards.forEach(c => c.classList.remove('selected'));
-                    this.classList.add('selected');
-                });
+                    // Handle card clicks (but not button clicks)
+                    if (!e.target.classList.contains('template-apply-btn')) {
+                        console.log('Card click detected, applying template:', templateType);
+                        applyTemplate(templateType);
+                        
+                        // Visual feedback
+                        const allCards = document.querySelectorAll('.template-card');
+                        allCards.forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                    }
+                }
             });
-
-            // Add click listeners to apply buttons
-            applyButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    console.log('Apply button clicked');
-                    e.stopPropagation();
-                    const card = this.closest('.template-card');
-                    const templateType = card.dataset.template;
-                    console.log('Template type:', templateType);
-                    applyTemplate(templateType);
-                    
-                    // Visual feedback
-                    templateCards.forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                });
-            });
+            
+            console.log('Template initialization complete');
         }
 
         // Apply a template to the form
@@ -2243,9 +2360,11 @@
                 
                 if (specifyDurationToggle) {
                     specifyDurationToggle.checked = template.specifyDuration;
+                    console.log('Set specifyDuration to:', template.specifyDuration);
                 }
                 if (includeTimeToggle) {
                     includeTimeToggle.checked = template.includeTime;
+                    console.log('Set includeTime to:', template.includeTime);
                 }
 
                 // Set number of shifts if applicable
@@ -2264,6 +2383,9 @@
                 // Update UI visibility
                 toggleInputMode();
                 
+                // Directly apply template data to form fields
+                applyTemplateDataToForm(template);
+                
                 // Load the first shift data
                 loadShiftData(1);
 
@@ -2281,6 +2403,90 @@
                 
             } finally {
                 isLoadingData = false;
+            }
+        }
+
+        // Directly apply template data to form fields
+        function applyTemplateDataToForm(template) {
+            console.log('Applying template data directly to form fields...');
+            
+            const shiftData = template.shifts[1]; // Get first shift data
+            if (!shiftData || !shiftData.weekdays) {
+                console.error('No shift data found in template');
+                return;
+            }
+
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            weekdays.forEach(day => {
+                const dayData = shiftData.weekdays[day];
+                if (!dayData) return;
+
+                // Set checkbox
+                const checkbox = document.getElementById(day);
+                if (checkbox) {
+                    checkbox.checked = dayData.checked;
+                    console.log(`Set ${day} checkbox to:`, dayData.checked);
+                }
+
+                // Set time inputs if includeTime is true
+                if (shiftData.includeTime) {
+                    const startInput = document.getElementById(day + '-start');
+                    const endInput = document.getElementById(day + '-end');
+                    
+                    if (startInput && dayData.startTime) {
+                        startInput.value = dayData.startTime;
+                        console.log(`Set ${day} start time to:`, dayData.startTime);
+                    }
+                    if (endInput && dayData.endTime) {
+                        endInput.value = dayData.endTime;
+                        console.log(`Set ${day} end time to:`, dayData.endTime);
+                    }
+                } else {
+                    // Set duration input
+                    const durationInput = document.getElementById(day + '-duration-input');
+                    if (durationInput && dayData.duration) {
+                        durationInput.value = dayData.duration;
+                        console.log(`Set ${day} duration to:`, dayData.duration);
+                    }
+                }
+
+                // Update UI visibility for this day
+                updateDayInputVisibility(day, dayData.checked, shiftData.includeTime);
+            });
+            
+            // Force recalculation after applying template data
+            setTimeout(() => {
+                updateAllDayDurations();
+                calculateWeeklyDuration();
+                console.log('Recalculated weekly duration after template application');
+            }, 100);
+        }
+
+        // Update day input visibility based on checkbox and time mode
+        function updateDayInputVisibility(day, isChecked, includeTime) {
+            const dayItem = document.querySelector(`[data-day="${day}"]`) || 
+                           document.getElementById(day)?.closest('.checkbox-item');
+            
+            if (!dayItem) return;
+
+            const timeInputs = dayItem.querySelector('.time-inputs');
+            const durationInput = dayItem.querySelector('.duration-input');
+
+            if (isChecked && document.getElementById('specifyDuration')?.checked) {
+                if (includeTime) {
+                    // Show time inputs
+                    if (timeInputs) timeInputs.style.display = 'flex';
+                    if (durationInput) durationInput.style.display = 'none';
+                } else {
+                    // Show duration input
+                    if (timeInputs) timeInputs.style.display = 'none';
+                    if (durationInput) durationInput.style.display = 'block';
+                }
+            } else {
+                // Hide all inputs
+                if (timeInputs) timeInputs.style.display = 'none';
+                if (durationInput) durationInput.style.display = 'none';
             }
         }
 
@@ -3133,11 +3339,13 @@
 
         // Weekly work duration calculation
         function calculateWeeklyDuration() {
+            console.log('Calculating weekly duration...');
             const specifyDurationToggle = document.getElementById('specifyDuration');
             const weeklyDurationSummary = document.getElementById('weeklyDurationSummary');
             const calculatedDurationElement = document.getElementById('calculatedDuration');
 
             if (!specifyDurationToggle.checked) {
+                console.log('Specify duration toggle is OFF, hiding summary');
                 weeklyDurationSummary.style.display = 'none';
                 return;
             }
@@ -3147,19 +3355,36 @@
             let totalHours = 0;
             const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
             const includeTimeToggle = document.getElementById('includeTime');
+            console.log('Include time toggle is:', includeTimeToggle.checked);
+            
             weekdays.forEach(day => {
                 const checkbox = document.getElementById(day);
-                if (!checkbox || !checkbox.checked) return;
+                if (!checkbox || !checkbox.checked) {
+                    console.log(`${day} is not checked`);
+                    return;
+                }
+                console.log(`${day} is checked`);
+                
                 if (includeTimeToggle.checked) {
                     const startInput = document.getElementById(`${day}-start`);
                     const endInput = document.getElementById(`${day}-end`);
+                    console.log(`${day} start:`, startInput?.value, 'end:', endInput?.value);
                     if (startInput && endInput && startInput.value && endInput.value) {
                         const dur = calculateWorkingHours(startInput.value, endInput.value);
-                        if (dur) totalHours += dur.hours + dur.minutes / 60;
+                        if (dur) {
+                            const dayHours = dur.hours + dur.minutes / 60;
+                            totalHours += dayHours;
+                            console.log(`${day} duration:`, dayHours, 'hours');
+                        }
                     }
                 } else {
                     const durInput = document.getElementById(`${day}-duration-input`);
-                    if (durInput && durInput.value) totalHours += parseFloat(durInput.value) || 0;
+                    console.log(`${day} duration input:`, durInput?.value);
+                    if (durInput && durInput.value) {
+                        const dayHours = parseFloat(durInput.value) || 0;
+                        totalHours += dayHours;
+                        console.log(`${day} duration:`, dayHours, 'hours');
+                    }
                 }
             });
 
@@ -3173,6 +3398,7 @@
                 }
             }
 
+            console.log('Total weekly hours calculated:', totalHours);
             calculatedDurationElement.textContent = totalHours.toFixed(2);
         }
 

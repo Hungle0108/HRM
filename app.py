@@ -204,7 +204,12 @@ class WorkSchedule(db.Model):
                 if 'weekdays' in shift_data:
                     for day_key, day_data in shift_data['weekdays'].items():
                         if day_data.get('checked'):
-                            working_days.append(day_key.capitalize()[:3])  # Mon, Tue, etc.
+                            # Map day keys to proper abbreviations
+                            day_mapping = {
+                                'monday': 'Mon', 'tuesday': 'Tue', 'wednesday': 'Wed', 'thursday': 'Thu',
+                                'friday': 'Fri', 'saturday': 'Sat', 'sunday': 'Sun'
+                            }
+                            working_days.append(day_mapping.get(day_key.lower(), day_key.capitalize()[:3]))
                             
                             if shift_data.get('includeTime') and day_data.get('startTime') and day_data.get('endTime'):
                                 # Calculate hours from time range
@@ -228,7 +233,21 @@ class WorkSchedule(db.Model):
         
         # Remove duplicates and sort working days
         working_days = sorted(list(set(working_days)))
-        working_days_str = ', '.join(working_days) if working_days else ''
+        
+        # Convert to standardized day format (Mon, Tue, Wed, etc.)
+        day_mapping = {
+            'Mon': 'Mon', 'Tue': 'Tue', 'Wed': 'Wed', 'Thu': 'Thu', 
+            'Fri': 'Fri', 'Sat': 'Sat', 'Sun': 'Sun'
+        }
+        
+        # Sort days in proper order (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
+        day_order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        sorted_working_days = []
+        for day in day_order:
+            if day in working_days:
+                sorted_working_days.append(day)
+        
+        working_days_str = ', '.join(sorted_working_days) if sorted_working_days else ''
         
         # Try to get worker type name from schedule_data
         worker_type_name = None

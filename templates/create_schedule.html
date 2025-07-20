@@ -512,7 +512,6 @@
 
     <script>
     window.addEventListener('DOMContentLoaded', function() {
-        sessionStorage.removeItem('scheduleFormData');
         // Form validation and submission
         document.getElementById('schedule-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -625,12 +624,30 @@
         const savedData = sessionStorage.getItem('scheduleFormData');
         if (savedData) {
             const data = JSON.parse(savedData);
-            document.getElementById('scheduleName').value = data.scheduleName || '';
-            document.getElementById('workerType').value = data.workerType || '';
-            if (data.workerTypeName) {
+            console.log('Restoring form data:', data);
+            
+            // Restore schedule name
+            if (data.scheduleName) {
+                document.getElementById('scheduleName').value = data.scheduleName;
+            }
+            
+            // Restore worker type selection
+            if (data.workerType && data.workerTypeName) {
+                document.getElementById('workerType').value = data.workerType;
                 document.getElementById('workerType').setAttribute('data-name', data.workerTypeName);
                 document.getElementById('workerTypeDropdownLabel').textContent = data.workerTypeName;
+                
+                // Update dropdown visual state
+                const options = document.querySelectorAll('.dropdown-option');
+                options.forEach(option => {
+                    if (option.getAttribute('data-value') === data.workerType) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
             }
+            
             updateContinueButton();
         }
     });
