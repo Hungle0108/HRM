@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add person - HR Management System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+
     <style>
         * {
             margin: 0;
@@ -26,7 +26,7 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
@@ -44,7 +44,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -71,7 +71,7 @@
         }
 
         .page-header {
-            background: white;
+            background: #f8f9fa;
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -98,10 +98,29 @@
             line-height: 1.4;
         }
 
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 40px 40px 120px 40px;
@@ -117,11 +136,12 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-title {
@@ -133,7 +153,7 @@
 
         .steps-list {
             list-style: none;
-            padding: 0;
+            padding: 20px 0;
             margin: 0;
         }
 
@@ -142,6 +162,14 @@
             align-items: center;
             margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+
+        .step-item:first-child {
+            margin-top: 0;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
         }
 
         .step-number {
@@ -291,7 +319,27 @@
         }
 
         .form-input::placeholder {
-            color: #999;
+            color: #6c757d;
+        }
+
+        /* Error state styles */
+        .form-input.error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .form-input.error::placeholder {
+            color: #dc3545;
+        }
+
+        .form-select.error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .group-dropdown-container.error .group-dropdown-selected {
+            border-color: #dc3545;
+            color: #dc3545;
         }
 
         .dropdown-wrapper {
@@ -307,7 +355,79 @@
         #employeeCitizenshipInput,
         #employeeResidenceInput {
             width: 100% !important;
-            box-sizing: border-box !important;
+        }
+
+        .input-info-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .dropdown-wrapper {
+            position: relative;
+        }
+
+        /* Info modal styles */
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 48px 32px 48px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .info-modal-content img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+        }
+
+        .info-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .info-modal-text {
+            font-size: 0.95rem;
+            color: #495057;
+            margin-bottom: 32px;
+            line-height: 1.45;
+        }
+
+        .info-modal-close {
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .info-modal-close:hover {
+            background: #333;
         }
 
         .dropdown-menu {
@@ -321,7 +441,7 @@
             border: 1px solid #ced4da;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 10;
+            z-index: 20;
             display: none;
             width: 100%;
         }
@@ -345,13 +465,104 @@
             background: #f8f9fa;
         }
 
-        .error-message {
-            color: #dc3545;
-            font-size: 0.875rem;
-            margin-top: 8px;
+        /* Custom dropdown styles - matching create group page */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .dropdown-toggle:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-arrow {
+            width: 18px;
+            height: 18px;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            z-index: 10;
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e3f2fd;
+        }
+
+        .dropdown-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-main {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .option-subtitle {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .custom-dropdown.error .dropdown-toggle {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .error-message.show {
+            display: flex;
         }
 
         .error-icon {
@@ -374,9 +585,10 @@
         }
 
         .bottom-nav-content {
+            max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -396,6 +608,19 @@
         .btn-back:hover {
             background: #f8f9fa;
             border-color: #d1d5db;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
         }
 
         .btn-continue {
@@ -455,16 +680,7 @@
             background-color: rgba(0, 0, 0, 0.15);
         }
 
-        /* Hide default year navigation arrows */
-        .flatpickr-current-month .numInputWrapper::after,
-        .flatpickr-current-month .numInputWrapper::before {
-            display: none !important;
-        }
 
-        .flatpickr-current-month .arrowUp,
-        .flatpickr-current-month .arrowDown {
-            display: none !important;
-        }
 
         /* Navigation arrows container */
         .flatpickr-months {
@@ -790,6 +1006,282 @@
             transition: all 0.2s;
         }
 
+        /* New Calendar Styles */
+        .calendar-popup {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        :root {
+            --dark-body: #4d4c5a;
+            --dark-main: #141529;
+            --dark-second: #79788c;
+            --dark-hover: #323048;
+            --dark-text: #f8fbff;
+
+            --light-body: #f3f8fe;
+            --light-main: #fdfdfd;
+            --light-second: #c3c2c8;
+            --light-hover: #edf0f5;
+            --light-text: #151426;
+
+            --blue: #0000ff;
+            --white: #fff;
+
+            --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+            --font-family: cursive;
+        }
+
+        .dark {
+            --bg-body: var(--dark-body);
+            --bg-main: var(--dark-main);
+            --bg-second: var(--dark-second);
+            --color-hover: var(--dark-hover);
+            --color-txt: var(--dark-text);
+        }
+
+        .light {
+            --bg-body: var(--light-body);
+            --bg-main: var(--light-main);
+            --bg-second: var(--light-second);
+            --color-hover: var(--light-hover);
+            --color-txt: var(--light-text);
+        }
+
+        .calendar {
+            height: max-content;
+            width: max-content;
+            background-color: var(--bg-main);
+            border-radius: 30px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-txt);
+            padding: 10px;
+        }
+
+        .calendar-body {
+            padding: 10px;
+        }
+
+        .calendar-week-day {
+            height: 40px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .calendar-week-day div {
+            display: grid;
+            place-items: center;
+            color: var(--bg-second);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            color: var(--color-txt);
+        }
+
+        .calendar-days div {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            position: relative;
+            cursor: pointer;
+            animation: to-top 1s forwards;
+            font-size: 14px;
+        }
+
+        .calendar-days div span {
+            position: absolute;
+        }
+
+        .calendar-days div:hover span {
+            transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+        }
+
+        .calendar-days div span:nth-child(1),
+        .calendar-days div span:nth-child(3) {
+            width: 2px;
+            height: 0;
+            background-color: var(--color-txt);
+        }
+
+        .calendar-days div:hover span:nth-child(1),
+        .calendar-days div:hover span:nth-child(3) {
+            height: 100%;
+        }
+
+        .calendar-days div span:nth-child(1) {
+            bottom: 0;
+            left: 0;
+        }
+
+        .calendar-days div span:nth-child(3) {
+            top: 0;
+            right: 0;
+        }
+
+        .calendar-days div span:nth-child(2),
+        .calendar-days div span:nth-child(4) {
+            width: 0;
+            height: 2px;
+            background-color: var(--color-txt);
+        }
+
+        .calendar-days div:hover span:nth-child(2),
+        .calendar-days div:hover span:nth-child(4) {
+            width: 100%;
+        }
+
+        .calendar-days div span:nth-child(2) {
+            top: 0;
+            left: 0;
+        }
+
+        .calendar-days div span:nth-child(4) {
+            bottom: 0;
+            right: 0;
+        }
+
+        .calendar-days div:hover span:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .calendar-days div:hover span:nth-child(3) {
+            transition-delay: 0.4s;
+        }
+
+        .calendar-days div:hover span:nth-child(4) {
+            transition-delay: 0.6s;
+        }
+
+        .calendar-days div.curr-date,
+        .calendar-days div.curr-date:hover {
+            background-color: var(--blue);
+            color: var(--white);
+            border-radius: 50%;
+        }
+
+        .calendar-days div.curr-date span {
+            display: none;
+        }
+
+        .calendar-days div.selected-date {
+            background-color: #6b46c1;
+            color: var(--white);
+            border-radius: 50%;
+        }
+
+        .calendar-days div.selected-date span {
+            display: none;
+        }
+
+        .month-picker {
+            padding: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .month-picker:hover {
+            background-color: var(--color-hover);
+        }
+
+        .year-picker {
+            display: flex;
+            align-items: center;
+        }
+
+        .year-change {
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            margin: 0 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .year-change:hover {
+            background-color: var(--color-hover);
+        }
+
+        /* Dark mode toggle styles removed */
+
+        .month-list {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-main);
+            padding: 20px;
+            grid-template-columns: repeat(3, auto);
+            gap: 5px;
+            display: grid;
+            transform: scale(1.5);
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .month-list.show {
+            transform: scale(1);
+            visibility: visible;
+            pointer-events: visible;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .month-list > div {
+            display: grid;
+            place-items: center;
+        }
+
+        .month-list > div > div {
+            width: 100%;
+            padding: 5px 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--color-txt);
+            font-size: 14px;
+        }
+
+        .month-list > div > div:hover {
+            background-color: var(--color-hover);
+        }
+
+        @keyframes to-top {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         /* Group Dropdown Styles */
         .group-dropdown-wrapper {
             position: relative;
@@ -1052,10 +1544,9 @@
         .position-selected-tag .remove-tag {
             cursor: pointer;
             font-weight: bold;
-            color: #6c757d;
-            font-size: 0.75rem;
-            width: 14px;
-            height: 14px;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #adb5bd;
             color: white;
@@ -1063,6 +1554,8 @@
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
+            line-height: 1;
+            text-align: center;
         }
 
         .position-selected-tag .remove-tag:hover {
@@ -1190,11 +1683,42 @@
         .tag .remove-tag {
             cursor: pointer;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #adb5bd;
+            color: white;
+            font-size: 12px;
+            transition: background-color 0.2s;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .tag .remove-tag:hover {
+            background: #6c757d;
         }
     </style>
 </head>
 <body>
     <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="clearAllFormData(); window.location.href='/add-people'">✕</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Add member</h1>
+                <p class="page-subtitle">Onboard your direct employee</p>
+            </div>
+        </div>
+
         <!-- Main Container -->
         <div class="main-container">
             <!-- Content Area -->
@@ -1205,29 +1729,30 @@
                         
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <div class="group-dropdown-wrapper">
-                                    <div class="group-dropdown-container" id="groupDropdownContainer">
-                                        <div class="group-dropdown-selected" id="groupDropdownSelected">
-                                            <span class="group-dropdown-text" id="groupDropdownText">Group *</span>
-                                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="group-dropdown-arrow" id="groupDropdownArrow" style="width: 16px; height: 16px;">
-                            </div>
-                                        <div class="group-dropdown-menu" id="groupDropdownMenu">
+                                <div class="custom-dropdown" id="groupDropdown">
+                                    <button type="button" class="dropdown-toggle" id="groupDropdownBtn">
+                                        <span id="groupDropdownLabel">Group *</span>
+                                        <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                                    </button>
+                                    <div class="dropdown-menu" id="groupDropdownMenu">
                                             {% if groups %}
                                                 {% for group in groups %}
-                                                <div class="group-dropdown-item" data-value="{{ group.id }}" data-name="{{ group.name }}">
-                                                    {{ group.name }}
+                                            <div class="dropdown-option" data-value="{{ group.id }}" data-name="{{ group.name }}">
+                                                <div class="option-main">{{ group.name }}</div>
+                                                <div class="option-subtitle">
+                                                    {% if group.admin_names %}
+                                                        Admins: {{ group.admin_names|join(', ') }}
+                                                    {% else %}
+                                                        No admins assigned
+                                                    {% endif %}
+                                                </div>
                                                 </div>
                                                 {% endfor %}
                                             {% else %}
-                                                <div class="group-dropdown-empty">
-                                                    <span class="empty-icon">📁</span>
-                                                    <div>
-                                                        <div>No groups found</div>
-                                                        <div style="font-size: 0.8rem; color: #9aa0a6; margin-top: 4px;">Create a group first to assign employees</div>
-                                                    </div>
+                                            <div class="dropdown-option disabled" style="color: #6c757d; cursor: not-allowed;">
+                                                No groups available
                                                 </div>
                                             {% endif %}
-                                        </div>
                                     </div>
                                     <input type="hidden" id="selectedGroupId" name="groupId" required>
                                 </div>
@@ -1281,18 +1806,60 @@
                                     <button type="button" class="calendar-icon" id="calendarToggle">
                                         <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
                                     </button>
+                                    <div class="calendar-popup" id="calendarPopup" style="display: none;">
+                                        <div class="calendar light">
+                                            <div class="calendar-header">
+                                                <span class="month-picker" id="month-picker">February</span>
+                                                <div class="year-picker">
+                                                    <span class="year-change" id="prev-year">
+                                                        <pre><</pre>
+                                                    </span>
+                                                    <span id="year">2021</span>
+                                                    <span class="year-change" id="next-year">
+                                                        <pre>></pre>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="calendar-body">
+                                                <div class="calendar-week-day">
+                                                    <div>Sun</div>
+                                                    <div>Mon</div>
+                                                    <div>Tue</div>
+                                                    <div>Wed</div>
+                                                    <div>Thu</div>
+                                                    <div>Fri</div>
+                                                    <div>Sat</div>
+                                                </div>
+                                                <div class="calendar-days"></div>
+                                            </div>
+                                            <!-- Dark mode toggle removed -->
+                                            <div class="month-list"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <select class="form-select" id="genderSelect">
-                                    <option value="" disabled selected hidden>Gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
+                                <div class="custom-dropdown" id="genderDropdown">
+                                    <button type="button" class="dropdown-toggle" id="genderDropdownBtn">
+                                        <span id="genderDropdownLabel">Gender</span>
+                                        <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                                    </button>
+                                    <div class="dropdown-menu" id="genderDropdownMenu">
+                                        <div class="dropdown-option" data-value="male">
+                                            <div class="option-main">Male</div>
+                                        </div>
+                                        <div class="dropdown-option" data-value="female">
+                                            <div class="option-main">Female</div>
+                                        </div>
+                                        <div class="dropdown-option" data-value="other">
+                                            <div class="option-main">Other</div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="genderSelect" name="gender">
+                                </div>
                             </div>
                         </div>
 
@@ -1316,75 +1883,21 @@
                                 <div class="dropdown-wrapper">
                                     <input type="text" class="form-input" id="employeeResidenceInput" placeholder="Country of residence *" autocomplete="off" required>
                                     <div class="dropdown-menu" id="employeeResidenceDropdown"></div>
+                                    <div class="input-info-icon" id="residenceInfoIcon">
+                                        <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="Info" width="16" height="16">
                                 </div>
-                                <small style="color: #6c757d;">Country the employee will be working from</small>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h3 class="section-title">Organization position</h3>
-                        <div class="position-selection-container">
-                            {% if org_structures %}
-                                {% for structure in org_structures %}
-                                    <div class="position-dropdown-wrapper" 
-                                         data-structure-id="{{ structure.id }}" 
-                                         data-allow-multiple="{{ 'true' if structure.allow_multiple_assignments else 'false' }}">
-                                        <div class="position-dropdown-selected">
-                                            <div class="position-dropdown-label">{{ structure.name }} (optional)</div>
-                                            <div class="position-dropdown-content">
-                                            <span class="position-dropdown-text">{{ structure.name }} (optional)</span>
-                                                <div class="position-selected-tags"></div>
-                                            </div>
-                                            <div class="position-dropdown-controls">
-                                                <div class="position-dropdown-delete"></div>
-                                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="position-dropdown-arrow" style="width: 16px; height: 16px;">
-                                            </div>
-                                        </div>
-                                        <div class="position-dropdown-menu">
-                                            {% if structure['items'] %}
-                                                {% for item in structure['items'] %}
-                                                    <div class="position-dropdown-item position-level-1" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}">
-                                                        <span>{{ item.name }}</span>
-                                                        <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
-                                                </div>
-                                                    {% if item.children %}
-                                                        {% for child in item.children %}
-                                                            <div class="position-dropdown-item position-level-2" data-item-id="{{ child.id }}" data-item-name="{{ child.name }}">
-                                                                <span>{{ child.name }}</span>
-                                                                <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
-                                                            </div>
-                                                            {% if child.children %}
-                                                                {% for grandchild in child.children %}
-                                                                    <div class="position-dropdown-item position-level-3" data-item-id="{{ grandchild.id }}" data-item-name="{{ grandchild.name }}">
-                                                                        <span>{{ grandchild.name }}</span>
-                                                                        <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
-                                                                    </div>
-                                            {% endfor %}
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% else %}
-                                                <div class="position-dropdown-empty">No items in this structure</div>
-                                            {% endif %}
-                                        </div>
-                                        <input type="hidden" name="structure-{{ structure.id }}" class="selected-items-input">
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="no-structures-message">
-                                    No organization structures have been set up. You can create them in Settings.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+
                 </form>
             </div>
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
+                <!-- Steps heading removed -->
                 
                 <ol class="steps-list">
                     <li class="step-item active">
@@ -1413,32 +1926,32 @@
                     </li>
                 </ol>
 
-                <div class="help-section">
-                    <div class="help-title">
-                        Help and support
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                    </div>
-                </div>
+                <!-- Help and Support section removed -->
             </div>
         </div>
 
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <button type="button" class="btn-back" id="backButton" onclick="window.location.href='/add-people'">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back
-                </button>
+                <div class="nav-right">
+                    <div class="step-info">Step 1 of 6<br>Next step: Job details</div>
                 <button type="submit" class="btn-continue" form="employee-form">Continue</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+    <!-- Info popup for country of residence -->
+    <div id="residenceInfoModal" class="info-modal">
+        <div class="info-modal-content">
+            <img src="{{ url_for('static', filename='images/information.png') }}" alt="Info">
+            <h2 class="info-modal-title">Country of residence</h2>
+            <p class="info-modal-text">This is the country where the employee will be working from. This information is important for tax and legal compliance purposes.</p>
+            <button type="button" id="residenceInfoModalClose" class="info-modal-close">OK</button>
+        </div>
+    </div>
+
+
     <script>
     // Track which fields have been interacted with
     const interactedFields = new Set();
@@ -1500,7 +2013,28 @@
             if (formData.firstName) document.querySelectorAll('input[type="text"]')[0].value = formData.firstName;
             if (formData.lastName) document.querySelectorAll('input[type="text"]')[1].value = formData.lastName;
             if (formData.dateOfBirth) document.getElementById('dateOfBirth').value = formData.dateOfBirth;
-            if (formData.gender) document.getElementById('genderSelect').value = formData.gender;
+            if (formData.gender) {
+                document.getElementById('genderSelect').value = formData.gender;
+                // Also restore the gender dropdown label
+                const genderLabel = document.getElementById('genderDropdownLabel');
+                const selectedGenderOption = document.querySelector(`#genderDropdown .dropdown-option[data-value="${formData.gender}"]`);
+                if (genderLabel && selectedGenderOption) {
+                    const genderName = selectedGenderOption.querySelector('.option-main').textContent;
+                    genderLabel.textContent = genderName;
+                    selectedGenderOption.classList.add('selected');
+                }
+            }
+            if (formData.selectedGroupId) {
+                document.getElementById('selectedGroupId').value = formData.selectedGroupId;
+                // Also restore the group dropdown label
+                const groupLabel = document.getElementById('groupDropdownLabel');
+                const selectedGroupOption = document.querySelector(`#groupDropdown .dropdown-option[data-value="${formData.selectedGroupId}"]`);
+                if (groupLabel && selectedGroupOption) {
+                    const groupName = selectedGroupOption.querySelector('.option-main').textContent;
+                    groupLabel.textContent = groupName;
+                    selectedGroupOption.classList.add('selected');
+                }
+            }
             if (formData.workEmail) document.querySelectorAll('input[type="email"]')[1].value = formData.workEmail;
             if (formData.citizenship) document.getElementById('employeeCitizenshipInput').value = formData.citizenship;
             if (formData.residence) document.getElementById('employeeResidenceInput').value = formData.residence;
@@ -1513,21 +2047,18 @@
         console.log('All form data cleared');
     }
 
-    // Initialize form data restoration
-    restoreFormData();
-
     // Group Dropdown Functionality
     function initializeGroupDropdown() {
-        const dropdownSelected = document.getElementById('groupDropdownSelected');
+        const dropdownBtn = document.getElementById('groupDropdownBtn');
         const dropdownMenu = document.getElementById('groupDropdownMenu');
-        const dropdownText = document.getElementById('groupDropdownText');
-        const dropdownArrow = document.getElementById('groupDropdownArrow');
+        const dropdownLabel = document.getElementById('groupDropdownLabel');
+        const dropdownArrow = document.querySelector('#groupDropdown .dropdown-arrow');
         const hiddenInput = document.getElementById('selectedGroupId');
         
-        if (!dropdownSelected || !dropdownMenu) return;
+        if (!dropdownBtn || !dropdownMenu) return;
 
         // Toggle dropdown menu
-        dropdownSelected.addEventListener('click', function(e) {
+        dropdownBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             
             const isOpen = dropdownMenu.classList.contains('show');
@@ -1540,23 +2071,24 @@
         });
 
         // Handle group selection
-        const groupItems = document.querySelectorAll('.group-dropdown-item');
-        groupItems.forEach(item => {
-            item.addEventListener('click', function(e) {
+        const groupOptions = document.querySelectorAll('#groupDropdown .dropdown-option');
+        groupOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
                 e.stopPropagation();
                 
+                if (this.classList.contains('disabled')) return;
+                
                 const groupId = this.getAttribute('data-value');
-                const groupName = this.getAttribute('data-name');
+                const groupName = this.querySelector('.option-main').textContent;
                 
-                // Remove selected class from all items
-                groupItems.forEach(i => i.classList.remove('selected'));
+                // Remove selected class from all options
+                groupOptions.forEach(opt => opt.classList.remove('selected'));
                 
-                // Add selected class to clicked item
+                // Add selected class to clicked option
                 this.classList.add('selected');
                 
                 // Update display and hidden input
-                dropdownText.textContent = groupName;
-                dropdownText.classList.add('selected');
+                dropdownLabel.textContent = groupName;
                 hiddenInput.value = groupId;
                 
                 // Save form data
@@ -1579,40 +2111,114 @@
 
         function openDropdown() {
             dropdownMenu.classList.add('show');
-            dropdownSelected.classList.add('active');
+            dropdownBtn.classList.add('active');
             // Change arrow to point up
+            if (dropdownArrow) {
             dropdownArrow.src = dropdownArrow.src.replace('angle-small-down.png', 'angle-small-up.png');
+            }
         }
 
         function closeDropdown() {
             dropdownMenu.classList.remove('show');
-            dropdownSelected.classList.remove('active');
+            dropdownBtn.classList.remove('active');
             // Change arrow to point down
+            if (dropdownArrow) {
             dropdownArrow.src = dropdownArrow.src.replace('angle-small-up.png', 'angle-small-down.png');
-        }
-
-        // Restore selected group if exists
-        const savedData = sessionStorage.getItem('employeeFormData');
-        if (savedData) {
-            const formData = JSON.parse(savedData);
-            if (formData.selectedGroupId) {
-                const selectedItem = document.querySelector(`[data-value="${formData.selectedGroupId}"]`);
-                if (selectedItem) {
-                    const groupName = selectedItem.getAttribute('data-name');
-                    dropdownText.textContent = groupName;
-                    dropdownText.classList.add('selected');
-                    hiddenInput.value = formData.selectedGroupId;
-                    
-                    // Add selected class to the item
-                    selectedItem.classList.add('selected');
-                }
             }
         }
+
+
+    }
+
+    // Gender Dropdown Functionality
+    function initializeGenderDropdown() {
+        const dropdownBtn = document.getElementById('genderDropdownBtn');
+        const dropdownMenu = document.getElementById('genderDropdownMenu');
+        const dropdownLabel = document.getElementById('genderDropdownLabel');
+        const dropdownArrow = document.querySelector('#genderDropdown .dropdown-arrow');
+        const hiddenInput = document.getElementById('genderSelect');
+        
+        if (!dropdownBtn || !dropdownMenu) return;
+
+        // Toggle dropdown menu
+        dropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        });
+
+        // Handle gender selection
+        const genderOptions = document.querySelectorAll('#genderDropdown .dropdown-option');
+        genderOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const genderValue = this.getAttribute('data-value');
+                const genderName = this.querySelector('.option-main').textContent;
+                
+                // Remove selected class from all options
+                genderOptions.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                
+                // Update display and hidden input
+                dropdownLabel.textContent = genderName;
+                hiddenInput.value = genderValue;
+                
+                // Save form data
+                saveFormData();
+                
+                // Close dropdown
+                closeDropdown();
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            closeDropdown();
+        });
+
+        // Prevent dropdown from closing when clicking inside menu
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        function openDropdown() {
+            dropdownMenu.classList.add('show');
+            dropdownBtn.classList.add('active');
+            // Change arrow to point up
+            if (dropdownArrow) {
+                dropdownArrow.src = dropdownArrow.src.replace('angle-small-down.png', 'angle-small-up.png');
+            }
+        }
+
+        function closeDropdown() {
+            dropdownMenu.classList.remove('show');
+            dropdownBtn.classList.remove('active');
+            // Change arrow to point down
+            if (dropdownArrow) {
+                dropdownArrow.src = dropdownArrow.src.replace('angle-small-up.png', 'angle-small-down.png');
+            }
+        }
+
+
     }
 
     // Initialize group dropdown when DOM is loaded
-    document.addEventListener('DOMContentLoaded', initializeGroupDropdown);
-    document.addEventListener('DOMContentLoaded', initializePositionDropdowns);
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeGroupDropdown();
+        initializeGenderDropdown();
+        initializePositionDropdowns();
+        // Restore form data after dropdowns are initialized
+        restoreFormData();
+    });
 
     // Auto-save form data when inputs change
     document.querySelectorAll('input, select').forEach(input => {
@@ -1688,7 +2294,7 @@
         field.classList.add('error');
         const errorMsg = field.parentNode.querySelector('.error-message');
         if (errorMsg) {
-            errorMsg.style.display = 'flex';
+            errorMsg.classList.add('show');
         }
     }
 
@@ -1696,7 +2302,7 @@
         field.classList.remove('error');
         const errorMsg = field.parentNode.querySelector('.error-message');
         if (errorMsg) {
-            errorMsg.style.display = 'none';
+            errorMsg.classList.remove('show');
         }
     }
 
@@ -1727,263 +2333,175 @@
       'Zambia', 'Zimbabwe'
     ];
 
-    // Initialize date picker
+    // Initialize new calendar
     document.addEventListener('DOMContentLoaded', function() {
         const dateInput = document.getElementById('dateOfBirth');
         const calendarToggle = document.getElementById('calendarToggle');
+        const calendarPopup = document.getElementById('calendarPopup');
 
-        if (dateInput && calendarToggle) {
-            const fp = flatpickr(dateInput, {
-                dateFormat: "Y-m-d",
-                maxDate: "today",
-                minDate: "1900-01-01",
-                defaultDate: null,
-                clickOpens: true,
-                allowInput: false,
-                static: false, // Allow popup to float freely outside container
-                showMonths: 1,
-                fixedHeight: false, // Disable to prevent interference with year mode height
-                showOutsideDays: false,
-                disableMobile: true, // Ensure our custom navigation works
-                onChange: function(selectedDates, dateStr) {
-                    console.log('Date selected:', dateStr);
-                    saveFormData(); // Save form data when date changes
-                },
-                onMonthChange: function(selectedDates, dateStr, instance) {
-                    // Check and disable navigation buttons after month change
-                    setTimeout(() => {
-                        checkAndDisableNavigation(instance);
-                        setupYearDropdown(instance); // Re-setup year dropdown after month change
-                    }, 10);
-                },
-                onYearChange: function(selectedDates, dateStr, instance) {
-                    // Check and disable navigation buttons after year change
-                    setTimeout(() => {
-                        checkAndDisableNavigation(instance);
-                        setupYearDropdown(instance); // Re-setup year dropdown after year change
-                    }, 10);
-                },
-                onOpen: function(selectedDates, dateStr, instance) {
-                    // Check and disable navigation buttons when calendar opens
-                    setTimeout(() => {
-                        checkAndDisableNavigation(instance);
-                        setupYearDropdown(instance); // Setup year dropdown when calendar opens
-                    }, 10);
-                },
-                onReady: function(selectedDates, dateStr, instance) {
-                    // Check and disable navigation buttons when calendar is ready
-                    setTimeout(() => {
-                        checkAndDisableNavigation(instance);
-                        setupYearDropdown(instance); // Setup year dropdown when calendar is ready
-                    }, 10);
-                }
-            });
+        if (dateInput && calendarToggle && calendarPopup) {
+            let calendar = calendarPopup.querySelector('.calendar')
+            let selectedDate = null; // Declare selectedDate variable
 
-            // Initial check after flatpickr is created
-            setTimeout(() => {
-                checkAndDisableNavigation(fp);
-                setupYearDropdown(fp); // Setup year dropdown initially
-            }, 50);
+            const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-            // Function to check and disable future navigation
-            function checkAndDisableNavigation(instance) {
-                if (!instance || !instance.calendarContainer) return;
-                
-                const calendar = instance.calendarContainer;
-                const nextButton = calendar.querySelector('.flatpickr-next-month');
-                const prevButton = calendar.querySelector('.flatpickr-prev-month');
-                
-                if (nextButton && prevButton) {
-                    const currentMonth = instance.currentMonth;
-                    const currentYear = instance.currentYear;
-                    
-                    // Use today's date for max navigation
-                    const today = new Date();
-                    
-                    // Calculate the first day of the next month that would be shown
-                    const nextMonth = new Date(currentYear, currentMonth + 1, 1);
-                    
-                    // Calculate the first day of the previous month that would be shown
-                    const prevMonth = new Date(currentYear, currentMonth - 1, 1);
-                    
-                    // Always keep the button visible, but disable functionality and obscure appearance for future months
-                    if (nextMonth > today) {
-                        nextButton.classList.add('disabled');
-                        // Make button visually obscured but still visible
-                        nextButton.style.opacity = '0.3';
-                        nextButton.style.cursor = 'not-allowed';
-                        nextButton.style.pointerEvents = 'none'; // Prevent clicking
-                        // Add a subtle filter to make it more obviously disabled
-                        nextButton.style.filter = 'grayscale(100%)';
-                    } else {
-                        nextButton.classList.remove('disabled');
-                        // Make button fully visible and functional
-                        nextButton.style.opacity = '1';
-                        nextButton.style.cursor = 'pointer';
-                        nextButton.style.pointerEvents = 'auto'; // Allow clicking
-                        nextButton.style.filter = 'none'; // Remove any filters
+            isLeapYear = (year) => {
+                return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 ===0)
+            }
+
+            getFebDays = (year) => {
+                return isLeapYear(year) ? 29 : 28
+            }
+
+            generateCalendar = (month, year) => {
+                let calendar_days = calendar.querySelector('.calendar-days')
+                let calendar_header_year = calendar.querySelector('#year')
+
+                let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+                calendar_days.innerHTML = ''
+
+                let currDate = new Date()
+                if (!month) month = currDate.getMonth()
+                if (!year) year = currDate.getFullYear()
+
+                let curr_month = `${month_names[month]}`
+                month_picker.innerHTML = curr_month
+                calendar_header_year.innerHTML = year
+
+                // get first day of month
+                let first_day = new Date(year, month, 1)
+
+                for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+                    let day = document.createElement('div')
+                    if (i >= first_day.getDay()) {
+                        day.classList.add('calendar-day-hover')
+                        day.innerHTML = i - first_day.getDay() + 1
+                        day.innerHTML += `<span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>`
+                        
+                        // Check if this is today (but don't auto-select it)
+                        if (i - first_day.getDay() + 1 === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
+                            // Don't add curr-date class to avoid auto-selection
+                            // day.classList.add('curr-date')
+                        }
+                        
+                        // Check if this is the selected date
+                        if (selectedDate && i - first_day.getDay() + 1 === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
+                            day.classList.add('selected-date')
+                        }
+                        
+                        // Check if this date is in the future (disable it)
+                        const currentDate = new Date(year, month, i - first_day.getDay() + 1);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        if (currentDate > today) {
+                            day.style.opacity = '0.3';
+                            day.style.cursor = 'not-allowed';
+                            day.style.pointerEvents = 'none';
+                        } else {
+                            // Add click handler for date selection
+                            day.addEventListener('click', function(e) {
+                                e.stopPropagation(); // Prevent event bubbling
+                                
+                                // Remove selected class from all days in the current view
+                                calendar_days.querySelectorAll('div').forEach(div => div.classList.remove('selected-date'));
+                                
+                                // Add selected class to clicked day
+                                this.classList.add('selected-date');
+                                
+                                // Get the actual date
+                                const dayNum = parseInt(this.textContent);
+                                selectedDate = new Date(year, month, dayNum);
+                                
+                                // Format date for input (YYYY-MM-DD)
+                                const formattedDate = selectedDate.toISOString().split('T')[0];
+                                dateInput.value = formattedDate;
+                                
+                                // Save form data
+                                saveFormData();
+                                
+                                // Close calendar immediately
+                                calendarPopup.style.display = 'none';
+                            });
+                        }
                     }
-                    
-                    // Handle previous button (should work until we reach the minimum date: January 1900)
-                    const minDate = new Date(1900, 0, 1);
-                    if (prevMonth < minDate) {
-                        prevButton.classList.add('disabled');
-                        prevButton.style.opacity = '0.3';
-                        prevButton.style.cursor = 'not-allowed';
-                        prevButton.style.pointerEvents = 'none';
-                        prevButton.style.filter = 'grayscale(100%)';
-                    } else {
-                        prevButton.classList.remove('disabled');
-                        prevButton.style.opacity = '1';
-                        prevButton.style.cursor = 'pointer';
-                        prevButton.style.pointerEvents = 'auto';
-                        prevButton.style.filter = 'none';
-                    }
+                    calendar_days.appendChild(day)
                 }
             }
 
-            // Override the default click handlers to respect our disabled state
-            const originalNextMonth = fp.nextMonth;
-            const originalPrevMonth = fp.prevMonth;
-            
-            fp.nextMonth = function() {
-                if (!fp.calendarContainer) return;
-                
-                const calendar = fp.calendarContainer;
-                const nextButton = calendar.querySelector('.flatpickr-next-month');
-                
-                if (nextButton && !nextButton.classList.contains('disabled')) {
-                    originalNextMonth.call(fp);
-                    setTimeout(() => {
-                        checkAndDisableNavigation(fp);
-                    }, 10);
-                }
-            };
-            
-            fp.prevMonth = function() {
-                if (!fp.calendarContainer) return;
-                
-                const calendar = fp.calendarContainer;
-                const prevButton = calendar.querySelector('.flatpickr-prev-month');
-                
-                if (prevButton && !prevButton.classList.contains('disabled')) {
-                    originalPrevMonth.call(fp);
-                    setTimeout(() => {
-                        checkAndDisableNavigation(fp);
-                    }, 10);
-                }
-            };
+            let month_list = calendar.querySelector('.month-list')
 
+            month_names.forEach((e, index) => {
+                let month = document.createElement('div')
+                month.innerHTML = `<div data-month="${index}">${e}</div>`
+                month.querySelector('div').onclick = () => {
+                    month_list.classList.remove('show')
+                    curr_month.value = index
+                    generateCalendar(index, curr_year.value)
+                }
+                month_list.appendChild(month)
+            })
+
+            let month_picker = calendar.querySelector('#month-picker')
+
+            month_picker.onclick = () => {
+                month_list.classList.add('show')
+            }
+
+            let currDate = new Date()
+
+            let curr_month = {value: currDate.getMonth()}
+            let curr_year = {value: currDate.getFullYear()}
+
+            generateCalendar(curr_month.value, curr_year.value)
+
+            document.querySelector('#prev-year').onclick = () => {
+                --curr_year.value
+                generateCalendar(curr_month.value, curr_year.value)
+            }
+
+            document.querySelector('#next-year').onclick = () => {
+                ++curr_year.value
+                generateCalendar(curr_month.value, curr_year.value)
+            }
+
+            // Dark mode toggle functionality removed
+
+            // Toggle calendar popup
             calendarToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (fp) {
-                    fp.toggle();
-                }
-            });
-
-            // Function to setup year dropdown functionality
-            function setupYearDropdown(instance) {
-                if (!instance || !instance.calendarContainer) return;
-                
-                const calendar = instance.calendarContainer;
-                const currentMonthContainer = calendar.querySelector('.flatpickr-current-month');
-                
-                if (!currentMonthContainer) return;
-                
-                // Remove existing year dropdown if it exists
-                const existingDropdownBtn = currentMonthContainer.querySelector('.year-dropdown-btn');
-                const existingYearGrid = calendar.querySelector('.year-grid');
-                if (existingDropdownBtn) existingDropdownBtn.remove();
-                if (existingYearGrid) existingYearGrid.remove();
-                
-                // Create year dropdown button
-                const yearDropdownBtn = document.createElement('button');
-                yearDropdownBtn.className = 'year-dropdown-btn';
-                yearDropdownBtn.innerHTML = '▼'; // Down arrow
-                yearDropdownBtn.type = 'button';
-                
-                // Create year grid container
-                const yearGrid = document.createElement('div');
-                yearGrid.className = 'year-grid';
-                
-                const yearGridContainer = document.createElement('div');
-                yearGridContainer.className = 'year-grid-container';
-                
-                // Generate years from 1900 to current year
-                const currentYear = instance.currentYear;
-                const maxYear = new Date().getFullYear();
-                const minYear = 1900;
-                
-                for (let year = maxYear; year >= minYear; year--) {
-                    const yearOption = document.createElement('div');
-                    yearOption.className = 'year-option';
-                    yearOption.textContent = year;
-                    
-                    if (year === currentYear) {
-                        yearOption.classList.add('selected');
-                    }
-                    
-                    // Disable future years beyond current year
-                    if (year > maxYear) {
-                        yearOption.classList.add('disabled');
-                    } else {
-                        yearOption.addEventListener('click', () => {
-                            instance.changeYear(year);
-                            // Exit year mode and return to calendar
-                            calendar.classList.remove('year-mode');
-                            yearDropdownBtn.classList.remove('active');
-                            yearDropdownBtn.innerHTML = '▼'; // Reset to down arrow
-                        });
-                    }
-                    
-                    yearGridContainer.appendChild(yearOption);
-                }
-                
-                yearGrid.appendChild(yearGridContainer);
-                
-                // Add click handler for dropdown button
-                yearDropdownBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    const isYearMode = calendar.classList.contains('year-mode');
-                    
-                    if (isYearMode) {
-                        // Exit year mode, show calendar
-                        calendar.classList.remove('year-mode');
-                        yearDropdownBtn.classList.remove('active');
-                        yearDropdownBtn.innerHTML = '▼'; // Down arrow
+                if (calendarPopup.style.display === 'none') {
+                    calendarPopup.style.display = 'block';
+                    generateCalendar(curr_month.value, curr_year.value);
                     } else {
-                        // Enter year mode, hide calendar days and show year grid
-                        calendar.classList.add('year-mode');
-                        yearDropdownBtn.classList.add('active');
-                        yearDropdownBtn.innerHTML = '▲'; // Up arrow
-                        
-                        // Update selected year in grid
-                        const yearOptions = yearGrid.querySelectorAll('.year-option');
-                        yearOptions.forEach(option => {
-                            option.classList.remove('selected');
-                            if (parseInt(option.textContent) === instance.currentYear) {
-                                option.classList.add('selected');
-                            }
-                        });
-                        
-                        // Scroll to selected year
-                        setTimeout(() => {
-                            const selectedOption = yearGrid.querySelector('.year-option.selected');
-                            if (selectedOption) {
-                                selectedOption.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                            }
-                        }, 10);
-                    }
-                });
-                
-                // Append dropdown button after the year
-                currentMonthContainer.appendChild(yearDropdownBtn);
-                
-                // Insert year grid as the last child of calendar container
-                calendar.appendChild(yearGrid);
+                    calendarPopup.style.display = 'none';
+                }
+            });
+
+            // Close calendar when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!calendarPopup.contains(e.target) && !calendarToggle.contains(e.target)) {
+                    calendarPopup.style.display = 'none';
+                }
+            });
+
+            // Restore selected date if exists
+            const savedData = sessionStorage.getItem('employeeFormData');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                if (formData.dateOfBirth) {
+                    selectedDate = new Date(formData.dateOfBirth);
+                    dateInput.value = formData.dateOfBirth;
+                }
             }
+
+
         }
 
         // Country dropdowns functionality
@@ -2010,6 +2528,12 @@
             div.addEventListener('click', () => {
               input.value = country;
               dropdown.classList.remove('show');
+              // Clear any error states when a country is selected
+              input.classList.remove('error');
+              const errorMsg = input.parentNode.querySelector('.error-message');
+              if (errorMsg) {
+                errorMsg.classList.remove('show');
+              }
             });
             dropdown.appendChild(div);
           });
@@ -2048,6 +2572,29 @@
         }
       });
         });
+
+        // Info modal functionality for country of residence
+        const residenceInfoIcon = document.getElementById('residenceInfoIcon');
+        const residenceInfoModal = document.getElementById('residenceInfoModal');
+        const residenceInfoModalClose = document.getElementById('residenceInfoModalClose');
+
+        if (residenceInfoIcon && residenceInfoModal && residenceInfoModalClose) {
+            residenceInfoIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                residenceInfoModal.style.display = 'flex';
+            });
+
+            residenceInfoModalClose.addEventListener('click', function() {
+                residenceInfoModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside the content
+            residenceInfoModal.addEventListener('click', function(e) {
+                if (e.target === residenceInfoModal) {
+                    residenceInfoModal.style.display = 'none';
+                }
+            });
+        }
     });
 
     function initializePositionDropdowns() {
@@ -2264,6 +2811,74 @@
             selected.classList.remove('active');
         }
     }
+
+    // Error handling functions
+    function showFieldError(field) {
+        field.classList.add('error');
+        const errorMessage = field.parentElement.querySelector('.error-message');
+        if (errorMessage) {
+            errorMessage.classList.add('show');
+        }
+    }
+
+    function hideFieldError(field) {
+        field.classList.remove('error');
+        const errorMessage = field.parentElement.querySelector('.error-message');
+        if (errorMessage) {
+            errorMessage.classList.remove('show');
+        }
+    }
+
+    // Add error handling to form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const requiredInputs = document.querySelectorAll('input[required], select[required]');
+        
+        requiredInputs.forEach(input => {
+            // Show error on blur if field is empty and has been interacted with
+            input.addEventListener('blur', function() {
+                if (interactedFields.has(this) && !this.value.trim()) {
+                    showFieldError(this);
+                }
+            });
+
+            // Hide error when user starts typing
+            input.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    hideFieldError(this);
+                }
+            });
+
+            // Track field interaction
+            input.addEventListener('focus', function() {
+                interactedFields.add(this);
+            });
+        });
+
+        // Handle group dropdown error state
+        const groupDropdown = document.getElementById('groupDropdown');
+        const groupHiddenInput = document.getElementById('selectedGroupId');
+        
+        if (groupDropdown && groupHiddenInput) {
+            // Show error if group is not selected when form is submitted
+            document.getElementById('employee-form').addEventListener('submit', function(e) {
+                if (!groupHiddenInput.value) {
+                    groupDropdown.classList.add('error');
+                    e.preventDefault();
+                    return;
+                }
+            });
+
+            // Hide error when group is selected
+            const groupOptions = document.querySelectorAll('.dropdown-option');
+            groupOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    if (!this.classList.contains('disabled')) {
+                        groupDropdown.classList.remove('error');
+                    }
+                });
+            });
+        }
+    });
     </script>
 </body>
 </html> 

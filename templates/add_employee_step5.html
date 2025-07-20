@@ -25,7 +25,7 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
@@ -43,7 +43,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -318,20 +318,20 @@
         }
 
         .bottom-navigation {
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            padding: 24px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
             z-index: 1000;
         }
 
         .bottom-nav-content {
+            max-width: 930px;
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -339,43 +339,57 @@
         }
 
         .btn-back {
-            background: none;
-            border: none;
-            color: #6c757d;
-            font-size: 0.9rem;
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 0;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
         }
 
         .btn-back:hover {
-            color: #495057;
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
         }
 
         .btn-continue {
             background: #1a1a1a;
             color: white;
             border: none;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .btn-continue:hover {
             background: #333;
-            transform: translateY(-1px);
         }
 
         .btn-continue:disabled {
-            background: #6c757d;
+            background: #e9ecef;
+            color: #6c757d;
             cursor: not-allowed;
-            transform: none;
         }
 
         @media (max-width: 1024px) {
@@ -441,11 +455,7 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-content">
-                <div class="saved-indicator">
-                    <div class="saved-icon">✓</div>
-                    SAVED
-                </div>
-                <button class="close-btn">&times;</button>
+                <button class="close-btn" onclick="clearAllFormData(); window.location.href='/add-people'">✕</button>
             </div>
         </div>
 
@@ -633,13 +643,16 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <button type="button" class="btn-back" id="backButton" onclick="goToPreviousStep()">
+                <a href="/add-employee-step4" class="btn-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
                     Back
-                </button>
-                <button type="submit" class="btn-continue" form="employee-form-step5">Continue</button>
+                </a>
+                <div class="nav-right">
+                    <div class="step-info">Step 5 of 6<br>Next step: Review</div>
+                    <button type="submit" class="btn-continue" form="employee-form-step5">Continue</button>
+                </div>
             </div>
         </div>
     </div>

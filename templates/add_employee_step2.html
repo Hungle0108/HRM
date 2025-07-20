@@ -25,7 +25,7 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
@@ -43,7 +43,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -320,21 +320,108 @@
             padding-right: 44px;
         }
 
-        .bottom-navigation {
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            padding: 24px 40px;
+        /* Custom dropdown styles - matching group dropdown from page 1 */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .dropdown-toggle:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-arrow {
+            width: 18px;
+            height: 18px;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            z-index: 10;
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e3f2fd;
+        }
+
+        .dropdown-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-main {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .option-subtitle {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .custom-dropdown.error .dropdown-toggle {
+            border-color: #dc3545;
+        }
+
+        .bottom-navigation {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
             z-index: 1000;
         }
 
         .bottom-nav-content {
+            max-width: 930px;
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -342,43 +429,57 @@
         }
 
         .btn-back {
-            background: none;
-            border: none;
-            color: #6c757d;
-            font-size: 0.9rem;
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 0;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
         }
 
         .btn-back:hover {
-            color: #495057;
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
         }
 
         .btn-continue {
             background: #1a1a1a;
             color: white;
             border: none;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .btn-continue:hover {
             background: #333;
-            transform: translateY(-1px);
         }
 
         .btn-continue:disabled {
-            background: #6c757d;
+            background: #e9ecef;
+            color: #6c757d;
             cursor: not-allowed;
-            transform: none;
         }
 
         @media (max-width: 1024px) {
@@ -422,6 +523,243 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Position Dropdown Styles */
+        .position-selection-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .position-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .position-dropdown-selected {
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            height: 72px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .position-dropdown-selected.has-selection {
+            padding: 8px 16px;
+        }
+
+        .position-dropdown-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .position-dropdown-label {
+            position: absolute;
+            top: 8px;
+            left: 16px;
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        .position-dropdown-label.no-transition {
+            transition: none !important;
+        }
+
+        .position-dropdown-label.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .position-dropdown-text {
+            font-size: 0.95rem;
+            color: #6c757d;
+            transition: opacity 0.2s ease-out;
+        }
+
+        .position-dropdown-selected.has-selection .position-dropdown-text:not(.selected) {
+            opacity: 0;
+        }
+
+        .position-dropdown-text.no-transition {
+            transition: none !important;
+        }
+
+        .position-dropdown-text.selected {
+            color: #1a1a1a;
+        }
+
+        .position-dropdown-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .position-selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .position-selected-tag {
+            background-color: #e9ecef;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .position-selected-tag .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #adb5bd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .position-selected-tag .remove-tag:hover {
+            background: #6c757d;
+        }
+
+        .position-dropdown-delete {
+            width: 16px;
+            height: 16px;
+            background-image: url('{{ url_for("static", filename="images/cross-small.png") }}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            margin-right: 8px;
+            display: none;
+        }
+
+        .position-dropdown-delete:hover {
+            opacity: 1;
+        }
+
+        .position-dropdown-delete.show {
+            display: block;
+        }
+
+        .position-dropdown-arrow.rotated {
+            /* Remove rotation effect */
+        }
+
+        .position-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            display: none;
+            margin-top: 4px;
+        }
+
+        .position-dropdown-menu.show-above {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .position-dropdown-menu.show {
+            display: block;
+        }
+
+        .position-dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+            color: #202124;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .position-dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .position-dropdown-item.selected {
+            background: #f1f3f5;
+            font-weight: 500;
+        }
+
+        .position-dropdown-item .checkmark {
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .position-dropdown-empty {
+            padding: 16px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Position level indentation */
+        .position-level-1 { padding-left: 16px; }
+        .position-level-2 { padding-left: 36px; }
+        .position-level-3 { padding-left: 56px; }
+        .position-level-4 { padding-left: 76px; }
+        .position-level-5 { padding-left: 96px; }
+
+        .position-dropdown-selected:hover {
+            border-color: #adb5bd;
+        }
+
+        .position-dropdown-selected.active {
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+        }
+
+        .no-structures-message {
+            padding: 24px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px dashed #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -429,11 +767,7 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-content">
-                <div class="saved-indicator">
-                    <div class="saved-icon">✓</div>
-                    SAVED
-                </div>
-                <!-- Close button removed -->
+                <button class="close-btn" onclick="clearAllFormData(); window.location.href='/add-people'">✕</button>
             </div>
         </div>
 
@@ -455,50 +789,76 @@
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Job title (optional)</label>
-                                <select class="form-select">
-                                    <option value="">Job title (optional)</option>
-                                    <option value="software-engineer">Software Engineer</option>
-                                    <option value="product-manager">Product Manager</option>
-                                    <option value="designer">Designer</option>
-                                    <option value="data-analyst">Data Analyst</option>
-                                    <option value="marketing-manager">Marketing Manager</option>
-                                    <option value="sales-representative">Sales Representative</option>
-                                    <option value="hr-specialist">HR Specialist</option>
-                                    <option value="other">Other</option>
-                                </select>
+                                <div class="custom-dropdown" id="workerTypeDropdown">
+                                    <button type="button" class="dropdown-toggle" id="workerTypeDropdownBtn">
+                                        <span id="workerTypeDropdownLabel">Select worker type</span>
+                                        <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                                    </button>
+                                    <div class="dropdown-menu" id="workerTypeDropdownMenu">
+                                        <div class="dropdown-options-list" id="workerTypeOptionsList">
+                                            <!-- Worker types will be loaded dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Seniority level (optional)</label>
-                                <select class="form-select">
-                                    <option value="">Seniority level (optional)</option>
-                                    <option value="intern">Intern</option>
-                                    <option value="junior">Junior</option>
-                                    <option value="mid-level">Mid-level</option>
-                                    <option value="senior">Senior</option>
-                                    <option value="lead">Lead</option>
-                                    <option value="principal">Principal</option>
-                                    <option value="director">Director</option>
-                                    <option value="vp">VP</option>
-                                    <option value="c-level">C-level</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Working location (optional)</label>
-                                <select class="form-select">
-                                    <option value="">Working location (optional)</option>
-                                    <option value="remote">Remote</option>
-                                    <option value="office">Office</option>
-                                    <option value="hybrid">Hybrid</option>
-                                    <option value="on-site">On-site</option>
-                                </select>
-                            </div>
+                    <div class="form-section">
+                        <h3 class="section-title">Organization position</h3>
+                        <div class="position-selection-container">
+                            {% if org_structures %}
+                                {% for structure in org_structures %}
+                                    <div class="position-dropdown-wrapper" 
+                                         data-structure-id="{{ structure.id }}" 
+                                         data-allow-multiple="{{ 'true' if structure.allow_multiple_assignments else 'false' }}">
+                                        <div class="position-dropdown-selected">
+                                            <div class="position-dropdown-label">{{ structure.name }} (optional)</div>
+                                            <div class="position-dropdown-content">
+                                            <span class="position-dropdown-text">{{ structure.name }} (optional)</span>
+                                                <div class="position-selected-tags"></div>
+                                            </div>
+                                            <div class="position-dropdown-controls">
+                                                <div class="position-dropdown-delete"></div>
+                                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="position-dropdown-arrow" style="width: 16px; height: 16px;">
+                                            </div>
+                                        </div>
+                                        <div class="position-dropdown-menu">
+                                            {% if structure['items'] %}
+                                                {% for item in structure['items'] %}
+                                                    <div class="position-dropdown-item position-level-1" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}">
+                                                        <span>{{ item.name }}</span>
+                                                        <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
+                                                </div>
+                                                    {% if item.children %}
+                                                        {% for child in item.children %}
+                                                            <div class="position-dropdown-item position-level-2" data-item-id="{{ child.id }}" data-item-name="{{ child.name }}">
+                                                                <span>{{ child.name }}</span>
+                                                                <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
+                                                            </div>
+                                                            {% if child.children %}
+                                                                {% for grandchild in child.children %}
+                                                                    <div class="position-dropdown-item position-level-3" data-item-id="{{ grandchild.id }}" data-item-name="{{ grandchild.name }}">
+                                                                        <span>{{ grandchild.name }}</span>
+                                                                        <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
+                                                                    </div>
+                                            {% endfor %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="position-dropdown-empty">No items in this structure</div>
+                                            {% endif %}
+                                        </div>
+                                        <input type="hidden" name="structure-{{ structure.id }}" class="selected-items-input">
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="no-structures-message">
+                                    No organization structures have been set up. You can create them in Settings.
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </form>
@@ -554,13 +914,16 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <button type="button" class="btn-back" id="backButton" onclick="goToPreviousStep()">
+                <a href="/add-employee" class="btn-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
                     Back
-                </button>
-                <button type="submit" class="btn-continue" form="employee-form-step2">Continue</button>
+                </a>
+                <div class="nav-right">
+                    <div class="step-info">Step 2 of 6<br>Next step: Compensation and dates</div>
+                    <button type="submit" class="btn-continue" form="employee-form-step2">Continue</button>
+                </div>
             </div>
         </div>
     </div>
@@ -570,13 +933,137 @@
     let currentStep = 2;
     const totalSteps = 6;
 
+    // Function to load worker types from API
+    function loadWorkerTypes() {
+        fetch('/api/get-worker-types')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.worker_types) {
+                    const workerTypeOptionsList = document.getElementById('workerTypeOptionsList');
+                    const savedData = sessionStorage.getItem('employeeFormStep2');
+                    let savedWorkerType = '';
+                    
+                    if (savedData) {
+                        const formData = JSON.parse(savedData);
+                        savedWorkerType = formData.workerType || '';
+                    }
+                    
+                    // Clear existing options
+                    workerTypeOptionsList.innerHTML = '';
+                    
+                    // Add worker types from API
+                    data.worker_types.forEach(workerType => {
+                        const option = document.createElement('div');
+                        option.className = 'dropdown-option';
+                        option.dataset.value = workerType.id;
+                        option.textContent = workerType.template_name;
+                        
+                        // Restore saved selection if it matches
+                        if (savedWorkerType == workerType.id) {
+                            option.classList.add('selected');
+                            updateWorkerTypeDropdownLabel(workerType.template_name);
+                        }
+                        
+                        // Add click event
+                        option.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Remove selected class from all options
+                            workerTypeOptionsList.querySelectorAll('.dropdown-option').forEach(opt => {
+                                opt.classList.remove('selected');
+                            });
+                            
+                            // Add selected class to clicked option
+                            this.classList.add('selected');
+                            
+                            // Update dropdown label
+                            updateWorkerTypeDropdownLabel(this.textContent);
+                            
+                            // Close dropdown
+                            closeWorkerTypeDropdown();
+                            
+                            // Save form data
+                            saveFormData();
+                        });
+                        
+                        workerTypeOptionsList.appendChild(option);
+                    });
+                    
+                    console.log('Worker types loaded successfully');
+                } else {
+                    console.error('Failed to load worker types:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading worker types:', error);
+            });
+    }
+
+    // Function to update worker type dropdown label
+    function updateWorkerTypeDropdownLabel(text) {
+        const dropdownLabel = document.getElementById('workerTypeDropdownLabel');
+        dropdownLabel.textContent = text;
+    }
+
+    // Function to close worker type dropdown
+    function closeWorkerTypeDropdown() {
+        const dropdown = document.getElementById('workerTypeDropdown');
+        const dropdownMenu = document.getElementById('workerTypeDropdownMenu');
+        const arrow = dropdown.querySelector('.dropdown-arrow');
+        
+        dropdownMenu.classList.remove('show');
+        arrow.src = '/static/images/angle-small-down.png';
+    }
+
+    // Function to setup worker type dropdown
+    function setupWorkerTypeDropdown() {
+        const dropdown = document.getElementById('workerTypeDropdown');
+        const dropdownMenu = document.getElementById('workerTypeDropdownMenu');
+        
+        // Toggle dropdown
+        dropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            if (!isOpen) {
+                dropdownMenu.classList.add('show');
+                // Change arrow to up
+                const arrow = dropdown.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+            } else {
+                closeWorkerTypeDropdown();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                closeWorkerTypeDropdown();
+            }
+        });
+    }
+
     // Function to save form data to sessionStorage
     function saveFormData() {
+        const selectedWorkerType = document.querySelector('#workerTypeOptionsList .dropdown-option.selected');
+        const workerTypeValue = selectedWorkerType ? selectedWorkerType.dataset.value : '';
+        
         const formData = {
-            jobTitle: document.querySelectorAll('.form-select')[0].value,
-            seniorityLevel: document.querySelectorAll('.form-select')[1].value,
-            workingLocation: document.querySelectorAll('.form-select')[2].value
+            workerType: workerTypeValue
         };
+        
+        // Add position dropdown data
+        const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
+        positionDropdowns.forEach(wrapper => {
+            const structureId = wrapper.dataset.structureId;
+            const hiddenInput = wrapper.querySelector('.selected-items-input');
+            if (hiddenInput) {
+                formData[`structure-${structureId}`] = hiddenInput.value;
+            }
+        });
+        
         sessionStorage.setItem('employeeFormStep2', JSON.stringify(formData));
         
         // Show auto-save indicator (if you want to add visual feedback)
@@ -589,10 +1076,7 @@
         if (savedData) {
             const formData = JSON.parse(savedData);
             
-            // Restore form values
-            if (formData.jobTitle) document.querySelectorAll('.form-select')[0].value = formData.jobTitle;
-            if (formData.seniorityLevel) document.querySelectorAll('.form-select')[1].value = formData.seniorityLevel;
-            if (formData.workingLocation) document.querySelectorAll('.form-select')[2].value = formData.workingLocation;
+            // Worker type will be restored when loadWorkerTypes is called
         }
     }
 
@@ -629,6 +1113,12 @@
 
     // Initialize form data restoration
     restoreFormData();
+    
+    // Setup worker type dropdown
+    setupWorkerTypeDropdown();
+    
+    // Load worker types when page loads
+    loadWorkerTypes();
 
     // Save form data whenever inputs change (with debouncing)
     let saveTimeout;
@@ -664,6 +1154,208 @@
         // Proceed to next step (step 3)
         window.location.href = '/add-employee-step3';
     });
+
+    // Position Dropdown Functionality
+    function initializePositionDropdowns() {
+        const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
+        
+        positionDropdowns.forEach(wrapper => {
+            const selected = wrapper.querySelector('.position-dropdown-selected');
+            const menu = wrapper.querySelector('.position-dropdown-menu');
+            const items = wrapper.querySelectorAll('.position-dropdown-item');
+            const text = wrapper.querySelector('.position-dropdown-text');
+            const label = wrapper.querySelector('.position-dropdown-label');
+            const deleteBtn = wrapper.querySelector('.position-dropdown-delete');
+            const tagsContainer = wrapper.querySelector('.position-selected-tags');
+            const hiddenInput = wrapper.querySelector('.selected-items-input');
+            const allowMultiple = wrapper.dataset.allowMultiple === 'true';
+            
+            let selectedItems = [];
+            
+            // Toggle dropdown
+            selected.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const isOpen = menu.classList.contains('show');
+                
+                if (isOpen) {
+                    closeDropdown();
+                } else {
+                    openDropdown();
+                }
+            });
+            
+            // Handle item selection
+            items.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const itemId = this.dataset.itemId;
+                    const itemName = this.dataset.itemName;
+                    
+                    if (allowMultiple) {
+                        // Multiple selection logic
+                        const existingIndex = selectedItems.findIndex(selected => selected.id === itemId);
+                        
+                        if (existingIndex > -1) {
+                            // Remove item
+                            selectedItems.splice(existingIndex, 1);
+                            this.classList.remove('selected');
+                            this.querySelector('.checkmark').style.display = 'none';
+                        } else {
+                            // Add item
+                            selectedItems.push({ id: itemId, name: itemName });
+                            this.classList.add('selected');
+                            this.querySelector('.checkmark').style.display = 'block';
+                        }
+                    } else {
+                        // Single selection logic
+                        selectedItems = [{ id: itemId, name: itemName }];
+                        
+                        // Remove selected class from all items
+                        items.forEach(item => {
+                            item.classList.remove('selected');
+                            item.querySelector('.checkmark').style.display = 'none';
+                        });
+                        
+                        // Add selected class to clicked item
+                        this.classList.add('selected');
+                        this.querySelector('.checkmark').style.display = 'block';
+                    }
+                    
+                    updateDisplay();
+                    saveFormData();
+                    
+                    if (!allowMultiple) {
+                        closeDropdown();
+                    }
+                });
+            });
+            
+            // Delete button functionality
+            deleteBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                clearSelection();
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!wrapper.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+            
+            function openDropdown() {
+                menu.classList.add('show');
+                selected.classList.add('active');
+            }
+            
+            function closeDropdown() {
+                menu.classList.remove('show');
+                selected.classList.remove('active');
+            }
+            
+            function updateDisplay() {
+                if (selectedItems.length === 0) {
+                    // No selection
+                    text.textContent = wrapper.querySelector('.position-dropdown-label').textContent;
+                    text.classList.remove('selected');
+                    selected.classList.remove('has-selection');
+                    label.classList.remove('show');
+                    deleteBtn.classList.remove('show');
+                    tagsContainer.innerHTML = '';
+                } else if (selectedItems.length === 1) {
+                    // Single selection
+                    text.textContent = selectedItems[0].name;
+                    text.classList.add('selected');
+                    selected.classList.add('has-selection');
+                    label.classList.add('show');
+                    deleteBtn.classList.add('show');
+                    tagsContainer.innerHTML = '';
+                } else {
+                    // Multiple selections
+                    text.classList.remove('selected');
+                    selected.classList.add('has-selection');
+                    label.classList.add('show');
+                    deleteBtn.classList.add('show');
+                    
+                    // Create tags
+                    tagsContainer.innerHTML = '';
+                    selectedItems.forEach(item => {
+                        const tag = document.createElement('div');
+                        tag.className = 'position-selected-tag';
+                        tag.innerHTML = `
+                            <span>${item.name}</span>
+                            <span class="remove-tag" data-item-id="${item.id}">×</span>
+                        `;
+                        
+                        // Add remove functionality to tag
+                        tag.querySelector('.remove-tag').addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const itemId = this.dataset.itemId;
+                            const itemIndex = selectedItems.findIndex(selected => selected.id === itemId);
+                            
+                            if (itemIndex > -1) {
+                                selectedItems.splice(itemIndex, 1);
+                                const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
+                                if (itemElement) {
+                                    itemElement.classList.remove('selected');
+                                    itemElement.querySelector('.checkmark').style.display = 'none';
+                                }
+                                updateDisplay();
+                                saveFormData();
+                            }
+                        });
+                        
+                        tagsContainer.appendChild(tag);
+                    });
+                }
+                
+                // Update hidden input
+                if (hiddenInput) {
+                    hiddenInput.value = selectedItems.map(item => item.id).join(',');
+                }
+            }
+            
+            function clearSelection() {
+                selectedItems = [];
+                items.forEach(item => {
+                    item.classList.remove('selected');
+                    item.querySelector('.checkmark').style.display = 'none';
+                });
+                updateDisplay();
+                saveFormData();
+            }
+            
+            // Restore saved selection if exists
+            const savedData = sessionStorage.getItem('employeeFormStep2');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                const structureId = wrapper.dataset.structureId;
+                const savedStructureData = formData[`structure-${structureId}`];
+                
+                if (savedStructureData) {
+                    const itemIds = savedStructureData.split(',');
+                    selectedItems = [];
+                    
+                    itemIds.forEach(itemId => {
+                        const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
+                        if (itemElement) {
+                            const itemName = itemElement.dataset.itemName;
+                            selectedItems.push({ id: itemId, name: itemName });
+                            itemElement.classList.add('selected');
+                            itemElement.querySelector('.checkmark').style.display = 'block';
+                        }
+                    });
+                    
+                    updateDisplay();
+                }
+            }
+        });
+    }
+
+    // Initialize position dropdowns when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializePositionDropdowns);
     </script>
 </body>
 </html> 

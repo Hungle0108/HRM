@@ -383,7 +383,30 @@ def add_employee_step2():
         session.pop('user_id', None)
         return redirect('/login')
     
-    return render_template('add_employee_step2.html', user=user)
+    organization = None
+    user_groups = []
+    structure_data = []
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+        user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
+        
+        structures = OrgStructure.query.filter_by(organization_id=user.organization_id).all()
+        for structure in structures:
+            # Fetch top-level items for each structure
+            top_level_items = StructureItem.query.filter_by(structure_id=structure.id, parent_id=None).all()
+            structure_dict = {
+                'id': structure.id,
+                'name': structure.name,
+                'allow_multiple_assignments': structure.allow_multiple_assignments,
+                'items': [item.to_dict() for item in top_level_items]
+            }
+            print(f"DEBUG: Structure {structure.name} - items type: {type(structure_dict['items'])}, items: {structure_dict['items']}")
+            structure_data.append(structure_dict)
+        
+        print(f"DEBUG: Total structure_data: {len(structure_data)}")
+        print(f"DEBUG: Type of structure_data: {type(structure_data)}")
+    
+    return render_template('add_employee_step2.html', user=user, groups=user_groups, org_structures=structure_data)
 
 @app.route('/add-employee-step3')
 def add_employee_step3():

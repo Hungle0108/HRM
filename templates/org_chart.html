@@ -375,81 +375,587 @@
         font-size: 0.875rem;
         margin-bottom: 16px;
     }
-     /* Table */
-    .org-table-container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        margin-bottom: 24px;
-        overflow: hidden;
-    }
-     .org-table {
+     /* Table styles */
+    .structures-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: none;
+        border-radius: 0;
+        overflow: visible;
     }
-     .org-table th,
-    .org-table td {
-        padding: 16px 24px;
+
+    .structures-table th {
+        padding: 16px;
         text-align: left;
-        border-bottom: 1px solid #f1f3f4;
-    }
-     .org-table th {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
         background: #f8f9fa;
-        font-weight: 500;
-        color: #374151;
+        user-select: none;
+        position: relative;
+        transition: background-color 0.2s ease;
+    }
+
+    .structures-table th .sort-icon {
+        display: inline-block;
+        margin-left: 8px;
+        width: 12px;
+        height: 12px;
+        opacity: 0.3;
+        transition: opacity 0.2s ease;
+        vertical-align: baseline;
+        transform: translateY(-2px);
+        cursor: pointer;
+    }
+
+    .structures-table th .sort-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        vertical-align: middle;
+        transition: none;
+    }
+
+    .structures-table th.sortable:hover .sort-icon,
+    .structures-table th.sorted .sort-icon,
+    .structures-table th.sort-active .sort-icon {
+        opacity: 1;
+    }
+
+    .header-menu-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        z-index: 2;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .structures-table th:hover .header-menu-icon {
+        opacity: 0.7;
+    }
+
+    .header-menu-icon:hover {
+        opacity: 1;
+    }
+
+    .structures-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
         font-size: 0.875rem;
-        letter-spacing: 0.025em;
+        color: #495057;
+        vertical-align: top;
     }
-     .org-table td {
-        font-size: 0.875rem;
-        color: #1f2937;
+
+    /* Center content vertically in specific columns */
+    .structures-table td:nth-child(2), /* Units column */
+    .structures-table td:nth-child(3), /* Roles column */
+    .structures-table td:last-child { /* Actions column */
+        vertical-align: middle;
     }
-     .org-table tbody tr:hover {
-        background: #f9fafb;
+
+    .structures-table td:last-child {
+        border-right: none;
     }
-     .org-table tbody tr:last-child td {
+
+    .structures-table tr:last-child td {
         border-bottom: none;
     }
-     .table-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
+
+    .structures-table tr:hover {
+        background: #f8f9fa;
     }
-     .view-org-chart-link {
+
+    /* Ensure rounded corners are respected */
+    .structures-table thead tr:first-child th:first-child {
+        border-top-left-radius: 0;
+    }
+    
+    .structures-table thead tr:first-child th:last-child {
+        border-top-right-radius: 0;
+    }
+    
+    .structures-table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+    }
+    
+    .structures-table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
+    }
+
+    .structure-name {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .structure-name.clickable {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .structure-name.clickable:hover {
+        color: #8b5cf6;
+    }
+
+    /* Edit button styles */
+    .edit-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        padding: 6px 12px;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
+        justify-content: center;
+        opacity: 0.7;
+    }
+
+    .edit-btn:hover {
+        background: #f8f9fa;
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .edit-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Actions column width */
+    .structures-table td:last-child,
+    .structures-table th:last-child {
+        width: 60px;
+        text-align: center;
+        padding: 12px 8px;
+        position: relative;
+    }
+
+    /* Header dropdown menu styles */
+    .header-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
         background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+        z-index: 1001;
+        display: none;
+        padding: 6px 0;
+        margin-top: 4px;
+        animation: fadeIn 0.15s ease-out;
+    }
+    
+    .header-dropdown.positioned-above {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px 14px;
+        font-size: 0.875rem;
         color: #374151;
-        text-decoration: none;
-        font-size: 0.8125rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.15s ease;
+        position: relative;
         font-weight: 500;
-        transition: all 0.2s;
     }
-     .view-org-chart-link:hover {
-        background: #f9fafb;
-        border-color: #d1d5db;
-        text-decoration: none;
-        color: #374151;
+
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+        color: #1f2937;
+        padding-left: 16px;
     }
-     .edit-btn {
-        padding: 6px 12px;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
+
+    .dropdown-item:first-child {
+        margin-top: 2px;
+    }
+
+    .dropdown-item:last-child {
+        margin-bottom: 2px;
+    }
+
+    .dropdown-item img {
+        width: 14px;
+        height: 14px;
+        opacity: 0.7;
+        transition: opacity 0.15s ease;
+    }
+
+    .dropdown-item:hover img {
+        opacity: 1;
+    }
+
+    /* Action menu styles */
+    .action-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
         background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+        z-index: 9999;
+        display: none;
+        padding: 6px 0;
+        margin-top: 4px;
+        animation: fadeIn 0.15s ease-out;
+    }
+
+    /* Ensure active menu always appears on top */
+    .actions-container.menu-active .action-menu {
+        z-index: 10001;
+    }
+
+    .action-menu.show {
+        display: block;
+    }
+
+    .action-menu.positioned-above {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
+
+    .action-item {
+        padding: 10px 14px;
+        font-size: 0.875rem;
         color: #374151;
-        text-decoration: none;
-        font-size: 0.8125rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.15s ease;
+        position: relative;
+        font-weight: 500;
+    }
+
+    .action-item:hover {
+        background-color: #f8fafc;
+        color: #1f2937;
+        padding-left: 16px;
+    }
+
+    .action-item:first-child {
+        margin-top: 2px;
+    }
+
+    .action-item:last-child {
+        margin-bottom: 2px;
+    }
+
+    .action-item img {
+        width: 14px;
+        height: 14px;
+        opacity: 0.7;
+        transition: opacity 0.15s ease;
+    }
+
+    .action-item:hover img {
+        opacity: 1;
+    }
+
+    .action-item.delete:hover {
+        background-color: #fef2f2;
+        color: #dc2626;
+    }
+
+    .action-item.delete:hover img {
+        opacity: 1;
+    }
+
+    /* Structure info styles */
+    .structure-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .structure-icon {
+        width: 40px;
+        height: 40px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .structure-details h4 {
+        margin: 0 0 4px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .structure-details p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    /* Empty state styles */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state-icon {
+        margin-bottom: 16px;
+    }
+
+    .empty-state-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+        line-height: 1.4;
+    }
+
+    /* Table box styles */
+    .table-box {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 24px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .table-summary {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 0.875rem;
+        color: #6c757d;
+        background: #f8f9fa;
+    }
+
+    /* Actions container */
+    .actions-container {
+        position: relative;
+        z-index: 10;
+    }
+
+    /* When action menu is active, increase container z-index */
+    .actions-container.menu-active {
+        z-index: 10000;
+    }
+
+    /* Filters and search styles */
+    .filters-box {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .filters-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .filters-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+    }
+
+    .action-buttons-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .action-button {
+        padding: 10px 20px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-     .edit-btn:hover {
-        background: #f9fafb;
-        border-color: #d1d5db;
+
+    .action-button:hover {
+        background: #333;
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Search container styles */
+    .filters-section .search-container {
+        position: relative;
+        height: 44px;
+        width: 44px;
+        max-width: 300px;
+        transition: width 0.3s ease;
+        cursor: pointer;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Expanded state */
+    .filters-section .search-container.expanded {
+        width: 300px;
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .filters-section .search-container:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .filters-section .search-container.expanded:hover {
+        background: white;
+        border-color: #80bdff;
+    }
+
+    .filters-section .search-input {
+        width: 0;
+        padding: 0;
+        border: none !important;
+        outline: none !important;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        opacity: 0;
+        margin-left: 40px;
+        box-shadow: none !important;
+    }
+
+    /* Visible input in expanded state */
+    .filters-section .search-container.expanded .search-input {
+        width: calc(100% - 50px);
+        padding: 10px 16px 10px 0;
+        opacity: 1;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .filters-section .search-input:focus {
+        outline: none !important;
+        background: transparent;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .filters-section .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+
+    .filters-section .search-container.expanded .search-icon {
+        opacity: 0.8;
+    }
+
+    .filters-section .search-icon:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 3;
+        display: none;
+    }
+
+    .search-clear-btn:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn.show {
+        display: block;
+        opacity: 0.6;
+    }
+
+    /* Prevent body scroll when dropdown menus are open */
+    body.no-scroll {
+        overflow: hidden;
     }
 </style>
 {% endblock %}
@@ -473,74 +979,566 @@
             <div class="sub-tab active">Org structures</div>
         </div>
 
-        <!-- Controls -->
-        <div class="controls">
-            <div class="controls-left">
-                <div class="search-control">
-                    <input type="text" placeholder="Search">
-                    <span class="search-icon">🔍</span>
+        <!-- Groups section -->
+        <div class="groups-section">
+            <!-- Filters Box -->
+            <div class="filters-box">
+                <div class="filters-section">
+                    <div class="filters-left">
+                        <div class="search-container" id="searchContainer">
+                            <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                            <input type="text" class="search-input" placeholder="Search by structure name..." id="searchInput">
+                            <button class="search-clear-btn" id="searchClearBtn">
+                                <img src="/static/images/cross.png" alt="Clear" style="width: 16px; height: 16px;">
+                            </button>
                 </div>
             </div>
-            
-            <div class="controls-right">
-                <button class="create-structure-btn">Create new structure</button>
-                <button class="expand-btn">
-                    <img src="/static/images/expand.png" alt="Expand" width="16" height="16">
-                </button>
+                    <div class="action-buttons-group">
+                        <button class="action-button" id="headerCreateBtn">Create new structure</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Item Count -->
-        <div class="item-count">Total {{ structures|length }} items</div>
-
-        <!-- Org Structure Table -->
-        <div class="org-table-container">
-            <table class="org-table">
+        <!-- Table Box -->
+        <div class="table-box">
+            <div class="table-wrapper">
+                <div class="table-summary" id="tableSummary">Total {{ structures|length }} items</div>
+                <!-- Data table -->
+                <table class="structures-table" id="structuresTable">
                 <thead>
                     <tr>
-                        <th>Structure</th>
-                        <th>Units</th>
-                        <th>Roles</th>
-                        <th></th>
+                            <th class="sortable" data-sort="name">
+                                Structure
+                                <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'name')">
+                            </th>
+                            <th class="sortable" data-sort="units">
+                                Units
+                                <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'units')">
+                            </th>
+                            <th class="sortable" data-sort="roles">
+                                Roles
+                                <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'roles')">
+                            </th>
+                            <th style="width: 60px;"></th>
                     </tr>
                 </thead>
-                <tbody>
+                    <tbody id="structuresBody">
+                        {% if structures %}
                     {% for structure in structures %}
-                    <tr>
-                        <td>{{ structure.name }}</td>
-                        <td>{{ structure.items.count() }}</td>
-                        <td>0</td>  <!-- Placeholder for roles count -->
-                        <td>
-                            <div class="table-actions">
-                                <a href="#" class="view-org-chart-link">
-                                    View org chart
-                                    <span>↗</span>
-                                </a>
-                                <button class="edit-btn">Edit</button>
+                            <tr data-structure-id="{{ structure.id }}">
+                                <td>
+                                    <div class="structure-info">
+                                        <div class="structure-icon">
+                                            <img src="/static/images/department-structure.png" alt="Department Structure" style="width: 24px; height: 24px;">
+                                        </div>
+                                        <div class="structure-details">
+                                            <h4 class="structure-name clickable" data-structure-id="{{ structure.id }}" onclick="showStructureInfo(this.getAttribute('data-structure-id'))" title="Click to view details">{{ structure.name }}</h4>
+                                            <p>Organizational structure</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ structure.items.count() }} units</td>
+                                <td>0 roles</td>
+                                <td>
+                                    <div class="actions-container">
+                                        <button class="edit-btn" data-structure-id="{{ structure.id }}" onclick="toggleActionMenu(event, this.getAttribute('data-structure-id'))" title="More actions">
+                                            <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                                        </button>
+                                        <div class="action-menu" id="menu-{{ structure.id }}">
+                                            <a href="/settings/create-structure?edit={{ structure.id }}" class="action-item" style="text-decoration: none; color: inherit;">
+                                                <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                                <span>Edit structure</span>
+                                            </a>
+                                        </div>
                             </div>
                         </td>
                     </tr>
+                            {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="4" style="text-align: center; color: #6c757d; padding: 40px;">
-                            No structures created yet. <a href="/settings/create-structure" style="color: #007bff;">Create your first structure</a>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon"><img src="/static/images/building.png" alt="Structure" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                                    <div class="empty-state-title">No structures yet</div>
+                                    <div class="empty-state-description">Create your first organizational structure to define team hierarchy</div>
+                                </div>
                         </td>
                     </tr>
-                    {% endfor %}
+                        {% endif %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Portal dropdown utilities
+    let currentPortalTrigger = null; // keep track of which header icon opened dropdown
+    let portalOutsideHandler = null; // keep reference to active outside-click listener
+
+    function openPortalDropdown(trigger, html) {
+        // If an old outside-click handler exists, remove it to avoid stacking
+        if (portalOutsideHandler) {
+            document.removeEventListener('mousedown', portalOutsideHandler);
+            portalOutsideHandler = null;
+        }
+
+        // Check if there's already an open dropdown
+        const portalRoot = document.getElementById('portal-root');
+        const existingDropdown = portalRoot.querySelector('.header-dropdown');
+        
+        // If there's a visible dropdown, close it (toggle behavior)
+        if (existingDropdown && existingDropdown.classList.contains('show')) {
+            closePortalDropdown();
+            return;
+        }
+        
+        // Otherwise, open a new dropdown
+        currentPortalTrigger = trigger;
+
+        portalRoot.innerHTML = html;
+
+        const rect = trigger.getBoundingClientRect();
+        const dropdownWidth = 220;
+        const gap = 4;
+        const minMargin = 8;
+
+        let left;
+        // Prefer left alignment, but if not enough space, align right
+        if (rect.right - dropdownWidth > minMargin) {
+            // Enough space to the left
+            left = rect.right - dropdownWidth;
+        } else if (rect.left + dropdownWidth < window.innerWidth - minMargin) {
+            // Not enough space to the left, so show to the right
+            left = rect.left;
+        } else {
+            // Fallback: stick to minMargin
+            left = minMargin;
+        }
+
+        const dropdown = portalRoot.firstElementChild;
+        dropdown.style.position = 'fixed';
+        dropdown.style.top = (rect.bottom + gap) + 'px';
+        dropdown.style.width = dropdownWidth + 'px';
+        dropdown.style.left = left + 'px';
+        dropdown.style.zIndex = 9999;
+
+        portalOutsideHandler = function(event) {
+            if (!dropdown.contains(event.target) && event.target !== trigger) {
+                closePortalDropdown();
+                currentPortalTrigger = null;
+                document.removeEventListener('mousedown', portalOutsideHandler);
+                portalOutsideHandler = null;
+            }
+        };
+        document.addEventListener('mousedown', portalOutsideHandler);
+        
+        // Lock body scroll while header dropdown is open
+        document.body.classList.add('no-scroll');
+    }
+
+    function closePortalDropdown() {
+        const portalRoot = document.getElementById('portal-root');
+        portalRoot.innerHTML = '';
+        // Re-enable body scroll
+        document.body.classList.remove('no-scroll');
+        currentPortalTrigger = null;
+        // Remove any lingering outside-click handler
+        if (portalOutsideHandler) {
+            document.removeEventListener('mousedown', portalOutsideHandler);
+            portalOutsideHandler = null;
+        }
+    }
+
+    // Sort dropdown functionality
+    function showSortDropdown(trigger, column) {
+        // Check if this column is currently sorted
+        const isCurrentlySorted = currentSort && currentSort.field === column;
+        const currentDirection = currentSort ? currentSort.direction : null;
+        
+        let dropdownHtml = `
+            <div class="header-dropdown show" id="sort-dropdown-${column}">`;
+        
+        if (isCurrentlySorted && currentSort.field !== null) {
+            // If column is sorted, show opposite sort option and unsort
+            const oppositeDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            const oppositeText = oppositeDirection === 'asc' ? 'Sort by ASC' : 'Sort by DESC';
+            const oppositeIcon = oppositeDirection === 'asc' ? 'arrow-small-up.png' : 'arrow-small-down.png';
+            
+            dropdownHtml += `
+                <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="${oppositeDirection}">
+                    <img src="/static/images/${oppositeIcon}" alt="Sort ${oppositeDirection.toUpperCase()}">
+                    ${oppositeText}
+                </div>
+                <div class="dropdown-item" data-action="unsort">
+                    <img src="/static/images/cross.png" alt="Unsort">
+                    Unsort
+                </div>`;
+        } else {
+            // If column is not sorted, show both sort options
+            dropdownHtml += `
+                <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="asc">
+                    <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                    Sort by ASC
+                </div>
+                <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="desc">
+                    <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                    Sort by DESC
+                </div>`;
+        }
+        
+        dropdownHtml += `
+                <div class="dropdown-item" data-action="customize">
+                    <img src="/static/images/columns-3.png" alt="Customize">
+                    Customize columns
+                </div>
+            </div>
+        `;
+        
+        openPortalDropdown(trigger, dropdownHtml);
+        
+        // Add event listeners after the dropdown is created
+        setTimeout(() => {
+            const dropdown = document.getElementById(`sort-dropdown-${column}`);
+            if (dropdown) {
+                dropdown.addEventListener('click', function(e) {
+                    const item = e.target.closest('.dropdown-item');
+                    if (!item) return;
+                    
+                    e.stopPropagation();
+                    
+                    const action = item.getAttribute('data-action');
+                    const col = item.getAttribute('data-column');
+                    const direction = item.getAttribute('data-direction');
+                    
+                    // Close dropdown first
+                    closePortalDropdown();
+                    
+                    // Then execute action
+                    if (action === 'sort') {
+                        sortColumn(col, direction);
+                    } else if (action === 'unsort') {
+                        unsortColumn();
+                    } else if (action === 'customize') {
+                        customizeColumnsFromDropdown();
+                    }
+                });
+            }
+        }, 50);
+    }
+
+    // Sorting system variables
+    let currentSort = { field: null, direction: null };
+    let originalData = [];
+
+    // Initialize sorting system
+    function initializeSorting() {
+        // Collect original data from table rows
+        const tbody = document.getElementById('structuresBody');
+        const rows = tbody.querySelectorAll('tr');
+        
+        originalData = [];
+        rows.forEach(row => {
+            if (row.cells.length > 1) { // Skip empty state rows
+                const nameCell = row.querySelector('.structure-name');
+                const unitsCell = row.cells[1];
+                const rolesCell = row.cells[2];
+                
+                originalData.push({
+                    element: row.cloneNode(true),
+                    name: nameCell ? nameCell.textContent.trim().toLowerCase() : '',
+                    units: unitsCell ? parseInt(unitsCell.textContent.match(/\d+/)?.[0] || '0') : 0,
+                    roles: rolesCell ? parseInt(rolesCell.textContent.match(/\d+/)?.[0] || '0') : 0
+                });
+            }
+        });
+    }
+
+    // Sort column function
+    function sortColumn(field, direction) {
+        console.log('Sorting by', field, direction);
+        
+        // Update current sort state
+        currentSort = { field: field, direction: direction };
+        
+        // Update sort icons
+        updateSortIcons(field, direction);
+        
+        // Update table view with new sorting
+        updateTableView();
+    }
+
+    // Unsort column function
+    function unsortColumn() {
+        console.log('Unsorting - removing all sorting');
+        
+        // Reset current sort state to no sorting
+        currentSort = { field: null, direction: null };
+        
+        // Reset all sort icons
+        resetSortIcons();
+        
+        // Update table view without sorting
+        updateTableView();
+    }
+
+    // Update sort icons
+    function updateSortIcons(field, direction) {
+        // Reset all sort icons first
+        resetSortIcons();
+        
+        // Update the current column's sort icon
+        const header = document.querySelector(`th[data-sort="${field}"]`);
+        if (header) {
+            const sortIcon = header.querySelector('.sort-icon img');
+            if (sortIcon) {
+                const iconPath = direction === 'asc' ? 'arrow-small-up.png' : 'arrow-small-down.png';
+                sortIcon.src = `/static/images/${iconPath}`;
+                sortIcon.style.opacity = '1';
+            }
+            // Add active class to the header
+            header.classList.add('sort-active');
+        }
+    }
+
+    // Reset all sort icons
+    function resetSortIcons() {
+        const sortIcons = document.querySelectorAll('.sort-icon img');
+        const headers = document.querySelectorAll('th.sort-active');
+        
+        sortIcons.forEach(icon => {
+            icon.src = '/static/images/arrow-small-up.png';
+            icon.style.opacity = '0.3';
+        });
+        
+        headers.forEach(header => {
+            header.classList.remove('sort-active');
+        });
+    }
+
+    // Update table view function
+    function updateTableView() {
+        const tbody = document.getElementById('structuresBody');
+        tbody.innerHTML = '';
+        
+        if (originalData.length === 0) {
+            // Show empty state if no structures exist
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><img src="/static/images/building.png" alt="Structure" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                            <div class="empty-state-title">No structures yet</div>
+                            <div class="empty-state-description">Create your first organizational structure to define team hierarchy</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        let sortedData = [...originalData];
+        
+        // Apply sorting if there's an active sort
+        if (currentSort.field && currentSort.direction) {
+            sortedData.sort((a, b) => {
+                let aValue = a[currentSort.field];
+                let bValue = b[currentSort.field];
+                
+                // Handle string comparison
+                if (typeof aValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+                
+                if (currentSort.direction === 'asc') {
+                    return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+                } else {
+                    return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+                }
+            });
+        }
+        
+        // Rebuild the table with sorted data
+        sortedData.forEach(item => {
+            const clonedRow = item.element.cloneNode(true);
+            // Re-attach event listeners to cloned elements
+            attachRowEventListeners(clonedRow);
+            tbody.appendChild(clonedRow);
+        });
+    }
+
+    // Reattach event listeners to cloned rows
+    function attachRowEventListeners(row) {
+        // Reattach structure name click listener
+        const structureName = row.querySelector('.structure-name.clickable');
+        if (structureName) {
+            structureName.addEventListener('click', function() {
+                showStructureInfo(this.getAttribute('data-structure-id'));
+            });
+        }
+        
+        // Reattach action menu listeners
+        const editBtn = row.querySelector('.edit-btn');
+        if (editBtn) {
+            editBtn.addEventListener('click', function(event) {
+                toggleActionMenu(event, this.getAttribute('data-structure-id'));
+            });
+        }
+    }
+
+    // Customize columns functions
+    function customizeColumnsFromDropdown() {
+        console.log('Customize columns from dropdown');
+        // This would open a customize modal
+    }
+
+    // Action menu functionality
+    function toggleActionMenu(event, structureId) {
+        event.stopPropagation();
+
+        // Close all other action menus and remove active class from containers
+        document.querySelectorAll('.action-menu.show').forEach(openMenu => {
+            if (openMenu.id !== `menu-${structureId}`) {
+                openMenu.classList.remove('show');
+                // Remove active class from the container
+                const container = openMenu.closest('.actions-container');
+                if (container) {
+                    container.classList.remove('menu-active');
+                }
+            }
+        });
+        
+        // Re-enable body scroll (in case another menu was open)
+        document.body.classList.remove('no-scroll');
+
+        // Also close column-header dropdown (portal)
+        if (typeof closePortalDropdown === 'function') {
+            closePortalDropdown();
+        }
+        const menu = document.getElementById(`menu-${structureId}`);
+        const button = event.currentTarget;
+
+        // If the clicked menu is already open, close it.
+        if (menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            // Remove active class from container
+            button.closest('.actions-container').classList.remove('menu-active');
+            // Re-enable body scroll
+            document.body.classList.remove('no-scroll');
+            return;
+        }
+
+        // Reset any previous positioning class
+        menu.classList.remove('positioned-above');
+
+        // Check if menu would overflow the bottom of the viewport or table container
+        const buttonRect = button.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const tableWrapper = document.querySelector('.table-wrapper');
+        
+        // Temporarily show the menu to measure its actual height
+        menu.style.visibility = 'hidden';
+        menu.style.position = 'absolute';
+        menu.style.top = '-9999px';
+        menu.classList.add('show');
+        const actualMenuHeight = menu.offsetHeight;
+        menu.classList.remove('show');
+        menu.style.visibility = '';
+        menu.style.position = '';
+        menu.style.top = '';
+        
+        // Calculate available space below the button
+        let availableSpaceBelow = viewportHeight - buttonRect.bottom;
+        
+        // If there's a table wrapper, also consider its boundaries
+        if (tableWrapper) {
+            const wrapperRect = tableWrapper.getBoundingClientRect();
+            const spaceToWrapperBottom = wrapperRect.bottom - buttonRect.bottom;
+            availableSpaceBelow = Math.min(availableSpaceBelow, spaceToWrapperBottom);
+        }
+        
+        // If there's not enough space below (with some padding), position above
+        if (availableSpaceBelow < actualMenuHeight + 20) { // 20px padding for better responsiveness
+            menu.classList.add('positioned-above');
+            console.log('Positioning menu above - available space:', availableSpaceBelow, 'menu height:', actualMenuHeight);
+        } else {
+            console.log('Positioning menu below - available space:', availableSpaceBelow, 'menu height:', actualMenuHeight);
+        }
+
+        // Show the menu (CSS will handle the positioning)
+        menu.classList.add('show');
+        
+        // Add active class to container for higher z-index
+        button.closest('.actions-container').classList.add('menu-active');
+        
+        // Lock body scrolling
+        document.body.classList.add('no-scroll');
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.actions-container')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.remove('show');
+                // Remove active class from container
+                const container = menu.closest('.actions-container');
+                if (container) {
+                    container.classList.remove('menu-active');
+                }
+            });
+            // Re-enable body scroll
+            document.body.classList.remove('no-scroll');
+        }
+    });
+
+    // Action handlers
+    function showStructureInfo(structureId) {
+        if (structureId) {
+            console.log('Show structure info for ID:', structureId);
+            // Add structure info functionality here
+        }
+    }
+
+    // Initialize portal root
 document.addEventListener('DOMContentLoaded', function() {
+        // Create portal root if it doesn't exist
+        if (!document.getElementById('portal-root')) {
+            const portalRoot = document.createElement('div');
+            portalRoot.id = 'portal-root';
+            document.body.appendChild(portalRoot);
+        }
+
+        // Initialize sorting system
+        initializeSorting();
+
     // Search functionality
-    const searchInput = document.querySelector('.search-control input');
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('.org-table tbody tr');
+        const searchContainer = document.getElementById('searchContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchIcon = document.getElementById('searchIcon');
+        const searchClearBtn = document.getElementById('searchClearBtn');
+
+        // Search container click handler
+        searchContainer.addEventListener('click', function() {
+            if (!this.classList.contains('expanded')) {
+                this.classList.add('expanded');
+                searchInput.focus();
+            }
+        });
+
+        // Search input handlers
+        searchInput.addEventListener('input', function() {
+            const hasValue = this.value.trim().length > 0;
+            searchClearBtn.classList.toggle('show', hasValue);
+            
+            // Filter table based on search term
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.structures-table tbody tr');
             
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
@@ -548,32 +1546,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.style.display = shouldShow ? 'table-row' : 'none';
             });
         });
-    }
+
+        searchInput.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                searchContainer.classList.remove('expanded');
+            }
+        });
+
+        // Clear search button
+        searchClearBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            searchInput.value = '';
+            searchContainer.classList.remove('expanded');
+            this.classList.remove('show');
+            
+            // Show all rows
+            const rows = document.querySelectorAll('.structures-table tbody tr');
+            rows.forEach(row => {
+                row.style.display = 'table-row';
+            });
+        });
+
+        // Click outside to collapse search
+        document.addEventListener('click', function(e) {
+            if (!searchContainer.contains(e.target) && !searchInput.value.trim()) {
+                searchContainer.classList.remove('expanded');
+            }
+        });
 
     // Create new structure button
-    const createBtn = document.querySelector('.create-structure-btn');
+        const createBtn = document.getElementById('headerCreateBtn');
     if (createBtn) {
         createBtn.addEventListener('click', function() {
             window.location.href = '/settings/create-structure';
         });
     }
-
-    // View org chart buttons
-    const viewOrgChartBtns = document.querySelectorAll('.view-org-chart-link');
-    viewOrgChartBtns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('View org chart functionality would be implemented here');
-        });
-    });
-
-    // Edit buttons
-    const editBtns = document.querySelectorAll('.edit-btn');
-    editBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            alert('Edit structure functionality would be implemented here');
-        });
-    });
 
     // Sub-tab navigation
     const subTabs = document.querySelectorAll('.sub-tab');
