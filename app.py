@@ -2155,6 +2155,34 @@ def api_get_organization_workers():
         logger.error(f"Error fetching organization workers: {str(e)}")
         return jsonify({'error': 'Failed to fetch workers'}), 500
 
+@app.route('/api/get-organization-schedules', methods=['GET'])
+def api_get_organization_schedules():
+    """API endpoint to get all work schedules for current user's organization"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        # Fetch all schedules for this organization
+        schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).order_by(WorkSchedule.created_at.desc()).all()
+        
+        # Convert to list of dictionaries for JSON serialization
+        schedules_data = []
+        for schedule in schedules:
+            schedules_data.append(schedule.to_dict())
+        
+        return jsonify({
+            'success': True,
+            'schedules': schedules_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching organization schedules: {str(e)}")
+        return jsonify({'error': 'Failed to fetch schedules'}), 500
+
 @app.route('/group/<int:group_id>/settings')
 def group_settings(group_id):
     if 'user_id' not in session:

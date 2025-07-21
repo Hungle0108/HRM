@@ -1020,7 +1020,7 @@
                         const option = document.createElement('div');
                         option.className = 'dropdown-option';
                         option.dataset.value = workerType.id;
-                        option.textContent = workerType.template_name;
+                        option.innerHTML = `<div class="option-main">${workerType.template_name}</div>`;
                         
                         // Restore saved selection if it matches
                         if (savedWorkerType == workerType.id) {
@@ -1042,7 +1042,7 @@
                             this.classList.add('selected');
                             
                             // Update dropdown label
-                            updateWorkerTypeDropdownLabel(this.textContent);
+                            updateWorkerTypeDropdownLabel(this.querySelector('.option-main').textContent);
                             
                             // Close dropdown
                             closeWorkerTypeDropdown();

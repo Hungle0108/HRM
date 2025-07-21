@@ -450,6 +450,14 @@
             display: block;
         }
 
+        /* When dropdown is near bottom of viewport, show it above the input */
+        .dropdown-menu.show-above {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
         .dropdown-item {
             padding: 12px 16px;
             cursor: pointer;
@@ -2047,6 +2055,33 @@
         console.log('All form data cleared');
     }
 
+    // Global function to close all dropdowns except the specified one
+    function closeAllDropdowns(exceptDropdown = null) {
+        // Close all dropdown menus
+        const allDropdowns = document.querySelectorAll('.dropdown-menu');
+        allDropdowns.forEach(dropdown => {
+            if (dropdown !== exceptDropdown) {
+                dropdown.classList.remove('show');
+                dropdown.classList.remove('show-above');
+            }
+        });
+        
+        // Close all custom dropdowns (gender, group, etc.)
+        const allCustomDropdowns = document.querySelectorAll('.custom-dropdown');
+        allCustomDropdowns.forEach(customDropdown => {
+            if (customDropdown !== exceptDropdown?.parentElement) {
+                const menu = customDropdown.querySelector('.dropdown-menu');
+                const arrow = customDropdown.querySelector('.dropdown-arrow');
+                if (menu) {
+                    menu.classList.remove('show');
+                }
+                if (arrow) {
+                    arrow.src = arrow.src.replace('angle-small-up.png', 'angle-small-down.png');
+                }
+            }
+        });
+    }
+
     // Group Dropdown Functionality
     function initializeGroupDropdown() {
         const dropdownBtn = document.getElementById('groupDropdownBtn');
@@ -2110,6 +2145,9 @@
         });
 
         function openDropdown() {
+            // Close all other dropdowns before opening this one
+            closeAllDropdowns(dropdownMenu);
+            
             dropdownMenu.classList.add('show');
             dropdownBtn.classList.add('active');
             // Change arrow to point up
@@ -2191,6 +2229,9 @@
         });
 
         function openDropdown() {
+            // Close all other dropdowns before opening this one
+            closeAllDropdowns(dropdownMenu);
+            
             dropdownMenu.classList.add('show');
             dropdownBtn.classList.add('active');
             // Change arrow to point up
@@ -2523,11 +2564,12 @@
         if (filteredCountries.length > 0) {
           filteredCountries.forEach(country => {
             const div = document.createElement('div');
-            div.className = 'dropdown-item';
-            div.textContent = country;
+            div.className = 'dropdown-option';
+            div.innerHTML = `<div class="option-main">${country}</div>`;
             div.addEventListener('click', () => {
               input.value = country;
               dropdown.classList.remove('show');
+              dropdown.classList.remove('show-above');
               // Clear any error states when a country is selected
               input.classList.remove('error');
               const errorMsg = input.parentNode.querySelector('.error-message');
@@ -2537,9 +2579,24 @@
             });
             dropdown.appendChild(div);
           });
+          
+          // Check if dropdown would be cut off by bottom navigation
+          const inputRect = input.getBoundingClientRect();
+          const dropdownHeight = Math.min(filteredCountries.length * 48, 200); // Approximate height
+          const viewportHeight = window.innerHeight;
+          const bottomNavigationHeight = 80; // Approximate height of bottom navigation
+          
+          // If dropdown would extend below the viewport (accounting for bottom navigation)
+          if (inputRect.bottom + dropdownHeight > viewportHeight - bottomNavigationHeight) {
+            dropdown.classList.add('show-above');
+          } else {
+            dropdown.classList.remove('show-above');
+          }
+          
           dropdown.classList.add('show');
         } else {
           dropdown.classList.remove('show');
+          dropdown.classList.remove('show-above');
         }
       }
 
@@ -2550,6 +2607,9 @@
       });
 
       input.addEventListener('focus', () => {
+        // Close all other dropdowns before opening this one
+        closeAllDropdowns();
+        
         if (input.value) {
                     const filteredCountries = filterCountries(input.value);
                     updateDropdown(filteredCountries);
@@ -2564,13 +2624,14 @@
         setupCountryDropdown('employeeResidenceInput', 'employeeResidenceDropdown');
 
         // Close dropdowns when clicking outside
-      document.addEventListener('click', (e) => {
+        document.addEventListener('click', (e) => {
             const dropdowns = document.querySelectorAll('.dropdown-menu');
             dropdowns.forEach(dropdown => {
                 if (!dropdown.parentElement.contains(e.target)) {
-          dropdown.classList.remove('show');
-        }
-      });
+                    dropdown.classList.remove('show');
+                    dropdown.classList.remove('show-above');
+                }
+            });
         });
 
         // Info modal functionality for country of residence

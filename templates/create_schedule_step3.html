@@ -1075,8 +1075,15 @@
                     // Clear the session storage
                     sessionStorage.removeItem('scheduleFormData');
                     
-                    // Redirect to time tracking page
-                    window.location.href = '/settings/time-tracking';
+                    // Redirect to return_to if present
+                    const returnTo = sessionStorage.getItem('scheduleReturnTo');
+                    if (returnTo) {
+                        window.location.href = returnTo;
+                        sessionStorage.removeItem('scheduleReturnTo');
+                    } else {
+                        // Redirect to time tracking page
+                        window.location.href = '/settings/time-tracking';
+                    }
                 } else {
                     // Show error message
                     alert('Error: ' + (result.error || 'Failed to create schedule'));
@@ -1097,7 +1104,16 @@
         });
         
         // Initialize everything when page loads
+        // Store return_to param in sessionStorage if present
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
         document.addEventListener('DOMContentLoaded', function() {
+            const returnTo = getQueryParam('return_to');
+            if (returnTo) {
+                sessionStorage.setItem('scheduleReturnTo', returnTo);
+            }
             // Load saved data first
             loadSavedData();
             
