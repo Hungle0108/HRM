@@ -593,24 +593,26 @@
             margin-bottom: 24px;
         }
 
-        .create-schedule-btn {
-            background: none;
-            border: 1px solid #e9ecef;
-            color: #495057;
-            font-size: 0.85rem;
-            font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
+        .section-header h3 {
+            margin: 0;
         }
-
+        .create-schedule-btn {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-weight: 600;
+            color: #222;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: none;
+            font-size: 0.80rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
         .create-schedule-btn:hover {
-            border-color: #ced4da;
-            background: #f8f9fa;
+            background: #ececec;
         }
 
         .create-schedule-btn svg {
@@ -719,12 +721,12 @@
 
         .calendar-icon {
             position: absolute;
-            right: 16px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            padding: 8px;
+            padding: 0;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -753,6 +755,12 @@
         }
         .calendar-popup.show {
             display: block;
+        }
+        .calendar-popup.show-above {
+            bottom: 100%;
+            top: auto;
+            margin-top: 0;
+            margin-bottom: 4px;
         }
 
         :root {
@@ -1112,6 +1120,148 @@
                 grid-column: span 1;
             }
         }
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 48px 32px 48px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .info-modal-content img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+        }
+        .info-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        .info-modal-text {
+            font-size: 0.95rem;
+            color: #495057;
+            margin-bottom: 32px;
+            line-height: 1.45;
+        }
+        .info-modal-close {
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .info-modal-close:hover {
+            background: #333;
+        }
+        .date-input-wrapper {
+          position: relative;
+          background: transparent;
+          border: none;
+        }
+        .date-input-wrapper .form-input {
+          width: 100%;
+          padding-right: 44px;
+          border: 1px solid #ced4da !important;
+          border-radius: 8px !important;
+          font-size: 0.95rem;
+          background: white !important;
+          transition: all 0.2s;
+        }
+        .calendar-icon {
+          background: transparent;
+          border: none;
+        }
+        .form-input[readonly] {
+          background: #fafbfc;
+          cursor: pointer;
+        }
+        .custom-dropdown {
+          position: relative;
+          width: 100%;
+        }
+        .dropdown-toggle {
+          padding: 14px 16px;
+          border: 1px solid #ced4da;
+          border-radius: 8px;
+          background: white;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          font-size: 0.95rem;
+          transition: all 0.2s;
+        }
+        .dropdown-toggle:hover {
+          border-color: #adb5bd;
+        }
+        .dropdown-arrow {
+          margin-left: 8px;
+          width: 18px;
+          height: 18px;
+          transition: transform 0.2s;
+        }
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          max-height: 250px;
+          overflow-y: auto;
+          background: white;
+          border: 1px solid #ced4da;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          z-index: 20;
+          display: none;
+          margin-top: 4px;
+        }
+        .dropdown-menu.show {
+          display: block;
+        }
+        .dropdown-option {
+          padding: 16px 20px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid #f1f3f4;
+          transition: background-color 0.2s;
+          font-size: 0.95rem;
+          color: #202124;
+          background: white;
+        }
+        .dropdown-option:last-child {
+          border-bottom: none;
+        }
+        .dropdown-option:hover {
+          background: #f8f9fa;
+        }
+        .dropdown-option.selected {
+          background: #f5f5f5;
+          color: #1a1a1a;
+        }
+        .dropdown-placeholder {
+          color: #888;
+         
+        }
     </style>
 </head>
 <body>
@@ -1228,7 +1378,7 @@
                         
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label class="form-label">Agreement start date (DD/MM/YYYY) <span class="required">*</span></label>
+                                
                                 <div class="date-input-wrapper">
                                     <input type="text" class="form-input date-input" id="agreementStartDate" placeholder="Start date" readonly>
                                     <button type="button" class="calendar-icon" id="agreementCalendarToggle">
@@ -1271,14 +1421,13 @@
                     <!-- On-Target payments section -->
                     <div class="form-section">
                         <div class="section-header">
-                            <h3 class="section-title">On-Target payments</h3>
-                            <button type="button" class="create-schedule-btn" onclick="addOnTargetPayment()">
+                            <h3 class="section-title">On-Target payments
+                                <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="Info" style="width: 18px; height: 18px; margin-left: 8px; vertical-align: middle; cursor: pointer;" />
+                            </h3>
+                            <button type="button" class="create-schedule-btn" id="addOteBtn">
                                 Add
                             </button>
                         </div>
-                        
-                        <p class="section-description">Add additional on-target payment that will be included within the contract. <a href="#" class="learn-more-link">Learn more</a></p>
-                        
                         <div class="payment-info">
                             <div class="info-icon">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1289,6 +1438,76 @@
                             <div class="info-content">
                                 <p class="info-text">No on-target payment yet</p>
                             </div>
+                        </div>
+                    </div>
+                    <!-- Add On-Target Payment Modal (hidden by default) -->
+                    <div id="addOteModal" class="add-ote-modal">
+                      <div class="add-ote-modal-content">
+                        <button type="button" class="add-ote-modal-close" id="addOteModalClose">&times;</button>
+                        <h2 class="add-ote-modal-title">Add on-target payment</h2>
+                        <form class="add-ote-modal-form" id="addOteForm">
+                          <div class="form-group full-width">
+                            <input type="text" class="form-input" placeholder="Title *" name="oteTitle">
+                          </div>
+                          <div class="date-input-wrapper" style="position:relative;">
+                            <input type="text" class="form-input" id="oteEffectiveDate" placeholder="Effective date (DD/MM/YYYY)*" name="oteEffectiveDate" readonly>
+                            <button type="button" class="calendar-icon" id="oteCalendarToggle">
+                              <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar" style="width: 20px; height: 20px;">
+                            </button>
+                            <div class="calendar-popup" id="oteCalendarPopup" style="display: none;">
+                              <div class="calendar light">
+                                <div class="calendar-header">
+                                  <span class="month-picker" id="ote-month-picker">February</span>
+                                  <div class="year-picker">
+                                    <span class="year-change" id="ote-prev-year"><pre><</pre></span>
+                                    <span id="ote-year">2025</span>
+                                    <span class="year-change" id="ote-next-year"><pre>></pre></span>
+                                  </div>
+                                </div>
+                                <div class="calendar-body">
+                                  <div class="calendar-week-day">
+                                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                                  </div>
+                                  <div class="calendar-days"></div>
+                                </div>
+                                <div class="month-list"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="add-ote-row">
+                            <div class="add-ote-col">
+                              <div class="form-group full-width">
+                                <input type="text" class="form-input" placeholder="On-target payment amount *" name="oteAmount">
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Custom dropdown for frequency with placeholder -->
+                          <div class="custom-dropdown" id="oteFrequencyDropdown">
+                            <button type="button" class="dropdown-toggle" id="oteFrequencyDropdownBtn">
+                              <span id="oteFrequencyDropdownLabel" class="dropdown-placeholder">On-target payment frequency *</span>
+                              <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu" id="oteFrequencyDropdownMenu">
+                              <div class="dropdown-option" data-value="annually">
+                                <div class="option-main">Annually</div>
+                              </div>
+                              <div class="dropdown-option" data-value="monthly">
+                                <div class="option-main">Monthly</div>
+                              </div>
+                            </div>
+                            <input type="hidden" id="oteFrequencySelect" name="oteFrequency" value="">
+                          </div>
+                          <button type="button" class="add-ote-modal-add-btn" disabled>Add</button>
+                        </form>
+                      </div>
+                    </div>
+                    <!-- Info popup for On-Target payments (hidden initially) -->
+                    <div id="onTargetInfoModal" class="info-modal">
+                        <div class="info-modal-content">
+                            <img src="{{ url_for('static', filename='images/information.png') }}" alt="Info">
+                            <h2 class="info-modal-title">On-Target payments</h2>
+                            <p class="info-modal-text">Add additional on-target payment that will be included within the contract.</p>
+                            <button type="button" id="onTargetInfoModalClose" class="info-modal-close">OK</button>
                         </div>
                     </div>
 
@@ -1591,8 +1810,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             saveFormData && saveFormData();
                             calendarPopup.classList.remove('show');
                         });
-                    }
-                }
+            }
+        }
                 calendar_days.appendChild(day);
             }
         }
@@ -1628,10 +1847,21 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.stopPropagation();
             if (!calendarPopup.classList.contains('show')) {
+                // Calculate available space below and above
+                const inputRect = dateInput.getBoundingClientRect();
+                const popupHeight = 440; // Increased height for the calendar popup
+                const viewportHeight = window.innerHeight;
+                const spaceBelow = viewportHeight - inputRect.bottom;
+                const spaceAbove = inputRect.top;
+                calendarPopup.classList.remove('show-above');
+                if (spaceBelow < popupHeight && spaceAbove > spaceBelow) {
+                    calendarPopup.classList.add('show-above');
+                }
                 calendarPopup.classList.add('show');
                 generateCalendar(curr_month.value, curr_year.value);
             } else {
                 calendarPopup.classList.remove('show');
+                calendarPopup.classList.remove('show-above');
             }
         });
         document.addEventListener('click', (e) => {
@@ -1646,10 +1876,119 @@ document.addEventListener('DOMContentLoaded', function() {
             if (formData.agreementStartDate) {
                 selectedDate = new Date(formData.agreementStartDate);
                 dateInput.value = formData.agreementStartDate;
-            }
+    }
         }
     }
 });
+
+    // OTE Effective Date Calendar logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const oteDateInput = document.getElementById('oteEffectiveDate');
+        const oteCalendarToggle = document.getElementById('oteCalendarToggle');
+        const oteCalendarPopup = document.getElementById('oteCalendarPopup');
+        if (oteDateInput && oteCalendarToggle && oteCalendarPopup) {
+            let calendar = oteCalendarPopup.querySelector('.calendar');
+            let selectedDate = null;
+            const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            function isLeapYear(year) {
+                return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 ===0);
+            }
+            function getFebDays(year) {
+                return isLeapYear(year) ? 29 : 28;
+            }
+            function generateCalendar(month, year) {
+                let calendar_days = calendar.querySelector('.calendar-days');
+                let calendar_header_year = calendar.querySelector('#ote-year');
+                let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                calendar_days.innerHTML = '';
+                let currDate = new Date();
+                if (month === undefined) month = currDate.getMonth();
+                if (year === undefined) year = currDate.getFullYear();
+                let curr_month = `${month_names[month]}`;
+                month_picker.innerHTML = curr_month;
+                calendar_header_year.innerHTML = year;
+                let first_day = new Date(year, month, 1);
+                for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+                    let day = document.createElement('div');
+                    if (i >= first_day.getDay()) {
+                        day.classList.add('calendar-day-hover');
+                        day.innerHTML = i - first_day.getDay() + 1;
+                        day.innerHTML += `<span></span><span></span><span></span><span></span>`;
+                        if (selectedDate && i - first_day.getDay() + 1 === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
+                            day.classList.add('selected-date');
+                        }
+                        // Prevent selecting future dates
+                        const currentDate = new Date(year, month, i - first_day.getDay() + 1);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (currentDate > today) {
+                            day.style.opacity = '0.3';
+                            day.style.cursor = 'not-allowed';
+                            day.style.pointerEvents = 'none';
+                        } else {
+                            day.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                calendar_days.querySelectorAll('div').forEach(div => div.classList.remove('selected-date'));
+                                this.classList.add('selected-date');
+                                const dayNum = parseInt(this.textContent);
+                                selectedDate = new Date(year, month, dayNum);
+                                // Format date as DD/MM/YYYY for display
+                                const formattedDate = `${String(dayNum).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+                                oteDateInput.value = formattedDate;
+                                oteCalendarPopup.style.display = 'none';
+                            });
+                        }
+                    }
+                    calendar_days.appendChild(day);
+                }
+            }
+            let month_list = calendar.querySelector('.month-list');
+            month_list.innerHTML = '';
+            month_names.forEach((e, index) => {
+                let month = document.createElement('div');
+                month.innerHTML = `<div data-month="${index}">${e}</div>`;
+                month.querySelector('div').onclick = () => {
+                    month_list.classList.remove('show');
+                    curr_month.value = index;
+                    generateCalendar(index, curr_year.value);
+                };
+                month_list.appendChild(month);
+            });
+            let month_picker = calendar.querySelector('#ote-month-picker');
+            month_picker.onclick = () => {
+                month_list.classList.add('show');
+            };
+            let currDate = new Date();
+            let curr_month = {value: currDate.getMonth()};
+            let curr_year = {value: currDate.getFullYear()};
+            generateCalendar(curr_month.value, curr_year.value);
+            document.querySelector('#ote-prev-year').onclick = () => {
+                --curr_year.value;
+                generateCalendar(curr_month.value, curr_year.value);
+            };
+            document.querySelector('#ote-next-year').onclick = () => {
+                ++curr_year.value;
+                generateCalendar(curr_month.value, curr_year.value);
+            };
+            oteCalendarToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                oteCalendarPopup.style.display = (oteCalendarPopup.style.display === 'block') ? 'none' : 'block';
+                generateCalendar(curr_month.value, curr_year.value);
+            });
+            oteDateInput.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                oteCalendarPopup.style.display = (oteCalendarPopup.style.display === 'block') ? 'none' : 'block';
+                generateCalendar(curr_month.value, curr_year.value);
+            });
+            document.addEventListener('click', (e) => {
+                if (!oteCalendarPopup.contains(e.target) && !oteCalendarToggle.contains(e.target) && e.target !== oteDateInput) {
+                    oteCalendarPopup.style.display = 'none';
+                }
+            });
+        }
+    });
 
     // Function to add on-target payment
     function addOnTargetPayment() {
@@ -1714,6 +2053,387 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Create new schedule functionality would be implemented here');
         });
     }
+
+    // Info modal logic for On-Target payments
+    const onTargetInfoIcon = document.querySelector('.section-title img[alt="Info"]');
+    const onTargetInfoModal = document.getElementById('onTargetInfoModal');
+    const onTargetInfoModalClose = document.getElementById('onTargetInfoModalClose');
+    if (onTargetInfoIcon && onTargetInfoModal && onTargetInfoModalClose) {
+        onTargetInfoIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            onTargetInfoModal.style.display = 'flex';
+        });
+        onTargetInfoModalClose.addEventListener('click', function() {
+            onTargetInfoModal.style.display = 'none';
+        });
+        onTargetInfoModal.addEventListener('click', function(e) {
+            if (e.target === onTargetInfoModal) {
+                onTargetInfoModal.style.display = 'none';
+            }
+        });
+    }
+
+    // Add OTE modal logic
+    const addOteBtn = document.getElementById('addOteBtn');
+    const addOteModal = document.getElementById('addOteModal');
+    const addOteModalClose = document.getElementById('addOteModalClose');
+    if (addOteBtn && addOteModal && addOteModalClose) {
+        addOteBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            addOteModal.classList.add('show');
+        });
+        addOteModalClose.addEventListener('click', function() {
+            addOteModal.classList.remove('show');
+        });
+        addOteModal.addEventListener('click', function(e) {
+            if (e.target === addOteModal) {
+                addOteModal.classList.remove('show');
+            }
+        });
+    }
+
+    // OTE Frequency Dropdown logic
+    const oteFrequencyDropdown = document.getElementById('oteFrequencyDropdown');
+    const oteFrequencyDropdownBtn = document.getElementById('oteFrequencyDropdownBtn');
+    const oteFrequencyDropdownMenu = document.getElementById('oteFrequencyDropdownMenu');
+    const oteFrequencyDropdownLabel = document.getElementById('oteFrequencyDropdownLabel');
+    const oteFrequencySelect = document.getElementById('oteFrequencySelect');
+    if (oteFrequencyDropdown && oteFrequencyDropdownBtn && oteFrequencyDropdownMenu && oteFrequencyDropdownLabel && oteFrequencySelect) {
+      oteFrequencyDropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        oteFrequencyDropdownMenu.classList.toggle('show');
+      });
+      oteFrequencyDropdownMenu.querySelectorAll('.dropdown-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+          oteFrequencyDropdownMenu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          const value = this.getAttribute('data-value');
+          const text = this.querySelector('.option-main').textContent;
+          oteFrequencyDropdownLabel.textContent = text;
+          oteFrequencyDropdownLabel.classList.remove('dropdown-placeholder');
+          oteFrequencySelect.value = value;
+          oteFrequencyDropdownMenu.classList.remove('show');
+        });
+      });
+      document.addEventListener('click', function(e) {
+        if (!oteFrequencyDropdown.contains(e.target)) {
+          oteFrequencyDropdownMenu.classList.remove('show');
+        }
+      });
+      // Show placeholder if no value is selected
+      if (!oteFrequencySelect.value) {
+        oteFrequencyDropdownLabel.textContent = 'On-target payment frequency *';
+        oteFrequencyDropdownLabel.classList.add('dropdown-placeholder');
+      }
+    }
+
     </script>
+    <style>
+.add-ote-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.25);
+  z-index: 10001;
+  align-items: center;
+  justify-content: center;
+}
+.add-ote-modal.show {
+  display: flex;
+}
+.add-ote-modal-content {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 32px 24px 32px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+  position: relative;
+}
+.add-ote-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #222;
+  cursor: pointer;
+}
+.add-ote-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.add-ote-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: transparent !important;
+  z-index: 0;
+}
+.add-ote-modal-form .form-group,
+.add-ote-modal-form .custom-dropdown {
+  margin-bottom: 0 !important;
+}
+.add-ote-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 2px;
+}
+.add-ote-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+  background: #fafbfc;
+}
+.add-ote-floating-label-group {
+  position: relative;
+  margin-bottom: 12px;
+}
+.add-ote-floating-label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 0.95rem;
+  pointer-events: none;
+  background: transparent;
+  transition: all 0.2s;
+}
+.add-ote-input:focus + .add-ote-floating-label,
+.add-ote-input:not(:placeholder-shown) + .add-ote-floating-label {
+  top: 0;
+  left: 10px;
+  font-size: 0.75rem;
+  color: #6b46c1;
+  background: #fff;
+  padding: 0 4px;
+  transform: translateY(-60%);
+}
+.add-ote-input {
+  padding-top: 20px;
+  padding-bottom: 8px;
+}
+.add-ote-date-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.add-ote-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0;
+}
+.add-ote-row {
+  display: flex;
+  gap: 12px;
+}
+.add-ote-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.add-ote-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fafbfc;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px 16px 12px 16px;
+  margin: 10px 0 0 0;
+}
+.add-ote-info-icon {
+  font-size: 1.2rem;
+  color: #888;
+  margin-top: 2px;
+}
+.add-ote-info-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 2px;
+}
+.add-ote-info-text {
+  font-size: 0.85rem;
+  color: #666;
+}
+.add-ote-modal-add-btn {
+  width: 100%;
+  margin-top: 18px;
+  background: #f5f5f5;
+  color: #bbb;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: not-allowed;
+}
+.date-input-wrapper {
+  position: relative;
+  background: transparent !important;
+  border: none !important;
+}
+.date-input-wrapper .form-input {
+  width: 100%;
+  padding-right: 44px;
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  font-size: 0.95rem;
+  background: white !important;
+  transition: all 0.2s;
+}
+.calendar-icon {
+  background: transparent;
+  border: none;
+}
+.form-input[readonly] {
+  background: #fafbfc;
+  cursor: pointer;
+}
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+.dropdown-toggle {
+  padding: 14px 16px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+.dropdown-toggle:hover {
+  border-color: #adb5bd;
+}
+.dropdown-arrow {
+  margin-left: 8px;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  display: none;
+  margin-top: 4px;
+}
+.dropdown-menu.show {
+  display: block;
+}
+.dropdown-option {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f1f3f4;
+  transition: background-color 0.2s;
+  font-size: 0.95rem;
+  color: #202124;
+  background: white;
+}
+.dropdown-option:last-child {
+  border-bottom: none;
+}
+.dropdown-option:hover {
+  background: #f8f9fa;
+}
+.dropdown-option.selected {
+  background: #f5f5f5;
+  color: #1a1a1a;
+}
+.dropdown-placeholder {
+  color: #888;
+ 
+}
+    </style>
+<div id="addOteModal" class="add-ote-modal">
+  <div class="add-ote-modal-content">
+    <button type="button" class="add-ote-modal-close" id="addOteModalClose">&times;</button>
+    <h2 class="add-ote-modal-title">Add on-target payment</h2>
+    <form class="add-ote-modal-form" id="addOteForm">
+      <div class="form-group full-width">
+        <input type="text" class="form-input" placeholder="Title *" name="oteTitle">
+      </div>
+      <div class="date-input-wrapper" style="position:relative;">
+        <input type="text" class="form-input" id="oteEffectiveDate" placeholder="Effective date (DD/MM/YYYY)*" name="oteEffectiveDate" readonly>
+        <button type="button" class="calendar-icon" id="oteCalendarToggle">
+          <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar" style="width: 20px; height: 20px;">
+        </button>
+        <div class="calendar-popup" id="oteCalendarPopup" style="display: none;">
+          <div class="calendar light">
+            <div class="calendar-header">
+              <span class="month-picker" id="ote-month-picker">February</span>
+              <div class="year-picker">
+                <span class="year-change" id="ote-prev-year"><pre><</pre></span>
+                <span id="ote-year">2025</span>
+                <span class="year-change" id="ote-next-year"><pre>></pre></span>
+              </div>
+            </div>
+            <div class="calendar-body">
+              <div class="calendar-week-day">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+              <div class="calendar-days"></div>
+            </div>
+            <div class="month-list"></div>
+          </div>
+        </div>
+      </div>
+      <div class="add-ote-row">
+        <div class="add-ote-col">
+          <div class="form-group full-width">
+            <input type="text" class="form-input" placeholder="On-target payment amount *" name="oteAmount">
+          </div>
+        </div>
+      </div>
+      <!-- Custom dropdown for frequency with placeholder -->
+      <div class="custom-dropdown" id="oteFrequencyDropdown">
+        <button type="button" class="dropdown-toggle" id="oteFrequencyDropdownBtn">
+          <span id="oteFrequencyDropdownLabel" class="dropdown-placeholder">On-target payment frequency *</span>
+          <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+        </button>
+        <div class="dropdown-menu" id="oteFrequencyDropdownMenu">
+          <div class="dropdown-option" data-value="annually">
+            <div class="option-main">Annually</div>
+          </div>
+          <div class="dropdown-option" data-value="monthly">
+            <div class="option-main">Monthly</div>
+          </div>
+        </div>
+        <input type="hidden" id="oteFrequencySelect" name="oteFrequency" value="">
+      </div>
+      <button type="button" class="add-ote-modal-add-btn" disabled>Add</button>
+    </form>
+  </div>
+</div>
 </body>
 </html> 
