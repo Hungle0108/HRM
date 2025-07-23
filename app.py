@@ -182,7 +182,7 @@ class WorkSchedule(db.Model):
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+    is_default = db.Column(db.Boolean, default=False)  # NEW: True for default templates
     # JSON field to store the complete schedule data
     schedule_data = db.Column(db.Text, nullable=False)
     
@@ -1677,7 +1677,10 @@ def time_tracking():
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
         # Fetch all schedules for this organization
-        schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).order_by(WorkSchedule.created_at.desc()).all()
+        org_schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).order_by(WorkSchedule.created_at.desc()).all()
+        # Fetch default schedules (organization_id=0, is_default=True)
+        default_schedules = WorkSchedule.query.filter_by(organization_id=0, is_default=True).order_by(WorkSchedule.created_at.desc()).all()
+        schedules = default_schedules + org_schedules
     
     return render_template('time_tracking.html', user=user, organization=organization, schedules=schedules, active_page='time_tracking')
 
@@ -2042,6 +2045,10 @@ def edit_schedule(schedule_id):
     if user and user.organization_id:
         worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
     prefill_data = json.loads(schedule.schedule_data)
+    # Add top-level fields for robust prefill
+    prefill_data['scheduleName'] = schedule.name
+    prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
+    prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     return render_template('edit_schedule.html', user=user, worker_types=worker_types, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step2/<int:schedule_id>')
@@ -2053,6 +2060,9 @@ def edit_schedule_step2(schedule_id):
         return redirect('/settings/time-tracking')
     user = User.query.get(session['user_id'])
     prefill_data = json.loads(schedule.schedule_data)
+    prefill_data['scheduleName'] = schedule.name
+    prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
+    prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     return render_template('edit_schedule_step2.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step3/<int:schedule_id>')
@@ -2064,6 +2074,9 @@ def edit_schedule_step3(schedule_id):
         return redirect('/settings/time-tracking')
     user = User.query.get(session['user_id'])
     prefill_data = json.loads(schedule.schedule_data)
+    prefill_data['scheduleName'] = schedule.name
+    prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
+    prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     return render_template('edit_schedule_step3.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/api/edit-schedule', methods=['POST'])

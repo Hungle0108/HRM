@@ -1089,9 +1089,12 @@
             daysList.innerHTML = '<div class="modal-label" style="margin-bottom:0.5rem; font-weight: bold;">Daily workload detailing</div>';
             if (schedule.schedule_data && schedule.schedule_data.scheduleDetails && schedule.schedule_data.scheduleDetails.shifts) {
                 const shifts = schedule.schedule_data.scheduleDetails.shifts;
-                let dayRows = '';
-                Object.values(shifts).forEach(shift => {
+                const shiftCount = Object.keys(shifts).length;
+                let shiftIndex = 1;
+                let shiftSections = '';
+                Object.entries(shifts).forEach(([shiftNum, shift]) => {
                     if (shift.weekdays) {
+                        let dayRows = '';
                         Object.entries(shift.weekdays).forEach(([day, data]) => {
                             if (data.checked) {
                                 let time = '';
@@ -1102,9 +1105,17 @@
                                 dayRows += `<div class='modal-day-box'><span class='modal-day-label'>${day.charAt(0).toUpperCase() + day.slice(1)}</span><span class='modal-day-details'><span>${time ? time : ''}${time && duration ? ' / ' : ''}${duration}</span></span></div>`;
                             }
                         });
+                        if (dayRows) {
+                            if (shiftCount > 1) {
+                                shiftSections += `<div style='margin-bottom:1.5rem;'><div class='modal-label' style='margin-bottom:0.5rem; font-weight: bold;'>Shift ${shiftIndex}</div>${dayRows}</div>`;
+                            } else {
+                                shiftSections += `<div style='margin-bottom:1.5rem;'>${dayRows}</div>`;
+                            }
+                        }
                     }
+                    shiftIndex++;
                 });
-                daysList.innerHTML += dayRows;
+                daysList.innerHTML += shiftSections;
             }
         });
     });

@@ -639,6 +639,7 @@
     </style>
 </head>
 <body>
+    <pre id="debug-prefill-data">{{ prefill_data|tojson|safe }}</pre>
     <div class="page-container">
         <!-- Top Bar -->
         <div class="top-bar">
@@ -1136,15 +1137,83 @@ if (typeof saveFormStateToSession !== 'function') {
             return url.searchParams.get(name);
         }
         document.addEventListener('DOMContentLoaded', function() {
-            const returnTo = getQueryParam('return_to');
-            if (returnTo) {
-                sessionStorage.setItem('scheduleReturnTo', returnTo);
+            var data = {{ prefill_data|tojson|safe }};
+            if (!data) return;
+            // Display basic information
+            if (data.scheduleName) {
+                const scheduleNameElement = document.getElementById('reviewScheduleName');
+                if (scheduleNameElement) {
+                    scheduleNameElement.textContent = data.scheduleName;
+                }
             }
-            console.log('Step 3: DOM loaded, checking for update button...');
-            
-            // Load saved data first
-            loadSavedData();
-            
+            if (data.workerTypeName) {
+                const workerTypeElement = document.getElementById('reviewWorkerType');
+                if (workerTypeElement) {
+                    workerTypeElement.textContent = data.workerTypeName;
+                }
+            } else if (data.workerType) {
+                const workerTypeText = data.workerType.charAt(0).toUpperCase() + data.workerType.slice(1);
+                const workerTypeElement = document.getElementById('reviewWorkerType');
+                if (workerTypeElement) {
+                    workerTypeElement.textContent = workerTypeText;
+                }
+            }
+            // Display schedule details
+            if (data.scheduleDetails) {
+                const details = data.scheduleDetails;
+                const scheduleType = details.specifyDuration ? 'Duration-based schedule' : 'Basic schedule';
+                const scheduleTypeElement = document.querySelector('.schedule-type-value');
+                if (scheduleTypeElement) {
+                    scheduleTypeElement.textContent = scheduleType;
+                }
+                // Calculate total weekly hours from all shifts
+                let totalWeeklyHours = 0;
+                if (details.shifts) {
+                    const numberOfShifts = details.numberOfShifts || 1;
+                    for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
+                        if (details.shifts[shiftNum] && details.shifts[shiftNum].weekdays) {
+                            const shiftData = details.shifts[shiftNum];
+                            const weekdaysData = shiftData.weekdays;
+                            Object.keys(weekdaysData).forEach(day => {
+                                const dayData = weekdaysData[day];
+                                if (dayData && dayData.checked) {
+                                    if (shiftData.includeTime && dayData.startTime && dayData.endTime) {
+                                        // Time-based: calculate hours from start/end times
+                                        const duration = calculateWorkingHours(dayData.startTime, dayData.endTime);
+                                        if (duration) {
+                                            totalWeeklyHours += duration.hours + (duration.minutes / 60);
+                                        }
+                                    } else if (!shiftData.includeTime && dayData.duration) {
+                                        // Duration-based: use duration directly
+                                        totalWeeklyHours += parseFloat(dayData.duration) || 0;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+                // Display the calculated weekly hours
+                const reviewWeeklyHoursElement = document.getElementById('reviewWeeklyHours');
+                if (reviewWeeklyHoursElement) {
+                    if (totalWeeklyHours > 0) {
+                        reviewWeeklyHoursElement.textContent = `${totalWeeklyHours.toFixed(1)} hrs`;
+                    } else if (details.weeklyDuration) {
+                        reviewWeeklyHoursElement.textContent = `${details.weeklyDuration} hrs`;
+                    } else {
+                        reviewWeeklyHoursElement.textContent = '--';
+                    }
+                }
+                // Show shift count if multiple shifts
+                if (details.numberOfShifts && details.numberOfShifts > 1) {
+                    const shiftCountElement = document.getElementById('reviewShiftCount');
+                    if (shiftCountElement) {
+                        shiftCountElement.textContent = `(${details.numberOfShifts} shifts)`;
+                    }
+                }
+                // Generate schedule preview
+                generateSchedulePreview(details);
+            }
+
             // Check the schedule type from sessionStorage and update the text
             const saved = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
             console.log('Step 3: Loaded saved data:', saved);

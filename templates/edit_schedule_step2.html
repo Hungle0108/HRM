@@ -1117,7 +1117,7 @@
                         <div class="toggle-section">
                             <span class="toggle-label">Specify the work duration for each day</span>
                             <div class="toggle-switch">
-                                <input type="checkbox" id="specifyDuration">
+                                <input type="checkbox" id="specifyDuration" checked>
                                 <span class="toggle-slider"></span>
                             </div>
                         </div>
@@ -1872,6 +1872,8 @@
 
         // --- Main Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
+            var specifyDurationToggle = document.getElementById('specifyDuration');
+            if (specifyDurationToggle) specifyDurationToggle.checked = true;
             // Initialize default states first
             initializeToggleStates();
             initializeDurationUnits();

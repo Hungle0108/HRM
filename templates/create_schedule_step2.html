@@ -223,6 +223,7 @@
 
         .weekly-duration-summary {
             margin-bottom: 24px;
+            border-top: none !important;
         }
 
         .duration-summary-content {
@@ -1032,7 +1033,7 @@
             align-items: center;
             margin: 16px 0 24px 0;
             padding: 12px 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: none !important;
         }
 
         .pagination-bookmarks {
@@ -1209,6 +1210,11 @@
             display: block;
         }
         .force-redraw { outline: none !important; }
+
+        /* If there is a vertical line (e.g., .vertical-separator or similar), hide it */
+        .vertical-separator {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1236,65 +1242,7 @@
             <!-- Content Area -->
             <div class="content-area">
                 <form id="schedule-form-step2">
-                    <!-- Vietnam Default Working Hours Section -->
-                    <div class="form-section">
-                        <h3 class="section-title">Quick Start Templates (Vietnam)</h3>
-                        <p class="section-description">Choose from common working hour templates in Vietnam to quickly set up your schedule.</p>
-                        
-                        <div class="templates-grid">
-                            <div class="template-card" data-template="office">
-                                <button type="button" class="template-unselect-x">&times;</button>
-                                <div class="template-header">
-                                    <h4 class="template-title">Standard Office Hours</h4>
-                                </div>
-                                <div class="template-details">
-                                    <div class="template-hours">8:00 AM - 5:00 PM</div>
-                                    <div class="template-days">Monday - Friday</div>
-                                    <div class="template-total">45 hours/week</div>
-                                </div>
-                                <button type="button" class="template-apply-btn">Apply Template</button>
-                            </div>
-                            
-                            <div class="template-card" data-template="shift">
-                                <button type="button" class="template-unselect-x">&times;</button>
-                                <div class="template-header">
-                                    <h4 class="template-title">2-Shift Work</h4>
-                                </div>
-                                <div class="template-details">
-                                    <div class="template-hours">6:00 AM - 2:00 PM / 2:00 PM - 10:00 PM</div>
-                                    <div class="template-days">Monday - Saturday</div>
-                                    <div class="template-total">96 hours/week</div>
-                                </div>
-                                <button type="button" class="template-apply-btn">Apply Template</button>
-                            </div>
-                            
-                            <div class="template-card" data-template="overtime">
-                                <button type="button" class="template-unselect-x">&times;</button>
-                                <div class="template-header">
-                                    <h4 class="template-title">Extended Hours</h4>
-                                </div>
-                                <div class="template-details">
-                                    <div class="template-hours">7:00 AM - 7:00 PM</div>
-                                    <div class="template-days">Monday - Saturday</div>
-                                    <div class="template-total">68 hours/week</div>
-                                </div>
-                                <button type="button" class="template-apply-btn">Apply Template</button>
-                            </div>
-                            
-                            <div class="template-card" data-template="retail">
-                                <button type="button" class="template-unselect-x">&times;</button>
-                                <div class="template-header">
-                                    <h4 class="template-title">Retail Hours</h4>
-                                </div>
-                                <div class="template-details">
-                                    <div class="template-hours">9:00 AM - 9:00 PM</div>
-                                    <div class="template-days">7 days/week</div>
-                                    <div class="template-total">54 hours/week</div>
-                                </div>
-                                <button type="button" class="template-apply-btn">Apply Template</button>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Removed: Vietnam Default Working Hours Section (Quick Start Templates) -->
 
                     <div class="form-section">
                         <h3 class="section-title">Working days and hours per day</h3>
@@ -1695,6 +1643,11 @@
     </div>
 
     <script>
+        let shiftData = {
+            1: {},
+            2: {},
+            3: {}
+        };
         // Function to clear all schedule form data
         function clearScheduleFormData() {
             sessionStorage.removeItem('scheduleFormData');
@@ -1796,56 +1749,57 @@
                 const durationUnit = dayItem.querySelector('.duration-unit');
                 const specifyDurationToggle = document.getElementById('specifyDuration');
                 const includeTimeToggle = document.getElementById('includeTime');
-                
                 if (this.checked) {
-                    dayItem.classList.add('selected');
+                    dayItem.classList.add('selected', 'checked');
                     dayItem.classList.remove('disabled');
                     timeInputs.forEach(input => {
                         input.disabled = false;
                         input.classList.remove('disabled');
                     });
-                    
+                    // Enable duration input
+                    const durationInput = dayItem.querySelector('.duration-field');
+                    if (durationInput) {
+                        durationInput.disabled = false;
+                        durationInput.classList.remove('disabled');
+                    }
                     // Show appropriate input containers based on toggles
                     if (specifyDurationToggle.checked) {
                         if (includeTimeToggle.checked) {
-                            // Show time inputs
                             if (timeInputsContainer) timeInputsContainer.style.display = 'flex';
                             if (durationInputContainer) durationInputContainer.style.display = 'none';
                         } else {
-                            // Show duration input
                             if (timeInputsContainer) timeInputsContainer.style.display = 'none';
                             if (durationInputContainer) durationInputContainer.style.display = 'block';
                         }
                     }
                 } else {
-                    dayItem.classList.remove('selected');
-                    dayItem.classList.add('disabled');
+                    // Remove all possible classes and inline styles to restore pristine state
+                    dayItem.classList.remove('selected', 'checked', 'active', 'error', 'warning', 'has-value', 'disabled');
+                    dayItem.removeAttribute('style');
                     timeInputs.forEach(input => {
                         input.disabled = true;
-                        input.classList.add('disabled');
+                        input.classList.remove('disabled', 'error', 'has-value', 'active', 'warning');
                         input.value = '';
-                        // Hide validation messages
+                        input.removeAttribute('style');
                         const errorMsg = input.parentNode.querySelector('.validation-message');
                         if (errorMsg) errorMsg.style.display = 'none';
-                        input.classList.remove('error');
                     });
-                    
-                    // Hide all input containers when unchecked
                     if (timeInputsContainer) timeInputsContainer.style.display = 'none';
                     if (durationInputContainer) durationInputContainer.style.display = 'none';
-                    
-                    // Hide duration unit when checkbox is unchecked
-                    if (durationUnit) {
-                        durationUnit.style.display = 'none';
-                    }
-                    // Also clear duration input when unchecked
+                    if (durationUnit) durationUnit.style.display = 'none';
                     const durationInput = dayItem.querySelector('.duration-field');
                     if (durationInput) {
                         durationInput.value = '';
-                        durationInput.classList.remove('has-value', 'error', 'warning');
+                        durationInput.classList.remove('has-value', 'error', 'warning', 'active');
+                        durationInput.removeAttribute('style');
                     }
+                    // Remove error/warning from duration error
+                    const durationError = dayItem.querySelector('.duration-error');
+                    if (durationError) {
+                        durationError.classList.remove('show');
+                        durationError.style.display = 'none';
                 }
-                // Update cumulative day durations when checkboxes change
+                }
                 updateAllDayDurations();
                 calculateWeeklyDuration();
             });
@@ -1952,7 +1906,7 @@
             const weekdayDetails = document.querySelector('.weekday-details');
             const includeTimeToggle = document.getElementById('includeTimeToggle');
             const includeTimeCheckbox = document.getElementById('includeTime');
-            
+            const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
             if (this.checked) {
                 // Show both weekday details and include time toggle when specify duration is ON
                 weekdayDetails.style.display = 'block';
@@ -1976,21 +1930,26 @@
                 // Hide both weekday details, include time toggle, shifts dropdown, and pagination when specify duration is OFF
                 weekdayDetails.style.display = 'none';
                 includeTimeToggle.style.display = 'none';
-
                 // Only force checkbox OFF if not during data loading
                 if (!isLoadingData) {
                     includeTimeCheckbox.checked = false;
                     includeTimeCheckbox.dispatchEvent(new Event('change'));
                 }
-
                 // Explicitly hide shifts dropdown and shift pagination (in case they were visible)
                 const shiftsDropdown = document.getElementById('shiftsDropdown');
                 if (shiftsDropdown) shiftsDropdown.style.display = 'none';
                 const shiftPagination = document.getElementById('shiftPagination');
                 if (shiftPagination) shiftPagination.style.display = 'none';
+                // --- NEW: Uncheck all weekday checkboxes and reset their UI ---
+                weekdaysArr.forEach(day => {
+                    const checkbox = document.getElementById(day);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
             }
             calculateWeeklyDuration();
-            
             // Save state immediately when toggle changes
             if (!isLoadingData) {
                 saveFormStateToSession();
@@ -2000,6 +1959,85 @@
         // Toggle functionality for showing/hiding start and end time inputs
         document.getElementById('includeTime').addEventListener('change', function() {
             if (isLoadingData) return;
+            const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+            // --- Reset all duration values and hour displays when toggled ON ---
+            if (this.checked) {
+                weekdaysArr.forEach(day => {
+                    const dayItem = document.querySelector(`[data-day="${day}"]`);
+                    if (!dayItem) return;
+                    const durationInput = dayItem.querySelector('.duration-field');
+                    if (durationInput) {
+                        durationInput.value = '';
+                        durationInput.classList.remove('has-value', 'error', 'warning', 'active');
+                    }
+                    const durationUnit = dayItem.querySelector('.duration-unit');
+                    if (durationUnit) durationUnit.style.display = 'none';
+                    const dayDuration = dayItem.querySelector('.day-duration');
+                    if (dayDuration) dayDuration.textContent = '';
+                    const durationError = dayItem.querySelector('.duration-error');
+                    if (durationError) {
+                        durationError.classList.remove('show');
+                        durationError.style.display = 'none';
+                    }
+                });
+            } else {
+                // --- Reset all start/end time values and UI for ALL SHIFTS when toggled OFF ---
+                for (let shiftNum = 1; shiftNum <= 3; shiftNum++) {
+                    const shiftSuffix = shiftNum === 1 ? '' : `-shift${shiftNum}`;
+                    weekdaysArr.forEach(day => {
+                        // Clear UI for each shift's inputs
+                        const dayItem = document.querySelector(`[data-day="${day}"]`);
+                        if (dayItem) {
+                            // Clear hour indicator
+                            const dayDuration = dayItem.querySelector('.day-duration');
+                            if (dayDuration) dayDuration.textContent = '';
+                        }
+                        // Clear start/end time inputs for each shift
+                        const startInput = document.getElementById(`${day}-start${shiftSuffix}`) || document.getElementById(`${day}-start`);
+                        const endInput = document.getElementById(`${day}-end${shiftSuffix}`) || document.getElementById(`${day}-end`);
+                        if (startInput) {
+                            startInput.value = '';
+                            startInput.classList.remove('has-value', 'error', 'warning', 'active');
+                            startInput.blur();
+                        }
+                        if (endInput) {
+                            endInput.value = '';
+                            endInput.classList.remove('has-value', 'error', 'warning', 'active');
+                            endInput.blur();
+                        }
+                        const startError = document.getElementById(`${day}-start-error${shiftSuffix}`) || document.getElementById(`${day}-start-error`);
+                        const endError = document.getElementById(`${day}-end-error${shiftSuffix}`) || document.getElementById(`${day}-end-error`);
+                        if (startError) startError.style.display = 'none';
+                        if (endError) endError.style.display = 'none';
+                    });
+                    // Clear shiftData for this shift
+                    if (!shiftData[shiftNum]) shiftData[shiftNum] = {};
+                    shiftData[shiftNum].weekdays = {};
+                    shiftData[shiftNum].includeTime = false;
+                }
+                // --- Uncheck all weekday checkboxes and trigger change events ---
+                weekdaysArr.forEach(day => {
+                    const checkbox = document.getElementById(day);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+                // --- Reset shift dropdown and pagination bar to 1 shift and hide if not in time mode ---
+                const dropdownSelected = document.getElementById('dropdownSelected');
+                if (dropdownSelected) dropdownSelected.textContent = '1 shift';
+                if (typeof updateShiftPagination === 'function') updateShiftPagination(1);
+                const shiftPagination = document.getElementById('shiftPagination');
+                if (shiftPagination) shiftPagination.style.display = 'none';
+                currentShift = 1;
+            }
+            // --- NEW: Reset shiftData and currentShift on toggle ---
+            for (let shiftNum = 1; shiftNum <= 3; shiftNum++) {
+                if (!shiftData[shiftNum]) shiftData[shiftNum] = {};
+                shiftData[shiftNum].weekdays = {};
+                shiftData[shiftNum].includeTime = this.checked;
+            }
+            currentShift = 1;
             updateInputVisibility();
             saveFormStateToSession();
         });
@@ -2141,11 +2179,7 @@
         // Shift data storage
         let currentShift = 1;
         let isLoadingData = false;
-        let shiftData = {
-            1: {},
-            2: {},
-            3: {}
-        };
+        
         
         console.log('INITIAL VARIABLES SET - currentShift:', currentShift, 'shiftData:', shiftData);
         
@@ -2191,6 +2225,12 @@
                     console.log('First template clickable:', firstTemplate.onclick !== null);
                 }
             }, 200);
+
+            const includeTimeToggle = document.getElementById('includeTime');
+            const shiftPagination = document.querySelector('.shift-pagination');
+            if (includeTimeToggle && shiftPagination && !includeTimeToggle.checked) {
+                shiftPagination.style.display = 'none';
+            }
         });
 
         // Template definitions with Vietnam working hours
@@ -2999,6 +3039,8 @@
                 updateAllDayDurations();
                 calculateWeeklyDuration();
             }
+            // After filling values, update validation state
+            updateContinueButtonState();
         });
 
         // Time input validation
@@ -3152,7 +3194,8 @@
             
             // Get the number of shifts configured
             const selectedShiftsText = document.getElementById('dropdownSelected').textContent;
-            const numberOfShifts = parseInt(selectedShiftsText.match(/\d+/)[0]) || 1;
+            const match = selectedShiftsText.match(/\d+/);
+            const numberOfShifts = match ? parseInt(match[0]) : 1;
             
             // Save current shift data first to ensure we have latest data
             saveCurrentShiftData();
@@ -3262,11 +3305,6 @@
                 
                 if (checkbox.checked) {
                     checkboxItem.classList.add('checked');
-                    // Show error if duration is empty and toggle is on
-                    if (specifyDurationToggle.checked && !durationField.value.trim()) {
-                        durationField.classList.add('error');
-                        durationError.classList.add('show');
-                    }
                 } else {
                     checkboxItem.classList.remove('checked');
                     durationField.classList.remove('error');
@@ -3281,75 +3319,24 @@
         // Add event listeners for checkboxes
         weekdays.forEach(day => {
             const checkbox = document.getElementById(day);
-            const durationField = document.getElementById(`${day}-duration-input`);
+            const durInput = document.getElementById(`${day}-duration-input`);
             const durationError = document.getElementById(`${day}-duration-error`);
-            
-            checkbox.addEventListener('change', updateDurationValidation);
-            
-            // Track if user has hovered over the field
-            let hasHovered = false;
-            
-            // Function to update floating label state
-            function updateDurationFloatingLabel() {
-                if (durationField.value.trim()) {
-                    durationField.classList.add('has-value');
-                } else {
-                    durationField.classList.remove('has-value');
-                }
+            if (checkbox && durInput) {
+                checkbox.addEventListener('change', function() {
+                    if (!checkbox.checked) {
+                        durInput.classList.remove('error', 'warning');
+                        if (durationError) durationError.classList.remove('show');
+                        touchedInputs[day] = false;
+                    }
+                    // Do not trigger error just by checking the box
+                });
+                durInput.addEventListener('blur', function() {
+                    if (checkbox.checked) {
+                        touchedInputs[day] = true;
+                        validateDurationInput(day);
+                    }
+                });
             }
-            
-            // Mark as hovered when mouse enters
-            durationField.addEventListener('mouseenter', function() {
-                hasHovered = true;
-            });
-            
-            // Show warning when user leaves field empty after hovering
-            durationField.addEventListener('mouseleave', function() {
-                if (specifyDurationToggle.checked && checkbox.checked && hasHovered && !this.value.trim()) {
-                    this.classList.add('warning');
-                    durationError.classList.add('show');
-                }
-            });
-            
-            // Also check on blur in case user focused without hovering
-            durationField.addEventListener('blur', function() {
-                if (specifyDurationToggle.checked && checkbox.checked && hasHovered && !this.value.trim()) {
-                    this.classList.add('warning');
-                    durationError.classList.add('show');
-                } else if (this.value.trim()) {
-                    this.classList.remove('warning');
-                    this.classList.remove('error');
-                    durationError.classList.remove('show');
-                }
-            });
-            
-            // Remove warning on input
-            durationField.addEventListener('input', function() {
-                if (this.value.trim()) {
-                    this.classList.remove('warning');
-                    this.classList.remove('error');
-                    durationError.classList.remove('show');
-                    hasHovered = false; // Reset hover state when user fills in
-                }
-                updateDurationFloatingLabel();
-            });
-            
-            // Update floating label on focus and blur
-            durationField.addEventListener('focus', updateDurationFloatingLabel);
-            durationField.addEventListener('blur', updateDurationFloatingLabel);
-            
-            // Initialize floating label state
-            updateDurationFloatingLabel();
-            
-            // Reset hover state when checkbox is unchecked
-            checkbox.addEventListener('change', function() {
-                if (!this.checked) {
-                    hasHovered = false;
-                    durationField.classList.remove('warning');
-                    durationField.classList.remove('error');
-                    durationError.classList.remove('show');
-                }
-            });
         });
 
         // Helper to calculate total hours for a stored shift object
@@ -3431,7 +3418,8 @@
 
             // Add totals from other saved shifts (if multi-shift)
             const selectedShiftsText = document.getElementById('dropdownSelected').textContent;
-            const numberOfShifts = parseInt(selectedShiftsText.match(/\d+/)[0]) || 1;
+            const match = selectedShiftsText.match(/\d+/);
+            const numberOfShifts = match ? parseInt(match[0]) : 1;
             if (numberOfShifts > 1) {
                 for (let i = 1; i <= numberOfShifts; i++) {
                     if (i === currentShift) continue; // skip current (already included)
@@ -3784,6 +3772,56 @@
                     console.log('Unselect: All template cards and buttons reset.');
                 }, 30);
             }
+        });
+
+        // Track touched state for duration inputs
+        const touchedInputs = {};
+        
+        weekdays.forEach(day => {
+            const durInput = document.getElementById(`${day}-duration-input`);
+            if (durInput) {
+                durInput.addEventListener('blur', function() {
+                    touchedInputs[day] = true;
+                    validateDurationInput(day);
+                });
+                durInput.addEventListener('input', function() {
+                    validateDurationInput(day);
+                });
+            }
+        });
+
+        function validateDurationInput(day) {
+            const durInput = document.getElementById(`${day}-duration-input`);
+            const errorClass = 'error';
+            if (durInput) {
+                if (touchedInputs[day] && !durInput.value) {
+                    durInput.classList.add(errorClass);
+                } else {
+                    durInput.classList.remove(errorClass);
+                }
+            }
+        }
+
+        includeTimeToggle.addEventListener('change', function() {
+            shiftData[currentShift].includeTime = includeTimeToggle.checked;
+            const shiftPagination = document.querySelector('.shift-pagination');
+            if (includeTimeToggle.checked) {
+                // When first turning on, set to 1 shift and hide shift pagination
+                if (shiftPagination) shiftPagination.style.display = 'none';
+                // Reset shiftData to only have shift 1
+                shiftData = { 1: shiftData[1] || {} };
+                currentShift = 1;
+                // Optionally, update the UI to reflect only one shift
+                // (e.g., hide shift buttons 2 and 3)
+                const shiftButtons = document.querySelectorAll('.shift-pagination .bookmark');
+                shiftButtons.forEach((btn, idx) => {
+                    if (idx > 0) btn.style.display = 'none';
+                    else btn.style.display = '';
+                });
+            } else {
+                // ... existing code for toggling off ...
+            }
+            // ... rest of your toggle handler ...
         });
     </script>
 </body>
