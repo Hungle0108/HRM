@@ -25,7 +25,8 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -74,7 +75,7 @@
         }
 
         .page-header {
-            background: white;
+            
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -104,10 +105,10 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            
             justify-content: center;
             align-items: flex-start;
-            padding: 40px 40px 120px 40px;
+            padding: 20px 40px 120px 40px;
             gap: 60px;
         }
 
@@ -120,11 +121,19 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.hidden {
+            display: none;
         }
 
         .sidebar-title {
@@ -139,11 +148,13 @@
             padding: 0;
             margin: 0;
         }
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
 
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
             font-size: 0.95rem;
         }
 
@@ -432,8 +443,8 @@
         }
 
         .bottom-nav-content {
-            width: 100%;
             max-width: 930px;
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -457,29 +468,24 @@
         .btn-back:hover {
             background: #f8f9fa;
             border-color: #d1d5db;
-            text-decoration: none;
         }
 
-        .btn-create {
+        .btn-continue {
             background: #1a1a1a;
             color: white;
             border: none;
-            padding: 12px 32px;
+            padding: 12px 24px;
             border-radius: 8px;
             font-size: 0.95rem;
-            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .btn-create:hover {
-            background: #333333;
+        .btn-continue:hover {
+            background: #333;
         }
 
-        .btn-create:disabled {
+        .btn-continue:disabled {
             background: #e9ecef;
             color: #6c757d;
             cursor: not-allowed;
@@ -713,22 +719,14 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
-                
                 <ol class="steps-list">
                     <li class="step-item completed">
-                        <div class="step-number">✓</div>
-                        <div>
-                            <div class="step-badge">Completed</div>
-                            <div class="step-text">Name and worker types</div>
-                        </div>
+                        <div class="step-number">1</div>
+                        <div class="step-text">Name and worker types</div>
                     </li>
                     <li class="step-item completed">
-                        <div class="step-number">✓</div>
-                        <div>
-                            <div class="step-badge">Completed</div>
-                            <div class="step-text">Working time details</div>
-                        </div>
+                        <div class="step-number">2</div>
+                        <div class="step-text">Working time details</div>
                     </li>
                     <li class="step-item active">
                         <div class="step-number">3</div>
@@ -752,7 +750,7 @@
                         <div class="create-label">Ready to create:</div>
                         <div class="create-title">Your new schedule</div>
                     </div>
-                    <button type="button" class="btn-create" id="createScheduleBtn">Create Schedule</button>
+                    <button type="button" class="btn-continue" id="createScheduleBtn">Create Schedule</button>
                 </div>
             </div>
         </div>

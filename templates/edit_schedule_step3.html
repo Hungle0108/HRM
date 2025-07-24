@@ -25,7 +25,8 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -37,42 +38,27 @@
             right: 0;
             z-index: 1000;
         }
-
         .top-bar-content {
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
         .close-btn {
             background: none;
             border: none;
+            font-size: 24px;
             cursor: pointer;
+            color: #666;
             padding: 8px;
-            border-radius: 50%;
+            border-radius: 4px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-
         .close-btn:hover {
-            background: #f0f0f0;
+            background: #f5f5f5;
+            color: #333;
         }
-        
-        .close-btn img {
-            width: 16px;
-            height: 16px;
-        }
-
         .page-header {
             background: white;
             padding: 40px 40px 20px 40px;
@@ -104,7 +90,7 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 40px 40px 120px 40px;
@@ -636,6 +622,10 @@
         .info-modal-close:hover {
             background: #333;
         }
+        .close-btn img {
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 <body>
@@ -645,7 +635,7 @@
         <div class="top-bar">
             <div class="top-bar-content">
                 <div class="logo"></div>
-                <a href="/settings/time-tracking" class="close-btn">
+                <a href="/settings/time-tracking" class="close-btn" onclick="clearEditScheduleData(event)">
                     <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
                 </a>
             </div>
@@ -742,7 +732,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/edit-schedule-step2/{{ schedule_id }}" class="btn-back">
+                <a href="/settings/time-tracking" class="btn-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -750,11 +740,10 @@
                 </a>
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <div class="next-step-info">
-                        <div class="next-step-label">Next step:</div>
-                        <div class="next-step-title">3. Review and finish</div>
+                        <div class="next-step-label">Finish</div>
+                        <div class="next-step-title">Save and complete</div>
                     </div>
-                    <!-- Ensure the button is type='button' and outside the form -->
-                    <button type="button" class="btn-create" id="createScheduleBtn">Update</button>
+                    <button type="submit" form="schedule-form" class="btn-continue" id="continueBtn">Finish</button>
                 </div>
             </div>
         </div>
@@ -1254,5 +1243,12 @@ if (typeof saveFormStateToSession !== 'function') {
             }
         });
     </script>
+<script>
+function clearEditScheduleData(e) {
+    if (e) e.preventDefault();
+    sessionStorage.removeItem('scheduleFormData');
+    window.location.href = '/settings/time-tracking';
+}
+</script>
 </body>
 </html> 

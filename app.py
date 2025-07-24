@@ -1926,10 +1926,12 @@ def create_schedule():
         return redirect('/login')
     
     worker_types = []
+    user_groups = []
     if user.organization_id:
         worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+        user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
     
-    return render_template('create_schedule.html', user=user, worker_types=worker_types)
+    return render_template('create_schedule.html', user=user, worker_types=worker_types, groups=user_groups)
 
 @app.route('/create-schedule-step2')
 def create_schedule_step2():
@@ -2042,14 +2044,17 @@ def edit_schedule(schedule_id):
         return redirect('/settings/time-tracking')
     user = User.query.get(session['user_id'])
     worker_types = []
+    user_groups = []
     if user and user.organization_id:
         worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
+        user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
     prefill_data = json.loads(schedule.schedule_data)
     # Add top-level fields for robust prefill
     prefill_data['scheduleName'] = schedule.name
     prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
     prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
-    return render_template('edit_schedule.html', user=user, worker_types=worker_types, prefill_data=prefill_data, schedule_id=schedule_id)
+    prefill_data['groupId'] = getattr(schedule, 'group_id', None) if hasattr(schedule, 'group_id') else prefill_data.get('groupId')
+    return render_template('edit_schedule.html', user=user, worker_types=worker_types, groups=user_groups, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step2/<int:schedule_id>')
 def edit_schedule_step2(schedule_id):

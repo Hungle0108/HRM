@@ -25,7 +25,8 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -42,7 +43,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -55,26 +56,21 @@
         .close-btn {
             background: none;
             border: none;
+            font-size: 24px;
             cursor: pointer;
+            color: #666;
             padding: 8px;
-            border-radius: 50%;
+            border-radius: 4px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .close-btn:hover {
-            background: #f0f0f0;
-        }
-
-        .close-btn img {
-            width: 16px;
-            height: 16px;
+            background: #f5f5f5;
+            color: #333;
         }
 
         .page-header {
-            background: white;
+           
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -104,7 +100,7 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 40px 40px 120px 40px;
@@ -124,7 +120,7 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
@@ -1083,6 +1079,11 @@
         #currentShiftLabel {
             color: #1a1a1a;
         }
+
+        .close-btn img {
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 <body>
@@ -1091,7 +1092,7 @@
         <div class="top-bar">
             <div class="top-bar-content">
                 <div class="logo"></div>
-                <a href="/time-tracking" class="close-btn">
+                <a href="/settings/time-tracking" class="close-btn" onclick="clearEditScheduleData(event)">
                     <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
                 </a>
             </div>
@@ -1466,7 +1467,7 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
+                
                 
                 <ol class="steps-list">
                     <li class="step-item completed">
@@ -1491,7 +1492,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/edit-schedule/{{ schedule_id }}" class="btn-back" id="backBtn">
+                <a href="/settings/time-tracking" class="btn-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -1502,7 +1503,7 @@
                         <div class="next-step-label">Next step:</div>
                         <div class="next-step-title">3. Review and finish</div>
                     </div>
-                    <button type="submit" class="btn-continue" form="schedule-form-step2" id="continueBtn">Continue</button>
+                    <button type="submit" form="schedule-form" class="btn-continue" id="continueBtn">Continue</button>
                 </div>
             </div>
         </div>
@@ -1515,30 +1516,132 @@
             const data = JSON.parse(savedData);
         }
 
-        // Back button handler - save data before navigating
-        document.getElementById('backBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            // Save current form data before going back
-            saveFormStateToSession();
-            // Navigate to edit schedule step 1
-            window.location.href = '/edit-schedule/{{ schedule_id }}';
+        // Prefill script for edit mode
+        window.addEventListener('DOMContentLoaded', function() {
+            sessionStorage.removeItem('scheduleFormData');
+            var prefill = {{ prefill_data|tojson|safe }};
+            // Always set window.shiftData only from this prefill
+            if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
+                // If only one shift, keep only shift 1
+                if (prefill.scheduleDetails.numberOfShifts === 1) {
+                    prefill.scheduleDetails.shifts = { 1: prefill.scheduleDetails.shifts[1] || {} };
+                }
+                window.shiftData = prefill.scheduleDetails.shifts;
+            } else {
+                window.shiftData = { 1: {} };
+            }
+            if (prefill && prefill.scheduleDetails) {
+                // --- PATCH: Detect includeTime from first shift if not present at top level ---
+                var includeTimeTop = prefill.scheduleDetails.includeTime;
+                var firstShift = prefill.scheduleDetails.shifts && prefill.scheduleDetails.shifts[1];
+                var includeTimeShift = firstShift && typeof firstShift.includeTime !== 'undefined' ? firstShift.includeTime : undefined;
+                var isFlexible = !(typeof includeTimeTop !== 'undefined' ? includeTimeTop : includeTimeShift);
+                var isFixed = !!(typeof includeTimeTop !== 'undefined' ? includeTimeTop : includeTimeShift);
+                var numShifts = prefill.scheduleDetails.numberOfShifts || 1;
+                var specifyDurationToggle = document.getElementById('specifyDuration');
+                var includeTimeToggle = document.getElementById('includeTime');
+                var includeTimeToggleSection = document.getElementById('includeTimeToggle');
+                var shiftsDropdown = document.getElementById('shiftsDropdown');
+                var shiftPagination = document.getElementById('shiftPagination');
+                var dropdownSelected = document.getElementById('dropdownSelected');
+                var dropdownOptions = document.getElementById('dropdownOptions');
+                if (isFlexible) {
+                    if (specifyDurationToggle) {
+                        specifyDurationToggle.checked = true;
+                        specifyDurationToggle.disabled = true;
+                    }
+                    if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'none';
+                    if (shiftsDropdown) shiftsDropdown.style.display = 'none';
+                    if (shiftPagination) shiftPagination.style.display = 'none';
+                    ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
+                        var startInput = document.getElementById(day + '-start');
+                        var endInput = document.getElementById(day + '-end');
+                        var durInput = document.getElementById(day + '-duration-input');
+                        if (startInput) startInput.parentElement.parentElement.style.display = 'none';
+                        if (endInput) endInput.parentElement.parentElement.style.display = 'none';
+                        if (durInput) durInput.parentElement.parentElement.style.display = 'block';
+                    });
+                } else if (isFixed) {
+                    if (specifyDurationToggle) {
+                        specifyDurationToggle.checked = true;
+                        specifyDurationToggle.disabled = true;
+                    }
+                    if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'flex';
+                    if (includeTimeToggle) {
+                        includeTimeToggle.checked = true;
+                        includeTimeToggle.disabled = true;
+                    }
+                    if (shiftsDropdown) shiftsDropdown.style.display = 'block';
+                    if (shiftPagination) shiftPagination.style.display = numShifts > 1 ? 'flex' : 'none';
+                    if (dropdownSelected) dropdownSelected.textContent = numShifts === 1 ? '1 shift' : `${numShifts} shifts`;
+                    if (dropdownOptions) {
+                        dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
+                            if (parseInt(opt.dataset.value) === numShifts) {
+                                opt.style.display = 'block';
+                                opt.classList.add('selected');
+                            } else {
+                                opt.style.display = 'none';
+                                opt.classList.remove('selected');
+                            }
+                        });
+                    }
+                    // --- PATCH: Set weekday checkboxes based on prefill data ---
+                    var shift = prefill.scheduleDetails.shifts && prefill.scheduleDetails.shifts[1];
+                    if (shift && shift.weekdays) {
+                        ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
+                            var dayData = shift.weekdays[day] || {};
+                            var checkbox = document.getElementById(day);
+                            if (checkbox) {
+                                // Check if the day is marked checked or has start/end time data
+                                if (dayData.checked || (dayData.startTime && dayData.endTime)) {
+                                    checkbox.checked = true;
+                                    checkbox.dispatchEvent(new Event('change'));
+                                } else {
+                                    checkbox.checked = false;
+                                    checkbox.dispatchEvent(new Event('change'));
+                                }
+                            }
+                            // Prefill start and end time values for each day
+                            var startInput = document.getElementById(day + '-start');
+                            var endInput = document.getElementById(day + '-end');
+                            if (startInput && dayData.startTime) startInput.value = dayData.startTime;
+                            if (endInput && dayData.endTime) endInput.value = dayData.endTime;
+                        });
+                        // After setting checkboxes and values, enforce correct visibility:
+                        updateInputVisibility();
+                    }
+                }
+            }
+            window.prefill = prefill;
         });
+
+        // Back button handler - save data before navigating
+        var backBtn = document.getElementById('backBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Save current form data before going back
+                saveFormStateToSession();
+                // Navigate to edit schedule step 1
+                window.location.href = '/edit-schedule/{{ schedule_id }}';
+            });
+        }
 
         // Form validation and submission
-        document.getElementById('schedule-form-step2').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Re-run validation on submit click
-            if (!isFormValid()) {
-                alert('Please turn on "Specify the work duration" and provide details for at least one day before continuing.');
-                return;
-            }
-            
-            // State is already saved by listeners, but we save one last time to be safe.
-            saveFormStateToSession();
-            
-            window.location.href = '/edit-schedule-step3/{{ schedule_id }}';
-        });
+        var scheduleFormStep2 = document.getElementById('schedule-form-step2');
+        if (scheduleFormStep2) {
+            scheduleFormStep2.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Re-run validation on submit click
+                if (!isFormValid()) {
+                    alert('Please turn on "Specify the work duration" and provide details for at least one day before continuing.');
+                    return;
+                }
+                // State is already saved by listeners, but we save one last time to be safe.
+                saveFormStateToSession();
+                window.location.href = '/edit-schedule-step3/{{ schedule_id }}';
+            });
+        }
 
 
 
@@ -1605,7 +1708,7 @@
                 updateAllDayDurations();
                 calculateWeeklyDuration();
             });
-        });
+        })
 
         // Duration input focus/blur functionality for showing/hiding "hour" text
         document.querySelectorAll('.duration-field').forEach(durationInput => {
@@ -1872,8 +1975,19 @@
 
         // --- Main Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
-            var specifyDurationToggle = document.getElementById('specifyDuration');
-            if (specifyDurationToggle) specifyDurationToggle.checked = true;
+            // FULL RESET: Always clear sessionStorage and window.shiftData for this schedule
+            sessionStorage.removeItem('scheduleFormData');
+            window.shiftData = undefined;
+            var prefill = {{ prefill_data|tojson|safe }};
+            // Always set window.shiftData only from this prefill
+            if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
+                if (prefill.scheduleDetails.numberOfShifts === 1) {
+                    prefill.scheduleDetails.shifts = { 1: prefill.scheduleDetails.shifts[1] || {} };
+                }
+                window.shiftData = prefill.scheduleDetails.shifts;
+            } else {
+                window.shiftData = { 1: {} };
+            }
             // Initialize default states first
             initializeToggleStates();
             initializeDurationUnits();
@@ -2138,23 +2252,17 @@
             bookmarks.forEach(bookmark => {
                 bookmark.addEventListener('click', function() {
                     const shiftNumber = parseInt(this.getAttribute('data-shift'));
-                    
-                    // Don't switch if already on this shift
                     if (currentShift === shiftNumber) {
                         return;
                     }
-                    
-                    // Save current shift data before switching
                     saveCurrentShiftData();
-                    
-                    // Switch to new shift
                     currentShift = shiftNumber;
                     setActiveShift(shiftNumber);
-                    
-                    // Load new shift data (or clear if no data exists)
+                    // Prefill from backend data if available
+                    if (window.prefill && window.prefill.scheduleDetails && window.prefill.scheduleDetails.shifts && window.prefill.scheduleDetails.shifts[shiftNumber]) {
+                        shiftData[shiftNumber] = window.prefill.scheduleDetails.shifts[shiftNumber];
+                    }
                     loadShiftData(shiftNumber);
-                    
-                    // Save the form state after switching
                     saveFormStateToSession();
                 });
             });
@@ -3074,70 +3182,28 @@
             isLoadingData = false;
         }
 
-        // Prefill script for edit mode
-        window.addEventListener('DOMContentLoaded', function() {
-            // Check if we already have sessionStorage data (user changes)
-            const existingData = sessionStorage.getItem('scheduleFormData');
-            if (existingData) {
-                console.log('Step 2: Found existing sessionStorage data, using that instead of backend data');
-                return; // Don't overwrite user changes with backend data
-            }
-            
-            var prefill = {{ prefill_data|tojson|safe }};
-            if (prefill && prefill.scheduleDetails) {
-                console.log('Step 2: No sessionStorage data, using backend prefill data');
-                
-                // Prefill toggles
-                if (typeof prefill.scheduleDetails.specifyDuration !== 'undefined') {
-                    var durToggle = document.getElementById('specifyDuration');
-                    if (durToggle) durToggle.checked = prefill.scheduleDetails.specifyDuration;
-                }
-                if (typeof prefill.scheduleDetails.includeTime !== 'undefined') {
-                    var timeToggle = document.getElementById('includeTime');
-                    if (timeToggle) timeToggle.checked = prefill.scheduleDetails.includeTime;
-                }
-                
-                // Prefill days/hours
-                if (prefill.scheduleDetails.shifts) {
-                    Object.values(prefill.scheduleDetails.shifts).forEach(function(shift) {
-                        if (shift.weekdays) {
-                            Object.entries(shift.weekdays).forEach(function(entry) {
-                                var day = entry[0];
-                                var data = entry[1];
-                                var dayCheckbox = document.getElementById(day);
-                                if (dayCheckbox) dayCheckbox.checked = !!data.checked;
-                                
-                                if (data.checked) {
-                                    var dayItem = dayCheckbox.closest('.checkbox-item');
-                                    dayItem.classList.add('selected');
-                                    dayItem.classList.remove('disabled');
-                                    
-                                    if (shift.includeTime) {
-                                        var startInput = document.getElementById(day + '-start');
-                                        var endInput = document.getElementById(day + '-end');
-                                        if (startInput && data.startTime) startInput.value = data.startTime;
-                                        if (endInput && data.endTime) endInput.value = data.endTime;
-                                    } else {
-                                        var durInput = document.getElementById(day + '-duration-input');
-                                        if (durInput && data.duration) durInput.value = data.duration;
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-                
-                // Only store backend data if no sessionStorage data exists
-                sessionStorage.setItem('scheduleFormData', JSON.stringify(prefill));
-                console.log('Step 2: Stored backend data in sessionStorage');
-                
-                // Trigger change events to update UI
-                var editSpecifyDurationToggle = document.getElementById('specifyDuration');
-                var editIncludeTimeToggle = document.getElementById('includeTime');
-                if (editSpecifyDurationToggle) editSpecifyDurationToggle.dispatchEvent(new Event('change'));
-                if (editIncludeTimeToggle) editIncludeTimeToggle.dispatchEvent(new Event('change'));
-            }
-        });
+        function clearEditScheduleData(e) {
+            if (e) e.preventDefault();
+            sessionStorage.removeItem('scheduleFormData');
+            window.location.href = '/settings/time-tracking';
+        }
     </script>
+    <div class="bottom-navigation">
+        <div class="bottom-nav-content">
+            <a href="/settings/time-tracking" class="btn-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back
+            </a>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="next-step-info">
+                    <div class="next-step-label">Next step:</div>
+                    <div class="next-step-title">3. Review and finish</div>
+                </div>
+                <button type="submit" form="schedule-form" class="btn-continue" id="continueBtn">Continue</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 

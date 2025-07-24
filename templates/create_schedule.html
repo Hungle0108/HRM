@@ -25,7 +25,8 @@
         }
 
         .top-bar {
-            background: #f8f9fa;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -74,7 +75,7 @@
         }
 
         .page-header {
-            background: white;
+            background: #f8f9fa;
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -104,10 +105,10 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
-            padding: 40px 40px 120px 40px;
+            padding: 20px 40px 120px 40px;
             gap: 60px;
         }
 
@@ -120,11 +121,19 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.hidden {
+            display: none;
         }
 
         .sidebar-title {
@@ -139,11 +148,13 @@
             padding: 0;
             margin: 0;
         }
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
 
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
             font-size: 0.95rem;
         }
 
@@ -212,6 +223,10 @@
             margin-bottom: 24px;
         }
 
+        .form-group.full-width {
+            width: 100%;
+        }
+
         .form-label {
             font-size: 0.9rem;
             font-weight: 500;
@@ -276,8 +291,8 @@
         }
 
         .bottom-nav-content {
-            width: 100%;
             max-width: 930px;
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -301,7 +316,6 @@
         .btn-back:hover {
             background: #f8f9fa;
             border-color: #d1d5db;
-            text-decoration: none;
         }
 
         .btn-continue {
@@ -401,6 +415,18 @@
             background: #f8f9fa;
             color: #1a1a1a;
         }
+        .dropdown-option.disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        .option-main {
+            font-weight: 600;
+        }
+        .option-subtitle {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
         .form-input#scheduleName {
             color: inherit;
             caret-color: auto;
@@ -449,28 +475,36 @@
                         
                         <div class="form-group">
                             <input type="text" class="form-input" placeholder="Schedule name *" id="scheduleName" required>
-                            <div class="error-message" id="scheduleNameError">Worker type relation must not be empty</div>
+                            <div class="error-message" id="scheduleNameError">Schedule name is required</div>
                         </div>
                     </div>
 
                     <div class="form-section">
-                        <h3 class="section-title">Worker type relation</h3>
-                        <p class="section-description">Depending on the worker type, the work schedule may have specific restrictions. Select the worker type that will follow this schedule.</p>
-                        
-                        <div class="form-group">
+                        <h3 class="section-title">Team information</h3>
+                        <p class="section-description">Select the worker type for this schedule.</p>
+                        <div class="form-group full-width">
                             <div class="custom-dropdown" id="workerTypeDropdown">
                                 <button type="button" class="dropdown-toggle" id="workerTypeDropdownBtn">
-                                    <span id="workerTypeDropdownLabel">Worker type group *</span>
-                                    <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                                    <span id="workerTypeDropdownLabel">Worker Type *</span>
+                                    <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
                                 </button>
                                 <div class="dropdown-menu" id="workerTypeDropdownMenu">
-                                    {% for wt in worker_types %}
-                                        <div class="dropdown-option" data-value="{{ wt.id }}">{{ wt.template_name }}</div>
-                                    {% endfor %}
+                                    {% if worker_types %}
+                                        {% for worker_type in worker_types %}
+                                            <div class="dropdown-option" data-value="{{ worker_type.id }}" data-name="{{ worker_type.template_name }}">
+                                                <div class="option-main">{{ worker_type.template_name }}</div>
+                                                <div class="option-subtitle">{{ worker_type.description }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="dropdown-option disabled" style="color: #6c757d; cursor: not-allowed;">
+                                            No worker types available
+                                        </div>
+                                    {% endif %}
                                 </div>
-                                <input type="hidden" id="workerType" name="workerType" required>
+                                <input type="hidden" id="selectedWorkerTypeId" name="workerTypeId" required>
                             </div>
-                            <div class="error-message" id="workerTypeError">Worker type relation must not be empty</div>
+                            <div class="error-message" id="workerTypeDropdownError">Worker type must not be empty</div>
                         </div>
                     </div>
                 </form>
@@ -478,7 +512,6 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
                 
                 <ol class="steps-list">
                     <li class="step-item active">
@@ -530,12 +563,11 @@
             e.preventDefault();
             
             const scheduleName = document.getElementById('scheduleName').value.trim();
-            const workerType = document.getElementById('workerType').value;
-            const workerTypeName = document.getElementById('workerType').getAttribute('data-name') || '';
+            const workerTypeId = document.getElementById('selectedWorkerTypeId').value;
             
             // Reset error messages
             document.getElementById('scheduleNameError').style.display = 'none';
-            document.getElementById('workerTypeError').style.display = 'none';
+            document.getElementById('workerTypeDropdownError').style.display = 'none';
             
             let hasErrors = false;
             
@@ -546,26 +578,24 @@
                 hasErrors = true;
             }
             
-            // Validate worker type
-            if (!workerType) {
-                document.getElementById('workerTypeError').style.display = 'block';
+            // Validate worker type selection
+            if (!workerTypeId) {
+                document.getElementById('workerTypeDropdownError').style.display = 'block';
                 hasErrors = true;
             }
             
             if (!hasErrors) {
                 // Preserve existing schedule details if they exist
                 const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-                
                 // Save data and proceed to next step
+                const workerTypeDropdownLabel = document.getElementById('workerTypeDropdownLabel').textContent;
                 const updatedData = {
                     ...existingData,  // Preserve existing data (like scheduleDetails)
                     scheduleName: scheduleName,
-                    workerType: workerType,
-                    workerTypeName: workerTypeName
+                    workerTypeId: workerTypeId,
+                    workerTypeName: workerTypeDropdownLabel
                 };
-                
                 sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
-                
                 // Navigate to step 2
                 window.location.href = '/create-schedule-step2';
             }
@@ -578,13 +608,13 @@
             }
         });
 
-        // Custom dropdown for worker type
+        // Custom dropdown for worker type selection (copied from add_employee.html)
         (function() {
             const dropdown = document.getElementById('workerTypeDropdown');
             const btn = document.getElementById('workerTypeDropdownBtn');
             const menu = document.getElementById('workerTypeDropdownMenu');
             const label = document.getElementById('workerTypeDropdownLabel');
-            const hiddenInput = document.getElementById('workerType');
+            const hiddenInput = document.getElementById('selectedWorkerTypeId');
             const options = menu.querySelectorAll('.dropdown-option');
 
             btn.addEventListener('click', function(e) {
@@ -594,13 +624,13 @@
 
             options.forEach(option => {
                 option.addEventListener('click', function() {
+                    if (this.classList.contains('disabled')) return;
                     options.forEach(opt => opt.classList.remove('selected'));
                     this.classList.add('selected');
-                    label.textContent = this.textContent;
+                    label.textContent = this.querySelector('.option-main').textContent;
                     hiddenInput.value = this.getAttribute('data-value');
-                    hiddenInput.setAttribute('data-name', this.textContent); // Save name as data attribute
                     menu.classList.remove('show');
-                    document.getElementById('workerTypeError').style.display = 'none';
+                    document.getElementById('workerTypeDropdownError').style.display = 'none';
                     updateContinueButton();
                 });
             });
@@ -616,10 +646,10 @@
         // Update continue button state
         function updateContinueButton() {
             const scheduleName = document.getElementById('scheduleName').value.trim();
-            const workerType = document.getElementById('workerType').value;
+            const workerTypeId = document.getElementById('selectedWorkerTypeId').value;
             const continueBtn = document.getElementById('continueBtn');
             
-            if (scheduleName && workerType) {
+            if (scheduleName && workerTypeId) {
                 continueBtn.disabled = false;
             } else {
                 continueBtn.disabled = true;
@@ -628,7 +658,7 @@
 
         // Listen for changes to update button state
         document.getElementById('scheduleName').addEventListener('input', updateContinueButton);
-        document.getElementById('workerType').addEventListener('change', updateContinueButton);
+        document.getElementById('selectedWorkerTypeId').addEventListener('change', updateContinueButton);
 
         // Initialize button state
         updateContinueButton();
@@ -645,15 +675,14 @@
             }
             
             // Restore worker type selection
-            if (data.workerType && data.workerTypeName) {
-                document.getElementById('workerType').value = data.workerType;
-                document.getElementById('workerType').setAttribute('data-name', data.workerTypeName);
-                document.getElementById('workerTypeDropdownLabel').textContent = data.workerTypeName;
+            if (data.workerTypeId) {
+                document.getElementById('selectedWorkerTypeId').value = data.workerTypeId;
+                document.getElementById('workerTypeDropdownLabel').textContent = data.workerTypeName || 'Worker Type'; // Assuming workerTypeName is stored
                 
                 // Update dropdown visual state
                 const options = document.querySelectorAll('.dropdown-option');
                 options.forEach(option => {
-                    if (option.getAttribute('data-value') === data.workerType) {
+                    if (option.getAttribute('data-value') === data.workerTypeId) {
                         option.classList.add('selected');
                     } else {
                         option.classList.remove('selected');

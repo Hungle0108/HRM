@@ -22,7 +22,8 @@
             flex-direction: column;
         }
         .top-bar {
-            background: #f8f9fa;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
             padding: 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -38,7 +39,7 @@
             max-width: 930px;
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
         }
         .logo {
@@ -49,23 +50,19 @@
         .close-btn {
             background: none;
             border: none;
+            font-size: 24px;
             cursor: pointer;
+            color: #666;
             padding: 8px;
-            border-radius: 50%;
+            border-radius: 4px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .close-btn:hover {
-            background: #f0f0f0;
-        }
-        .close-btn img {
-            width: 16px;
-            height: 16px;
+            background: #f5f5f5;
+            color: #333;
         }
         .page-header {
-            background: white;
+            
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -91,7 +88,7 @@
         .main-container {
             flex: 1;
             display: flex;
-            background: white;
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 40px 40px 120px 40px;
@@ -105,11 +102,16 @@
         .sidebar {
             flex: 0 0 auto;
             width: 280px;
-            background: #f8f9fa;
+            background: white;
             border: 1px solid #e9ecef;
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .sidebar-title {
             font-size: 1.1rem;
@@ -122,10 +124,13 @@
             padding: 0;
             margin: 0;
         }
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
+            
             font-size: 0.95rem;
         }
         .step-number {
@@ -183,6 +188,9 @@
             flex-direction: column;
             margin-bottom: 24px;
         }
+        .form-group.full-width {
+            width: 100%;
+        }
         .form-label {
             font-size: 0.9rem;
             font-weight: 500;
@@ -205,6 +213,10 @@
             outline: none;
             border-color: #80bdff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .close-btn img {
+            width: 16px;
+            height: 16px;
         }
         .form-select {
             appearance: none;
@@ -355,6 +367,19 @@
             background: #f8f9fa;
             color: #1a1a1a;
         }
+        .dropdown-option.disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        .option-main {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .option-subtitle {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
         .form-input#scheduleName {
             color: inherit;
             caret-color: auto;
@@ -372,7 +397,7 @@
         <div class="top-bar">
             <div class="top-bar-content">
                 <div class="logo"></div>
-                <a href="/settings/time-tracking" class="close-btn">
+                <a href="/settings/time-tracking" class="close-btn" onclick="clearEditScheduleData(event)">
                     <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
                 </a>
             </div>
@@ -396,33 +421,41 @@
                         <p class="section-description">Assigning a unique name to each schedule will help you distinguish between them during the contract creation process.</p>
                         <div class="form-group">
                             <input type="text" class="form-input" placeholder="Schedule name *" id="scheduleName" required>
-                            <div class="error-message" id="scheduleNameError">Worker type relation must not be empty</div>
+                            <div class="error-message" id="scheduleNameError">Schedule name is required</div>
                         </div>
                     </div>
                     <div class="form-section">
-                        <h3 class="section-title">Worker type relation</h3>
-                        <p class="section-description">Depending on the worker type, the work schedule may have specific restrictions. Select the worker type that will follow this schedule.</p>
-                        <div class="form-group">
+                        <h3 class="section-title">Team information</h3>
+                        <p class="section-description">Select the worker type for this schedule.</p>
+                        <div class="form-group full-width">
                             <div class="custom-dropdown" id="workerTypeDropdown">
                                 <button type="button" class="dropdown-toggle" id="workerTypeDropdownBtn">
-                                    <span id="workerTypeDropdownLabel">Worker type group *</span>
-                                    <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                                    <span id="workerTypeDropdownLabel">Worker Type *</span>
+                                    <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
                                 </button>
                                 <div class="dropdown-menu" id="workerTypeDropdownMenu">
-                                    {% for wt in worker_types %}
-                                        <div class="dropdown-option" data-value="{{ wt.id }}">{{ wt.template_name }}</div>
-                                    {% endfor %}
+                                    {% if worker_types %}
+                                        {% for worker_type in worker_types %}
+                                            <div class="dropdown-option" data-value="{{ worker_type.id }}" data-name="{{ worker_type.template_name }}">
+                                                <div class="option-main">{{ worker_type.template_name }}</div>
+                                                <div class="option-subtitle">{{ worker_type.description }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="dropdown-option disabled" style="color: #6c757d; cursor: not-allowed;">
+                                            No worker types available
+                                        </div>
+                                    {% endif %}
                                 </div>
-                                <input type="hidden" id="workerType" name="workerType" required>
+                                <input type="hidden" id="selectedWorkerTypeId" name="workerTypeId" required>
                             </div>
-                            <div class="error-message" id="workerTypeError">Worker type relation must not be empty</div>
+                            <div class="error-message" id="workerTypeDropdownError">Worker type must not be empty</div>
                         </div>
                     </div>
                 </form>
             </div>
             <!-- Sidebar -->
             <div class="sidebar">
-                <h3 class="sidebar-title">Steps</h3>
                 <ol class="steps-list">
                     <li class="step-item active">
                         <div class="step-number">1</div>
@@ -439,49 +472,35 @@
                 </ol>
             </div>
         </div>
-        <!-- Bottom Navigation -->
-        <div class="bottom-navigation">
-            <div class="bottom-nav-content">
-                <a href="/settings/time-tracking" class="btn-back">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                    </svg>
-                    Back
-                </a>
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div class="next-step-info">
-                        <div class="next-step-label">Next step:</div>
-                        <div class="next-step-title">2. Working time details</div>
-                    </div>
-                    <button type="submit" class="btn-continue" form="schedule-form" id="continueBtn">Continue</button>
-                </div>
-            </div>
-        </div>
     </div>
     <script>
     // Prefill logic for edit schedule step 1
     window.addEventListener('DOMContentLoaded', function() {
-        var dataToUse = {{ prefill_data|tojson|safe }};
+        var dataToUse = {{ prefill_data|tojson|default('{}')|safe }};
+        console.log('Prefill data:', dataToUse);
         if (dataToUse) {
             // Prefill schedule name
             const scheduleNameInput = document.getElementById('scheduleName');
             if (dataToUse.scheduleName && scheduleNameInput) {
                 scheduleNameInput.value = dataToUse.scheduleName;
             }
-            // Prefill worker type
-            const workerTypeInput = document.getElementById('workerType');
+            // Prefill worker type selection
+            const workerTypeInput = document.getElementById('selectedWorkerTypeId');
             const workerTypeLabel = document.getElementById('workerTypeDropdownLabel');
             const workerTypeMenu = document.getElementById('workerTypeDropdownMenu');
-            if (dataToUse.workerType && workerTypeInput) {
-                workerTypeInput.value = dataToUse.workerType;
-                workerTypeInput.setAttribute('data-name', dataToUse.workerTypeName || '');
-                if (workerTypeLabel && dataToUse.workerTypeName) {
-                    workerTypeLabel.textContent = dataToUse.workerTypeName;
+            if (dataToUse.workerTypeId && workerTypeInput) {
+                workerTypeInput.value = dataToUse.workerTypeId;
+                if (workerTypeLabel) {
+                    // Find the worker type name from the dropdown options
+                    const selectedOption = workerTypeMenu.querySelector('.dropdown-option[data-value="' + dataToUse.workerTypeId + '"] .option-main');
+                    if (selectedOption) {
+                        workerTypeLabel.textContent = selectedOption.textContent;
+                    }
                 }
                 if (workerTypeMenu) {
                     var options = workerTypeMenu.querySelectorAll('.dropdown-option');
                     options.forEach(function(opt) {
-                        if (opt.getAttribute('data-value') === String(dataToUse.workerType)) {
+                        if (opt.getAttribute('data-value') === String(dataToUse.workerTypeId)) {
                             opt.classList.add('selected');
                         } else {
                             opt.classList.remove('selected');
@@ -495,49 +514,13 @@
             }
         }
     });
-    </script>
-    <script>
-    // Form validation and submission
-    document.getElementById('schedule-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const scheduleName = document.getElementById('scheduleName').value.trim();
-        const workerType = document.getElementById('workerType').value;
-        const workerTypeName = document.getElementById('workerType').getAttribute('data-name') || '';
-        document.getElementById('scheduleNameError').style.display = 'none';
-        document.getElementById('workerTypeError').style.display = 'none';
-        let hasErrors = false;
-        if (!scheduleName) {
-            document.getElementById('scheduleNameError').textContent = 'Schedule name is required';
-            document.getElementById('scheduleNameError').style.display = 'block';
-            hasErrors = true;
-        }
-        if (!workerType) {
-            document.getElementById('workerTypeError').style.display = 'block';
-            hasErrors = true;
-        }
-        if (!hasErrors) {
-            const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-            const updatedData = {
-                ...existingData,
-                scheduleName: scheduleName,
-                workerType: workerType,
-                workerTypeName: workerTypeName
-            };
-            sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
-            window.location.href = '/edit-schedule-step2/{{ schedule_id }}';
-        }
-    });
-    document.getElementById('scheduleName').addEventListener('input', function() {
-        if (this.value.trim()) {
-            document.getElementById('scheduleNameError').style.display = 'none';
-        }
-    });
+    // Custom dropdown for worker type selection
     (function() {
         const dropdown = document.getElementById('workerTypeDropdown');
         const btn = document.getElementById('workerTypeDropdownBtn');
         const menu = document.getElementById('workerTypeDropdownMenu');
         const label = document.getElementById('workerTypeDropdownLabel');
-        const hiddenInput = document.getElementById('workerType');
+        const hiddenInput = document.getElementById('selectedWorkerTypeId');
         const options = menu.querySelectorAll('.dropdown-option');
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -545,13 +528,13 @@
         });
         options.forEach(option => {
             option.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
                 options.forEach(opt => opt.classList.remove('selected'));
                 this.classList.add('selected');
-                label.textContent = this.textContent;
+                label.textContent = this.querySelector('.option-main').textContent;
                 hiddenInput.value = this.getAttribute('data-value');
-                hiddenInput.setAttribute('data-name', this.textContent);
                 menu.classList.remove('show');
-                document.getElementById('workerTypeError').style.display = 'none';
+                document.getElementById('workerTypeDropdownError').style.display = 'none';
                 updateContinueButton();
             });
         });
@@ -561,19 +544,74 @@
             }
         });
     })();
+    // Update continue button state
     function updateContinueButton() {
         const scheduleName = document.getElementById('scheduleName').value.trim();
-        const workerType = document.getElementById('workerType').value;
+        const workerTypeId = document.getElementById('selectedWorkerTypeId').value;
         const continueBtn = document.getElementById('continueBtn');
-        if (scheduleName && workerType) {
-            continueBtn.disabled = false;
-        } else {
-            continueBtn.disabled = true;
+        if (continueBtn) {
+            if (scheduleName && workerTypeId) {
+                continueBtn.disabled = false;
+            } else {
+                continueBtn.disabled = true;
+            }
         }
     }
     document.getElementById('scheduleName').addEventListener('input', updateContinueButton);
-    document.getElementById('workerType').addEventListener('change', updateContinueButton);
+    document.getElementById('selectedWorkerTypeId').addEventListener('change', updateContinueButton);
     updateContinueButton();
+    // Form validation and submission
+    document.getElementById('schedule-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const scheduleName = document.getElementById('scheduleName').value.trim();
+        const workerTypeId = document.getElementById('selectedWorkerTypeId').value;
+        document.getElementById('scheduleNameError').style.display = 'none';
+        document.getElementById('workerTypeDropdownError').style.display = 'none';
+        let hasErrors = false;
+        if (!scheduleName) {
+            document.getElementById('scheduleNameError').textContent = 'Schedule name is required';
+            document.getElementById('scheduleNameError').style.display = 'block';
+            hasErrors = true;
+        }
+        if (!workerTypeId) {
+            document.getElementById('workerTypeDropdownError').style.display = 'block';
+            hasErrors = true;
+        }
+        if (!hasErrors) {
+            const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            const updatedData = {
+                ...existingData,
+                scheduleName: scheduleName,
+                workerTypeId: workerTypeId
+            };
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(updatedData));
+            window.location.href = '/edit-schedule-step2/{{ schedule_id }}';
+        }
+    });
+    function clearEditScheduleData(e) {
+        if (e) e.preventDefault();
+        sessionStorage.removeItem('scheduleFormData');
+        window.location.href = '/settings/time-tracking';
+    }
     </script>
+
+    <div class="bottom-navigation">
+        <div class="bottom-nav-content">
+            <a href="/settings/time-tracking" class="btn-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back
+            </a>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="next-step-info">
+                    <div class="next-step-label">Next step:</div>
+                    <div class="next-step-title">2. Working time details</div>
+                </div>
+                <button type="submit" form="schedule-form" class="btn-continue" id="continueBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html> 
