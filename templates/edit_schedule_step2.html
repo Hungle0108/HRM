@@ -912,17 +912,14 @@
             z-index: 1000;
             margin-bottom: 16px;
         }
-
         .custom-dropdown-wrapper {
             position: relative;
             width: 100%;
         }
-
         .custom-dropdown {
             position: relative;
             width: 100%;
         }
-
         .dropdown-header {
             width: 100%;
             padding: 14px 16px;
@@ -935,28 +932,23 @@
             transition: all 0.2s;
             position: relative;
         }
-
         .dropdown-header:hover {
             border-color: #80bdff;
         }
-
         .dropdown-header.active {
             border-color: #80bdff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
-
         .dropdown-label {
             font-size: 0.75rem;
             color: #6c757d;
             margin-bottom: 2px;
         }
-
         .dropdown-selected {
             font-size: 0.95rem;
             color: #1a1a1a;
             font-weight: 500;
         }
-
         .dropdown-arrow {
             position: absolute;
             right: 16px;
@@ -967,11 +959,9 @@
             color: #6c757d;
             transition: transform 0.3s ease;
         }
-
         .dropdown-header.active .dropdown-arrow {
             transform: translateY(-50%) rotate(180deg);
         }
-
         .dropdown-options {
             position: absolute;
             top: 100%;
@@ -987,7 +977,6 @@
             max-height: 200px;
             overflow-y: auto;
         }
-
         .dropdown-option {
             padding: 12px 16px;
             display: flex;
@@ -998,17 +987,14 @@
             font-size: 0.95rem;
             color: #495057;
         }
-
         .dropdown-option:hover {
             background-color: #f8f9fa;
         }
-
         .dropdown-option.selected {
             background-color: #e7f3ff;
             color: #1a1a1a;
             font-weight: 500;
         }
-
         .check-icon {
             width: 16px;
             height: 16px;
@@ -1016,7 +1002,6 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-
         .dropdown-option.selected .check-icon {
             opacity: 1;
         }
@@ -1133,37 +1118,37 @@
                         
                         <!-- Shifts Dropdown (appears when Include Time toggle is ON) -->
                         <div class="shifts-dropdown" id="shiftsDropdown" style="display: none;">
-                            <div class="custom-dropdown-wrapper">
-                                <div class="custom-dropdown" id="customShiftsDropdown">
-                                    <div class="dropdown-header" id="dropdownHeader">
-                                        <span class="dropdown-label">Number of shifts *</span>
-                                        <span class="dropdown-selected" id="dropdownSelected">1 shift</span>
-                                        <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M6 9l6 6 6-6"/>
-                                        </svg>
-                                    </div>
-                                    <div class="dropdown-options" id="dropdownOptions" style="display: none;">
-                                        <div class="dropdown-option" data-value="1">
-                                            <span>1 shift</span>
-                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20 6L9 17l-5-5"/>
-                                            </svg>
-                                        </div>
-                                        <div class="dropdown-option" data-value="2">
-                                            <span>2 shifts</span>
-                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20 6L9 17l-5-5"/>
-                                            </svg>
-                                        </div>
-                                        <div class="dropdown-option" data-value="3">
-                                            <span>3 shifts</span>
-                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20 6L9 17l-5-5"/>
-                                            </svg>
-                                        </div>
-                                    </div>
+                          <div class="custom-dropdown-wrapper">
+                            <div class="custom-dropdown" id="customShiftsDropdown">
+                              <div class="dropdown-header" id="dropdownHeader">
+                                <span class="dropdown-label">Number of shifts *</span>
+                                <span class="dropdown-selected" id="dropdownSelected">1 shift</span>
+                                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                              </div>
+                              <div class="dropdown-options" id="dropdownOptions" style="display: none;">
+                                <div class="dropdown-option" data-value="1">
+                                  <span>1 shift</span>
+                                  <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                  </svg>
                                 </div>
+                                <div class="dropdown-option" data-value="2">
+                                  <span>2 shifts</span>
+                                  <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                  </svg>
+                                </div>
+                                <div class="dropdown-option" data-value="3">
+                                  <span>3 shifts</span>
+                                  <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                  </svg>
+                                </div>
+                              </div>
                             </div>
+                          </div>
                         </div>
                         
                         <div class="weekday-details">
@@ -1519,7 +1504,7 @@
         // Prefill script for edit mode
         window.addEventListener('DOMContentLoaded', function() {
             sessionStorage.removeItem('scheduleFormData');
-            var prefill = {{ prefill_data|tojson|safe }};
+            var prefill = {{ prefill_data | tojson | safe }};
             // Always set window.shiftData only from this prefill
             if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
                 // If only one shift, keep only shift 1
@@ -1577,12 +1562,11 @@
                     if (dropdownOptions) {
                         dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
                             if (parseInt(opt.dataset.value) === numShifts) {
-                                opt.style.display = 'block';
                                 opt.classList.add('selected');
                             } else {
-                                opt.style.display = 'none';
                                 opt.classList.remove('selected');
                             }
+                            opt.style.display = 'block'; // Always show all options
                         });
                     }
                     // --- PATCH: Set weekday checkboxes based on prefill data ---
@@ -1613,6 +1597,8 @@
                 }
             }
             window.prefill = prefill;
+            // Ensure dropdown is initialized after window.prefill is set
+            initializeCustomDropdown();
         });
 
         // Back button handler - save data before navigating
@@ -1824,9 +1810,15 @@
 
         // Toggle functionality for showing/hiding start and end time inputs
         document.getElementById('includeTime').addEventListener('change', function() {
-            if (isLoadingData) return;
-            updateInputVisibility();
-            saveFormStateToSession();
+            console.log('DEBUG: Include Time toggle changed. Checked:', this.checked);
+            const shiftsDropdown = document.getElementById('shiftsDropdown');
+            if (this.checked) {
+                shiftsDropdown.style.display = 'block';
+                console.log('DEBUG: shiftsDropdown set to block');
+            } else {
+                shiftsDropdown.style.display = 'none';
+                console.log('DEBUG: shiftsDropdown set to none');
+            }
         });
 
         // Function to update input visibility based on current toggle states
@@ -1978,13 +1970,13 @@
             // FULL RESET: Always clear sessionStorage and window.shiftData for this schedule
             sessionStorage.removeItem('scheduleFormData');
             window.shiftData = undefined;
-            var prefill = {{ prefill_data|tojson|safe }};
+            
             // Always set window.shiftData only from this prefill
-            if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
-                if (prefill.scheduleDetails.numberOfShifts === 1) {
-                    prefill.scheduleDetails.shifts = { 1: prefill.scheduleDetails.shifts[1] || {} };
+            if (window.prefill && window.prefill.scheduleDetails && window.prefill.scheduleDetails.shifts) {
+                if (window.prefill.scheduleDetails.numberOfShifts === 1) {
+                    window.prefill.scheduleDetails.shifts = { 1: window.prefill.scheduleDetails.shifts[1] || {} };
                 }
-                window.shiftData = prefill.scheduleDetails.shifts;
+                window.shiftData = window.prefill.scheduleDetails.shifts;
             } else {
                 window.shiftData = { 1: {} };
             }
@@ -2275,21 +2267,27 @@
             const dropdownSelected = document.getElementById('dropdownSelected');
             
             if (!dropdownHeader || !dropdownOptions || !dropdownSelected) {
-                console.log('Dropdown elements not found');
                 return;
             }
             
-            // Set default selection
-            const defaultOption = dropdownOptions.querySelector('.dropdown-option[data-value="1"]');
-            if (defaultOption) {
-                defaultOption.classList.add('selected');
+            // Set default selection based on prefill data
+            var numShifts = 1;
+            if (window.prefill && window.prefill.scheduleDetails && window.prefill.scheduleDetails.numberOfShifts) {
+                numShifts = window.prefill.scheduleDetails.numberOfShifts;
             }
+            dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
+                if (parseInt(opt.dataset.value) === numShifts) {
+                    opt.classList.add('selected');
+                    dropdownSelected.textContent = numShifts === 1 ? '1 shift' : `${numShifts} shifts`;
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
             
             // Toggle dropdown
             dropdownHeader.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const isActive = dropdownHeader.classList.contains('active');
-                
                 if (isActive) {
                     closeDropdown();
                 } else {
@@ -2303,22 +2301,17 @@
                 if (option) {
                     const value = option.getAttribute('data-value');
                     const text = option.querySelector('span').textContent;
-                    
                     // Update selected option
                     dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
                         opt.classList.remove('selected');
                     });
                     option.classList.add('selected');
-                    
                     // Update display
                     dropdownSelected.textContent = text;
-                    
                     // Update shift pagination visibility
                     updateShiftPagination(parseInt(value));
-                    
                     // Save the form state after changing shift count
                     saveFormStateToSession();
-                    
                     // Close dropdown
                     closeDropdown();
                 }
@@ -3187,6 +3180,21 @@
             sessionStorage.removeItem('scheduleFormData');
             window.location.href = '/settings/time-tracking';
         }
+
+        document.getElementById('dropdownHeader').addEventListener('click', function() {
+            const dropdownOptions = document.getElementById('dropdownOptions');
+            const isActive = this.classList.contains('active');
+            console.log('DEBUG: Dropdown header clicked. isActive:', isActive);
+            if (isActive) {
+                dropdownOptions.style.display = 'none';
+                this.classList.remove('active');
+                console.log('DEBUG: dropdownOptions set to none');
+            } else {
+                dropdownOptions.style.display = 'block';
+                this.classList.add('active');
+                console.log('DEBUG: dropdownOptions set to block');
+            }
+        });
     </script>
     <div class="bottom-navigation">
         <div class="bottom-nav-content">

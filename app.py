@@ -2054,6 +2054,16 @@ def edit_schedule(schedule_id):
     prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
     prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     prefill_data['groupId'] = getattr(schedule, 'group_id', None) if hasattr(schedule, 'group_id') else prefill_data.get('groupId')
+    # Ensure numberOfShifts is set correctly for the frontend dropdown
+    def _count_shifts(sd):
+        try:
+            return len(sd['shifts']) if 'shifts' in sd and isinstance(sd['shifts'], dict) else 1
+        except Exception:
+            return 1
+    if 'scheduleDetails' in prefill_data:
+        prefill_data['scheduleDetails']['numberOfShifts'] = _count_shifts(prefill_data['scheduleDetails'])
+        print('DEBUG BACKEND: scheduleDetails:', prefill_data['scheduleDetails'])
+        print('DEBUG BACKEND: numberOfShifts:', prefill_data['scheduleDetails']['numberOfShifts'])
     return render_template('edit_schedule.html', user=user, worker_types=worker_types, groups=user_groups, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step2/<int:schedule_id>')
@@ -2068,6 +2078,18 @@ def edit_schedule_step2(schedule_id):
     prefill_data['scheduleName'] = schedule.name
     prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
     prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
+    # Ensure numberOfShifts is set correctly for the frontend dropdown
+    def _count_shifts(sd):
+        try:
+            return len(sd['shifts']) if 'shifts' in sd and isinstance(sd['shifts'], dict) else 1
+        except Exception:
+            return 1
+    if 'scheduleDetails' in prefill_data:
+        prefill_data['scheduleDetails']['numberOfShifts'] = _count_shifts(prefill_data['scheduleDetails'])
+        print('DEBUG BACKEND: scheduleDetails:', prefill_data['scheduleDetails'])
+        print('DEBUG BACKEND: numberOfShifts:', prefill_data['scheduleDetails']['numberOfShifts'])
+    else:
+        print('DEBUG BACKEND: scheduleDetails missing in prefill_data:', prefill_data)
     return render_template('edit_schedule_step2.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step3/<int:schedule_id>')
