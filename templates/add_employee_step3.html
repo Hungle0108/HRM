@@ -1263,6 +1263,86 @@
          
         }
     </style>
+    <style>
+.add-ote-modal-form .form-group.full-width,
+.add-ote-modal-form .date-input-wrapper,
+.add-ote-modal-form .add-ote-row,
+.add-ote-modal-form .custom-dropdown {
+  margin-bottom: 18px !important;
+}
+.add-ote-modal-form > * {
+  margin-bottom: 18px !important;
+}
+.add-ote-modal-form > *:last-child {
+  margin-bottom: 0 !important;
+}
+.add-ote-modal-form .add-ote-row {
+  flex-direction: column !important;
+}
+.add-ote-modal-form .form-group.full-width,
+.add-ote-modal-form .date-input-wrapper,
+.add-ote-modal-form .custom-dropdown {
+  margin-bottom: 18px !important;
+  border: 1px dashed #f99 !important; /* DEBUG: Remove after confirming spacing */
+}
+.add-ote-modal-form > *,
+.add-ote-modal-form .form-group.full-width,
+.add-ote-modal-form .date-input-wrapper,
+.add-ote-modal-form .add-ote-row,
+.add-ote-modal-form .custom-dropdown {
+  margin-bottom: 40px !important;
+  border: 4px solid #f00 !important;
+  background: #fffae6 !important;
+  position: relative;
+}
+.add-ote-modal-form .form-group.full-width::before {
+  content: 'form-group.full-width';
+  color: #fff;
+  background: #f00;
+  position: absolute;
+  top: -22px;
+  left: 0;
+  font-size: 12px;
+  z-index: 10;
+  padding: 2px 6px;
+}
+.add-ote-modal-form .date-input-wrapper::before {
+  content: 'date-input-wrapper';
+  color: #fff;
+  background: #0a0;
+  position: absolute;
+  top: -22px;
+  left: 0;
+  font-size: 12px;
+  z-index: 10;
+  padding: 2px 6px;
+}
+.add-ote-modal-form .add-ote-row::before {
+  content: 'add-ote-row';
+  color: #fff;
+  background: #00f;
+  position: absolute;
+  top: -22px;
+  left: 0;
+  font-size: 12px;
+  z-index: 10;
+  padding: 2px 6px;
+}
+.add-ote-modal-form .custom-dropdown::before {
+  content: 'custom-dropdown';
+  color: #fff;
+  background: #fa0;
+  position: absolute;
+  top: -22px;
+  left: 0;
+  font-size: 12px;
+  z-index: 10;
+  padding: 2px 6px;
+}
+body.modal-open {
+  overflow: hidden !important;
+}
+    </style>
 </head>
 <body>
     <div class="page-container">
@@ -1446,10 +1526,10 @@
                         <button type="button" class="add-ote-modal-close" id="addOteModalClose">&times;</button>
                         <h2 class="add-ote-modal-title">Add on-target payment</h2>
                         <form class="add-ote-modal-form" id="addOteForm">
-                          <div class="form-group full-width">
+                          <div class="form-group full-width" style="margin-bottom:18px; border:none; background:none;">
                             <input type="text" class="form-input" placeholder="Title *" name="oteTitle">
                           </div>
-                          <div class="date-input-wrapper" style="position:relative;">
+                          <div class="date-input-wrapper" style="position:relative; margin-bottom:18px; border:none; background:none;">
                             <input type="text" class="form-input" id="oteEffectiveDate" placeholder="Effective date (DD/MM/YYYY)*" name="oteEffectiveDate" readonly>
                             <button type="button" class="calendar-icon" id="oteCalendarToggle">
                               <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar" style="width: 20px; height: 20px;">
@@ -1476,13 +1556,12 @@
                           </div>
                           <div class="add-ote-row">
                             <div class="add-ote-col">
-                              <div class="form-group full-width">
+                              <div class="form-group full-width" style="margin-bottom:18px; border:none; background:none;">
                                 <input type="text" class="form-input" placeholder="On-target payment amount *" name="oteAmount">
                               </div>
                             </div>
                           </div>
-                          <!-- Custom dropdown for frequency with placeholder -->
-                          <div class="custom-dropdown" id="oteFrequencyDropdown">
+                          <div class="custom-dropdown" id="oteFrequencyDropdown" style="margin-bottom:18px; border:none; background:none;">
                             <button type="button" class="dropdown-toggle" id="oteFrequencyDropdownBtn">
                               <span id="oteFrequencyDropdownLabel" class="dropdown-placeholder">On-target payment frequency *</span>
                               <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
@@ -1540,7 +1619,7 @@
                     Back
                 </a>
                 <div class="nav-right">
-                    <div class="step-info">Step 3 of 6<br>Next step: Compliance</div>
+                    <div class="step-info">Step 3 of 5<br>Next step: Compliance</div>
                     <button type="submit" class="btn-continue" form="employee-form-step3">Continue</button>
                 </div>
             </div>
@@ -1550,7 +1629,7 @@
     <script>
     // Track current step (3 for Compensation and dates)
     let currentStep = 3;
-    const totalSteps = 6;
+    const totalSteps = 5;
 
     // Function to load work schedules from API
     function loadWorkSchedules() {
@@ -1596,6 +1675,9 @@
                         
                         dropdownMenu.appendChild(option);
                     });
+                    
+                    // Call restoreFormData here, after options are loaded
+                    restoreFormData();
                     
                     console.log('Work schedules loaded successfully');
                 } else {
@@ -1702,10 +1784,10 @@
 
     // Function to clear all form data from sessionStorage
     function clearAllFormData() {
-        sessionStorage.removeItem('employeeFormStep1');
+        sessionStorage.removeItem('employeeFormData');
         sessionStorage.removeItem('employeeFormStep2');
         sessionStorage.removeItem('employeeFormStep3');
-        // Add more steps as they are created
+        sessionStorage.removeItem('employeeFormStep4');
         console.log('All form data cleared');
     }
 
@@ -1977,8 +2059,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize form data restoration
-    restoreFormData();
-    
+    // restoreFormData(); // <-- Remove or comment out this line
     // Load work schedules from database
     loadWorkSchedules();
     
@@ -2062,13 +2143,16 @@ document.addEventListener('DOMContentLoaded', function() {
         addOteBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             addOteModal.classList.add('show');
+            document.body.classList.add('modal-open');
         });
         addOteModalClose.addEventListener('click', function() {
             addOteModal.classList.remove('show');
+            document.body.classList.remove('modal-open');
         });
         addOteModal.addEventListener('click', function(e) {
             if (e.target === addOteModal) {
                 addOteModal.classList.remove('show');
+                document.body.classList.remove('modal-open');
             }
         });
     }
@@ -2161,8 +2245,9 @@ document.addEventListener('DOMContentLoaded', function() {
   z-index: 0;
 }
 .add-ote-modal-form .form-group,
-.add-ote-modal-form .custom-dropdown {
-  margin-bottom: 0 !important;
+.add-ote-modal-form .custom-dropdown,
+.add-ote-modal-form .date-input-wrapper {
+  margin-bottom: 18px !important;
 }
 .add-ote-label {
   font-size: 0.95rem;
@@ -2356,65 +2441,5 @@ document.addEventListener('DOMContentLoaded', function() {
  
 }
     </style>
-<div id="addOteModal" class="add-ote-modal">
-  <div class="add-ote-modal-content">
-    <button type="button" class="add-ote-modal-close" id="addOteModalClose">&times;</button>
-    <h2 class="add-ote-modal-title">Add on-target payment</h2>
-    <form class="add-ote-modal-form" id="addOteForm">
-      <div class="form-group full-width">
-        <input type="text" class="form-input" placeholder="Title *" name="oteTitle">
-      </div>
-      <div class="date-input-wrapper" style="position:relative;">
-        <input type="text" class="form-input" id="oteEffectiveDate" placeholder="Effective date (DD/MM/YYYY)*" name="oteEffectiveDate" readonly>
-        <button type="button" class="calendar-icon" id="oteCalendarToggle">
-          <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar" style="width: 20px; height: 20px;">
-        </button>
-        <div class="calendar-popup" id="oteCalendarPopup" style="display: none;">
-          <div class="calendar light">
-            <div class="calendar-header">
-              <span class="month-picker" id="ote-month-picker">February</span>
-              <div class="year-picker">
-                <span class="year-change" id="ote-prev-year"><pre><</pre></span>
-                <span id="ote-year">2025</span>
-                <span class="year-change" id="ote-next-year"><pre>></pre></span>
-              </div>
-            </div>
-            <div class="calendar-body">
-              <div class="calendar-week-day">
-                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-              </div>
-              <div class="calendar-days"></div>
-            </div>
-            <div class="month-list"></div>
-          </div>
-        </div>
-      </div>
-      <div class="add-ote-row">
-        <div class="add-ote-col">
-          <div class="form-group full-width">
-            <input type="text" class="form-input" placeholder="On-target payment amount *" name="oteAmount">
-          </div>
-        </div>
-      </div>
-      <!-- Custom dropdown for frequency with placeholder -->
-      <div class="custom-dropdown" id="oteFrequencyDropdown">
-        <button type="button" class="dropdown-toggle" id="oteFrequencyDropdownBtn">
-          <span id="oteFrequencyDropdownLabel" class="dropdown-placeholder">On-target payment frequency *</span>
-          <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
-        </button>
-        <div class="dropdown-menu" id="oteFrequencyDropdownMenu">
-          <div class="dropdown-option" data-value="annually">
-            <div class="option-main">Annually</div>
-          </div>
-          <div class="dropdown-option" data-value="monthly">
-            <div class="option-main">Monthly</div>
-          </div>
-        </div>
-        <input type="hidden" id="oteFrequencySelect" name="oteFrequency" value="">
-      </div>
-      <button type="button" class="add-ote-modal-add-btn" disabled>Add</button>
-    </form>
-  </div>
-</div>
 </body>
 </html> 

@@ -787,6 +787,7 @@
             max-width: 200px;
             gap: 8px;
             position: relative;
+            min-height: 24px;
         }
 
         .selected-tag .tag-text {
@@ -794,13 +795,12 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             flex: 1;
-            margin-right: 20px;
+            margin-right: 24px;
+            padding-right: 4px;
         }
 
         .selected-tag .tag-remove {
             cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
             width: 16px;
             height: 16px;
             border-radius: 50%;
@@ -810,13 +810,33 @@
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
-            line-height: 1;
-            text-align: center;
             flex-shrink: 0;
             position: absolute;
             right: 4px;
             top: 50%;
             transform: translateY(-50%);
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .selected-tag .tag-remove::before,
+        .selected-tag .tag-remove::after {
+            content: '';
+            position: absolute;
+            background: white;
+            width: 8px;
+            height: 1.5px;
+            top: 50%;
+            left: 50%;
+        }
+
+        .selected-tag .tag-remove::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .selected-tag .tag-remove::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
         }
 
         .selected-tag .tag-remove:hover {
@@ -966,7 +986,7 @@
                     Back
                 </a>
                 <div class="nav-right">
-                    <div class="step-info">Step 2 of 6<br>Next step: Compensation and dates</div>
+                    <div class="step-info">Step 2 of 5<br>Next step: Compensation and dates</div>
                     <button type="submit" class="btn-continue" form="employee-form-step2">Continue</button>
                 </div>
             </div>
@@ -976,7 +996,7 @@
     <script>
     // Track current step (2 for Job details)
     let currentStep = 2;
-    const totalSteps = 6;
+    const totalSteps = 5;
 
     // Function to load worker types from API
     function loadWorkerTypes() {
@@ -1100,16 +1120,26 @@
 
         // Add position data for each structure
         const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
+        console.log('Found position dropdowns:', positionDropdowns.length);
+        
         positionDropdowns.forEach(wrapper => {
             const structureId = wrapper.dataset.structureId;
             const hiddenInput = wrapper.querySelector('.selected-items-input');
-            if (hiddenInput) {
-                formData[`structure-${structureId}`] = hiddenInput.value;
+            // Save both ID and name for each selected item
+            if (wrapper.selectedItems && wrapper.selectedItems.length > 0) {
+                // Save comma-separated IDs
+                formData[`structure-${structureId}-id`] = wrapper.selectedItems.map(item => item.id).join(',');
+                // Save comma-separated names
+                formData[`structure-${structureId}-name`] = wrapper.selectedItems.map(item => item.name).join(',');
+            } else if (hiddenInput) {
+                // Fallback for legacy/empty
+                formData[`structure-${structureId}-id`] = hiddenInput.value;
+                formData[`structure-${structureId}-name`] = '';
             }
         });
 
         sessionStorage.setItem('employeeFormStep2', JSON.stringify(formData));
-        console.log('Step 2 form data auto-saved');
+        console.log('Step 2 form data auto-saved:', formData);
     }
 
     // Function to restore form data from sessionStorage
@@ -1130,71 +1160,49 @@
             
             // Restore position data for each structure
             const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
+            console.log('Found position dropdowns:', positionDropdowns.length);
+            
             positionDropdowns.forEach(wrapper => {
                 const structureId = wrapper.dataset.structureId;
-                const savedStructureData = formData[`structure-${structureId}`];
+                const savedStructureData = formData[`structure-${structureId}-id`];
+                
+                console.log('Checking structure', structureId, 'saved data:', savedStructureData);
                 
                 if (savedStructureData) {
                     const itemIds = savedStructureData.split(',');
-                    const selectedItems = [];
+                    console.log('Restoring items for structure', structureId, ':', itemIds);
+                    wrapper.selectedItems = [];
                     
                     itemIds.forEach(itemId => {
                         const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
                         if (itemElement) {
                             const itemName = itemElement.dataset.itemName;
-                            selectedItems.push({ id: itemId, name: itemName });
+                            console.log('Found item element for', itemId, ':', itemName);
+                            wrapper.selectedItems.push({ id: itemId, name: itemName });
                             itemElement.classList.add('selected');
                             const checkmark = itemElement.querySelector('.checkmark');
                             if (checkmark) checkmark.style.display = 'block';
+                        } else {
+                            console.log('Item element not found for', itemId);
                         }
                     });
                     
-                    // Update display for this wrapper
-                    const label = wrapper.querySelector('span[id^="positionDropdownLabel"]');
-                    if (selectedItems.length > 0) {
-                        const tagsContainer = wrapper.querySelector('.selected-tags-container') || createTagsContainer();
-                        tagsContainer.innerHTML = '';
-                        
-                        const toggleBtn = wrapper.querySelector('.dropdown-toggle');
-                        toggleBtn.classList.add('has-tags');
-                        
-                        selectedItems.forEach(item => {
-                            const tag = document.createElement('div');
-                            tag.className = 'selected-tag';
-                            tag.innerHTML = `
-                                <span class="tag-text">${item.name}</span>
-                                <span class="tag-remove" data-item-id="${item.id}">×</span>
-                            `;
-                            
-                            // Add remove functionality to tag
-                            tag.querySelector('.tag-remove').addEventListener('click', function(e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                e.stopImmediatePropagation();
-                                
-                                const itemId = this.dataset.itemId;
-                                const itemIndex = selectedItems.findIndex(selected => selected.id === itemId);
-                                
-                                if (itemIndex > -1) {
-                                    selectedItems.splice(itemIndex, 1);
-                                    
-                                    const itemElements = wrapper.querySelectorAll(`[data-item-id="${itemId}"]`);
-                                    itemElements.forEach(itemElement => {
-                                        itemElement.classList.remove('selected');
-                                        const checkmark = itemElement.querySelector('.checkmark');
-                                        if (checkmark) checkmark.style.display = 'none';
-                                    });
-                                    
-                                    updateDisplay();
-                                    saveFormData();
-                                }
-                            });
-                            
-                            tagsContainer.appendChild(tag);
-                        });
-                        
-                        label.style.display = 'none';
+                    console.log('Final selectedItems for structure', structureId, ':', wrapper.selectedItems);
+                    console.log('Calling updateDisplay for structure', structureId);
+                    
+                    // Call the updateDisplay function that's bound to this wrapper
+                    if (wrapper.updateDisplay) {
+                        console.log('About to call wrapper.updateDisplay()');
+                        // Add a small delay to ensure DOM is ready
+                        setTimeout(() => {
+                            wrapper.updateDisplay();
+                            console.log('Finished calling wrapper.updateDisplay()');
+                        }, 100);
+                    } else {
+                        console.log('updateDisplay function not found on wrapper');
                     }
+                } else {
+                    console.log('No saved data for structure', structureId);
                 }
             });
         }
@@ -1202,10 +1210,10 @@
 
     // Function to clear all form data from sessionStorage
     function clearAllFormData() {
-        sessionStorage.removeItem('employeeFormStep1');
+        sessionStorage.removeItem('employeeFormData');
         sessionStorage.removeItem('employeeFormStep2');
         sessionStorage.removeItem('employeeFormStep3');
-        // Add more steps as they are created
+        sessionStorage.removeItem('employeeFormStep4');
         console.log('All form data cleared');
     }
 
@@ -1236,14 +1244,14 @@
         // Load worker types
         loadWorkerTypes();
         
-        // Restore form data
+        // Initialize position dropdowns FIRST
+        initializePositionDropdowns();
+        
+        // Restore form data AFTER dropdowns are ready
         restoreFormData();
         
         // Add event listeners for form inputs
         document.getElementById('workerIdInput').addEventListener('input', saveFormData);
-        
-        // Initialize position dropdowns
-        initializePositionDropdowns();
         
         // Initialize worker type dropdown
         setupWorkerTypeDropdown();
@@ -1299,7 +1307,7 @@
             console.log('Label element found:', label);
             console.log('Label text content:', label ? label.textContent : 'No label found');
             
-            let selectedItems = [];
+            wrapper.selectedItems = [];
             
             // Toggle dropdown
             toggleBtn.addEventListener('click', function(e) {
@@ -1328,18 +1336,18 @@
                     
                     if (allowMultiple) {
                         // Multiple selection logic
-                        const existingIndex = selectedItems.findIndex(selected => selected.id === itemId);
+                        const existingIndex = wrapper.selectedItems.findIndex(selected => selected.id === itemId);
                         
                         if (existingIndex > -1) {
                             // Remove item
-                            selectedItems.splice(existingIndex, 1);
+                            wrapper.selectedItems.splice(existingIndex, 1);
                             this.classList.remove('selected');
                             const checkmark = this.querySelector('.checkmark');
                             if (checkmark) checkmark.style.display = 'none';
                             console.log('Removed item from selection:', itemId);
                         } else {
                             // Add item
-                            selectedItems.push({ id: itemId, name: itemName });
+                            wrapper.selectedItems.push({ id: itemId, name: itemName });
                             this.classList.add('selected');
                             const checkmark = this.querySelector('.checkmark');
                             if (checkmark) checkmark.style.display = 'block';
@@ -1347,7 +1355,7 @@
                         }
                     } else {
                         // Single selection logic
-                        selectedItems = [{ id: itemId, name: itemName }];
+                        wrapper.selectedItems = [{ id: itemId, name: itemName }];
                         
                         // Remove selected class from all items
                         items.forEach(item => {
@@ -1363,7 +1371,7 @@
                         console.log('Single item selected:', itemId);
                     }
                     
-                    updateDisplay();
+                    updateDisplay.call(wrapper);
                     saveFormData();
                     
                     if (!allowMultiple) {
@@ -1396,10 +1404,11 @@
                 console.log('Wrapper ID:', wrapper.id);
                 console.log('Label element:', label);
                 console.log('Label current text:', label ? label.textContent : 'No label');
-                console.log('selectedItems:', selectedItems);
-                console.log('selectedItems.length:', selectedItems.length);
+                console.log('selectedItems:', wrapper.selectedItems);
+                console.log('selectedItems.length:', wrapper.selectedItems.length);
+                console.log('Call stack:', new Error().stack);
                 
-                if (selectedItems.length === 0) {
+                if (wrapper.selectedItems.length === 0) {
                     console.log('No selection - showing placeholder');
                     // No selection - show original placeholder
                     label.textContent = wrapper.querySelector('.dropdown-toggle span').getAttribute('data-original-text') || label.textContent;
@@ -1419,21 +1428,21 @@
                     toggleBtn.classList.remove('has-tags');
                 } else {
                     // One or more selections - show as tags
-                    console.log('Selections - creating tags for:', selectedItems.length, 'items');
-                    const tagsContainer = wrapper.querySelector('.selected-tags-container') || createTagsContainer();
+                    console.log('Selections - creating tags for:', wrapper.selectedItems.length, 'items');
+                    const tagsContainer = wrapper.querySelector('.selected-tags-container') || wrapper.createTagsContainer();
                     tagsContainer.innerHTML = '';
                     
                     // Add has-tags class to toggle button
                     const toggleBtn = wrapper.querySelector('.dropdown-toggle');
                     toggleBtn.classList.add('has-tags');
                     
-                    selectedItems.forEach(item => {
+                    wrapper.selectedItems.forEach(item => {
                         console.log('Creating tag for item:', item);
                         const tag = document.createElement('div');
                         tag.className = 'selected-tag';
                         tag.innerHTML = `
                             <span class="tag-text">${item.name}</span>
-                            <span class="tag-remove" data-item-id="${item.id}">×</span>
+                            <span class="tag-remove" data-item-id="${item.id}"></span>
                         `;
                         
                         // Add remove functionality to tag
@@ -1443,11 +1452,11 @@
                             e.stopImmediatePropagation();
                             
                             const itemId = this.dataset.itemId;
-                            const itemIndex = selectedItems.findIndex(selected => selected.id === itemId);
+                            const itemIndex = wrapper.selectedItems.findIndex(selected => selected.id === itemId);
                             
                             if (itemIndex > -1) {
                                 // Remove from selectedItems array
-                                selectedItems.splice(itemIndex, 1);
+                                wrapper.selectedItems.splice(itemIndex, 1);
                                 
                                 // Remove selected class and hide checkmark from all dropdown options with this itemId
                                 const itemElements = wrapper.querySelectorAll(`[data-item-id="${itemId}"]`);
@@ -1458,7 +1467,7 @@
                                 });
                                 
                                 // Update display and save
-                                updateDisplay();
+                                updateDisplay.call(wrapper);
                                 saveFormData();
                             }
                         });
@@ -1468,14 +1477,20 @@
                     
                     // Hide the label when showing tags
                     label.style.display = 'none';
-                    return;
                 }
                 
                 // Update hidden input
                 if (hiddenInput) {
-                    hiddenInput.value = selectedItems.map(item => item.id).join(',');
+                    const newValue = wrapper.selectedItems.map(item => item.id).join(',');
+                    hiddenInput.value = newValue;
+                    console.log('Updated hidden input for structure', wrapper.dataset.structureId, ':', newValue);
+                } else {
+                    console.log('Hidden input not found for structure', wrapper.dataset.structureId);
                 }
             }
+            
+            // Attach updateDisplay to wrapper immediately when it's defined
+            wrapper.updateDisplay = updateDisplay;
             
             function createTagsContainer() {
                 const container = document.createElement('div');
@@ -1485,35 +1500,12 @@
                 return container;
             }
             
+            // Attach createTagsContainer to wrapper so it can be called from updateDisplay
+            wrapper.createTagsContainer = createTagsContainer;
+            
             // Store original text for restoration
             const originalText = label.textContent;
             label.setAttribute('data-original-text', originalText);
-            
-            // Restore saved selection if exists
-            const savedData = sessionStorage.getItem('employeeFormStep2');
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-                const structureId = wrapper.dataset.structureId;
-                const savedStructureData = formData[`structure-${structureId}`];
-                
-                if (savedStructureData) {
-                    const itemIds = savedStructureData.split(',');
-                    selectedItems = [];
-                    
-                    itemIds.forEach(itemId => {
-                        const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
-                        if (itemElement) {
-                            const itemName = itemElement.dataset.itemName;
-                            selectedItems.push({ id: itemId, name: itemName });
-                            itemElement.classList.add('selected');
-                            const checkmark = itemElement.querySelector('.checkmark');
-                            if (checkmark) checkmark.style.display = 'block';
-                        }
-                    });
-                    
-                    updateDisplay();
-                }
-            }
         });
     }
 

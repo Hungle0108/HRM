@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add person - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .saved-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .saved-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+        .step-item:first-child {
+            margin-top: 20px;
+        }
+        .step-item:last-child {
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        .help-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .help-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .help-content {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .help-content.show {
+            display: block;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .delete-draft-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .review-section {
+            margin-bottom: 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 24px;
+            background: white;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .edit-button {
+            
+            border: 1px solid #e9ecef;
+            color: #495057;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .edit-button:hover {
+            border-color: #ced4da;
+            background: #f8f9fa;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .detail-value.not-specified {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
+        }
+
+        .btn-add-person {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-add-person:hover {
+            background: #333;
+        }
+
+        .btn-add-person:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: -1;
+                padding: 20px 40px;
+            }
+
+            .content-area {
+                padding: 20px 40px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 16px 20px;
+            }
+
+            .page-header {
+                padding: 24px 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .sidebar {
+                padding: 20px;
+            }
+
+            .bottom-navigation {
+                padding: 20px;
+            }
+
+            .review-section {
+                padding: 20px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Calendar styles to match step 1 */
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            color: var(--color-txt, #1a1a1a);
+        }
+
+        .calendar-days div {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            position: relative;
+            cursor: pointer;
+            animation: to-top 1s forwards;
+            font-size: 14px;
+        }
+
+        .calendar-days div span {
+            position: absolute;
+        }
+
+        .calendar-days div:hover span {
+            transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+        }
+
+        .calendar-days div span:nth-child(1),
+        .calendar-days div span:nth-child(3) {
+            width: 2px;
+            height: 0;
+            background-color: var(--color-txt, #1a1a1a);
+        }
+
+        .calendar-days div:hover span:nth-child(1),
+        .calendar-days div:hover span:nth-child(3) {
+            height: 100%;
+        }
+
+        .calendar-days div span:nth-child(1) {
+            bottom: 0;
+            left: 0;
+        }
+
+        .calendar-days div span:nth-child(3) {
+            top: 0;
+            right: 0;
+        }
+
+        .calendar-days div span:nth-child(2),
+        .calendar-days div span:nth-child(4) {
+            width: 0;
+            height: 2px;
+            background-color: var(--color-txt, #1a1a1a);
+        }
+
+        .calendar-days div:hover span:nth-child(2),
+        .calendar-days div:hover span:nth-child(4) {
+            width: 100%;
+        }
+
+        .calendar-days div span:nth-child(2) {
+            top: 0;
+            left: 0;
+        }
+
+        .calendar-days div span:nth-child(4) {
+            bottom: 0;
+            right: 0;
+        }
+
+        .calendar-days div:hover span:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .calendar-days div:hover span:nth-child(3) {
+            transition-delay: 0.4s;
+        }
+
+        .calendar-days div:hover span:nth-child(4) {
+            transition-delay: 0.6s;
+        }
+
+        .calendar-days div.curr-date,
+        .calendar-days div.curr-date:hover {
+            background-color: var(--blue, #007bff);
+            color: var(--white, #ffffff);
+            border-radius: 50%;
+        }
+
+        .calendar-days div.curr-date span {
+            display: none;
+        }
+
+        .calendar-days div.selected-date {
+            background-color: #6b46c1;
+            color: var(--white, #ffffff);
+            border-radius: 50%;
+        }
+
+        .calendar-days div.selected-date span {
+            display: none;
+        }
+
+        @keyframes to-top {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        :root {
+            --dark-body: #4d4c5a;
+            --dark-main: #141529;
+            --dark-second: #79788c;
+            --dark-hover: #323048;
+            --dark-text: #f8fbff;
+
+            --light-body: #f3f8fe;
+            --light-main: #fdfdfd;
+            --light-second: #c3c2c8;
+            --light-hover: #edf0f5;
+            --light-text: #151426;
+
+            --blue: #0000ff;
+            --white: #fff;
+
+            --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+            --font-family: cursive;
+        }
+
+        .dark {
+            --bg-body: var(--dark-body);
+            --bg-main: var(--dark-main);
+            --bg-second: var(--dark-second);
+            --color-hover: var(--dark-hover);
+            --color-txt: var(--dark-text);
+        }
+
+        .light {
+            --bg-body: var(--light-body);
+            --bg-main: var(--light-main);
+            --bg-second: var(--light-second);
+            --color-hover: var(--light-hover);
+            --color-txt: var(--light-text);
+        }
+
+        .calendar, .calendar-header, .calendar-week-day, .calendar-days {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 600;
+        }
+
+        /* Additional calendar styles to match step 1 */
+        .calendar {
+            width: 340px;
+            min-width: 340px;
+            max-width: 340px;
+            height: max-content;
+            background-color: var(--bg-main);
+            border-radius: 30px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-picker {
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .month-picker:hover {
+            background-color: #f0f0f0;
+        }
+
+        .year-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .year-change {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .year-change:hover {
+            background-color: #f0f0f0;
+        }
+
+        .calendar-week-day {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-week-day div {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            padding: 8px 0;
+        }
+
+        .month-list {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: white;
+            padding: 20px;
+            grid-template-columns: repeat(3, auto);
+            gap: 5px;
+            display: grid;
+            transform: scale(1.5);
+            visibility: hidden;
+            pointer-events: none;
+            border-radius: 12px;
+        }
+
+        .month-list.show {
+            transform: scale(1);
+            visibility: visible;
+            pointer-events: visible;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .month-list > div {
+            display: grid;
+            place-items: center;
+        }
+
+        .month-list > div > div {
+            width: 100%;
+            padding: 5px 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: #1a1a1a;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .month-list > div > div:hover {
+            background-color: #f0f0f0;
+        }
+
+        .calendar-day-hover {
+            transition: all 0.2s ease;
+        }
+
+
+
+                 .calendar-popup {
+             position: absolute;
+             top: 100%;
+             left: 0;
+             z-index: 1000;
+             margin-top: 4px;
+             display: none;
+         }
+
+        /* Edit Modal Styles */
+        .edit-section-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.45);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+        }
+        .edit-section-modal.show {
+            display: flex;
+        }
+        .edit-section-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            padding: 40px 48px 32px 48px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            text-align: center;
+            position: relative;
+        }
+        .edit-section-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .edit-section-modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .edit-section-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .edit-section-modal-save-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 24px;
+        }
+        .edit-section-modal-save-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* Form input styling to match original forms */
+        .form-input, .form-select {
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23666666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 48px;
+            cursor: pointer;
+        }
+
+        .form-select:hover {
+            border-color: #adb5bd;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23495057' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        .form-select:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23007bff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        .form-input::placeholder {
+            color: #6c757d;
+        }
+        
+        /* Custom dropdown styles - matching step 1 */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .dropdown-toggle:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-arrow {
+            width: 18px;
+            height: 18px;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            z-index: 10;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        /* Special styling for country dropdown to be more flexible */
+        #editCountryResidenceDropdownMenu {
+            max-height: 150px;
+            top: 100%;
+        }
+        
+        /* Adjust dropdown position if it would go below viewport */
+        .dropdown-menu.show-above {
+            bottom: 100%;
+            top: auto;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e3f2fd;
+        }
+
+        .dropdown-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-main {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .option-subtitle {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .custom-dropdown.error .dropdown-toggle {
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="clearAllFormData(); window.location.href='/add-people'">✕</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Add person</h1>
+                <p class="page-subtitle">Onboard your direct employee</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="employee-form-step5">
+                    <!-- Employee Details Section -->
+                    <div class="review-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Employee details</h3>
+                            <button type="button" class="edit-button" onclick="editEmployeeDetails()">Edit</button>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Legal first name</span>
+                            <span class="detail-value" id="legalFirstName">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Legal last name</span>
+                            <span class="detail-value" id="legalLastName">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Email address</span>
+                            <span class="detail-value" id="emailAddress">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Work email address (optional)</span>
+                            <span class="detail-value not-specified" id="workEmailAddress">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Date of birth</span>
+                            <span class="detail-value" id="dateOfBirth">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Gender</span>
+                            <span class="detail-value" id="gender">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Employee's citizenship (optional)</span>
+                            <span class="detail-value" id="citizenship">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Country of residence</span>
+                            <span class="detail-value" id="countryOfResidence">Not specified</span>
+                        </div>
+                    </div>
+
+                    <!-- Employment Information Section -->
+                    <div class="review-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Employment information</h3>
+                            <button type="button" class="edit-button" onclick="editEmploymentInfo()">Edit</button>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Worker type</span>
+                            <span class="detail-value" id="workerType">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Worker ID</span>
+                            <span class="detail-value" id="workerId">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Position</span>
+                            <span class="detail-value" id="position">Not specified</span>
+                        </div>
+                    </div>
+
+                    <!-- Compensation and Schedule Section -->
+                    <div class="review-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Compensation and schedule</h3>
+                            <button type="button" class="edit-button" onclick="editCompensationSchedule()">Edit</button>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Base salary</span>
+                            <span class="detail-value" id="baseSalary">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Currency</span>
+                            <span class="detail-value" id="currency">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Payment period</span>
+                            <span class="detail-value" id="paymentPeriod">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Employment type</span>
+                            <span class="detail-value" id="employmentType">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Work schedule</span>
+                            <span class="detail-value" id="workSchedule">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Agreement start date</span>
+                            <span class="detail-value" id="agreementStartDate">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Employment terms</span>
+                            <span class="detail-value" id="employmentTerms">Not specified</span>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Section -->
+                    <div class="review-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Compliance</h3>
+                            <button type="button" class="edit-button" onclick="editCompliance()">Edit</button>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Employment agreement</span>
+                            <span class="detail-value" id="employmentAgreement">Not specified</span>
+                        </div>
+                    </div>
+
+                    <!-- Group and Entity Section -->
+                    <div class="review-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Group and entity</h3>
+                            <button type="button" class="edit-button" onclick="editGroupEntity()">Edit</button>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Group</span>
+                            <span class="detail-value" id="group">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Direct manager</span>
+                            <span class="detail-value not-specified" id="directManager">Not specified</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Report</span>
+                            <span class="detail-value not-specified" id="report">Not specified</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                
+                <ol class="steps-list">
+                    <li class="step-item completed"><div class="step-number">1</div><div class="step-text">Personal Details</div></li>
+                    <li class="step-item completed"><div class="step-number">2</div><div class="step-text">Contact Information</div></li>
+                    <li class="step-item completed"><div class="step-number">3</div><div class="step-text">Employment Details</div></li>
+                    <li class="step-item completed"><div class="step-number">4</div><div class="step-text">Review</div></li>
+                    <li class="step-item active"><div class="step-number">5</div><div class="step-text">Confirmation</div></li>
+                </ol>
+
+                
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <a href="/add-employee-step4" class="btn-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </a>
+                <div class="nav-right">
+                    <div class="step-info">Step 5 of 5<br>Final step</div>
+                    <button type="submit" class="btn-add-person" form="employee-form-step5">Add person</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal Popup -->
+    <div id="editSectionModal" class="edit-section-modal">
+      <div class="edit-section-modal-content">
+        <button type="button" class="edit-section-modal-close" id="editSectionModalClose">&times;</button>
+        <h2 class="edit-section-modal-title" id="editSectionModalTitle">Edit Section</h2>
+        <div id="editSectionModalBody">
+          <!-- Dynamic form fields will be injected here -->
+        </div>
+        <button type="button" class="edit-section-modal-save-btn" id="editSectionModalSave">Save</button>
+        </div>
+    </div>
+
+    <script>
+    // Modal functions - must be defined first
+    function openEditSectionModal(sectionTitle, formHtml) {
+        console.log('openEditSectionModal called with:', sectionTitle);
+        const editSectionModal = document.getElementById('editSectionModal');
+        const editSectionModalTitle = document.getElementById('editSectionModalTitle');
+        const editSectionModalBody = document.getElementById('editSectionModalBody');
+        
+        editSectionModalTitle.textContent = sectionTitle;
+        editSectionModalBody.innerHTML = formHtml;
+        editSectionModal.classList.add('show');
+        document.body.classList.add('modal-open');
+    }
+    
+    function closeEditSectionModal() {
+        const editSectionModal = document.getElementById('editSectionModal');
+        editSectionModal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+    }
+    
+    // Track current step (5 for Review)
+    let currentStep = 5;
+    const totalSteps = 5;
+
+    // Function to restore form data from all previous steps
+    function restoreAllFormData() {
+        // Get data from all previous steps
+        const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
+        const step2Data = JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}');
+        const step3Data = JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}');
+        const step4Data = JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}');
+        
+        console.log('Restoring data from sessionStorage:', {
+            step1: step1Data,
+            step2: step2Data,
+            step3: step3Data,
+            step4: step4Data
+        });
+
+        // Step 1 Data - Employee Details
+        if (step1Data.legalFirstName || step1Data.firstName) {
+            document.getElementById('legalFirstName').textContent = step1Data.legalFirstName || step1Data.firstName;
+            document.getElementById('legalFirstName').classList.remove('not-specified');
+        }
+        if (step1Data.legalLastName || step1Data.lastName) {
+            document.getElementById('legalLastName').textContent = step1Data.legalLastName || step1Data.lastName;
+            document.getElementById('legalLastName').classList.remove('not-specified');
+        }
+        if (step1Data.personalEmail) {
+            document.getElementById('emailAddress').textContent = step1Data.personalEmail;
+            document.getElementById('emailAddress').classList.remove('not-specified');
+        }
+        if (step1Data.workEmail) {
+            document.getElementById('workEmailAddress').textContent = step1Data.workEmail;
+            document.getElementById('workEmailAddress').classList.remove('not-specified');
+        }
+        if (step1Data.dateOfBirth) {
+            document.getElementById('dateOfBirth').textContent = step1Data.dateOfBirth;
+            document.getElementById('dateOfBirth').classList.remove('not-specified');
+        }
+        if (step1Data.gender) {
+            document.getElementById('gender').textContent = step1Data.gender;
+            document.getElementById('gender').classList.remove('not-specified');
+        }
+        if (step1Data.citizenship) {
+            document.getElementById('citizenship').textContent = step1Data.citizenship;
+            document.getElementById('citizenship').classList.remove('not-specified');
+        }
+        if (step1Data.residence) {
+            document.getElementById('countryOfResidence').textContent = step1Data.residence;
+            document.getElementById('countryOfResidence').classList.remove('not-specified');
+        }
+
+        // Step 2 Data - Employment Information
+        if (step2Data.workerType) {
+            document.getElementById('workerType').textContent = step2Data.workerType;
+            document.getElementById('workerType').classList.remove('not-specified');
+        }
+        if (step2Data.workerId) {
+            document.getElementById('workerId').textContent = step2Data.workerId;
+            document.getElementById('workerId').classList.remove('not-specified');
+        }
+        // Handle position data from step 2
+        const positionNameKeys = Object.keys(step2Data).filter(key => key.startsWith('structure-') && key.endsWith('-name'));
+        if (positionNameKeys.length > 0) {
+            const positionNames = positionNameKeys.map(key => step2Data[key]).filter(value => value);
+            if (positionNames.length > 0) {
+                document.getElementById('position').textContent = positionNames.join(', ');
+                document.getElementById('position').classList.remove('not-specified');
+            }
+        }
+
+        // Step 3 Data - Compensation and Schedule
+        if (step3Data.baseSalary) {
+            document.getElementById('baseSalary').textContent = step3Data.baseSalary;
+            document.getElementById('baseSalary').classList.remove('not-specified');
+        }
+        if (step3Data.currency) {
+            document.getElementById('currency').textContent = step3Data.currency;
+            document.getElementById('currency').classList.remove('not-specified');
+        }
+        if (step3Data.paymentPeriod) {
+            document.getElementById('paymentPeriod').textContent = step3Data.paymentPeriod;
+            document.getElementById('paymentPeriod').classList.remove('not-specified');
+        }
+        if (step3Data.employmentType) {
+            const employmentTypeLabels = {
+                'fulltime': 'Full-time',
+                'parttime': 'Part-time',
+                'contractor': 'Contractor',
+                'intern': 'Intern'
+            };
+            document.getElementById('employmentType').textContent = employmentTypeLabels[step3Data.employmentType] || step3Data.employmentType;
+            document.getElementById('employmentType').classList.remove('not-specified');
+        }
+        if (step3Data.workSchedule) {
+            // Load work schedules to get the name for the ID
+            loadWorkScheduleName(step3Data.workSchedule);
+        }
+        if (step3Data.agreementStartDate) {
+            document.getElementById('agreementStartDate').textContent = step3Data.agreementStartDate;
+            document.getElementById('agreementStartDate').classList.remove('not-specified');
+        }
+        if (step3Data.employmentTerms) {
+            const termsLabels = {
+                'indefinite': 'Indefinite',
+                'fixed': 'Fixed-term'
+            };
+            document.getElementById('employmentTerms').textContent = termsLabels[step3Data.employmentTerms] || step3Data.employmentTerms;
+            document.getElementById('employmentTerms').classList.remove('not-specified');
+        }
+
+        // Step 4 Data - Compliance
+        if (step4Data.employmentAgreement) {
+            const agreementLabels = {
+                'upload': 'Upload agreement',
+                'generate': 'Generate agreement'
+            };
+            document.getElementById('employmentAgreement').textContent = agreementLabels[step4Data.employmentAgreement] || step4Data.employmentAgreement;
+            document.getElementById('employmentAgreement').classList.remove('not-specified');
+        }
+
+        // Group data from step 1
+        if (step1Data.selectedGroupId) {
+            // This would need to be enhanced to show actual group name
+            document.getElementById('group').textContent = 'Selected Group';
+            document.getElementById('group').classList.remove('not-specified');
+        }
+
+        console.log('Restored data from all previous steps');
+    }
+    
+    // Debug function to test data persistence
+    window.debugSessionStorage = function() {
+        console.log('=== SessionStorage Debug ===');
+        console.log('All sessionStorage keys:');
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            console.log(key + ':', sessionStorage.getItem(key));
+        }
+        
+        console.log('\nEmployee form data:');
+        console.log('employeeFormData:', sessionStorage.getItem('employeeFormData'));
+        console.log('employeeFormStep2:', sessionStorage.getItem('employeeFormStep2'));
+        console.log('employeeFormStep3:', sessionStorage.getItem('employeeFormStep3'));
+        console.log('employeeFormStep4:', sessionStorage.getItem('employeeFormStep4'));
+        
+        console.log('\nParsed data:');
+        try {
+            console.log('step1:', JSON.parse(sessionStorage.getItem('employeeFormData') || '{}'));
+            console.log('step2:', JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}'));
+            console.log('step3:', JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}'));
+            console.log('step4:', JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}'));
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+        }
+    };
+    
+    // Function to update employee details display immediately
+    function updateEmployeeDetailsDisplay(step1Data) {
+        console.log('Updating employee details display with:', step1Data);
+        if (step1Data.legalFirstName || step1Data.firstName) {
+            document.getElementById('legalFirstName').textContent = step1Data.legalFirstName || step1Data.firstName;
+            document.getElementById('legalFirstName').classList.remove('not-specified');
+        }
+        if (step1Data.legalLastName || step1Data.lastName) {
+            document.getElementById('legalLastName').textContent = step1Data.legalLastName || step1Data.lastName;
+            document.getElementById('legalLastName').classList.remove('not-specified');
+        }
+        if (step1Data.personalEmail) {
+            document.getElementById('emailAddress').textContent = step1Data.personalEmail;
+            document.getElementById('emailAddress').classList.remove('not-specified');
+        }
+        if (step1Data.workEmail) {
+            document.getElementById('workEmailAddress').textContent = step1Data.workEmail;
+            document.getElementById('workEmailAddress').classList.remove('not-specified');
+        }
+        if (step1Data.dateOfBirth) {
+            document.getElementById('dateOfBirth').textContent = step1Data.dateOfBirth;
+            document.getElementById('dateOfBirth').classList.remove('not-specified');
+        }
+        if (step1Data.gender) {
+            document.getElementById('gender').textContent = step1Data.gender;
+            document.getElementById('gender').classList.remove('not-specified');
+        }
+        if (step1Data.citizenship) {
+            document.getElementById('citizenship').textContent = step1Data.citizenship;
+            document.getElementById('citizenship').classList.remove('not-specified');
+        }
+        if (step1Data.residence) {
+            document.getElementById('countryOfResidence').textContent = step1Data.residence;
+            document.getElementById('countryOfResidence').classList.remove('not-specified');
+        }
+    }
+    
+    // Function to update employment info display immediately
+    function updateEmploymentInfoDisplay(step2Data) {
+        if (step2Data.workerType) {
+            document.getElementById('workerType').textContent = step2Data.workerType;
+            document.getElementById('workerType').classList.remove('not-specified');
+        }
+        if (step2Data.workerId) {
+            document.getElementById('workerId').textContent = step2Data.workerId;
+            document.getElementById('workerId').classList.remove('not-specified');
+        }
+        // Handle position data
+        const positionNameKeys = Object.keys(step2Data).filter(key => key.startsWith('structure-') && key.endsWith('-name'));
+        if (positionNameKeys.length > 0) {
+            const positionNames = positionNameKeys.map(key => step2Data[key]).filter(value => value);
+            if (positionNames.length > 0) {
+                document.getElementById('position').textContent = positionNames.join(', ');
+                document.getElementById('position').classList.remove('not-specified');
+            }
+        }
+    }
+    
+    // Function to update compensation schedule display immediately
+    function updateCompensationScheduleDisplay(step3Data) {
+        if (step3Data.baseSalary) {
+            document.getElementById('baseSalary').textContent = step3Data.baseSalary;
+            document.getElementById('baseSalary').classList.remove('not-specified');
+        }
+        if (step3Data.currency) {
+            document.getElementById('currency').textContent = step3Data.currency;
+            document.getElementById('currency').classList.remove('not-specified');
+        }
+        if (step3Data.paymentPeriod) {
+            document.getElementById('paymentPeriod').textContent = step3Data.paymentPeriod;
+            document.getElementById('paymentPeriod').classList.remove('not-specified');
+        }
+        if (step3Data.employmentType) {
+            const employmentTypeLabels = {
+                'fulltime': 'Full-time',
+                'parttime': 'Part-time',
+                'contractor': 'Contractor',
+                'intern': 'Intern'
+            };
+            document.getElementById('employmentType').textContent = employmentTypeLabels[step3Data.employmentType] || step3Data.employmentType;
+            document.getElementById('employmentType').classList.remove('not-specified');
+        }
+        if (step3Data.workSchedule) {
+            // Load work schedule name by ID
+            loadWorkScheduleName(step3Data.workSchedule);
+        }
+        if (step3Data.agreementStartDate) {
+            document.getElementById('agreementStartDate').textContent = step3Data.agreementStartDate;
+            document.getElementById('agreementStartDate').classList.remove('not-specified');
+        }
+        if (step3Data.employmentTerms) {
+            const termsLabels = {
+                'indefinite': 'Indefinite',
+                'fixed': 'Fixed-term'
+            };
+            document.getElementById('employmentTerms').textContent = termsLabels[step3Data.employmentTerms] || step3Data.employmentTerms;
+            document.getElementById('employmentTerms').classList.remove('not-specified');
+        }
+    }
+    
+    // Function to update compliance display immediately
+    function updateComplianceDisplay(step4Data) {
+        if (step4Data.employmentAgreement) {
+            const agreementLabels = {
+                'upload': 'Upload agreement',
+                'generate': 'Generate agreement'
+            };
+            document.getElementById('employmentAgreement').textContent = agreementLabels[step4Data.employmentAgreement] || step4Data.employmentAgreement;
+            document.getElementById('employmentAgreement').classList.remove('not-specified');
+        }
+    }
+    
+    // Function to update group entity display immediately
+    function updateGroupEntityDisplay(step1Data) {
+        if (step1Data.group) {
+            document.getElementById('group').textContent = step1Data.group;
+            document.getElementById('group').classList.remove('not-specified');
+        }
+        if (step1Data.entity) {
+            document.getElementById('entity').textContent = step1Data.entity;
+            document.getElementById('entity').classList.remove('not-specified');
+        }
+    }
+    
+    // Function to load work schedule name by ID
+    function loadWorkScheduleName(scheduleId) {
+        fetch('/api/get-organization-schedules')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.schedules) {
+                    const schedule = data.schedules.find(s => s.id == scheduleId);
+                    if (schedule) {
+                        document.getElementById('workSchedule').textContent = schedule.name;
+                        document.getElementById('workSchedule').classList.remove('not-specified');
+                    } else {
+                        document.getElementById('workSchedule').textContent = 'Schedule not found';
+                        document.getElementById('workSchedule').classList.remove('not-specified');
+                    }
+                } else {
+                    console.error('Failed to load work schedules:', data);
+                    document.getElementById('workSchedule').textContent = 'Error loading schedule';
+                    document.getElementById('workSchedule').classList.remove('not-specified');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading work schedules:', error);
+                document.getElementById('workSchedule').textContent = 'Error loading schedule';
+                document.getElementById('workSchedule').classList.remove('not-specified');
+            });
+    }
+
+    // Function to clear all form data from sessionStorage
+    function clearAllFormData() {
+        sessionStorage.removeItem('employeeFormData');
+        sessionStorage.removeItem('employeeFormStep2');
+        sessionStorage.removeItem('employeeFormStep3');
+        sessionStorage.removeItem('employeeFormStep4');
+        sessionStorage.removeItem('employeeFormStep5');
+        console.log('All form data cleared');
+    }
+
+    // Function to go to previous step
+    function goToPreviousStep() {
+        // Navigate back to step 5
+        window.location.href = '/add-employee-step5';
+    }
+
+    // Function to toggle help section
+    function toggleHelp() {
+        const helpContent = document.getElementById('helpContent');
+        helpContent.classList.toggle('show');
+    }
+
+    // Function to delete draft
+    function deleteDraft() {
+        if (confirm('Are you sure you want to delete this draft? All entered information will be lost.')) {
+            clearAllFormData();
+            window.location.href = '/add-people';
+        }
+    }
+
+    // Functions for editing sections
+    function editEmployeeDetails() {
+        console.log('editEmployeeDetails called');
+        const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
+        const formHtml = `
+            <div style="text-align: left;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Legal First Name</label>
+                    <input type="text" id="edit-legal-first-name" value="${step1Data.legalFirstName || step1Data.firstName || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Legal Last Name</label>
+                    <input type="text" id="edit-legal-last-name" value="${step1Data.legalLastName || step1Data.lastName || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Email Address</label>
+                    <input type="email" id="edit-email-address" value="${step1Data.personalEmail || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Work Email Address (optional)</label>
+                    <input type="email" id="edit-work-email-address" value="${step1Data.workEmail || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Date of Birth</label>
+                    <div style="position: relative;">
+                        <input type="text" id="edit-date-of-birth" value="${step1Data.dateOfBirth || ''}" class="form-input date-input" style="width: 100%;" readonly tabindex="-1">
+                        <button type="button" id="edit-calendar-toggle" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 5px;">
+                            <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar" style="width: 16px; height: 16px;">
+                        </button>
+                        <div class="calendar-popup" id="editCalendarPopup">
+                            <div class="calendar light">
+                                <div class="calendar-header">
+                                    <span class="month-picker" id="edit-month-picker">February</span>
+                                    <div class="year-picker">
+                                        <span class="year-change" id="edit-prev-year">
+                                            <pre><</pre>
+                                        </span>
+                                        <span id="edit-year">2021</span>
+                                        <span class="year-change" id="edit-next-year">
+                                            <pre>></pre>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="calendar-body">
+                                    <div class="calendar-week-day">
+                                        <div>Sun</div>
+                                        <div>Mon</div>
+                                        <div>Tue</div>
+                                        <div>Wed</div>
+                                        <div>Thu</div>
+                                        <div>Fri</div>
+                                        <div>Sat</div>
+                                    </div>
+                                    <div class="calendar-days"></div>
+                                </div>
+                                <div class="month-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Gender</label>
+                    <div class="custom-dropdown" id="editGenderDropdown">
+                        <button type="button" class="dropdown-toggle" id="editGenderDropdownBtn">
+                            <span id="editGenderDropdownLabel">${step1Data.gender ? (step1Data.gender === 'male' ? 'Male' : step1Data.gender === 'female' ? 'Female' : 'Other') : 'Gender'}</span>
+                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="editGenderDropdownMenu">
+                            <div class="dropdown-option" data-value="male">
+                                <div class="option-main">Male</div>
+                            </div>
+                            <div class="dropdown-option" data-value="female">
+                                <div class="option-main">Female</div>
+                            </div>
+                            <div class="dropdown-option" data-value="other">
+                                <div class="option-main">Other</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="edit-gender" name="gender" value="${step1Data.gender || ''}">
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Employee's Citizenship (optional)</label>
+                    <input type="text" id="edit-citizenship" value="${step1Data.citizenship || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Country of Residence</label>
+                    <div class="custom-dropdown" id="editCountryResidenceDropdown">
+                        <button type="button" class="dropdown-toggle" id="editCountryResidenceDropdownBtn">
+                            <span id="editCountryResidenceDropdownLabel">${step1Data.residence || 'Country of residence'}</span>
+                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="editCountryResidenceDropdownMenu">
+                            <!-- Countries will be populated dynamically -->
+                        </div>
+                        <input type="hidden" id="edit-country-of-residence" name="residence" value="${step1Data.residence || ''}">
+                    </div>
+                </div>
+            </div>
+        `;
+        openEditSectionModal('Edit Employee Details', formHtml);
+        
+        document.getElementById('editSectionModalSave').onclick = function() {
+            const updatedData = {
+                ...step1Data,
+                // New field names for step 5 display
+                legalFirstName: document.getElementById('edit-legal-first-name').value,
+                legalLastName: document.getElementById('edit-legal-last-name').value,
+                personalEmail: document.getElementById('edit-email-address').value,
+                workEmail: document.getElementById('edit-work-email-address').value,
+                dateOfBirth: document.getElementById('edit-date-of-birth').value,
+                gender: document.getElementById('edit-gender').value,
+                citizenship: document.getElementById('edit-citizenship').value,
+                residence: document.getElementById('edit-country-of-residence').value,
+                // Old field names for compatibility with original pages
+                firstName: document.getElementById('edit-legal-first-name').value,
+                lastName: document.getElementById('edit-legal-last-name').value
+            };
+            
+            sessionStorage.setItem('employeeFormData', JSON.stringify(updatedData));
+            console.log('Saved employee data to sessionStorage:', updatedData);
+            
+            // Update the display immediately
+            updateEmployeeDetailsDisplay(updatedData);
+            
+            closeEditSectionModal();
+        };
+        
+        // Initialize calendar for edit modal
+        initializeEditCalendar();
+        
+        // Initialize gender dropdown for edit modal
+        initializeEditGenderDropdown();
+        
+        // Countries list for dropdown
+        const countries = [
+            "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+            "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+            "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica",
+            "Croatia", "Cuba", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador",
+            "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France",
+            "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau",
+            "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland",
+            "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait",
+            "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+            "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico",
+            "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru",
+            "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman",
+            "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+            "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+            "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia",
+            "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+            "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey",
+            "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu",
+            "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        ];
+        
+        // Initialize country dropdown for edit modal
+        initializeEditCountryDropdown();
+        
+        function initializeEditCountryDropdown() {
+            const dropdownBtn = document.getElementById('editCountryResidenceDropdownBtn');
+            const dropdownMenu = document.getElementById('editCountryResidenceDropdownMenu');
+            const dropdownLabel = document.getElementById('editCountryResidenceDropdownLabel');
+            const dropdownArrow = document.querySelector('#editCountryResidenceDropdown .dropdown-arrow');
+            const hiddenInput = document.getElementById('edit-country-of-residence');
+            
+            if (!dropdownBtn || !dropdownMenu || !dropdownLabel || !hiddenInput) return;
+            
+            // Populate countries
+            function populateCountries(filterText = '') {
+                dropdownMenu.innerHTML = '';
+                const filteredCountries = countries.filter(country =>
+                    country.toLowerCase().includes(filterText.toLowerCase())
+                );
+                
+                filteredCountries.forEach(country => {
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';
+                    option.setAttribute('data-value', country);
+                    option.innerHTML = `<div class="option-main">${country}</div>`;
+                    
+                    option.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        hiddenInput.value = value;
+                        dropdownLabel.textContent = value;
+                        
+                        // Update selected state
+                        dropdownMenu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        // Close dropdown
+                        dropdownMenu.classList.remove('show');
+                        if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+                    });
+                    
+                    dropdownMenu.appendChild(option);
+                });
+            }
+            
+            // Toggle dropdown
+            dropdownBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isOpen = dropdownMenu.classList.contains('show');
+                
+                // Close all other dropdowns
+                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                    if (menu !== dropdownMenu) {
+                        menu.classList.remove('show');
+                    }
+                });
+                
+                if (isOpen) {
+                    dropdownMenu.classList.remove('show');
+                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+                } else {
+                    dropdownMenu.classList.add('show');
+                    populateCountries();
+                    
+                    // Check if dropdown would go below viewport and adjust position
+                    const dropdownRect = dropdownMenu.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const spaceBelow = viewportHeight - dropdownRect.bottom;
+                    
+                    if (spaceBelow < 50) { // If less than 50px space below
+                        dropdownMenu.classList.add('show-above');
+                    } else {
+                        dropdownMenu.classList.remove('show-above');
+                    }
+                    
+                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(180deg)';
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Set initial selected state
+            const currentValue = hiddenInput.value;
+            if (currentValue) {
+                dropdownLabel.textContent = currentValue;
+            }
+        }
+    }
+    
+    function initializeEditCalendar() {
+        const dateInput = document.getElementById('edit-date-of-birth');
+        const calendarToggle = document.getElementById('edit-calendar-toggle');
+        const calendarPopup = document.getElementById('editCalendarPopup');
+        
+        if (!dateInput || !calendarToggle || !calendarPopup) return;
+        
+        let selectedDate = null;
+        const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const isLeapYear = (year) => {
+            return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 === 0);
+        };
+        
+        const getFebDays = (year) => {
+            return isLeapYear(year) ? 29 : 28;
+        };
+        
+        const generateEditCalendar = (month, year) => {
+            let calendar_days = calendarPopup.querySelector('.calendar-days');
+            let calendar_header_year = calendarPopup.querySelector('#edit-year');
+            let month_picker = calendarPopup.querySelector('#edit-month-picker');
+            
+            let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            
+            calendar_days.innerHTML = '';
+            
+            let currDate = new Date();
+            if (!month) month = currDate.getMonth();
+            if (!year) year = currDate.getFullYear();
+            
+            let curr_month = `${month_names[month]}`;
+            month_picker.innerHTML = curr_month;
+            calendar_header_year.innerHTML = year;
+            
+            // get first day of month
+            let first_day = new Date(year, month, 1);
+            
+            for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+                let day = document.createElement('div');
+                if (i >= first_day.getDay()) {
+                    day.classList.add('calendar-day-hover');
+                    day.innerHTML = i - first_day.getDay() + 1;
+                    day.innerHTML += `<span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>`;
+                    
+                    // Check if this is the selected date
+                    if (selectedDate && i - first_day.getDay() + 1 === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
+                        day.classList.add('selected-date');
+                    }
+                    
+                    // Check if this date is in the future (disable it)
+                    const currentDate = new Date(year, month, i - first_day.getDay() + 1);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (currentDate > today) {
+                        day.style.opacity = '0.3';
+                        day.style.cursor = 'not-allowed';
+                        day.style.pointerEvents = 'none';
+                    } else {
+                        // Add click handler for date selection
+                        day.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            
+                            // Remove selected class from all days in the current view
+                            calendar_days.querySelectorAll('div').forEach(div => div.classList.remove('selected-date'));
+                            
+                            // Add selected class to clicked day
+                            this.classList.add('selected-date');
+                            
+                            // Get the actual date
+                            const dayNum = parseInt(this.textContent);
+                            selectedDate = new Date(year, month, dayNum);
+                            
+                            // Format date for input (YYYY-MM-DD)
+                            const formattedDate = selectedDate.toISOString().split('T')[0];
+                            dateInput.value = formattedDate;
+                            
+                            // Close calendar immediately
+                            calendarPopup.style.display = 'none';
+                        });
+                    }
+                }
+                calendar_days.appendChild(day);
+            }
+        };
+        
+        let month_list = calendarPopup.querySelector('.month-list');
+        
+        month_names.forEach((e, index) => {
+            let month = document.createElement('div');
+            month.innerHTML = `<div data-month="${index}">${e}</div>`;
+            month.querySelector('div').onclick = () => {
+                month_list.classList.remove('show');
+                curr_month.value = index;
+                generateEditCalendar(index, curr_year.value);
+            };
+            month_list.appendChild(month);
+        });
+        
+        let month_picker = calendarPopup.querySelector('#edit-month-picker');
+        
+        month_picker.onclick = () => {
+            month_list.classList.add('show');
+        };
+        
+        let currDate = new Date();
+        let curr_month = {value: currDate.getMonth()};
+        let curr_year = {value: currDate.getFullYear()};
+        
+        generateEditCalendar(curr_month.value, curr_year.value);
+        
+        document.querySelector('#edit-prev-year').onclick = () => {
+            --curr_year.value;
+            generateEditCalendar(curr_month.value, curr_year.value);
+        };
+        
+        document.querySelector('#edit-next-year').onclick = () => {
+            ++curr_year.value;
+            generateEditCalendar(curr_month.value, curr_year.value);
+        };
+        
+        // Toggle calendar popup
+        calendarToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (calendarPopup.style.display === 'none') {
+                calendarPopup.style.display = 'block';
+                generateEditCalendar(curr_month.value, curr_year.value);
+            } else {
+                calendarPopup.style.display = 'none';
+            }
+        });
+        // Also open calendar when clicking the input itself
+        dateInput.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (calendarPopup.style.display === 'none') {
+                calendarPopup.style.display = 'block';
+                generateEditCalendar(curr_month.value, curr_year.value);
+            } else {
+                calendarPopup.style.display = 'none';
+            }
+        });
+        // Close calendar when clicking outside
+        document.addEventListener('mousedown', function(e) {
+            if (!calendarPopup.contains(e.target) && !calendarToggle.contains(e.target) && !dateInput.contains(e.target)) {
+                calendarPopup.style.display = 'none';
+            }
+        });
+        
+        // Restore selected date if exists
+        if (dateInput.value) {
+            selectedDate = new Date(dateInput.value);
+        }
+    }
+
+    function editEmploymentInfo() {
+        const step2Data = JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}');
+        // Handle position name (may be stored as structure-*-name)
+        let positionName = '';
+        Object.keys(step2Data).forEach(key => {
+            if (key.startsWith('structure-') && key.endsWith('-name')) {
+                if (step2Data[key]) positionName += (positionName ? ', ' : '') + step2Data[key];
+            }
+        });
+        const formHtml = `
+            <div style="text-align: left;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Worker Type</label>
+                    <select id="edit-worker-type" class="form-select" style="width: 100%;">
+                        <option value="">Select Worker Type</option>
+                        <option value="employee" ${step2Data.workerType === 'employee' ? 'selected' : ''}>Employee</option>
+                        <option value="contractor" ${step2Data.workerType === 'contractor' ? 'selected' : ''}>Contractor</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Position</label>
+                    <input type="text" id="edit-position" value="${positionName}" class="form-input" style="width: 100%;">
+                </div>
+            </div>
+        `;
+        openEditSectionModal('Edit Employment Information', formHtml);
+        document.getElementById('editSectionModalSave').onclick = function() {
+            const updatedData = {
+                ...step2Data,
+                workerType: document.getElementById('edit-worker-type').value,
+            };
+            // Save position name back to all structure-*-name keys
+            Object.keys(updatedData).forEach(key => {
+                if (key.startsWith('structure-') && key.endsWith('-name')) {
+                    updatedData[key] = document.getElementById('edit-position').value;
+                }
+            });
+            sessionStorage.setItem('employeeFormStep2', JSON.stringify(updatedData));
+            
+            // Update the display immediately
+            updateEmploymentInfoDisplay(updatedData);
+            
+            closeEditSectionModal();
+        };
+    }
+
+    function editCompensationSchedule() {
+        const step3Data = JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}');
+        const formHtml = `
+            <div style="text-align: left;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Base Salary</label>
+                    <input type="number" id="edit-base-salary" value="${step3Data.baseSalary || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Currency</label>
+                    <input type="text" id="edit-currency" value="${step3Data.currency || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Payment Period</label>
+                    <input type="text" id="edit-payment-period" value="${step3Data.paymentPeriod || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Employment Type</label>
+                    <input type="text" id="edit-employment-type" value="${step3Data.employmentType || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Work Schedule</label>
+                    <input type="text" id="edit-work-schedule" value="${step3Data.workSchedule || ''}" class="form-input" style="width: 100%;">
+                </div>
+            </div>
+        `;
+        openEditSectionModal('Edit Compensation & Schedule', formHtml);
+        document.getElementById('editSectionModalSave').onclick = function() {
+            const updatedData = {
+                ...step3Data,
+                baseSalary: document.getElementById('edit-base-salary').value,
+                currency: document.getElementById('edit-currency').value,
+                paymentPeriod: document.getElementById('edit-payment-period').value,
+                employmentType: document.getElementById('edit-employment-type').value,
+                workSchedule: document.getElementById('edit-work-schedule').value
+            };
+            sessionStorage.setItem('employeeFormStep3', JSON.stringify(updatedData));
+            
+            // Update the display immediately
+            updateCompensationScheduleDisplay(updatedData);
+            
+            closeEditSectionModal();
+        };
+    }
+
+    function editCompliance() {
+        const step4Data = JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}');
+        const formHtml = `
+            <div style="text-align: left;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Employment Agreement</label>
+                    <select id="edit-employment-agreement" class="form-select" style="width: 100%;">
+                        <option value="">Select Agreement Type</option>
+                        <option value="upload" ${(step4Data.employmentAgreement || '') === 'upload' ? 'selected' : ''}>Upload agreement</option>
+                        <option value="generate" ${(step4Data.employmentAgreement || '') === 'generate' ? 'selected' : ''}>Generate agreement</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        openEditSectionModal('Edit Compliance', formHtml);
+        
+        // Set up save functionality
+        document.getElementById('editSectionModalSave').onclick = function() {
+            const updatedData = {
+                employmentAgreement: document.getElementById('edit-employment-agreement').value
+            };
+            
+            // Update sessionStorage
+            sessionStorage.setItem('employeeFormStep4', JSON.stringify(updatedData));
+            
+            // Update the display immediately
+            updateComplianceDisplay(updatedData);
+            
+            // Close modal
+            closeEditSectionModal();
+        };
+    }
+
+    function editGroupEntity() {
+        const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
+        const formHtml = `
+            <div style="text-align: left;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Group</label>
+                    <input type="text" id="edit-group" value="${step1Data.group || ''}" class="form-input" style="width: 100%;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Entity</label>
+                    <input type="text" id="edit-entity" value="${step1Data.entity || ''}" class="form-input" style="width: 100%;">
+                </div>
+            </div>
+        `;
+        openEditSectionModal('Edit Group & Entity', formHtml);
+        
+        // Set up save functionality
+        document.getElementById('editSectionModalSave').onclick = function() {
+            const updatedData = {
+                ...step1Data,
+                group: document.getElementById('edit-group').value,
+                entity: document.getElementById('edit-entity').value
+            };
+            
+            // Update sessionStorage
+            sessionStorage.setItem('employeeFormData', JSON.stringify(updatedData));
+            
+            // Update the display immediately
+            updateGroupEntityDisplay(updatedData);
+            
+            // Close modal
+            closeEditSectionModal();
+        };
+    }
+
+    // Initialize form data restoration when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, restoring form data...');
+        
+        // Debug: Check what's in sessionStorage
+        console.log('SessionStorage contents:');
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (key && key.includes('employeeForm')) {
+                console.log(key + ':', sessionStorage.getItem(key));
+            }
+        }
+        
+    restoreAllFormData();
+    });
+
+    // Clear form data when user closes the form
+    window.addEventListener('beforeunload', function(e) {
+        // Only clear if user is navigating away from the form process
+        if (!window.location.href.includes('/add-employee')) {
+            clearAllFormData();
+        }
+    });
+
+    // Form submission
+    document.getElementById('employee-form-step5').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get all form data from sessionStorage
+        const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
+        const step2Data = JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}');
+        const step3Data = JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}');
+        const step4Data = JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}');
+        
+        // Prepare data for API
+        const employeeData = {
+            step1: step1Data,
+            step2: step2Data,
+            step3: step3Data,
+            step4: step4Data
+        };
+        
+        // Show loading state
+        const submitButton = document.querySelector('.btn-add-person');
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Creating employee...';
+        submitButton.disabled = true;
+        
+        // Send data to API
+        fetch('/api/create-employee', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(employeeData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear all form data after successful submission
+                clearAllFormData();
+                
+                // Show success message
+                alert('Employee created successfully!');
+                
+                // Redirect to members page
+                window.location.href = data.redirect_url || '/members';
+            } else {
+                // Show error message
+                alert('Error creating employee: ' + (data.error || 'Unknown error'));
+                
+                // Reset button
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error creating employee. Please try again.');
+            
+            // Reset button
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        });
+    });
+
+    // Modal event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const editSectionModal = document.getElementById('editSectionModal');
+        const editSectionModalClose = document.getElementById('editSectionModalClose');
+        
+        editSectionModalClose.addEventListener('click', closeEditSectionModal);
+        editSectionModal.addEventListener('click', function(e) {
+            if (e.target === editSectionModal) closeEditSectionModal();
+        });
+    });
+
+    // Initialize country dropdown for edit modal
+    initializeEditCountryDropdown();
+    
+    function initializeEditGenderDropdown() {
+        const dropdownBtn = document.getElementById('editGenderDropdownBtn');
+        const dropdownMenu = document.getElementById('editGenderDropdownMenu');
+        const dropdownLabel = document.getElementById('editGenderDropdownLabel');
+        const dropdownArrow = document.querySelector('#editGenderDropdown .dropdown-arrow');
+        const hiddenInput = document.getElementById('edit-gender');
+        
+        if (!dropdownBtn || !dropdownMenu || !dropdownLabel || !hiddenInput) return;
+        
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                if (menu !== dropdownMenu) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            if (isOpen) {
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+            } else {
+                dropdownMenu.classList.add('show');
+                
+                // Check if dropdown would go below viewport and adjust position
+                const dropdownRect = dropdownMenu.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const spaceBelow = viewportHeight - dropdownRect.bottom;
+                
+                if (spaceBelow < 50) { // If less than 50px space below
+                    dropdownMenu.classList.add('show-above');
+                } else {
+                    dropdownMenu.classList.remove('show-above');
+                }
+                
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(180deg)';
+            }
+        });
+        
+        // Handle gender selection
+        const genderOptions = document.querySelectorAll('#editGenderDropdownMenu .dropdown-option');
+        genderOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const genderName = this.querySelector('.option-main').textContent;
+                
+                hiddenInput.value = value;
+                dropdownLabel.textContent = genderName;
+                
+                // Update selected state
+                genderOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Close dropdown
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Set initial selected state
+        const currentValue = hiddenInput.value;
+        if (currentValue) {
+            const selectedOption = document.querySelector(`#editGenderDropdownMenu .dropdown-option[data-value="${currentValue}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+        }
+    }
+    
+    function initializeEditCountryDropdown() {
+        const dropdownBtn = document.getElementById('editCountryResidenceDropdownBtn');
+        const dropdownMenu = document.getElementById('editCountryResidenceDropdownMenu');
+        const dropdownLabel = document.getElementById('editCountryResidenceDropdownLabel');
+        const dropdownArrow = document.querySelector('#editCountryResidenceDropdown .dropdown-arrow');
+        const hiddenInput = document.getElementById('edit-country-of-residence');
+        
+        if (!dropdownBtn || !dropdownMenu || !dropdownLabel || !hiddenInput) return;
+        
+        // Populate countries
+        function populateCountries(filterText = '') {
+            dropdownMenu.innerHTML = '';
+            const filteredCountries = countries.filter(country =>
+                country.toLowerCase().includes(filterText.toLowerCase())
+            );
+            
+            filteredCountries.forEach(country => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.setAttribute('data-value', country);
+                option.innerHTML = `<div class="option-main">${country}</div>`;
+                
+                option.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    hiddenInput.value = value;
+                    dropdownLabel.textContent = value;
+                    
+                    // Update selected state
+                    dropdownMenu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Close dropdown
+                    dropdownMenu.classList.remove('show');
+                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+                });
+                
+                dropdownMenu.appendChild(option);
+            });
+        }
+        
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                if (menu !== dropdownMenu) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            if (isOpen) {
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+            } else {
+                dropdownMenu.classList.add('show');
+                populateCountries();
+                
+                // Check if dropdown would go below viewport and adjust position
+                const dropdownRect = dropdownMenu.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const spaceBelow = viewportHeight - dropdownRect.bottom;
+                
+                if (spaceBelow < 50) { // If less than 50px space below
+                    dropdownMenu.classList.add('show-above');
+                } else {
+                    dropdownMenu.classList.remove('show-above');
+                }
+                
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(180deg)';
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Set initial selected state
+        const currentValue = hiddenInput.value;
+        if (currentValue) {
+            dropdownLabel.textContent = currentValue;
+        }
+    }
+
+    </script>
+</body>
+</html> 

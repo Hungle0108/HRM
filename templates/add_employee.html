@@ -573,10 +573,82 @@
             display: flex;
         }
 
+        .error-description {
+            color: #dc3545;
+            font-size: 0.75rem;
+            margin-top: 2px;
+            display: none;
+            padding-left: 20px;
+        }
+
+        .error-description.show {
+            display: block;
+        }
+
         .error-icon {
             width: 16px;
             height: 16px;
             fill: currentColor;
+        }
+
+        /* Form validation notification */
+        .form-validation-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #343a40;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 600px;
+            min-width: 500px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .form-validation-notification.show {
+            display: flex;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .notification-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            color: #dc3545;
+        }
+
+        .notification-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         .bottom-navigation {
@@ -1731,7 +1803,7 @@
         <div class="main-container">
             <!-- Content Area -->
             <div class="content-area">
-                <form id="employee-form">
+                <form id="employee-form" novalidate>
                     <div class="form-section">
                         <h3 class="section-title">Team information</h3>
                         
@@ -1773,36 +1845,48 @@
                         
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <input type="email" class="form-input" placeholder="Personal email *" required>
-                                <div class="error-message" style="display: none;">
+                                <input type="email" id="personalEmail" class="form-input" placeholder="Personal email *" required>
+                                <div class="error-message" id="emailError" style="display: none;">
                                     <svg class="error-icon" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
                                     </svg>
-                                    Email is a required field
+                                    <span id="emailErrorMessage">Email is a required field</span>
+                                </div>
+                                <div class="error-description" id="emailErrorDescription">
+                                    <span id="emailErrorDescriptionText">Already exists</span>
+                                </div>
+                                <div class="error-description" id="emailRequiredDescription">
+                                    <span id="emailRequiredDescriptionText">This field is required</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <input type="text" class="form-input" placeholder="Legal first name *" required>
+                                <input type="text" class="form-input" id="firstName" placeholder="Legal first name *" required>
                                 <div class="error-message" style="display: none;">
                                     <svg class="error-icon" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
                                     </svg>
                                     Legal first name is required
                                 </div>
+                                <div class="error-description" id="firstNameErrorDescription">
+                                    <span id="firstNameErrorDescriptionText">This field is required</span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <input type="text" class="form-input" placeholder="Legal last name *" required>
+                                <input type="text" class="form-input" id="lastName" placeholder="Legal last name *" required>
                                 <div class="error-message" style="display: none;">
                                     <svg class="error-icon" viewBox="0 0 20 20">
-                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+                                        <path d="M10 18a8 8 0 100-16 8 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
                                     </svg>
                                     Legal last name is required
+                                </div>
+                                <div class="error-description" id="lastNameErrorDescription">
+                                    <span id="lastNameErrorDescriptionText">This field is required</span>
                                 </div>
                             </div>
                         </div>
@@ -1893,13 +1977,14 @@
                                     <div class="dropdown-menu" id="employeeResidenceDropdown"></div>
                                     <div class="input-info-icon" id="residenceInfoIcon">
                                         <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="Info" width="16" height="16">
+                                    </div>
+                                </div>
+                                <div class="error-description" id="residenceErrorDescription">
+                                    <span id="residenceErrorDescriptionText">This field is required</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                                            </div>
-
-
                 </form>
             </div>
 
@@ -1930,6 +2015,18 @@
         </div>
     </div>
 
+    <!-- Form validation notification -->
+    <div id="formValidationNotification" class="form-validation-notification" style="display: none;">
+        <div class="notification-content">
+            <div class="notification-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="notification-text">Please make sure to fill in all required fields before proceeding</div>
+        </div>
+    </div>
+
     <!-- Info popup for country of residence -->
     <div id="residenceInfoModal" class="info-modal">
         <div class="info-modal-content">
@@ -1947,7 +2044,7 @@
     
     // Track current step (1 = Personal details, 2 = Job details, etc.)
     let currentStep = 1;
-    const totalSteps = 6;
+    const totalSteps = 5;
 
     // Function to save form data to sessionStorage
     function saveFormData() {
@@ -1955,9 +2052,9 @@
         const formData = {
             selectedGroupId: selectedGroupId,
             structurePositionId: document.getElementById('structurePositionId')?.value || '',
-            personalEmail: document.querySelector('input[type="email"]').value,
-            firstName: document.querySelectorAll('input[type="text"]')[0].value,
-            lastName: document.querySelectorAll('input[type="text"]')[1].value,
+            personalEmail: document.getElementById('personalEmail').value,
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
             dateOfBirth: document.getElementById('dateOfBirth').value,
             gender: document.getElementById('genderSelect').value,
             workEmail: document.querySelectorAll('input[type="email"]')[1].value,
@@ -1998,9 +2095,9 @@
             }
 
             // Restore other form values
-            if (formData.personalEmail) document.querySelector('input[type="email"]').value = formData.personalEmail;
-            if (formData.firstName) document.querySelectorAll('input[type="text"]')[0].value = formData.firstName;
-            if (formData.lastName) document.querySelectorAll('input[type="text"]')[1].value = formData.lastName;
+            if (formData.personalEmail) document.getElementById('personalEmail').value = formData.personalEmail;
+            if (formData.firstName) document.getElementById('firstName').value = formData.firstName;
+            if (formData.lastName) document.getElementById('lastName').value = formData.lastName;
             if (formData.dateOfBirth) document.getElementById('dateOfBirth').value = formData.dateOfBirth;
             if (formData.gender) {
                 document.getElementById('genderSelect').value = formData.gender;
@@ -2033,6 +2130,9 @@
     // Function to clear all form data from sessionStorage
     function clearAllFormData() {
         sessionStorage.removeItem('employeeFormData');
+        sessionStorage.removeItem('employeeFormStep2');
+        sessionStorage.removeItem('employeeFormStep3');
+        sessionStorage.removeItem('employeeFormStep4');
         console.log('All form data cleared');
     }
 
@@ -2240,6 +2340,9 @@
         initializePositionDropdowns();
         // Restore form data after dropdowns are initialized
         restoreFormData();
+        
+        // Initialize email validation
+        initializeEmailValidation();
     });
 
     // Auto-save form data when inputs change
@@ -2255,6 +2358,30 @@
             clearAllFormData();
         }
     });
+
+    // Form validation notification functions
+    function showFormValidationNotification() {
+        const notification = document.getElementById('formValidationNotification');
+        if (notification) {
+            notification.style.display = 'flex';
+            notification.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hideFormValidationNotification();
+            }, 5000);
+        }
+    }
+
+    function hideFormValidationNotification() {
+        const notification = document.getElementById('formValidationNotification');
+        if (notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }
+    }
 
     // Form submission
     document.getElementById('employee-form').addEventListener('submit', function(e) {
@@ -2272,12 +2399,22 @@
                 hideFieldError(field);
             }
         });
+
+        // Check for email-specific errors
+        const emailInput = document.getElementById('personalEmail');
+        const emailError = document.getElementById('emailError');
+        if (emailInput && emailError && emailError.classList.contains('show')) {
+            isValid = false;
+        }
         
         if (isValid) {
             // Save form data before proceeding
             saveFormData();
             // Proceed to next step
             window.location.href = '/add-employee-step2';
+        } else {
+            // Show notification when validation fails
+            showFormValidationNotification();
         }
     });
 
@@ -2318,6 +2455,14 @@
         if (errorMsg) {
             errorMsg.classList.add('show');
         }
+        
+        // Show error description for required fields (except email field which has special handling)
+        if (field.id !== 'personalEmail') {
+            const errorDescription = field.parentNode.querySelector('.error-description');
+            if (errorDescription) {
+                errorDescription.classList.add('show');
+            }
+        }
     }
 
     function hideFieldError(field) {
@@ -2325,6 +2470,14 @@
         const errorMsg = field.parentNode.querySelector('.error-message');
         if (errorMsg) {
             errorMsg.classList.remove('show');
+        }
+        
+        // Hide error description for required fields (except email field which has special handling)
+        if (field.id !== 'personalEmail') {
+            const errorDescription = field.parentNode.querySelector('.error-description');
+            if (errorDescription) {
+                errorDescription.classList.remove('show');
+            }
         }
     }
 
@@ -2861,6 +3014,14 @@
         if (errorMessage) {
             errorMessage.classList.add('show');
         }
+        
+        // Show error description for required fields (except email field which has special handling)
+        if (field.id !== 'personalEmail') {
+            const errorDescription = field.parentElement.querySelector('.error-description');
+            if (errorDescription) {
+                errorDescription.classList.add('show');
+            }
+        }
     }
 
     function hideFieldError(field) {
@@ -2868,6 +3029,14 @@
         const errorMessage = field.parentElement.querySelector('.error-message');
         if (errorMessage) {
             errorMessage.classList.remove('show');
+        }
+        
+        // Hide error description for required fields (except email field which has special handling)
+        if (field.id !== 'personalEmail') {
+            const errorDescription = field.parentElement.querySelector('.error-description');
+            if (errorDescription) {
+                errorDescription.classList.remove('show');
+            }
         }
     }
 
@@ -2921,6 +3090,158 @@
             });
         }
     });
+
+    // Email validation functionality
+    function initializeEmailValidation() {
+        const emailInput = document.getElementById('personalEmail');
+        const emailError = document.getElementById('emailError');
+        const emailErrorMessage = document.getElementById('emailErrorMessage');
+        window.emailCheckTimeout = null;
+
+        if (emailInput) {
+            emailInput.addEventListener('input', function() {
+                const email = this.value.trim();
+                
+                // Clear previous timeout
+                if (window.emailCheckTimeout) {
+                    clearTimeout(window.emailCheckTimeout);
+                }
+
+                // Hide error message when user starts typing
+                if (emailError) {
+                    emailError.classList.remove('show');
+                }
+                
+                // Hide error descriptions when user starts typing
+                const emailErrorDescription = document.getElementById('emailErrorDescription');
+                const emailRequiredDescription = document.getElementById('emailRequiredDescription');
+                if (emailErrorDescription) {
+                    emailErrorDescription.classList.remove('show');
+                }
+                if (emailRequiredDescription) {
+                    emailRequiredDescription.classList.remove('show');
+                }
+
+                // If field is empty, clear all errors and don't check for duplicates
+                if (!email) {
+                    hideEmailError();
+                    return;
+                }
+
+                // Only check if email has valid format
+                if (isValidEmail(email)) {
+                    // Debounce the API call to avoid too many requests
+                    window.emailCheckTimeout = setTimeout(() => {
+                        checkEmailExists(email);
+                    }, 500);
+                }
+            });
+
+            emailInput.addEventListener('blur', function() {
+                const email = this.value.trim();
+                
+                // Show required field error if empty
+                if (!email) {
+                    showEmailError('Email is a required field');
+                    return;
+                }
+
+                // Show format error if invalid
+                if (email && !isValidEmail(email)) {
+                    showEmailError('Please enter a valid email address');
+                    return;
+                }
+
+                // Check for duplicate if valid
+                if (email && isValidEmail(email)) {
+                    checkEmailExists(email);
+                }
+            });
+        }
+    }
+
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function checkEmailExists(email) {
+        fetch('/api/check-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                showEmailError('This email address is already registered');
+            } else {
+                hideEmailError();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking email:', error);
+            // Don't show error to user for API failures, just log it
+        });
+    }
+
+    function showEmailError(message) {
+        const emailInput = document.getElementById('personalEmail');
+        const emailError = document.getElementById('emailError');
+        const emailErrorMessage = document.getElementById('emailErrorMessage');
+        const emailErrorDescription = document.getElementById('emailErrorDescription');
+        const emailRequiredDescription = document.getElementById('emailRequiredDescription');
+        
+        if (emailInput && emailError && emailErrorMessage) {
+            emailInput.classList.add('error');
+            emailErrorMessage.textContent = message;
+            emailError.classList.add('show');
+            
+            // Clear any previous timeout to prevent API calls from interfering
+            if (window.emailCheckTimeout) {
+                clearTimeout(window.emailCheckTimeout);
+            }
+            
+            // Show appropriate description based on error type
+            if (emailErrorDescription) {
+                if (message === 'This email address is already registered') {
+                    emailErrorDescription.classList.add('show');
+                } else {
+                    emailErrorDescription.classList.remove('show');
+                }
+            }
+            
+            if (emailRequiredDescription) {
+                if (message === 'Email is a required field') {
+                    emailRequiredDescription.classList.add('show');
+                } else {
+                    emailRequiredDescription.classList.remove('show');
+                }
+            }
+        }
+    }
+
+    function hideEmailError() {
+        const emailInput = document.getElementById('personalEmail');
+        const emailError = document.getElementById('emailError');
+        const emailErrorDescription = document.getElementById('emailErrorDescription');
+        const emailRequiredDescription = document.getElementById('emailRequiredDescription');
+        
+        if (emailInput && emailError) {
+            emailInput.classList.remove('error');
+            emailError.classList.remove('show');
+            
+            // Hide both descriptions
+            if (emailErrorDescription) {
+                emailErrorDescription.classList.remove('show');
+            }
+            if (emailRequiredDescription) {
+                emailRequiredDescription.classList.remove('show');
+            }
+        }
+    }
     </script>
 </body>
 </html> 

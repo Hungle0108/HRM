@@ -505,7 +505,7 @@
                     Back
                 </a>
                 <div class="nav-right">
-                    <div class="step-info">Step 4 of 6<br>Next step: Benefits and extras</div>
+                    <div class="step-info">Step 4 of 5<br>Next step: Review and confirm</div>
                     <button type="submit" class="btn-continue" form="employee-form-step4">Continue</button>
                 </div>
             </div>
@@ -515,7 +515,7 @@
     <script>
     // Track current step (4 for Compliance)
     let currentStep = 4;
-    const totalSteps = 6;
+    const totalSteps = 5;
 
     // Function to save form data to sessionStorage
     function saveFormData() {
@@ -544,7 +544,7 @@
 
     // Function to clear all form data from sessionStorage
     function clearAllFormData() {
-        sessionStorage.removeItem('employeeFormStep1');
+        sessionStorage.removeItem('employeeFormData');
         sessionStorage.removeItem('employeeFormStep2');
         sessionStorage.removeItem('employeeFormStep3');
         sessionStorage.removeItem('employeeFormStep4');

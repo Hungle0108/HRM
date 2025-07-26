@@ -1013,7 +1013,7 @@
             align-items: center;
             margin: 16px 0 24px 0;
             padding: 12px 0;
-            border-bottom: 1px solid #e9ecef;
+            
         }
 
         .pagination-bookmarks {
@@ -1428,7 +1428,7 @@
                         </div>
 
                         <!-- Weekly Work Duration Summary -->
-                        <div class="weekly-duration-summary" id="weeklyDurationSummary" style="display: none; margin-top: 24px; border-top: 1px solid #e9ecef; padding-top: 24px;">
+                        <div class="weekly-duration-summary" id="weeklyDurationSummary" style="display: none; margin-top: 24px;  padding-top: 24px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <h4 class="section-title" style="margin: 0; font-size: 1rem;">Weekly work duration</h4>
                                 <div class="duration-summary-content" style="display: flex; align-items: center; gap: 24px;">
@@ -1477,7 +1477,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/settings/time-tracking" class="btn-back">
+                <a href="/edit-schedule/{{ schedule_id }}" class="btn-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -1488,13 +1488,14 @@
                         <div class="next-step-label">Next step:</div>
                         <div class="next-step-title">3. Review and finish</div>
                     </div>
-                    <button type="submit" form="schedule-form" class="btn-continue" id="continueBtn">Continue</button>
+                    <button type="submit" form="schedule-form-step2" class="btn-continue" id="continueBtn">Continue</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        console.log('DEBUG: edit_schedule_step2.js script loaded');
         // Restore form data from step 1
         const savedData = sessionStorage.getItem('scheduleFormData');
         if (savedData) {
@@ -1503,8 +1504,10 @@
 
         // Prefill script for edit mode
         window.addEventListener('DOMContentLoaded', function() {
+            console.log('DEBUG: DOMContentLoaded event fired in edit_schedule_step2.js');
             sessionStorage.removeItem('scheduleFormData');
             var prefill = {{ prefill_data | tojson | safe }};
+            console.log('Prefill data:', prefill);
             // Always set window.shiftData only from this prefill
             if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
                 // If only one shift, keep only shift 1
@@ -1512,8 +1515,10 @@
                     prefill.scheduleDetails.shifts = { 1: prefill.scheduleDetails.shifts[1] || {} };
                 }
                 window.shiftData = prefill.scheduleDetails.shifts;
+                console.log('Window shiftData set from prefill:', window.shiftData);
             } else {
                 window.shiftData = { 1: {} };
+                console.log('Window shiftData set to default:', window.shiftData);
             }
             if (prefill && prefill.scheduleDetails) {
                 // --- PATCH: Detect includeTime from first shift if not present at top level ---
@@ -1597,8 +1602,27 @@
                 }
             }
             window.prefill = prefill;
+            console.log('Window prefill set:', window.prefill);
             // Ensure dropdown is initialized after window.prefill is set
             initializeCustomDropdown();
+            
+            // Debug: Check form state after initialization
+            setTimeout(() => {
+                console.log('Form state after initialization:');
+                console.log('Duration toggle checked:', document.getElementById('specifyDuration')?.checked);
+                console.log('Include time toggle checked:', document.getElementById('includeTime')?.checked);
+                console.log('Form valid:', isFormValid());
+                console.log('Continue button disabled:', document.getElementById('continueBtn')?.disabled);
+                
+                // Check specific day data
+                ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                    const checkbox = document.getElementById(day);
+                    const startInput = document.getElementById(`${day}-start`);
+                    const endInput = document.getElementById(`${day}-end`);
+                    const durInput = document.getElementById(`${day}-duration-input`);
+                    console.log(`${day}: checkbox=${checkbox?.checked}, start=${startInput?.value}, end=${endInput?.value}, duration=${durInput?.value}`);
+                });
+            }, 1000);
         });
 
         // Back button handler - save data before navigating
@@ -1618,14 +1642,8 @@
         if (scheduleFormStep2) {
             scheduleFormStep2.addEventListener('submit', function(e) {
                 e.preventDefault();
-                // Re-run validation on submit click
-                if (!isFormValid()) {
-                    alert('Please turn on "Specify the work duration" and provide details for at least one day before continuing.');
-                    return;
-                }
-                // State is already saved by listeners, but we save one last time to be safe.
-                saveFormStateToSession();
-                window.location.href = '/edit-schedule-step3/{{ schedule_id }}';
+                // Let the continue button handle the navigation
+                document.getElementById('continueBtn').click();
             });
         }
 
@@ -1991,6 +2009,13 @@
             toggleInputMode();
             updateDurationValidation();
             updateContinueButtonState();
+            
+            // Debug: Check final form state
+            console.log('Final form state:');
+            console.log('Duration toggle checked:', document.getElementById('specifyDuration')?.checked);
+            console.log('Include time toggle checked:', document.getElementById('includeTime')?.checked);
+            console.log('Form valid:', isFormValid());
+            console.log('Continue button disabled:', document.getElementById('continueBtn')?.disabled);
 
             // Set up all event listeners
             const elementsToWatch = document.querySelectorAll(
@@ -2001,6 +2026,22 @@
                 el.addEventListener('input', updateContinueButtonState);
                 el.addEventListener('click', updateContinueButtonState); // For dropdown
             });
+            
+            // Initial button state update
+            updateContinueButtonState();
+            
+            // Setup continue button handler
+            setupContinueButton();
+            
+            // Final debug check
+            setTimeout(() => {
+                console.log('Final debug check after 2 seconds:');
+                console.log('Duration toggle checked:', document.getElementById('specifyDuration')?.checked);
+                console.log('Include time toggle checked:', document.getElementById('includeTime')?.checked);
+                console.log('Form valid:', isFormValid());
+                console.log('Continue button disabled:', document.getElementById('continueBtn')?.disabled);
+                console.log('Continue button element:', document.getElementById('continueBtn'));
+            }, 2000);
         });
 
         // Save current shift data
@@ -2923,7 +2964,9 @@
         
         // Validation function with user feedback
         function validateForm() {
+            console.log('validateForm() called');
             if (!isFormValid()) {
+                console.log('Form validation failed in validateForm()');
                 // Find specific validation issues and show user-friendly messages
                 const durationToggle = document.getElementById('specifyDuration');
                 if (!durationToggle || !durationToggle.checked) {
@@ -2968,16 +3011,65 @@
                 }
                 return false;
             }
+            console.log('Form validation passed in validateForm()');
             return true;
         }
 
-        // Save and Continue button handler
-        document.getElementById('continueBtn').addEventListener('click', function() {
-            if (validateForm()) {
-                saveFormStateToSession();
-                window.location.href = '/edit-schedule-step3/{{ schedule_id }}';
+        // Save and Continue button handler - moved inside DOMContentLoaded
+        function setupContinueButton() {
+            const continueBtn = document.getElementById('continueBtn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    console.log('Continue button clicked');
+                    if (!validateForm()) {
+                        console.log('Form validation failed');
+                        return;
+                    }
+                    console.log('Form is valid, saving and navigating');
+                    saveFormStateToSession();
+
+                    // Prepare data for backend
+                    let scheduleId = {{ schedule_id|tojson }};
+                    let data = JSON.parse(sessionStorage.getItem('scheduleFormData')) || {};
+                    data.id = scheduleId;
+                    data.schedule_id = scheduleId;
+                    var scheduleNameInput = document.querySelector('#schedule-form-step2 [name="scheduleName"]');
+                    if (scheduleNameInput) {
+                        data.scheduleName = scheduleNameInput.value;
+                    } else {
+                        data.scheduleName = data.scheduleName || '';
+                    }
+                    // Add any other top-level fields as needed
+
+                    // Show loading state
+                    continueBtn.disabled = true;
+                    continueBtn.textContent = 'Saving...';
+
+                    try {
+                        const response = await fetch('/api/edit-schedule', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            window.location.href = '/edit-schedule-step3/' + scheduleId;
+                        } else {
+                            alert('Failed to save schedule: ' + (result.error || 'Unknown error'));
+                            continueBtn.disabled = false;
+                            continueBtn.textContent = 'Continue';
+                        }
+                    } catch (err) {
+                        alert('Error saving schedule: ' + err);
+                        continueBtn.disabled = false;
+                        continueBtn.textContent = 'Continue';
+                    }
+                });
+            } else {
+                console.error('Continue button not found');
             }
-        });
+        }
 
         // Extra safety: Save form state before unloading or navigating away
         window.addEventListener('beforeunload', function() {
@@ -3014,38 +3106,51 @@
 
         // === Continue button state management ===
         function isFormValid() {
+            console.log('isFormValid() called');
             const durationToggle = document.getElementById('specifyDuration');
-            if (!durationToggle || !durationToggle.checked) return false;
+            if (!durationToggle || !durationToggle.checked) {
+                console.log('Duration toggle not checked');
+                return false;
+            }
 
             const includeTimeToggle = document.getElementById('includeTime');
             const weekdaysArr = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
             
             let hasAtLeastOneValidDay = false;
+            let checkedDays = 0;
             
             // Check each day - ALL checked days must have valid input
             for (const day of weekdaysArr) {
                 const checkbox = document.getElementById(day);
                 if (!checkbox || !checkbox.checked) continue;
+                
+                checkedDays++;
+                console.log(`Day ${day} is checked`);
 
                 // This day is checked, so it must have valid input
                 if (includeTimeToggle && includeTimeToggle.checked) {
                     // Time mode: both start and end time must be filled
                     const startVal = (document.getElementById(`${day}-start`) || {}).value || '';
                     const endVal = (document.getElementById(`${day}-end`) || {}).value || '';
+                    console.log(`Time mode - ${day}: start=${startVal}, end=${endVal}`);
                     if (!startVal.trim() || !endVal.trim()) {
+                        console.log(`Time mode validation failed for ${day}`);
                         return false; // This checked day is missing required fields
                     }
                     hasAtLeastOneValidDay = true;
                 } else {
                     // Duration mode: duration must be filled
                     const durVal = (document.getElementById(`${day}-duration-input`) || {}).value || '';
+                    console.log(`Duration mode - ${day}: duration=${durVal}`);
                     if (!durVal.trim()) {
+                        console.log(`Duration mode validation failed for ${day}`);
                         return false; // This checked day is missing required fields
                     }
                     hasAtLeastOneValidDay = true;
                 }
             }
             
+            console.log(`Total checked days: ${checkedDays}, hasAtLeastOneValidDay: ${hasAtLeastOneValidDay}`);
             // Form is valid only if we have at least one valid day and all checked days are complete
             return hasAtLeastOneValidDay;
         }
@@ -3053,7 +3158,9 @@
         function updateContinueButtonState() {
             const btn = document.getElementById('continueBtn');
             if (!btn) return;
-            btn.disabled = !isFormValid();
+            const isValid = isFormValid();
+            console.log('updateContinueButtonState: isValid =', isValid);
+            btn.disabled = !isValid;
         }
 
 
@@ -3113,9 +3220,12 @@
 
         // Enhanced restoration function with complete state preservation
         function restoreFormState() {
+            console.log('restoreFormState() called');
             const savedForm = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            console.log('Saved form data:', savedForm);
             
             if (!savedForm || !savedForm.scheduleDetails) {
+                console.log('No saved form data found');
                 return;
             }
 
@@ -3128,16 +3238,19 @@
             // Restore main toggles
             if (specifyDurationToggle) {
                 specifyDurationToggle.checked = details.specifyDuration || false;
+                console.log('Restored specifyDuration toggle:', specifyDurationToggle.checked);
             }
 
             // Restore shift data
             if (details.shifts) {
                 shiftData = details.shifts;
+                console.log('Restored shift data:', shiftData);
             }
 
             // Restore current shift
             if (details.currentShift) {
                 currentShift = details.currentShift;
+                console.log('Restored current shift:', currentShift);
             }
 
             // Restore includeTime toggle state for the current shift
@@ -3145,6 +3258,7 @@
                 const currentShiftData = details.shifts[currentShift];
                 if (typeof currentShiftData.includeTime !== 'undefined') {
                     includeTimeToggle.checked = currentShiftData.includeTime;
+                    console.log('Restored includeTime toggle:', includeTimeToggle.checked);
                 }
             }
 
@@ -3173,6 +3287,7 @@
             calculateWeeklyDuration();
 
             isLoadingData = false;
+            console.log('Form state restoration completed');
         }
 
         function clearEditScheduleData(e) {
@@ -3196,22 +3311,5 @@
             }
         });
     </script>
-    <div class="bottom-navigation">
-        <div class="bottom-nav-content">
-            <a href="/settings/time-tracking" class="btn-back">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back
-            </a>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <div class="next-step-info">
-                    <div class="next-step-label">Next step:</div>
-                    <div class="next-step-title">3. Review and finish</div>
-                </div>
-                <button type="submit" form="schedule-form" class="btn-continue" id="continueBtn">Continue</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html> 

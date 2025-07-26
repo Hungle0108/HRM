@@ -476,8 +476,15 @@
     <script>
     // Prefill logic for edit schedule step 1
     window.addEventListener('DOMContentLoaded', function() {
-        var dataToUse = {{ prefill_data|tojson|default('{}')|safe }};
-        console.log('Prefill data:', dataToUse);
+        var dataToUse;
+        const savedData = sessionStorage.getItem('scheduleFormData');
+        if (savedData) {
+            dataToUse = JSON.parse(savedData);
+            console.log('Prefill data from sessionStorage:', dataToUse);
+        } else {
+            dataToUse = {{ prefill_data|tojson|default('{}')|safe }};
+            console.log('Prefill data from backend:', dataToUse);
+        }
         if (dataToUse) {
             // Prefill schedule name
             const scheduleNameInput = document.getElementById('scheduleName');
@@ -488,13 +495,15 @@
             const workerTypeInput = document.getElementById('selectedWorkerTypeId');
             const workerTypeLabel = document.getElementById('workerTypeDropdownLabel');
             const workerTypeMenu = document.getElementById('workerTypeDropdownMenu');
+            console.log('DEBUG: dataToUse.workerTypeId =', dataToUse.workerTypeId);
             if (dataToUse.workerTypeId && workerTypeInput) {
                 workerTypeInput.value = dataToUse.workerTypeId;
+                console.log('DEBUG: Setting workerTypeInput.value to', dataToUse.workerTypeId);
                 if (workerTypeLabel) {
-                    // Find the worker type name from the dropdown options
                     const selectedOption = workerTypeMenu.querySelector('.dropdown-option[data-value="' + dataToUse.workerTypeId + '"] .option-main');
                     if (selectedOption) {
                         workerTypeLabel.textContent = selectedOption.textContent;
+                        console.log('DEBUG: Setting workerTypeLabel.textContent to', selectedOption.textContent);
                     }
                 }
                 if (workerTypeMenu) {
@@ -502,6 +511,7 @@
                     options.forEach(function(opt) {
                         if (opt.getAttribute('data-value') === String(dataToUse.workerTypeId)) {
                             opt.classList.add('selected');
+                            console.log('DEBUG: Marking option as selected:', opt);
                         } else {
                             opt.classList.remove('selected');
                         }

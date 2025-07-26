@@ -340,10 +340,13 @@ def members():
         return redirect('/login')
     
     organization = None
+    employees = []
     if user.organization_id:
         organization = Organization.query.get(user.organization_id)
+        # Get all users in the same organization
+        employees = User.query.filter_by(organization_id=user.organization_id).all()
     
-    return render_template('members.html', user=user, organization=organization)
+    return render_template('members.html', user=user, organization=organization, employees=employees)
 
 @app.route('/add-people')
 def add_people():
@@ -2054,16 +2057,24 @@ def edit_schedule(schedule_id):
     prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
     prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     prefill_data['groupId'] = getattr(schedule, 'group_id', None) if hasattr(schedule, 'group_id') else prefill_data.get('groupId')
+    prefill_data['workerTypeId'] = prefill_data.get('workerTypeId')
     # Ensure numberOfShifts is set correctly for the frontend dropdown
     def _count_shifts(sd):
         try:
-            return len(sd['shifts']) if 'shifts' in sd and isinstance(sd['shifts'], dict) else 1
+            if 'shifts' in sd and isinstance(sd['shifts'], dict):
+                count = 0
+                for shift in sd['shifts'].values():
+                    if 'weekdays' in shift and any(day.get('checked') for day in shift['weekdays'].values()):
+                        count += 1
+                return count or 1
+            return 1
         except Exception:
             return 1
     if 'scheduleDetails' in prefill_data:
         prefill_data['scheduleDetails']['numberOfShifts'] = _count_shifts(prefill_data['scheduleDetails'])
         print('DEBUG BACKEND: scheduleDetails:', prefill_data['scheduleDetails'])
         print('DEBUG BACKEND: numberOfShifts:', prefill_data['scheduleDetails']['numberOfShifts'])
+        print('DEBUG BACKEND: numberOfShifts sent to template:', prefill_data['scheduleDetails']['numberOfShifts'])
     return render_template('edit_schedule.html', user=user, worker_types=worker_types, groups=user_groups, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step2/<int:schedule_id>')
@@ -2081,13 +2092,20 @@ def edit_schedule_step2(schedule_id):
     # Ensure numberOfShifts is set correctly for the frontend dropdown
     def _count_shifts(sd):
         try:
-            return len(sd['shifts']) if 'shifts' in sd and isinstance(sd['shifts'], dict) else 1
+            if 'shifts' in sd and isinstance(sd['shifts'], dict):
+                count = 0
+                for shift in sd['shifts'].values():
+                    if 'weekdays' in shift and any(day.get('checked') for day in shift['weekdays'].values()):
+                        count += 1
+                return count or 1
+            return 1
         except Exception:
             return 1
     if 'scheduleDetails' in prefill_data:
         prefill_data['scheduleDetails']['numberOfShifts'] = _count_shifts(prefill_data['scheduleDetails'])
         print('DEBUG BACKEND: scheduleDetails:', prefill_data['scheduleDetails'])
         print('DEBUG BACKEND: numberOfShifts:', prefill_data['scheduleDetails']['numberOfShifts'])
+        print('DEBUG BACKEND: numberOfShifts sent to template:', prefill_data['scheduleDetails']['numberOfShifts'])
     else:
         print('DEBUG BACKEND: scheduleDetails missing in prefill_data:', prefill_data)
     return render_template('edit_schedule_step2.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
@@ -2502,6 +2520,103 @@ def delete_group(group_id):
         db.session.rollback()
         logger.error(f"Error deleting group: {str(e)}")
         return jsonify({'error': 'Failed to delete group'}), 500
+
+@app.route('/api/check-email', methods=['POST'])
+def check_email():
+    """Check if an email already exists in the database"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip()
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        # Check if email already exists
+        existing_user = User.query.filter_by(email=email).first()
+        
+        return jsonify({
+            'exists': existing_user is not None,
+            'message': 'Email already exists' if existing_user else 'Email is available'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error checking email: {str(e)}")
+        return jsonify({'error': 'Failed to check email'}), 500
+
+@app.route('/api/create-employee', methods=['POST'])
+def create_employee():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    if not user.organization_id:
+        return jsonify({'error': 'User must belong to an organization'}), 400
+    
+    try:
+        data = request.get_json()
+        
+        # Extract data from all steps
+        step1_data = data.get('step1', {})
+        step2_data = data.get('step2', {})
+        step3_data = data.get('step3', {})
+        step4_data = data.get('step4', {})
+        
+        # Validate required fields
+        if not step1_data.get('firstName') or not step1_data.get('lastName') or not step1_data.get('personalEmail'):
+            return jsonify({'error': 'First name, last name, and email are required'}), 400
+        
+        # Check if email already exists
+        if User.query.filter_by(email=step1_data['personalEmail']).first():
+            return jsonify({'error': 'Email already exists'}), 400
+        
+        # Create new employee user
+        new_employee = User(
+            email=step1_data['personalEmail'],
+            password=generate_password_hash('temp_password_123'),  # Temporary password
+            first_name=step1_data['firstName'],
+            last_name=step1_data['lastName'],
+            preferred_name=step1_data.get('preferredName'),
+            date_of_birth=step1_data.get('dateOfBirth'),
+            citizenship=step1_data.get('citizenship'),
+            tax_residence=step1_data.get('residence'),
+            organization_id=user.organization_id,
+            profile_completed=True
+        )
+        
+        # Add additional fields based on step data
+        if step2_data.get('workerType'):
+            new_employee.job_title = step2_data['workerType']
+        
+        if step2_data.get('workerId'):
+            new_employee.department = step2_data['workerId']
+        
+        # Store additional employment data in a structured way
+        # For now, we'll store some key information in existing fields
+        # In a production system, you might want to create separate models for employment details
+        
+        # Add to database
+        db.session.add(new_employee)
+        db.session.commit()
+        
+        logger.info(f"Created new employee: {new_employee.email} by user: {user.email}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Employee created successfully',
+            'employee_id': new_employee.id,
+            'redirect_url': '/members'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating employee: {str(e)}")
+        return jsonify({'error': 'Failed to create employee'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
