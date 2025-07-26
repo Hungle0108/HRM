@@ -2241,6 +2241,86 @@ def api_get_organization_schedules():
         logger.error(f"Error fetching organization schedules: {str(e)}")
         return jsonify({'error': 'Failed to fetch schedules'}), 500
 
+@app.route('/api/get-organization-structures', methods=['GET'])
+def api_get_organization_structures():
+    """API endpoint to get all organization structures for current user's organization"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        # Get organization structures
+        structures = OrgStructure.query.filter_by(organization_id=user.organization_id).all()
+        structures_data = []
+        
+        for structure in structures:
+            # Get all items for this structure
+            items = StructureItem.query.filter_by(structure_id=structure.id).all()
+            
+            # Build hierarchical structure
+            def build_hierarchy(items, parent_id=None):
+                hierarchy = []
+                for item in items:
+                    if item.parent_id == parent_id:
+                        children = build_hierarchy(items, item.id)
+                        hierarchy.append({
+                            'id': item.id,
+                            'name': item.name,
+                            'level': item.level,
+                            'children': children
+                        })
+                return hierarchy
+            
+            structure_items = build_hierarchy(items)
+            
+            structures_data.append({
+                'id': structure.id,
+                'name': structure.name,
+                'allow_multiple_assignments': structure.allow_multiple_assignments,
+                'items': structure_items
+            })
+        
+        return jsonify({
+            'success': True,
+            'structures': structures_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching organization structures: {str(e)}")
+        return jsonify({'error': 'Failed to fetch structures'}), 500
+
+@app.route('/api/get-group/<int:group_id>', methods=['GET'])
+def api_get_group(group_id):
+    """API endpoint to get group information by ID"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+    
+    try:
+        user = User.query.get(session['user_id'])
+        if not user or not user.organization_id:
+            return jsonify({'success': False, 'error': 'User not found or no organization'}), 404
+        
+        group = Group.query.filter_by(id=group_id, organization_id=user.organization_id).first()
+        
+        if not group:
+            return jsonify({'success': False, 'error': 'Group not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'group': {
+                'id': group.id,
+                'name': group.name,
+                'status': group.status
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting group: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
 @app.route('/group/<int:group_id>/settings')
 def group_settings(group_id):
     if 'user_id' not in session:

@@ -1005,7 +1005,7 @@
             .then(data => {
                 if (data.success && data.worker_types) {
                     const workerTypeOptionsList = document.getElementById('workerTypeOptionsList');
-                    const savedData = sessionStorage.getItem('employeeFormStep2');
+                    const savedData = sessionStorage.getItem('step2Data');
                     let savedWorkerType = '';
                     
                     if (savedData) {
@@ -1138,15 +1138,20 @@
             }
         });
 
-        sessionStorage.setItem('employeeFormStep2', JSON.stringify(formData));
+        sessionStorage.setItem('step2Data', JSON.stringify(formData));
         console.log('Step 2 form data auto-saved:', formData);
     }
 
     // Function to restore form data from sessionStorage
     function restoreFormData() {
-        const savedData = sessionStorage.getItem('employeeFormStep2');
+        console.log('Step 2: restoreFormData() called');
+        const savedData = sessionStorage.getItem('step2Data');
+        console.log('Step 2: Raw saved data:', savedData);
         if (savedData) {
             const formData = JSON.parse(savedData);
+            console.log('Step 2: Parsed form data:', formData);
+            console.log('Step 2: All keys in form data:', Object.keys(formData));
+            console.log('Step 2: Structure keys:', Object.keys(formData).filter(key => key.startsWith('structure-')));
             
             // Restore worker type
             if (formData.workerType) {
@@ -1164,45 +1169,98 @@
             
             positionDropdowns.forEach(wrapper => {
                 const structureId = wrapper.dataset.structureId;
-                const savedStructureData = formData[`structure-${structureId}-id`];
                 
-                console.log('Checking structure', structureId, 'saved data:', savedStructureData);
+                // Check for new format (step 5 format): structure-{id}-{index}-name
+                const structureNameKeys = Object.keys(formData).filter(key => 
+                    key.startsWith(`structure-${structureId}-`) && key.endsWith('-name')
+                );
                 
-                if (savedStructureData) {
-                    const itemIds = savedStructureData.split(',');
-                    console.log('Restoring items for structure', structureId, ':', itemIds);
+                console.log('Checking structure', structureId, 'structure name keys:', structureNameKeys);
+                
+                if (structureNameKeys.length > 0) {
+                    // New format: structure-{id}-{index}-name
+                    console.log('Using new format for structure', structureId);
                     wrapper.selectedItems = [];
                     
-                    itemIds.forEach(itemId => {
-                        const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
-                        if (itemElement) {
-                            const itemName = itemElement.dataset.itemName;
-                            console.log('Found item element for', itemId, ':', itemName);
-                            wrapper.selectedItems.push({ id: itemId, name: itemName });
-                            itemElement.classList.add('selected');
-                            const checkmark = itemElement.querySelector('.checkmark');
-                            if (checkmark) checkmark.style.display = 'block';
+                    structureNameKeys.forEach(key => {
+                        const itemName = formData[key];
+                        console.log('Found item name:', itemName, 'from key:', key);
+                        
+                        // Check if this is a comma-separated string (old format)
+                        if (itemName.includes(',')) {
+                            console.log('Detected comma-separated string, splitting:', itemName);
+                            const itemNames = itemName.split(',').map(name => name.trim()).filter(name => name);
+                            console.log('Split item names:', itemNames);
+                            
+                            itemNames.forEach(splitItemName => {
+                                const itemElement = wrapper.querySelector(`[data-item-name="${splitItemName}"]`);
+                                if (itemElement) {
+                                    const itemId = itemElement.dataset.itemId;
+                                    console.log('Found item element for', splitItemName, 'with ID:', itemId);
+                                    wrapper.selectedItems.push({ id: itemId, name: splitItemName });
+                                    itemElement.classList.add('selected');
+                                    const checkmark = itemElement.querySelector('.checkmark');
+                                    if (checkmark) checkmark.style.display = 'block';
+                                } else {
+                                    console.log('Item element not found for', splitItemName);
+                                }
+                            });
                         } else {
-                            console.log('Item element not found for', itemId);
+                            // Single item name
+                            const itemElement = wrapper.querySelector(`[data-item-name="${itemName}"]`);
+                            if (itemElement) {
+                                const itemId = itemElement.dataset.itemId;
+                                console.log('Found item element for', itemName, 'with ID:', itemId);
+                                wrapper.selectedItems.push({ id: itemId, name: itemName });
+                                itemElement.classList.add('selected');
+                                const checkmark = itemElement.querySelector('.checkmark');
+                                if (checkmark) checkmark.style.display = 'block';
+                            } else {
+                                console.log('Item element not found for', itemName);
+                            }
                         }
                     });
-                    
-                    console.log('Final selectedItems for structure', structureId, ':', wrapper.selectedItems);
-                    console.log('Calling updateDisplay for structure', structureId);
-                    
-                    // Call the updateDisplay function that's bound to this wrapper
-                    if (wrapper.updateDisplay) {
-                        console.log('About to call wrapper.updateDisplay()');
-                        // Add a small delay to ensure DOM is ready
-                        setTimeout(() => {
-                            wrapper.updateDisplay();
-                            console.log('Finished calling wrapper.updateDisplay()');
-                        }, 100);
-                    } else {
-                        console.log('updateDisplay function not found on wrapper');
-                    }
                 } else {
-                    console.log('No saved data for structure', structureId);
+                    // Check for old format: structure-{id}-id
+                    const savedStructureData = formData[`structure-${structureId}-id`];
+                    console.log('Checking old format for structure', structureId, 'saved data:', savedStructureData);
+                    
+                    if (savedStructureData) {
+                        const itemIds = savedStructureData.split(',');
+                        console.log('Restoring items for structure', structureId, ':', itemIds);
+                        wrapper.selectedItems = [];
+                        
+                        itemIds.forEach(itemId => {
+                            const itemElement = wrapper.querySelector(`[data-item-id="${itemId}"]`);
+                            if (itemElement) {
+                                const itemName = itemElement.dataset.itemName;
+                                console.log('Found item element for', itemId, ':', itemName);
+                                wrapper.selectedItems.push({ id: itemId, name: itemName });
+                                itemElement.classList.add('selected');
+                                const checkmark = itemElement.querySelector('.checkmark');
+                                if (checkmark) checkmark.style.display = 'block';
+                            } else {
+                                console.log('Item element not found for', itemId);
+                            }
+                        });
+                    } else {
+                        console.log('No saved data for structure', structureId);
+                    }
+                }
+                
+                console.log('Final selectedItems for structure', structureId, ':', wrapper.selectedItems);
+                console.log('Calling updateDisplay for structure', structureId);
+                
+                // Call the updateDisplay function that's bound to this wrapper
+                if (wrapper.updateDisplay) {
+                    console.log('About to call wrapper.updateDisplay()');
+                    // Add a small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        wrapper.updateDisplay();
+                        console.log('Finished calling wrapper.updateDisplay()');
+                    }, 100);
+                } else {
+                    console.log('updateDisplay function not found on wrapper');
                 }
             });
         }
@@ -1211,7 +1269,7 @@
     // Function to clear all form data from sessionStorage
     function clearAllFormData() {
         sessionStorage.removeItem('employeeFormData');
-        sessionStorage.removeItem('employeeFormStep2');
+        sessionStorage.removeItem('step2Data');
         sessionStorage.removeItem('employeeFormStep3');
         sessionStorage.removeItem('employeeFormStep4');
         console.log('All form data cleared');
@@ -1248,7 +1306,12 @@
         initializePositionDropdowns();
         
         // Restore form data AFTER dropdowns are ready
-        restoreFormData();
+        console.log('Step 2: About to call restoreFormData()');
+        // Add a small delay to ensure dropdowns are fully initialized
+        setTimeout(() => {
+            restoreFormData();
+            console.log('Step 2: Finished calling restoreFormData()');
+        }, 500);
         
         // Add event listeners for form inputs
         document.getElementById('workerIdInput').addEventListener('input', saveFormData);
@@ -1294,7 +1357,9 @@
 
     // Position Dropdown Functionality
     function initializePositionDropdowns() {
+        console.log('Step 2: initializePositionDropdowns() called');
         const positionDropdowns = document.querySelectorAll('.position-dropdown-wrapper');
+        console.log('Step 2: Found position dropdowns:', positionDropdowns.length);
         
         positionDropdowns.forEach(wrapper => {
             const toggleBtn = wrapper.querySelector('.dropdown-toggle');

@@ -286,7 +286,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid #f8f9fa;
+            
         }
 
         .detail-row:last-child {
@@ -887,27 +887,21 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.10);
             z-index: 10;
             display: none;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
             padding: 8px 0;
-        }
-        
-        /* Special styling for country dropdown to be more flexible */
-        #editCountryResidenceDropdownMenu {
-            max-height: 150px;
-            top: 100%;
-        }
-        
-        /* Adjust dropdown position if it would go below viewport */
-        .dropdown-menu.show-above {
-            bottom: 100%;
-            top: auto;
-            margin-top: 0;
-            margin-bottom: 4px;
         }
 
         .dropdown-menu.show {
             display: block;
+        }
+
+        /* Adjust dropdown position if it would go below viewport */
+        .dropdown-menu.show-above {
+            bottom: 110%;
+            top: auto;
+            margin-top: 0;
+            margin-bottom: 4px;
         }
 
         .dropdown-option {
@@ -943,6 +937,218 @@
         .custom-dropdown.error .dropdown-toggle {
             border-color: #dc3545;
         }
+
+        /* Dropdown wrapper styles for searchable dropdowns */
+        .dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-wrapper .form-input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .dropdown-wrapper .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            display: none;
+            width: 100%;
+        }
+
+        .dropdown-wrapper .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-wrapper .dropdown-menu.show-above {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-wrapper .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            color: #495057;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .dropdown-wrapper .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-wrapper .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        /* Styling for "Not specified" text */
+        .not-specified {
+            color: #6c757d;
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        /* Position Dropdown Styles for Edit Modal */
+        .position-selection-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .position-dropdown-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .position-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .position-dropdown-toggle:hover {
+            border-color: #adb5bd;
+        }
+
+        .position-dropdown-toggle:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dropdown-arrow {
+            width: 18px;
+            height: 18px;
+            margin-left: 8px;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+
+        .position-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            z-index: 10;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .position-dropdown-menu.show {
+            display: block;
+        }
+
+        .position-dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .position-dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .position-dropdown-item.selected {
+            background-color: #e3f2fd;
+        }
+
+        .position-dropdown-item .checkmark {
+            width: 16px;
+            height: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .position-dropdown-item.selected .checkmark {
+            opacity: 1;
+        }
+
+        .position-level-1 {
+            padding-left: 16px;
+        }
+
+        .position-level-2 {
+            padding-left: 32px;
+        }
+
+        .position-level-3 {
+            padding-left: 48px;
+        }
+
+        .selected-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+            margin-right: 8px;
+        }
+
+        .selected-tag {
+            background-color: #e9ecef;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #adb5bd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .tag-remove:hover {
+            background: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -976,17 +1182,17 @@
                         
                         <div class="detail-row">
                             <span class="detail-label">Legal first name</span>
-                            <span class="detail-value" id="legalFirstName">Not specified</span>
+                            <span class="detail-value not-specified" id="legalFirstName">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Legal last name</span>
-                            <span class="detail-value" id="legalLastName">Not specified</span>
+                            <span class="detail-value not-specified" id="legalLastName">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Email address</span>
-                            <span class="detail-value" id="emailAddress">Not specified</span>
+                            <span class="detail-value not-specified" id="emailAddress">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
@@ -996,22 +1202,22 @@
                         
                         <div class="detail-row">
                             <span class="detail-label">Date of birth</span>
-                            <span class="detail-value" id="dateOfBirth">Not specified</span>
+                            <span class="detail-value not-specified" id="dateOfBirth">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Gender</span>
-                            <span class="detail-value" id="gender">Not specified</span>
+                            <span class="detail-value not-specified" id="gender">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Employee's citizenship (optional)</span>
-                            <span class="detail-value" id="citizenship">Not specified</span>
+                            <span class="detail-value not-specified" id="citizenship">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Country of residence</span>
-                            <span class="detail-value" id="countryOfResidence">Not specified</span>
+                            <span class="detail-value not-specified" id="countryOfResidence">Not specified</span>
                         </div>
                     </div>
 
@@ -1024,17 +1230,17 @@
                         
                         <div class="detail-row">
                             <span class="detail-label">Worker type</span>
-                            <span class="detail-value" id="workerType">Not specified</span>
+                            <span class="detail-value not-specified" id="workerType">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Worker ID</span>
-                            <span class="detail-value" id="workerId">Not specified</span>
+                            <span class="detail-value not-specified" id="workerId">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Position</span>
-                            <span class="detail-value" id="position">Not specified</span>
+                            <span class="detail-value not-specified" id="position">Not specified</span>
                         </div>
                     </div>
 
@@ -1047,37 +1253,37 @@
                         
                         <div class="detail-row">
                             <span class="detail-label">Base salary</span>
-                            <span class="detail-value" id="baseSalary">Not specified</span>
+                            <span class="detail-value not-specified" id="baseSalary">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Currency</span>
-                            <span class="detail-value" id="currency">Not specified</span>
+                            <span class="detail-value not-specified" id="currency">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Payment period</span>
-                            <span class="detail-value" id="paymentPeriod">Not specified</span>
+                            <span class="detail-value not-specified" id="paymentPeriod">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Employment type</span>
-                            <span class="detail-value" id="employmentType">Not specified</span>
+                            <span class="detail-value not-specified" id="employmentType">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Work schedule</span>
-                            <span class="detail-value" id="workSchedule">Not specified</span>
+                            <span class="detail-value not-specified" id="workSchedule">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Agreement start date</span>
-                            <span class="detail-value" id="agreementStartDate">Not specified</span>
+                            <span class="detail-value not-specified" id="agreementStartDate">Not specified</span>
                         </div>
                         
                         <div class="detail-row">
                             <span class="detail-label">Employment terms</span>
-                            <span class="detail-value" id="employmentTerms">Not specified</span>
+                            <span class="detail-value not-specified" id="employmentTerms">Not specified</span>
                         </div>
                     </div>
 
@@ -1090,7 +1296,7 @@
                         
                         <div class="detail-row">
                             <span class="detail-label">Employment agreement</span>
-                            <span class="detail-value" id="employmentAgreement">Not specified</span>
+                            <span class="detail-value not-specified" id="employmentAgreement">Not specified</span>
                         </div>
                     </div>
 
@@ -1103,17 +1309,7 @@
                         
                         <div class="detail-row">
                             <span class="detail-label">Group</span>
-                            <span class="detail-value" id="group">Not specified</span>
-                        </div>
-                        
-                        <div class="detail-row">
-                            <span class="detail-label">Direct manager</span>
-                            <span class="detail-value not-specified" id="directManager">Not specified</span>
-                        </div>
-                        
-                        <div class="detail-row">
-                            <span class="detail-label">Report</span>
-                            <span class="detail-value not-specified" id="report">Not specified</span>
+                            <span class="detail-value not-specified" id="group">Not specified</span>
                         </div>
                     </div>
                 </form>
@@ -1137,7 +1333,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/add-employee-step4" class="btn-back">
+                <a href="/add-employee-step4" class="btn-back" onclick="ensureDataConsistency(); return true;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
@@ -1189,9 +1385,16 @@
 
     // Function to restore form data from all previous steps
     function restoreAllFormData() {
+        // Migrate data from old keys to new keys if needed
+        const oldStep2Data = sessionStorage.getItem('employeeFormStep2');
+        if (oldStep2Data && !sessionStorage.getItem('step2Data')) {
+            console.log('Migrating data from employeeFormStep2 to step2Data');
+            sessionStorage.setItem('step2Data', oldStep2Data);
+        }
+        
         // Get data from all previous steps
         const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
-        const step2Data = JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}');
+        const step2Data = JSON.parse(sessionStorage.getItem('step2Data') || '{}');
         const step3Data = JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}');
         const step4Data = JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}');
         
@@ -1201,6 +1404,10 @@
             step3: step3Data,
             step4: step4Data
         });
+        
+        // Debug: Check what's actually in sessionStorage
+        console.log('sessionStorage step2Data raw:', sessionStorage.getItem('step2Data'));
+        console.log('sessionStorage employeeFormStep2 raw:', sessionStorage.getItem('employeeFormStep2'));
 
         // Step 1 Data - Employee Details
         if (step1Data.legalFirstName || step1Data.firstName) {
@@ -1250,9 +1457,19 @@
         if (positionNameKeys.length > 0) {
             const positionNames = positionNameKeys.map(key => step2Data[key]).filter(value => value);
             if (positionNames.length > 0) {
-                document.getElementById('position').textContent = positionNames.join(', ');
+                // Each position name is now individual (no comma separation needed)
+                const uniquePositions = [...new Set(positionNames)];
+                document.getElementById('position').textContent = uniquePositions.join(', ');
                 document.getElementById('position').classList.remove('not-specified');
+            } else {
+                // No positions selected
+                document.getElementById('position').textContent = 'Not specified';
+                document.getElementById('position').classList.add('not-specified');
             }
+        } else {
+            // No position data at all
+            document.getElementById('position').textContent = 'Not specified';
+            document.getElementById('position').classList.add('not-specified');
         }
 
         // Step 3 Data - Compensation and Schedule
@@ -1306,10 +1523,18 @@
         }
 
         // Group data from step 1
-        if (step1Data.selectedGroupId) {
-            // This would need to be enhanced to show actual group name
-            document.getElementById('group').textContent = 'Selected Group';
-            document.getElementById('group').classList.remove('not-specified');
+        if (step1Data.selectedGroupId && step1Data.selectedGroupId !== 'fdsadsq') {
+            // Fetch the group name from the API
+            loadGroupName(step1Data.selectedGroupId);
+        } else {
+            // Clear invalid group ID
+            if (step1Data.selectedGroupId === 'fdsadsq') {
+                console.log('Clearing invalid group ID:', step1Data.selectedGroupId);
+                step1Data.selectedGroupId = '';
+                sessionStorage.setItem('employeeFormData', JSON.stringify(step1Data));
+            }
+            document.getElementById('group').textContent = 'Not specified';
+            document.getElementById('group').classList.add('not-specified');
         }
 
         console.log('Restored data from all previous steps');
@@ -1326,14 +1551,14 @@
         
         console.log('\nEmployee form data:');
         console.log('employeeFormData:', sessionStorage.getItem('employeeFormData'));
-        console.log('employeeFormStep2:', sessionStorage.getItem('employeeFormStep2'));
+        console.log('step2Data:', sessionStorage.getItem('step2Data'));
         console.log('employeeFormStep3:', sessionStorage.getItem('employeeFormStep3'));
         console.log('employeeFormStep4:', sessionStorage.getItem('employeeFormStep4'));
         
         console.log('\nParsed data:');
         try {
             console.log('step1:', JSON.parse(sessionStorage.getItem('employeeFormData') || '{}'));
-            console.log('step2:', JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}'));
+            console.log('step2:', JSON.parse(sessionStorage.getItem('step2Data') || '{}'));
             console.log('step3:', JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}'));
             console.log('step4:', JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}'));
         } catch (e) {
@@ -1388,15 +1613,30 @@
             document.getElementById('workerId').textContent = step2Data.workerId;
             document.getElementById('workerId').classList.remove('not-specified');
         }
-        // Handle position data
+        
+        // Handle position data - get all position names from structure data
         const positionNameKeys = Object.keys(step2Data).filter(key => key.startsWith('structure-') && key.endsWith('-name'));
         if (positionNameKeys.length > 0) {
             const positionNames = positionNameKeys.map(key => step2Data[key]).filter(value => value);
             if (positionNames.length > 0) {
-                document.getElementById('position').textContent = positionNames.join(', ');
+                // Each position name is now individual (no comma separation needed)
+                const uniquePositions = [...new Set(positionNames)];
+                document.getElementById('position').textContent = uniquePositions.join(', ');
                 document.getElementById('position').classList.remove('not-specified');
+            } else {
+                // No positions selected
+                document.getElementById('position').textContent = 'Not specified';
+                document.getElementById('position').classList.add('not-specified');
             }
+        } else {
+            // No position data at all
+            document.getElementById('position').textContent = 'Not specified';
+            document.getElementById('position').classList.add('not-specified');
         }
+        
+        console.log('Updated employment info display with data:', step2Data);
+        console.log('Position keys found:', positionNameKeys);
+        console.log('Position names:', positionNameKeys.map(key => step2Data[key]));
     }
     
     // Function to update compensation schedule display immediately
@@ -1455,16 +1695,167 @@
     
     // Function to update group entity display immediately
     function updateGroupEntityDisplay(step1Data) {
-        if (step1Data.group) {
-            document.getElementById('group').textContent = step1Data.group;
-            document.getElementById('group').classList.remove('not-specified');
+        if (step1Data.selectedGroupId && step1Data.selectedGroupId !== 'fdsadsq') {
+            // Fetch the group name from the API
+            loadGroupName(step1Data.selectedGroupId);
+        } else {
+            // Clear invalid group ID
+            if (step1Data.selectedGroupId === 'fdsadsq') {
+                console.log('Clearing invalid group ID in updateGroupEntityDisplay:', step1Data.selectedGroupId);
+                step1Data.selectedGroupId = '';
+                sessionStorage.setItem('employeeFormData', JSON.stringify(step1Data));
+            }
+            document.getElementById('group').textContent = 'Not specified';
+            document.getElementById('group').classList.add('not-specified');
         }
+        
         if (step1Data.entity) {
             document.getElementById('entity').textContent = step1Data.entity;
             document.getElementById('entity').classList.remove('not-specified');
         }
     }
     
+    // Function to load group name by ID
+    function loadGroupName(groupId) {
+        // Validate groupId - only proceed if it's a valid ID
+        if (!groupId || groupId === 'fdsadsq' || groupId === 'undefined' || groupId === 'null') {
+            console.log('Invalid group ID, showing "Not specified":', groupId);
+            document.getElementById('group').textContent = 'Not specified';
+            document.getElementById('group').classList.add('not-specified');
+            return;
+        }
+        
+        fetch(`/api/get-group/${groupId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.group) {
+                    document.getElementById('group').textContent = data.group.name;
+                    document.getElementById('group').classList.remove('not-specified');
+                } else {
+                    console.error('Failed to load group:', data);
+                    document.getElementById('group').textContent = 'Group not found';
+                    document.getElementById('group').classList.remove('not-specified');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading group:', error);
+                document.getElementById('group').textContent = 'Not specified';
+                document.getElementById('group').classList.add('not-specified');
+            });
+    }
+
+    // Function to initialize edit group dropdown
+    function initializeEditGroupDropdown(selectedGroupId) {
+        const dropdownBtn = document.getElementById('editGroupDropdownBtn');
+        const dropdownMenu = document.getElementById('editGroupDropdownMenu');
+        const dropdownLabel = document.getElementById('editGroupDropdownLabel');
+        const dropdownArrow = document.querySelector('#editGroupDropdown .dropdown-arrow');
+        const hiddenInput = document.getElementById('edit-selected-group-id');
+        
+        if (!dropdownBtn || !dropdownMenu) return;
+
+        // Load groups from the server
+        fetch('/groups')
+            .then(response => response.text())
+            .then(html => {
+                // Parse the HTML to extract group data
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const groupElements = doc.querySelectorAll('.group-item, .group-card, [data-group-id]');
+                
+                const optionsList = document.getElementById('editGroupOptionsList');
+                optionsList.innerHTML = '';
+                
+                let foundSelectedGroup = false;
+                
+                groupElements.forEach(groupElement => {
+                    const groupId = groupElement.dataset.groupId || groupElement.querySelector('[data-group-id]')?.dataset.groupId;
+                    const groupName = groupElement.querySelector('.group-name, .group-title, h3, h4')?.textContent?.trim();
+                    
+                    if (groupId && groupName) {
+                        const option = document.createElement('div');
+                        option.className = 'dropdown-option';
+                        option.dataset.value = groupId;
+                        option.innerHTML = `<div class="option-main">${groupName}</div>`;
+                        
+                        // Mark as selected if this is the current group
+                        if (groupId == selectedGroupId) {
+                            option.classList.add('selected');
+                            dropdownLabel.textContent = groupName;
+                            foundSelectedGroup = true;
+                        }
+                        
+                        // Add click event
+                        option.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Remove selected class from all options
+                            optionsList.querySelectorAll('.dropdown-option').forEach(opt => {
+                                opt.classList.remove('selected');
+                            });
+                            
+                            // Add selected class to clicked option
+                            this.classList.add('selected');
+                            
+                            // Update dropdown label and hidden input
+                            const selectedGroupName = this.querySelector('.option-main').textContent;
+                            const selectedGroupId = this.dataset.value;
+                            dropdownLabel.textContent = selectedGroupName;
+                            hiddenInput.value = selectedGroupId;
+                            
+                            // Close dropdown
+                            dropdownMenu.classList.remove('show');
+                            if (dropdownArrow) dropdownArrow.src = dropdownArrow.src.replace('angle-small-up.png', 'angle-small-down.png');
+                        });
+                        
+                        optionsList.appendChild(option);
+                    }
+                });
+                
+                // If no group was found as selected, show "Select group"
+                if (!foundSelectedGroup && selectedGroupId) {
+                    dropdownLabel.textContent = 'Select group';
+                }
+                
+                console.log('Edit group dropdown initialized successfully');
+            })
+            .catch(error => {
+                console.error('Error loading groups for edit dropdown:', error);
+                const optionsList = document.getElementById('editGroupOptionsList');
+                optionsList.innerHTML = '<div class="dropdown-option disabled">Error loading groups</div>';
+            });
+
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            if (isOpen) {
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.src = dropdownArrow.src.replace('angle-small-up.png', 'angle-small-down.png');
+            } else {
+                dropdownMenu.classList.add('show');
+                if (dropdownArrow) dropdownArrow.src = dropdownArrow.src.replace('angle-small-down.png', 'angle-small-up.png');
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+                if (dropdownArrow) dropdownArrow.src = dropdownArrow.src.replace('angle-small-up.png', 'angle-small-down.png');
+            }
+        });
+    }
+
     // Function to load work schedule name by ID
     function loadWorkScheduleName(scheduleId) {
         fetch('/api/get-organization-schedules')
@@ -1495,7 +1886,7 @@
     // Function to clear all form data from sessionStorage
     function clearAllFormData() {
         sessionStorage.removeItem('employeeFormData');
-        sessionStorage.removeItem('employeeFormStep2');
+        sessionStorage.removeItem('step2Data');
         sessionStorage.removeItem('employeeFormStep3');
         sessionStorage.removeItem('employeeFormStep4');
         sessionStorage.removeItem('employeeFormStep5');
@@ -1605,19 +1996,16 @@
                 </div>
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Employee's Citizenship (optional)</label>
-                    <input type="text" id="edit-citizenship" value="${step1Data.citizenship || ''}" class="form-input" style="width: 100%;">
+                    <div class="dropdown-wrapper">
+                        <input type="text" class="form-input" id="edit-citizenship" value="${step1Data.citizenship || ''}" placeholder="Employee's citizenship (optional)" autocomplete="off" style="width: 100%;">
+                        <div class="dropdown-menu" id="editCitizenshipDropdown"></div>
+                    </div>
                 </div>
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Country of Residence</label>
-                    <div class="custom-dropdown" id="editCountryResidenceDropdown">
-                        <button type="button" class="dropdown-toggle" id="editCountryResidenceDropdownBtn">
-                            <span id="editCountryResidenceDropdownLabel">${step1Data.residence || 'Country of residence'}</span>
-                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
-                        </button>
-                        <div class="dropdown-menu" id="editCountryResidenceDropdownMenu">
-                            <!-- Countries will be populated dynamically -->
-                        </div>
-                        <input type="hidden" id="edit-country-of-residence" name="residence" value="${step1Data.residence || ''}">
+                    <div class="dropdown-wrapper">
+                        <input type="text" class="form-input" id="edit-country-of-residence" value="${step1Data.residence || ''}" placeholder="Country of residence *" autocomplete="off" style="width: 100%;">
+                        <div class="dropdown-menu" id="editCountryResidenceDropdown"></div>
                     </div>
                 </div>
             </div>
@@ -1641,11 +2029,15 @@
                 lastName: document.getElementById('edit-legal-last-name').value
             };
             
+            // Save to sessionStorage
             sessionStorage.setItem('employeeFormData', JSON.stringify(updatedData));
             console.log('Saved employee data to sessionStorage:', updatedData);
             
             // Update the display immediately
             updateEmployeeDetailsDisplay(updatedData);
+            
+            // Show success message
+            showSaveSuccessMessage();
             
             closeEditSectionModal();
         };
@@ -1683,95 +2075,147 @@
         // Initialize country dropdown for edit modal
         initializeEditCountryDropdown();
         
-        function initializeEditCountryDropdown() {
-            const dropdownBtn = document.getElementById('editCountryResidenceDropdownBtn');
-            const dropdownMenu = document.getElementById('editCountryResidenceDropdownMenu');
-            const dropdownLabel = document.getElementById('editCountryResidenceDropdownLabel');
-            const dropdownArrow = document.querySelector('#editCountryResidenceDropdown .dropdown-arrow');
-            const hiddenInput = document.getElementById('edit-country-of-residence');
+        // Initialize citizenship dropdown for edit modal
+        initializeEditCitizenshipDropdown();
+        
+        function initializeEditCitizenshipDropdown() {
+            const input = document.getElementById('edit-citizenship');
+            const dropdown = document.getElementById('editCitizenshipDropdown');
             
-            if (!dropdownBtn || !dropdownMenu || !dropdownLabel || !hiddenInput) return;
+            if (!input || !dropdown) return;
             
-            // Populate countries
-            function populateCountries(filterText = '') {
-                dropdownMenu.innerHTML = '';
-                const filteredCountries = countries.filter(country =>
-                    country.toLowerCase().includes(filterText.toLowerCase())
+            // Citizenship dropdown functionality
+            function filterCountries(searchText) {
+                return countries.filter(country =>
+                    country.toLowerCase().includes(searchText.toLowerCase())
                 );
-                
-                filteredCountries.forEach(country => {
-                    const option = document.createElement('div');
-                    option.className = 'dropdown-option';
-                    option.setAttribute('data-value', country);
-                    option.innerHTML = `<div class="option-main">${country}</div>`;
+            }
+            
+            function setupCitizenshipDropdown() {
+                input.addEventListener('input', function() {
+                    const searchText = this.value;
+                    const filteredCountries = filterCountries(searchText);
                     
-                    option.addEventListener('click', function() {
-                        const value = this.getAttribute('data-value');
-                        hiddenInput.value = value;
-                        dropdownLabel.textContent = value;
-                        
-                        // Update selected state
-                        dropdownMenu.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
-                        this.classList.add('selected');
-                        
-                        // Close dropdown
-                        dropdownMenu.classList.remove('show');
-                        if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
+                    dropdown.innerHTML = '';
+                    filteredCountries.forEach(country => {
+                        const div = document.createElement('div');
+                        div.className = 'dropdown-item';
+                        div.innerHTML = `<div class="option-main">${country}</div>`;
+                        div.addEventListener('click', function() {
+                            input.value = country;
+                            dropdown.classList.remove('show');
+                        });
+                        dropdown.appendChild(div);
                     });
                     
-                    dropdownMenu.appendChild(option);
-                });
-            }
-            
-            // Toggle dropdown
-            dropdownBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const isOpen = dropdownMenu.classList.contains('show');
-                
-                // Close all other dropdowns
-                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
-                    if (menu !== dropdownMenu) {
-                        menu.classList.remove('show');
-                    }
-                });
-                
-                if (isOpen) {
-                    dropdownMenu.classList.remove('show');
-                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
-                } else {
-                    dropdownMenu.classList.add('show');
-                    populateCountries();
-                    
-                    // Check if dropdown would go below viewport and adjust position
-                    const dropdownRect = dropdownMenu.getBoundingClientRect();
-                    const viewportHeight = window.innerHeight;
-                    const spaceBelow = viewportHeight - dropdownRect.bottom;
-                    
-                    if (spaceBelow < 50) { // If less than 50px space below
-                        dropdownMenu.classList.add('show-above');
+                    if (filteredCountries.length > 0 && searchText.length > 0) {
+                        dropdown.classList.add('show');
+                        
+                        // Check if dropdown would go below viewport and adjust position
+                        setTimeout(() => {
+                            const dropdownRect = dropdown.getBoundingClientRect();
+                            const viewportHeight = window.innerHeight;
+                            const spaceBelow = viewportHeight - dropdownRect.bottom;
+                            
+                            if (spaceBelow < 50) { // If less than 50px space below
+                                dropdown.classList.add('show-above');
+                            } else {
+                                dropdown.classList.remove('show-above');
+                            }
+                        }, 10);
                     } else {
-                        dropdownMenu.classList.remove('show-above');
+                        dropdown.classList.remove('show');
                     }
-                    
-                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(180deg)';
-                }
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                    dropdownMenu.classList.remove('show');
-                    if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
-                }
-            });
-            
-            // Set initial selected state
-            const currentValue = hiddenInput.value;
-            if (currentValue) {
-                dropdownLabel.textContent = currentValue;
+                });
+                
+                input.addEventListener('focus', function() {
+                    if (this.value.length > 0) {
+                        const filteredCountries = filterCountries(this.value);
+                        if (filteredCountries.length > 0) {
+                            dropdown.classList.add('show');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('show');
+                    }
+                });
             }
+            
+            setupCitizenshipDropdown();
+        }
+        
+        function initializeEditCountryDropdown() {
+            const input = document.getElementById('edit-country-of-residence');
+            const dropdown = document.getElementById('editCountryResidenceDropdown');
+            
+            if (!input || !dropdown) return;
+            
+            // Country dropdown functionality
+            function filterCountries(searchText) {
+                return countries.filter(country =>
+                    country.toLowerCase().includes(searchText.toLowerCase())
+                );
+            }
+            
+            function setupCountryDropdown() {
+                input.addEventListener('input', function() {
+                    const searchText = this.value;
+                    const filteredCountries = filterCountries(searchText);
+                    
+                    dropdown.innerHTML = '';
+                    filteredCountries.forEach(country => {
+                        const div = document.createElement('div');
+                        div.className = 'dropdown-item';
+                        div.innerHTML = `<div class="option-main">${country}</div>`;
+                        div.addEventListener('click', function() {
+                            input.value = country;
+                            dropdown.classList.remove('show');
+                        });
+                        dropdown.appendChild(div);
+                    });
+                    
+                    if (filteredCountries.length > 0 && searchText.length > 0) {
+                        dropdown.classList.add('show');
+                        
+                        // Check if dropdown would go below viewport and adjust position
+                        setTimeout(() => {
+                            const dropdownRect = dropdown.getBoundingClientRect();
+                            const viewportHeight = window.innerHeight;
+                            const spaceBelow = viewportHeight - dropdownRect.bottom;
+                            
+                            if (spaceBelow < 50) { // If less than 50px space below
+                                dropdown.classList.add('show-above');
+                            } else {
+                                dropdown.classList.remove('show-above');
+                            }
+                        }, 10);
+                    } else {
+                        dropdown.classList.remove('show');
+                    }
+                });
+                
+                input.addEventListener('focus', function() {
+                    if (this.value.length > 0) {
+                        const filteredCountries = filterCountries(this.value);
+                        if (filteredCountries.length > 0) {
+                            dropdown.classList.add('show');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            setupCountryDropdown();
         }
     }
     
@@ -1936,46 +2380,102 @@
     }
 
     function editEmploymentInfo() {
-        const step2Data = JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}');
-        // Handle position name (may be stored as structure-*-name)
-        let positionName = '';
-        Object.keys(step2Data).forEach(key => {
-            if (key.startsWith('structure-') && key.endsWith('-name')) {
-                if (step2Data[key]) positionName += (positionName ? ', ' : '') + step2Data[key];
-            }
-        });
+        // Migrate data from old keys to new keys if needed
+        const oldStep2Data = sessionStorage.getItem('employeeFormStep2');
+        if (oldStep2Data && !sessionStorage.getItem('step2Data')) {
+            console.log('Migrating data from employeeFormStep2 to step2Data');
+            sessionStorage.setItem('step2Data', oldStep2Data);
+        }
+        
+        const step2Data = JSON.parse(sessionStorage.getItem('step2Data') || '{}');
+        console.log('Opening edit employment modal with fresh step2Data:', step2Data);
         const formHtml = `
             <div style="text-align: left;">
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Worker Type</label>
-                    <select id="edit-worker-type" class="form-select" style="width: 100%;">
-                        <option value="">Select Worker Type</option>
-                        <option value="employee" ${step2Data.workerType === 'employee' ? 'selected' : ''}>Employee</option>
-                        <option value="contractor" ${step2Data.workerType === 'contractor' ? 'selected' : ''}>Contractor</option>
-                    </select>
+                    <div class="custom-dropdown" id="editWorkerTypeDropdown">
+                        <button type="button" class="dropdown-toggle" id="editWorkerTypeDropdownBtn">
+                            <span id="editWorkerTypeDropdownLabel">Select worker type</span>
+                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="editWorkerTypeDropdownMenu">
+                            <div class="dropdown-options-list" id="editWorkerTypeOptionsList">
+                                <!-- Worker types will be loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Worker ID</label>
+                    <input type="text" id="edit-worker-id" value="${step2Data.workerId || ''}" class="form-input" style="width: 100%;" placeholder="Worker ID">
                 </div>
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Position</label>
-                    <input type="text" id="edit-position" value="${positionName}" class="form-input" style="width: 100%;">
+                    <div class="position-selection-container" id="editPositionSelectionContainer">
+                        <!-- Organization structures will be loaded dynamically -->
+                    </div>
                 </div>
             </div>
         `;
         openEditSectionModal('Edit Employment Information', formHtml);
+        
+        // Initialize the worker type dropdown after modal is opened
+        initializeEditWorkerTypeDropdown(step2Data.workerType);
+        
+        // Initialize the position dropdowns after modal is opened
+        console.log('About to initialize position dropdowns with step2Data:', step2Data);
+        console.log('Step2Data keys:', Object.keys(step2Data));
+        console.log('Step2Data structure keys:', Object.keys(step2Data).filter(key => key.startsWith('structure-')));
+        
+        // Debug: Check what's actually in sessionStorage
+        console.log('sessionStorage step2Data:', sessionStorage.getItem('step2Data'));
+        console.log('sessionStorage employeeFormStep2:', sessionStorage.getItem('employeeFormStep2'));
+        
+        initializeEditPositionDropdowns(step2Data);
+        
         document.getElementById('editSectionModalSave').onclick = function() {
             const updatedData = {
                 ...step2Data,
-                workerType: document.getElementById('edit-worker-type').value,
+                workerType: document.getElementById('editWorkerTypeDropdownLabel').textContent === 'Select worker type' ? '' : document.getElementById('editWorkerTypeDropdownLabel').textContent,
+                workerId: document.getElementById('edit-worker-id').value,
             };
-            // Save position name back to all structure-*-name keys
+            // Save position data from dropdowns
+            const positionDropdowns = document.querySelectorAll('#editPositionSelectionContainer .position-dropdown-wrapper');
+            console.log('Found position dropdowns:', positionDropdowns.length);
+            
+            // Clear all existing structure data first
             Object.keys(updatedData).forEach(key => {
-                if (key.startsWith('structure-') && key.endsWith('-name')) {
-                    updatedData[key] = document.getElementById('edit-position').value;
+                if (key.startsWith('structure-')) {
+                    delete updatedData[key];
+                    console.log('Cleared existing structure data:', key);
                 }
             });
-            sessionStorage.setItem('employeeFormStep2', JSON.stringify(updatedData));
+            
+            positionDropdowns.forEach(wrapper => {
+                const structureId = wrapper.dataset.structureId;
+                console.log('Processing structure:', structureId, 'with selected items:', wrapper.selectedItems);
+                
+                if (wrapper.selectedItems && wrapper.selectedItems.length > 0) {
+                    // Save selected items individually (no concatenation)
+                    wrapper.selectedItems.forEach((item, index) => {
+                        updatedData[`structure-${structureId}-${index}`] = item.id;
+                        updatedData[`structure-${structureId}-${index}-name`] = item.name;
+                        console.log('Saving position:', item.name, 'with ID:', item.id, 'at index:', index);
+                    });
+                }
+            });
+            
+            console.log('Final updated data for step2:', updatedData);
+            
+            // Save to sessionStorage
+            sessionStorage.setItem('step2Data', JSON.stringify(updatedData));
+            console.log('Saved employment data to sessionStorage:', updatedData);
             
             // Update the display immediately
             updateEmploymentInfoDisplay(updatedData);
+            
+            // Show success message
+            showSaveSuccessMessage();
             
             closeEditSectionModal();
         };
@@ -2017,10 +2517,16 @@
                 employmentType: document.getElementById('edit-employment-type').value,
                 workSchedule: document.getElementById('edit-work-schedule').value
             };
+            
+            // Save to sessionStorage
             sessionStorage.setItem('employeeFormStep3', JSON.stringify(updatedData));
+            console.log('Saved compensation data to sessionStorage:', updatedData);
             
             // Update the display immediately
             updateCompensationScheduleDisplay(updatedData);
+            
+            // Show success message
+            showSaveSuccessMessage();
             
             closeEditSectionModal();
         };
@@ -2048,11 +2554,15 @@
                 employmentAgreement: document.getElementById('edit-employment-agreement').value
             };
             
-            // Update sessionStorage
+            // Save to sessionStorage
             sessionStorage.setItem('employeeFormStep4', JSON.stringify(updatedData));
+            console.log('Saved compliance data to sessionStorage:', updatedData);
             
             // Update the display immediately
             updateComplianceDisplay(updatedData);
+            
+            // Show success message
+            showSaveSuccessMessage();
             
             // Close modal
             closeEditSectionModal();
@@ -2065,7 +2575,18 @@
             <div style="text-align: left;">
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Group</label>
-                    <input type="text" id="edit-group" value="${step1Data.group || ''}" class="form-input" style="width: 100%;">
+                    <div class="custom-dropdown" id="editGroupDropdown">
+                        <button type="button" class="dropdown-toggle" id="editGroupDropdownBtn">
+                            <span id="editGroupDropdownLabel">Select group</span>
+                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="editGroupDropdownMenu">
+                            <div class="dropdown-options-list" id="editGroupOptionsList">
+                                <!-- Groups will be loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="edit-selected-group-id" value="${step1Data.selectedGroupId || ''}">
                 </div>
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a1a1a; font-size: 0.95rem;">Entity</label>
@@ -2075,19 +2596,26 @@
         `;
         openEditSectionModal('Edit Group & Entity', formHtml);
         
+        // Initialize the group dropdown
+        initializeEditGroupDropdown(step1Data.selectedGroupId);
+        
         // Set up save functionality
         document.getElementById('editSectionModalSave').onclick = function() {
             const updatedData = {
                 ...step1Data,
-                group: document.getElementById('edit-group').value,
+                selectedGroupId: document.getElementById('edit-selected-group-id').value,
                 entity: document.getElementById('edit-entity').value
             };
             
-            // Update sessionStorage
+            // Save to sessionStorage
             sessionStorage.setItem('employeeFormData', JSON.stringify(updatedData));
+            console.log('Saved group/entity data to sessionStorage:', updatedData);
             
             // Update the display immediately
             updateGroupEntityDisplay(updatedData);
+            
+            // Show success message
+            showSaveSuccessMessage();
             
             // Close modal
             closeEditSectionModal();
@@ -2107,7 +2635,10 @@
             }
         }
         
-    restoreAllFormData();
+        // Ensure data consistency across all steps
+        ensureDataConsistency();
+        
+        restoreAllFormData();
     });
 
     // Clear form data when user closes the form
@@ -2124,7 +2655,7 @@
         
         // Get all form data from sessionStorage
         const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
-        const step2Data = JSON.parse(sessionStorage.getItem('employeeFormStep2') || '{}');
+        const step2Data = JSON.parse(sessionStorage.getItem('step2Data') || '{}');
         const step3Data = JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}');
         const step4Data = JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}');
         
@@ -2219,20 +2750,23 @@
             
             if (isOpen) {
                 dropdownMenu.classList.remove('show');
+                dropdownMenu.classList.remove('show-above');
                 if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
             } else {
                 dropdownMenu.classList.add('show');
                 
                 // Check if dropdown would go below viewport and adjust position
-                const dropdownRect = dropdownMenu.getBoundingClientRect();
-                const viewportHeight = window.innerHeight;
-                const spaceBelow = viewportHeight - dropdownRect.bottom;
-                
-                if (spaceBelow < 50) { // If less than 50px space below
-                    dropdownMenu.classList.add('show-above');
-                } else {
-                    dropdownMenu.classList.remove('show-above');
-                }
+                setTimeout(() => {
+                    const dropdownRect = dropdownMenu.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const spaceBelow = viewportHeight - dropdownRect.bottom;
+                    
+                    if (spaceBelow < 50) { // If less than 50px space below
+                        dropdownMenu.classList.add('show-above');
+                    } else {
+                        dropdownMenu.classList.remove('show-above');
+                    }
+                }, 10);
                 
                 if (dropdownArrow) dropdownArrow.style.transform = 'rotate(180deg)';
             }
@@ -2276,6 +2810,471 @@
         }
     }
     
+    function initializeEditWorkerTypeDropdown(savedWorkerType) {
+        const dropdown = document.getElementById('editWorkerTypeDropdown');
+        const dropdownMenu = document.getElementById('editWorkerTypeDropdownMenu');
+        const dropdownLabel = document.getElementById('editWorkerTypeDropdownLabel');
+        const optionsList = document.getElementById('editWorkerTypeOptionsList');
+        
+        if (!dropdown || !dropdownMenu || !dropdownLabel || !optionsList) return;
+        
+        // Load worker types from API
+        fetch('/api/get-worker-types')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.worker_types) {
+                    // Clear existing options
+                    optionsList.innerHTML = '';
+                    
+                    // Add worker types from API
+                    data.worker_types.forEach(workerType => {
+                        const option = document.createElement('div');
+                        option.className = 'dropdown-option';
+                        option.dataset.value = workerType.id;
+                        option.innerHTML = `<div class="option-main">${workerType.template_name}</div>`;
+                        
+                        // Restore saved selection if it matches
+                        if (savedWorkerType == workerType.id || savedWorkerType === workerType.template_name) {
+                            option.classList.add('selected');
+                            dropdownLabel.textContent = workerType.template_name;
+                        }
+                        
+                        // Add click event
+                        option.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Remove selected class from all options
+                            optionsList.querySelectorAll('.dropdown-option').forEach(opt => {
+                                opt.classList.remove('selected');
+                            });
+                            
+                            // Add selected class to clicked option
+                            this.classList.add('selected');
+                            
+                            // Update dropdown label
+                            dropdownLabel.textContent = this.querySelector('.option-main').textContent;
+                            
+                            // Close dropdown
+                            closeEditWorkerTypeDropdown();
+                        });
+                        
+                        optionsList.appendChild(option);
+                    });
+                    
+                    console.log('Edit worker types loaded successfully');
+                } else {
+                    console.error('Failed to load worker types:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading worker types:', error);
+            });
+        
+        // Setup dropdown toggle functionality
+        dropdown.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            if (!isOpen) {
+                dropdownMenu.classList.add('show');
+                // Change arrow to up
+                const arrow = dropdown.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+            } else {
+                closeEditWorkerTypeDropdown();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                closeEditWorkerTypeDropdown();
+            }
+        });
+    }
+    
+    function closeEditWorkerTypeDropdown() {
+        const dropdown = document.getElementById('editWorkerTypeDropdown');
+        const dropdownMenu = document.getElementById('editWorkerTypeDropdownMenu');
+        const arrow = dropdown.querySelector('.dropdown-arrow');
+        
+        dropdownMenu.classList.remove('show');
+        arrow.src = '/static/images/angle-small-down.png';
+    }
+
+    function initializeEditPositionDropdowns(step2Data) {
+        const container = document.getElementById('editPositionSelectionContainer');
+        if (!container) return;
+
+        console.log('Initializing edit position dropdowns with data:', step2Data);
+        console.log('Step2Data structure keys found:', Object.keys(step2Data).filter(key => key.startsWith('structure-')));
+        console.log('Step2Data structure name keys:', Object.keys(step2Data).filter(key => key.startsWith('structure-') && key.endsWith('-name')));
+
+        // Load organization structures from API
+        fetch('/api/get-organization-structures')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.structures) {
+                    container.innerHTML = '';
+                    
+                    data.structures.forEach(structure => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'custom-dropdown position-dropdown-wrapper';
+                        wrapper.dataset.structureId = structure.id;
+                        wrapper.dataset.allowMultiple = structure.allow_multiple_assignments ? 'true' : 'false';
+                        
+                        wrapper.innerHTML = `
+                            <button type="button" class="dropdown-toggle position-dropdown-toggle" id="editPositionDropdownBtn${structure.id}">
+                                <div class="dropdown-content">
+                                    <span id="editPositionDropdownLabel${structure.id}" data-original-text="${structure.name} (optional)">${structure.name} (optional)</span>
+                                </div>
+                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu position-dropdown-menu" id="editPositionDropdownMenu${structure.id}">
+                                ${generatePositionOptions(structure.items || [])}
+                            </div>
+                            <input type="hidden" name="structure-${structure.id}" class="selected-items-input">
+                        `;
+                        
+                        container.appendChild(wrapper);
+                        
+                        // Initialize the dropdown functionality
+                        initializeSinglePositionDropdown(wrapper, step2Data);
+                    });
+                    
+                    console.log('Edit position dropdowns initialized successfully');
+                } else {
+                    console.error('Failed to load organization structures:', data);
+                    container.innerHTML = '<div style="color: #6c757d; font-style: italic;">No organization structures available</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading organization structures:', error);
+                container.innerHTML = '<div style="color: #6c757d; font-style: italic;">Error loading organization structures</div>';
+            });
+    }
+
+    function generatePositionOptions(items, level = 1) {
+        let html = '';
+        items.forEach(item => {
+            html += `
+                <div class="dropdown-option position-dropdown-item position-level-${level}" data-item-id="${item.id}" data-item-name="${item.name}">
+                    <div class="option-main">${item.name}</div>
+                    <img src="{{ url_for('static', filename='images/check.png') }}" class="checkmark" style="display: none; width: 16px; height: 16px;">
+                </div>
+            `;
+            if (item.children && item.children.length > 0) {
+                html += generatePositionOptions(item.children, level + 1);
+            }
+        });
+        return html;
+    }
+
+    function initializeSinglePositionDropdown(wrapper, step2Data) {
+        const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+        const menu = wrapper.querySelector('.dropdown-menu');
+        const items = wrapper.querySelectorAll('.dropdown-option');
+        const label = wrapper.querySelector('span[id^="editPositionDropdownLabel"]');
+        const hiddenInput = wrapper.querySelector('.selected-items-input');
+        const allowMultiple = wrapper.dataset.allowMultiple === 'true';
+        const structureId = wrapper.dataset.structureId;
+        
+        wrapper.selectedItems = [];
+        
+        // Restore saved selections
+        console.log('Restoring selections for structure', structureId, 'with data:', step2Data);
+        Object.keys(step2Data).forEach(key => {
+            if (key.startsWith(`structure-${structureId}-`) && key.endsWith('-name')) {
+                const itemName = step2Data[key];
+                console.log('Found position data:', key, '=', itemName);
+                
+                // Check if this is a comma-separated string (old format from step 2)
+                if (itemName.includes(',')) {
+                    console.log('Detected comma-separated string in step 5, splitting:', itemName);
+                    const itemNames = itemName.split(',').map(name => name.trim()).filter(name => name);
+                    console.log('Split item names:', itemNames);
+                    
+                    itemNames.forEach(splitItemName => {
+                        const itemElement = wrapper.querySelector(`[data-item-name="${splitItemName}"]`);
+                        console.log('Looking for item with name:', splitItemName, 'found:', itemElement);
+                        if (itemElement) {
+                            const actualItemId = itemElement.dataset.itemId;
+                            const actualItemName = itemElement.dataset.itemName;
+                            
+                            // Check if this item is already selected
+                            const existingIndex = wrapper.selectedItems.findIndex(item => item.id === actualItemId);
+                            if (existingIndex === -1) {
+                                wrapper.selectedItems.push({ id: actualItemId, name: actualItemName });
+                                console.log('Added item to selection:', actualItemName);
+                            }
+                            
+                            // Mark as selected
+                            itemElement.classList.add('selected');
+                            const checkmark = itemElement.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'block';
+                        } else {
+                            console.log('Item element not found for', splitItemName);
+                        }
+                    });
+                } else {
+                    // Single item name (new format from step 5)
+                    const itemElement = wrapper.querySelector(`[data-item-name="${itemName}"]`);
+                    console.log('Looking for item with name:', itemName, 'found:', itemElement);
+                    if (itemElement) {
+                        const actualItemId = itemElement.dataset.itemId;
+                        const actualItemName = itemElement.dataset.itemName;
+                        
+                        // Check if this item is already selected
+                        const existingIndex = wrapper.selectedItems.findIndex(item => item.id === actualItemId);
+                        if (existingIndex === -1) {
+                            wrapper.selectedItems.push({ id: actualItemId, name: actualItemName });
+                            console.log('Added item to selection:', actualItemName);
+                        }
+                        
+                        // Mark as selected
+                        itemElement.classList.add('selected');
+                        const checkmark = itemElement.querySelector('.checkmark');
+                        if (checkmark) checkmark.style.display = 'block';
+                    } else {
+                        console.log('Item element not found for', itemName);
+                    }
+                }
+            }
+        });
+        
+        // Update display with restored selections
+        console.log('Selected items before display update:', wrapper.selectedItems);
+        updateEditPositionDisplay(wrapper);
+        
+        // Toggle dropdown
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const isOpen = menu.classList.contains('show');
+            
+            if (isOpen) {
+                closeEditPositionDropdown(wrapper);
+            } else {
+                openEditPositionDropdown(wrapper);
+            }
+        });
+        
+        // Handle item selection
+        items.forEach(item => {
+            if (item.classList.contains('disabled')) return;
+            
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const itemId = this.dataset.itemId;
+                const itemName = this.dataset.itemName;
+                
+                if (allowMultiple) {
+                    // Multiple selection logic
+                    const existingIndex = wrapper.selectedItems.findIndex(selected => selected.id === itemId);
+                    
+                    if (existingIndex > -1) {
+                        // Remove item
+                        wrapper.selectedItems.splice(existingIndex, 1);
+                        this.classList.remove('selected');
+                        const checkmark = this.querySelector('.checkmark');
+                        if (checkmark) checkmark.style.display = 'none';
+                    } else {
+                        // Add item
+                        wrapper.selectedItems.push({ id: itemId, name: itemName });
+                        this.classList.add('selected');
+                        const checkmark = this.querySelector('.checkmark');
+                        if (checkmark) checkmark.style.display = 'block';
+                    }
+                } else {
+                    // Single selection logic
+                    wrapper.selectedItems = [{ id: itemId, name: itemName }];
+                    
+                    // Remove selected class from all items
+                    items.forEach(item => {
+                        item.classList.remove('selected');
+                        const checkmark = item.querySelector('.checkmark');
+                        if (checkmark) checkmark.style.display = 'none';
+                    });
+                    
+                    // Add selected class to clicked item
+                    this.classList.add('selected');
+                    const checkmark = this.querySelector('.checkmark');
+                    if (checkmark) checkmark.style.display = 'block';
+                }
+                
+                updateEditPositionDisplay(wrapper);
+                
+                if (!allowMultiple) {
+                    closeEditPositionDropdown(wrapper);
+                }
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!wrapper.contains(e.target)) {
+                closeEditPositionDropdown(wrapper);
+            }
+        });
+    }
+
+    function updateEditPositionDisplay(wrapper) {
+        const label = wrapper.querySelector('span[id^="editPositionDropdownLabel"]');
+        const toggleBtn = wrapper.querySelector('.dropdown-toggle');
+        
+        if (wrapper.selectedItems.length === 0) {
+            // No selection - show original placeholder
+            const originalText = label.getAttribute('data-original-text') || label.textContent;
+            label.textContent = originalText;
+            
+            // Remove tags container if it exists
+            const tagsContainer = wrapper.querySelector('.selected-tags-container');
+            if (tagsContainer) {
+                tagsContainer.remove();
+            }
+            
+            // Show the label
+            label.style.display = 'block';
+            
+            // Remove has-tags class from toggle button
+            toggleBtn.classList.remove('has-tags');
+        } else {
+            // One or more selections - show as tags
+            let tagsContainer = wrapper.querySelector('.selected-tags-container');
+            if (!tagsContainer) {
+                tagsContainer = document.createElement('div');
+                tagsContainer.className = 'selected-tags-container';
+                const dropdownContent = toggleBtn.querySelector('.dropdown-content');
+                dropdownContent.appendChild(tagsContainer);
+            }
+            tagsContainer.innerHTML = '';
+            
+            // Add has-tags class to toggle button
+            toggleBtn.classList.add('has-tags');
+            
+            wrapper.selectedItems.forEach(item => {
+                const tag = document.createElement('div');
+                tag.className = 'selected-tag';
+                tag.innerHTML = `
+                    <span class="tag-text">${item.name}</span>
+                    <span class="tag-remove" data-item-id="${item.id}">×</span>
+                `;
+                
+                // Add remove functionality to tag
+                tag.querySelector('.tag-remove').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const itemId = this.dataset.itemId;
+                    const itemIndex = wrapper.selectedItems.findIndex(selected => selected.id === itemId);
+                    
+                    if (itemIndex > -1) {
+                        // Remove from selectedItems array
+                        wrapper.selectedItems.splice(itemIndex, 1);
+                        
+                        // Remove selected class and hide checkmark from all dropdown options with this itemId
+                        const itemElements = wrapper.querySelectorAll(`[data-item-id="${itemId}"]`);
+                        itemElements.forEach(itemElement => {
+                            itemElement.classList.remove('selected');
+                            const checkmark = itemElement.querySelector('.checkmark');
+                            if (checkmark) checkmark.style.display = 'none';
+                        });
+                        
+                        // Update display
+                        updateEditPositionDisplay(wrapper);
+                    }
+                });
+                
+                tagsContainer.appendChild(tag);
+            });
+            
+            // Hide the label when showing tags
+            label.style.display = 'none';
+        }
+    }
+
+    function openEditPositionDropdown(wrapper) {
+        const menu = wrapper.querySelector('.dropdown-menu');
+        const arrow = wrapper.querySelector('.dropdown-arrow');
+        
+        menu.classList.add('show');
+        arrow.src = '/static/images/angle-small-up.png';
+    }
+
+    function closeEditPositionDropdown(wrapper) {
+        const menu = wrapper.querySelector('.dropdown-menu');
+        const arrow = wrapper.querySelector('.dropdown-arrow');
+        
+        menu.classList.remove('show');
+        arrow.src = '/static/images/angle-small-down.png';
+    }
+
+    function showSaveSuccessMessage() {
+        // Create a temporary success message
+        const successMessage = document.createElement('div');
+        successMessage.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            z-index: 5000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+        `;
+        successMessage.textContent = 'Changes saved successfully!';
+        
+        // Add animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(successMessage);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            successMessage.style.animation = 'slideOut 0.3s ease-in';
+            successMessage.style.transform = 'translateX(100%)';
+            successMessage.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(successMessage);
+                document.head.removeChild(style);
+            }, 300);
+        }, 3000);
+    }
+
+    function ensureDataConsistency() {
+        // This function ensures that data is consistent across all steps
+        // It can be called when navigating between steps
+        console.log('Ensuring data consistency across all steps...');
+        
+        // Log current sessionStorage state
+        const step1Data = JSON.parse(sessionStorage.getItem('employeeFormData') || '{}');
+        const step2Data = JSON.parse(sessionStorage.getItem('step2Data') || '{}');
+        const step3Data = JSON.parse(sessionStorage.getItem('employeeFormStep3') || '{}');
+        const step4Data = JSON.parse(sessionStorage.getItem('employeeFormStep4') || '{}');
+        
+        console.log('Current sessionStorage state:', {
+            step1: step1Data,
+            step2: step2Data,
+            step3: step3Data,
+            step4: step4Data
+        });
+    }
+
     function initializeEditCountryDropdown() {
         const dropdownBtn = document.getElementById('editCountryResidenceDropdownBtn');
         const dropdownMenu = document.getElementById('editCountryResidenceDropdownMenu');
@@ -2332,21 +3331,23 @@
             
             if (isOpen) {
                 dropdownMenu.classList.remove('show');
+                dropdownMenu.classList.remove('show-above');
                 if (dropdownArrow) dropdownArrow.style.transform = 'rotate(0deg)';
             } else {
                 dropdownMenu.classList.add('show');
-                populateCountries();
                 
                 // Check if dropdown would go below viewport and adjust position
-                const dropdownRect = dropdownMenu.getBoundingClientRect();
-                const viewportHeight = window.innerHeight;
-                const spaceBelow = viewportHeight - dropdownRect.bottom;
-                
-                if (spaceBelow < 50) { // If less than 50px space below
-                    dropdownMenu.classList.add('show-above');
-                } else {
-                    dropdownMenu.classList.remove('show-above');
-                }
+                setTimeout(() => {
+                    const dropdownRect = dropdownMenu.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const spaceBelow = viewportHeight - dropdownRect.bottom;
+                    
+                    if (spaceBelow < 50) { // If less than 50px space below
+                        dropdownMenu.classList.add('show-above');
+                    } else {
+                        dropdownMenu.classList.remove('show-above');
+                    }
+                }, 10);
                 
                 if (dropdownArrow) dropdownArrow.style.transform = 'rotate(180deg)';
             }
