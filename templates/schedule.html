@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule - HRM{% endblock %}
+
+{% block content %}
+<style>
+    .schedule-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+
+    .schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .schedule-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .schedule-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .date-navigation {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-btn {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .current-period {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        min-width: 200px;
+        text-align: center;
+    }
+
+    .add-schedule-btn {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .add-schedule-btn:hover {
+        background: #333;
+        transform: translateY(-1px);
+    }
+
+    .schedule-grid {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .schedule-table th {
+        background: #f8f9fa;
+        padding: 16px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 1px solid #e9ecef;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .schedule-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f1f3f4;
+        vertical-align: top;
+    }
+
+    .schedule-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .employee-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 200px;
+    }
+
+    .employee-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .employee-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .employee-name {
+        font-weight: 600;
+        color: #1a1a1a;
+        font-size: 0.95rem;
+    }
+
+    .employee-id {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .schedule-cell {
+        min-width: 120px;
+        height: 80px;
+        position: relative;
+    }
+
+    .schedule-block {
+        background: #e6f7ec;
+        border: 1px solid #1ca97a;
+        border-radius: 8px;
+        padding: 8px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .schedule-time {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #1ca97a;
+    }
+
+    .schedule-type {
+        font-size: 0.75rem;
+        color: #1ca97a;
+        font-weight: 500;
+    }
+
+    .weekend-header {
+        color: #dc3545;
+    }
+
+    .saturday-header {
+        color: #fd7e14;
+    }
+
+    .empty-cell {
+        background: #f8f9fa;
+        border: 1px dashed #dee2e6;
+        border-radius: 8px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 0.8rem;
+    }
+
+    .schedule-summary {
+        background: #f8f9fa;
+        padding: 16px 24px;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .summary-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .summary-stats {
+        display: flex;
+        gap: 24px;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .stat-number {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+
+<div class="schedule-container">
+    <div class="schedule-header">
+        <h1 class="schedule-title">Employee Schedule</h1>
+        <div class="schedule-controls">
+            <div class="date-navigation">
+                <button class="nav-btn" onclick="previousWeek()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                <span class="current-period" id="currentPeriod">July 1-13, 2025</span>
+                <button class="nav-btn" onclick="nextWeek()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+            <button class="add-schedule-btn" onclick="window.location.href='/create-schedule'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Add Schedule
+            </button>
+        </div>
+    </div>
+
+    <div class="schedule-grid">
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th class="saturday-header">Tue<br>01/07</th>
+                    <th class="saturday-header">Wed<br>02/07</th>
+                    <th class="saturday-header">Thu<br>03/07</th>
+                    <th class="saturday-header">Fri<br>04/07</th>
+                    <th class="saturday-header">Sat<br>05/07</th>
+                    <th class="weekend-header">Sun<br>06/07</th>
+                    <th class="saturday-header">Mon<br>07/07</th>
+                    <th class="saturday-header">Tue<br>08/07</th>
+                    <th class="saturday-header">Wed<br>09/07</th>
+                    <th class="saturday-header">Thu<br>10/07</th>
+                    <th class="saturday-header">Fri<br>11/07</th>
+                    <th class="saturday-header">Sat<br>12/07</th>
+                    <th class="weekend-header">Sun<br>13/07</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td>
+                        <div class="employee-info">
+                            <div class="employee-avatar">
+                                {% if employee.first_name and employee.last_name %}
+                                    {{ employee.first_name[0] }}{{ employee.last_name[0] }}
+                                {% else %}
+                                    {{ employee.name[0:2] if employee.name else 'U' }}
+                                {% endif %}
+                            </div>
+                            <div class="employee-details">
+                                <div class="employee-name">{{ employee.name }}</div>
+                                <div class="employee-id">MCC: {{ employee.id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    {% for day in range(1, 14) %}
+                    <td class="schedule-cell">
+                        {% if employee.id in [445, 49, 50, 51, 52] %}
+                            <div class="schedule-block">
+                                <div class="schedule-time">08:00 - 17:00</div>
+                                <div class="schedule-type">Ca HC</div>
+                            </div>
+                        {% else %}
+                            <div class="empty-cell">No schedule</div>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="schedule-summary">
+        <div class="summary-text">
+            Showing schedules for {{ employees|length }} employees
+        </div>
+        <div class="summary-stats">
+            <div class="stat-item">
+                <div class="stat-number">{{ employees|length }}</div>
+                <div class="stat-label">Total Employees</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ employees|selectattr('id', 'in', [445, 49, 50, 51, 52])|list|length }}</div>
+                <div class="stat-label">Scheduled</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ employees|rejectattr('id', 'in', [445, 49, 50, 51, 52])|list|length }}</div>
+                <div class="stat-label">Unscheduled</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentWeek = 0;
+    const weekStart = new Date('2025-07-01');
+
+    function updatePeriod() {
+        const startDate = new Date(weekStart);
+        startDate.setDate(startDate.getDate() + (currentWeek * 7));
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 13);
+        
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        const periodText = `${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { day: 'numeric', year: 'numeric' })}`;
+        document.getElementById('currentPeriod').textContent = periodText;
+    }
+
+    function previousWeek() {
+        currentWeek--;
+        updatePeriod();
+    }
+
+    function nextWeek() {
+        currentWeek++;
+        updatePeriod();
+    }
+
+    // Initialize
+    updatePeriod();
+</script>
+{% endblock %} 

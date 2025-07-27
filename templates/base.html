@@ -302,14 +302,14 @@
             }
         }
 
-        .dropdown-header {
+        .profile-dropdown .dropdown-header {
             padding: 1.5rem 1.25rem;
             border-bottom: 1px solid rgba(229, 231, 235, 0.8);
             background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
             border-radius: 12px 12px 0 0;
         }
 
-        .dropdown-header-name {
+        .profile-dropdown .dropdown-header-name {
             font-weight: 700;
             font-size: 1.1rem;
             color: #1f2937;
@@ -317,7 +317,7 @@
             letter-spacing: -0.025em;
         }
 
-        .dropdown-header-email {
+        .profile-dropdown .dropdown-header-email {
             font-size: 0.75rem;
             color: #6b7280;
             font-weight: 400;
@@ -335,11 +335,11 @@
             color: #666;
         }
 
-        .dropdown-content {
+        .profile-dropdown .dropdown-content {
             padding: 0.75rem 0;
         }
 
-        .dropdown-item {
+        .profile-dropdown .dropdown-item {
             display: flex;
             align-items: center;
             padding: 1rem 1.25rem;
@@ -350,19 +350,19 @@
             position: relative;
         }
 
-        .dropdown-item:hover {
+        .profile-dropdown .dropdown-item:hover {
             background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             color: #111827;
             transform: translateX(2px);
         }
 
-        .dropdown-item:hover svg,
-        .dropdown-item:hover img {
+        .profile-dropdown .dropdown-item:hover svg,
+        .profile-dropdown .dropdown-item:hover img {
             transform: scale(1.1);
             color: #4f46e5;
         }
 
-        .dropdown-item svg {
+        .profile-dropdown .dropdown-item svg {
             width: 20px;
             height: 20px;
             margin-right: 1rem;
@@ -370,7 +370,7 @@
             transition: all 0.2s ease-in-out;
         }
 
-        .dropdown-item img {
+        .profile-dropdown .dropdown-item img {
             width: 20px;
             height: 20px;
             margin-right: 1rem;
@@ -379,11 +379,11 @@
             filter: grayscale(20%);
         }
 
-        .dropdown-item:hover img {
+        .profile-dropdown .dropdown-item:hover img {
             filter: grayscale(0%);
         }
 
-        .dropdown-item .chevron-right {
+        .profile-dropdown .dropdown-item .chevron-right {
             width: 16px;
             height: 16px;
             margin-left: auto;
@@ -392,17 +392,17 @@
             transition: all 0.2s ease-in-out;
         }
 
-        .dropdown-item:hover .chevron-right {
+        .profile-dropdown .dropdown-item:hover .chevron-right {
             opacity: 1;
             transform: translateX(2px);
         }
 
-        .dropdown-item span {
+        .profile-dropdown .dropdown-item span {
             flex: 1;
             font-size: 0.95rem;
         }
 
-        .dropdown-divider {
+        .profile-dropdown .dropdown-divider {
             height: 1px;
             background: linear-gradient(90deg, transparent 0%, #e5e7eb 50%, transparent 100%);
             margin: 0.75rem 1.25rem;
@@ -736,7 +736,7 @@
             <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
             <a href="/members" class="nav-link {% if request.path == '/members' %}active{% endif %}">Members</a>
             <a href="#" class="nav-link {% if request.path == '/payroll' %}active{% endif %}">Payroll</a>
-            <a href="#" class="nav-link {% if request.path == '/schedule' %}active{% endif %}">Schedule</a>
+            <a href="/schedule" class="nav-link {% if request.path == '/schedule' %}active{% endif %}">Schedule</a>
             <a href="#" class="nav-link {% if request.path == '/pit' %}active{% endif %}">PIT</a>
             <a href="#" class="nav-link {% if request.path == '/vss' %}active{% endif %}">VSS</a>
         </div>

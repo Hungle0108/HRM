@@ -44,47 +44,385 @@
         transform: translateY(-1px);
     }
 
+    /* Filters box - matching groups page */
+    .filters-box {
+        background: white;
+        border-radius: 12px;
+        padding: 24px 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 20px;
+    }
+
     .filters-section {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
+        gap: 16px;
     }
 
-    .search-input {
-        padding: 0.75rem 1rem;
-        padding-left: 2.5rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        background: white;
-        width: 280px;
+    .filters-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
 
-    .search-input:focus {
-        outline: none;
-        border-color: #666;
-    }
-
-    .search-wrapper {
+    /* Filter dropdown button styles - matching groups page */
+    .status-filter, .worker-type-filter {
         position: relative;
     }
 
-    .search-wrapper .search-icon {
+    .status-filter .dropdown-toggle,
+    .worker-type-filter .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 120px;
+    }
+
+    .status-filter .dropdown-toggle:hover,
+    .worker-type-filter .dropdown-toggle:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .status-filter .dropdown-toggle.active,
+    .worker-type-filter .dropdown-toggle.active {
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .status-filter .dropdown-label,
+    .worker-type-filter .dropdown-label {
+        font-weight: 500;
+    }
+
+    .dropdown-spacer {
+        flex-grow: 1;
+        min-width: 20px;
+    }
+
+    .dropdown-arrow {
+        width: 12px;
+        height: 12px;
+        opacity: 0.7;
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .filter-badge {
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: 9999px;
+        margin-left: 6px;
+        display: inline-block;
+        min-width: 18px;
+        text-align: center;
+        position: relative;
+        z-index: 0;
+        flex-shrink: 0;
+        margin-right: 8px;
+    }
+
+    /* Dropdown menu styles */
+    .status-filter .dropdown-menu,
+    .worker-type-filter .dropdown-menu {
         position: absolute;
-        left: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
+        top: calc(100% + 8px);
+        left: 0;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        z-index: 1000;
+        width: 400px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .status-filter .dropdown-menu.show,
+    .worker-type-filter .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .status-filter .dropdown-header,
+    .worker-type-filter .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: none !important;
+    }
+
+    .status-filter .dropdown-title,
+    .worker-type-filter .dropdown-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .dropdown-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0.7;
+        transition: all 0.2s;
     }
 
-    .search-wrapper .search-icon svg {
-        width: 18px;
-        height: 18px;
+    .dropdown-close:hover {
+        background: #f8f9fa;
+        opacity: 1;
+    }
+
+    .dropdown-content {
+        padding: 0 20px;
+    }
+
+    .dropdown-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+        margin-bottom: 8px;
+    }
+
+    .dropdown-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-option:first-child {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 16px;
+    }
+
+    .dropdown-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .dropdown-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .dropdown-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .option-text {
+        font-size: 0.875rem;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    /* Make "Select all" text bolder */
+    #selectAllStatus + .option-text,
+    #selectAllWorkerTypes + .option-text {
+        font-weight: 600;
+    }
+
+    .dropdown-footer {
+        display: flex;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .btn-reset {
+        flex: 1;
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .btn-show-results {
+        flex: 1;
+        padding: 10px 16px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-show-results:hover {
+        background: #333;
+        border-color: #333;
+    }
+
+    /* Search container styles - matching groups page */
+    .search-container {
+        position: relative;
+        height: 44px;
+        width: 44px;
+        max-width: 300px;
+        transition: width 0.3s ease;
+        cursor: pointer;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Expanded state */
+    .search-container.expanded {
+        width: 300px;
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .search-container:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .search-container.expanded:hover {
+        background: white;
+        border-color: #80bdff;
+    }
+
+    .search-input {
+        width: 0;
+        padding: 0;
+        border: none !important;
+        outline: none !important;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        opacity: 0;
+        margin-left: 40px;
+        box-shadow: none !important;
+    }
+
+    /* Visible input in expanded state */
+    .search-container.expanded .search-input {
+        width: calc(100% - 50px);
+        padding: 10px 16px 10px 0;
+        opacity: 1;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .search-input:focus {
+        outline: none !important;
+        background: transparent;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+
+    .search-container.expanded .search-icon {
+        opacity: 0.8;
+    }
+
+    .search-icon:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 3;
+        display: none;
+    }
+
+    .search-clear-btn:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn.show {
+        display: block;
+        opacity: 0.6;
     }
 
     .filter-dropdown {
@@ -111,26 +449,48 @@
         border-color: #666;
     }
 
-    .action-buttons {
+    /* Action buttons group - matching groups page */
+    .action-buttons-group {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        margin-left: auto;
+        gap: 12px;
+    }
+
+    .customize-columns-btn {
+        padding: 10px 16px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .customize-columns-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
     }
 
     .action-btn {
-        padding: 0.75rem 1rem;
-        border: 1px solid #e0e0e0;
+        padding: 10px 16px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
         border-radius: 8px;
-        background: white;
-        font-size: 0.9rem;
-        color: #333;
+        font-size: 0.875rem;
+        font-weight: 500;
         cursor: pointer;
-        white-space: nowrap;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
     }
 
     .action-btn:hover {
-        background: #f5f5f5;
+        background: #333;
+        text-decoration: none;
+        color: white;
     }
 
     .view-toggle {
@@ -360,6 +720,18 @@
         line-height: 1.2;
     }
 
+    .employee-name-link {
+        color: #333;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .employee-name-link:hover {
+        color: #007bff;
+        text-decoration: underline;
+    }
+
     .member-details p {
         margin: 0.25rem 0 0 0;
         font-size: 0.85rem;
@@ -545,7 +917,7 @@
         display: block;
     }
 
-    .dropdown-item {
+    .header-dropdown .dropdown-item {
         padding: 10px 14px;
         font-size: 0.875rem;
         color: #374151;
@@ -558,28 +930,28 @@
         font-weight: 500;
     }
 
-    .dropdown-item:hover {
+    .header-dropdown .dropdown-item:hover {
         background-color: #f8fafc;
         color: #1f2937;
         padding-left: 16px;
     }
 
-    .dropdown-item:first-child {
+    .header-dropdown .dropdown-item:first-child {
         margin-top: 2px;
     }
 
-    .dropdown-item:last-child {
+    .header-dropdown .dropdown-item:last-child {
         margin-bottom: 2px;
     }
 
-    .dropdown-item img {
+    .header-dropdown .dropdown-item img {
         width: 14px;
         height: 14px;
         opacity: 0.7;
         transition: opacity 0.15s ease;
     }
 
-    .dropdown-item:hover img {
+    .header-dropdown .dropdown-item:hover img {
         opacity: 1;
     }
 
@@ -627,72 +999,337 @@
             justify-content: flex-end;
         }
     }
+
+    /* Modal overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Customize Columns Modal (from groups page) */
+    .customize-modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 400px;
+        background: white;
+        border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1020;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customize-modal.show {
+        transform: translateX(0);
+    }
+
+    .customize-modal-content {
+        background: white;
+        border-radius: 0;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .customize-modal-header {
+        padding: 24px 24px 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .customize-modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .customize-modal-body {
+        padding: 24px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        color: #6c757d;
+        transition: all 0.2s;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .close-btn:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .column-option {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .column-option:hover {
+        background: #f8f9fa;
+    }
+
+    .column-option:last-child {
+        margin-bottom: 0;
+    }
+
+    .select-all-option {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .column-checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 0;
+    }
+
+    .column-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .column-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .column-checkbox:indeterminate {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:indeterminate::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        background: white;
+        transform: translate(-50%, -50%);
+    }
+
+    .column-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+        margin-left: 12px;
+    }
+
+    .column-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-left: 12px;
+    }
+
+    .selection-count {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .customize-modal-footer {
+        display: flex;
+        gap: 12px;
+        padding: 16px 24px 24px 24px;
+        flex-shrink: 0;
+    }
+
+    .btn-reset, .btn-save {
+        flex: 1;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-reset {
+        background: white;
+        color: #495057;
+        border: 1px solid #e9ecef;
+    }
+
+    .btn-reset:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+    }
+
+    .btn-save {
+        background: #1a1a1a;
+        color: white;
+    }
+
+    .btn-save:hover {
+        background: #333;
+    }
 </style>
 
 <div class="main-content">
     <div class="page-header">
         <h1 class="page-title">Member</h1>
-        <button class="add-member-btn" onclick="window.location.href='/add-people'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 5v14M5 12h14"/>
-            </svg>
-            Add people
-        </button>
     </div>
 
+    <!-- Filters Box - matching groups page structure -->
+    <div class="filters-box">
     <div class="filters-section">
-        <div class="search-wrapper">
-            <div class="search-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="M21 21l-4.35-4.35"></path>
-                </svg>
+            <div class="filters-left">
+                <div class="search-container" id="searchContainer">
+                    <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                    <input type="text" class="search-input" placeholder="Search by name..." id="searchInput">
+                    <button class="search-clear-btn" id="searchClearBtn">
+                        <img src="/static/images/cross.png" alt="Clear" style="width: 16px; height: 16px;">
+                    </button>
             </div>
-            <input type="text" class="search-input" placeholder="Search by worker ID">
+                
+                <div class="status-filter">
+                    <button class="dropdown-toggle" id="statusDropdown">
+                        <span class="dropdown-label">Worker status</span>
+                        <span class="filter-badge" id="statusBadge" style="display:none;">0</span>
+                        <div class="dropdown-spacer"></div>
+                        <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                    </button>
+                    <div class="dropdown-menu" id="statusDropdownMenu">
+                        <div class="dropdown-header">
+                            <span class="dropdown-title">Worker status</span>
+                            <button class="dropdown-close" id="statusDropdownClose">
+                                <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                            </button>
+                        </div>
+                        <div class="dropdown-content">
+                            <label class="dropdown-option">
+                                <input type="checkbox" class="dropdown-checkbox" id="selectAllStatus" data-value="all">
+                                <span class="option-text">Select all</span>
+                            </label>
+                            <div class="dropdown-options-list" id="statusOptionsList">
+                                <label class="dropdown-option">
+                                    <input type="checkbox" class="dropdown-checkbox" data-value="ACTIVE">
+                                    <span class="option-text">Active</span>
+                                </label>
+                                <label class="dropdown-option">
+                                    <input type="checkbox" class="dropdown-checkbox" data-value="DRAFT">
+                                    <span class="option-text">Draft</span>
+                                </label>
+                                <label class="dropdown-option">
+                                    <input type="checkbox" class="dropdown-checkbox" data-value="INACTIVE">
+                                    <span class="option-text">Inactive</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <button class="btn-reset" id="resetStatusFilters">Reset</button>
+                            <button class="btn-show-results" id="showStatusResults">Show results</button>
+                        </div>
+                    </div>
         </div>
         
-        <select class="filter-dropdown">
-            <option>Worker status ⚠️</option>
-            <option>Active</option>
-            <option>Draft</option>
-            <option>Inactive</option>
-        </select>
-        
-        <select class="filter-dropdown">
-            <option>Worker type</option>
-            <option>Employee</option>
-            <option>Contractor</option>
-        </select>
-        
-        <select class="filter-dropdown">
-            <option>Job title</option>
-            <option>Software Engineer</option>
-            <option>Manager</option>
-        </select>
-        
-        <div class="action-buttons">
-            <button class="action-btn">View as report</button>
-            <button class="action-btn">Configure columns</button>
-            <button class="more-actions">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
-                </svg>
+                <div class="worker-type-filter">
+                    <button class="dropdown-toggle" id="workerTypeDropdown">
+                        <span class="dropdown-label">Worker type</span>
+                        <span class="filter-badge" id="workerTypeBadge" style="display:none;">0</span>
+                        <div class="dropdown-spacer"></div>
+                        <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
             </button>
-            <div class="view-toggle">
-                <button class="view-btn active">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18M3 12h18M3 18h18"/>
-                    </svg>
+                    <div class="dropdown-menu" id="workerTypeDropdownMenu">
+                        <div class="dropdown-header">
+                            <span class="dropdown-title">Worker type</span>
+                            <button class="dropdown-close" id="workerTypeDropdownClose">
+                                <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
                 </button>
-                <button class="view-btn">
+                        </div>
+                        <div class="dropdown-content">
+                            <label class="dropdown-option">
+                                <input type="checkbox" class="dropdown-checkbox" id="selectAllWorkerTypes" data-value="all">
+                                <span class="option-text">Select all</span>
+                            </label>
+                            <div class="dropdown-options-list" id="workerTypeOptionsList">
+                                <!-- Dynamic worker type options will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <button class="btn-reset" id="resetWorkerTypeFilters">Reset</button>
+                            <button class="btn-show-results" id="showWorkerTypeResults">Show results</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons-group">
+                <button class="customize-columns-btn" id="customizeColumnsBtn">Customize columns</button>
+                <button class="add-member-btn" onclick="window.location.href='/add-people'">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"/>
-                        <rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/>
-                        <rect x="3" y="14" width="7" height="7"/>
+                        <path d="M12 5v14M5 12h14"/>
                     </svg>
+                    Add people
                 </button>
             </div>
         </div>
@@ -750,7 +1387,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="member-details">
-                                        <h4>{{ employee.name }}</h4>
+                                        <h4><a href="/employee/{{ employee.id }}" class="employee-name-link">{{ employee.name }}</a></h4>
                                         <p>{{ employee.job_title or 'No title specified' }}</p>
                                     </div>
                                 </div>
@@ -800,6 +1437,73 @@
                     {% endif %}
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="modalOverlay"></div>
+
+<!-- Customize Columns Modal -->
+<div class="customize-modal" id="customizeModal">
+    <div class="customize-modal-content">
+        <div class="customize-modal-header">
+            <h3 class="customize-modal-title">Customize columns</h3>
+            <button class="close-btn" id="customizeCloseBtn">
+                <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+            </button>
+        </div>
+        
+        <div class="customize-modal-body">
+            <div class="column-option select-all-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" id="selectAllColumns">
+                    <div class="column-info">
+                        <span class="column-name">Select all</span>
+                        <span class="selection-count" id="selectionCount">5 / 5 selected</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="person" checked>
+                    <span class="column-name">Person</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="country" checked>
+                    <span class="column-name">Country</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="worker-type" checked>
+                    <span class="column-name">Worker type</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="worker-status" checked>
+                    <span class="column-name">Worker status</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="start-date" checked>
+                    <span class="column-name">Start date</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="customize-modal-footer">
+            <button class="btn-reset" id="customizeResetBtn">Reset</button>
+            <button class="btn-save" id="customizeSaveBtn">Save</button>
         </div>
     </div>
 </div>
@@ -875,6 +1579,11 @@
 
     // Close menus when clicking outside
     document.addEventListener('click', function(e) {
+        // Don't close if clicking on profile dropdown
+        if (e.target.closest('#profileDropdown') || e.target.closest('#profileButton')) {
+            return;
+        }
+        
         if (!e.target.closest('.actions-container')) {
             document.querySelectorAll('.action-menu').forEach(menu => {
                 menu.classList.remove('show');
@@ -1272,12 +1981,653 @@
         // Add customize columns functionality here
     }
 
+    // Search functionality - matching groups page
+    function initializeSearch() {
+        console.log('Initializing search...'); // Debug log
+        const searchContainer = document.getElementById('searchContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchIcon = document.getElementById('searchIcon');
+        const searchClearBtn = document.getElementById('searchClearBtn');
+
+        // Search container click handler
+        searchContainer.addEventListener('click', function() {
+            if (!this.classList.contains('expanded')) {
+                this.classList.add('expanded');
+                searchInput.focus();
+            }
+        });
+
+        // Search input handlers
+        searchInput.addEventListener('input', function() {
+            const hasValue = this.value.trim().length > 0;
+            searchClearBtn.classList.toggle('show', hasValue);
+            
+            // Filter table based on search term
+            updateTableViewWithFilters();
+        });
+
+        searchInput.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                searchContainer.classList.remove('expanded');
+            }
+        });
+
+        // Clear search button
+        searchClearBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            searchInput.value = '';
+            searchContainer.classList.remove('expanded');
+            this.classList.remove('show');
+            updateTableViewWithFilters();
+        });
+
+        // Click outside to collapse search
+        document.addEventListener('click', function(e) {
+            // Don't close if clicking on profile dropdown
+            if (e.target.closest('#profileDropdown') || e.target.closest('#profileButton')) {
+                return;
+            }
+            
+            if (!searchContainer.contains(e.target) && !searchInput.value.trim()) {
+                searchContainer.classList.remove('expanded');
+            }
+        });
+    }
+
+    // Store search term globally
+    let currentSearchTerm = '';
+
+    // Store selected items in Sets globally
+    let selectedStatuses = new Set();
+    let selectedWorkerTypes = new Set();
+
+    // Dropdown functionality - matching groups page
+    function initializeDropdowns() {
+        // Status dropdown
+        const statusDropdown = document.getElementById('statusDropdown');
+        const statusDropdownMenu = document.getElementById('statusDropdownMenu');
+        const statusDropdownClose = document.getElementById('statusDropdownClose');
+        const selectAllStatus = document.getElementById('selectAllStatus');
+        const resetStatusFilters = document.getElementById('resetStatusFilters');
+        const showStatusResults = document.getElementById('showStatusResults');
+        const statusOptionsList = document.getElementById('statusOptionsList');
+
+        // Worker type dropdown
+        const workerTypeDropdown = document.getElementById('workerTypeDropdown');
+        const workerTypeDropdownMenu = document.getElementById('workerTypeDropdownMenu');
+        const workerTypeDropdownClose = document.getElementById('workerTypeDropdownClose');
+        const workerTypeOptionsList = document.getElementById('workerTypeOptionsList');
+        const selectAllWorkerTypes = document.getElementById('selectAllWorkerTypes');
+        const resetWorkerTypeFilters = document.getElementById('resetWorkerTypeFilters');
+        const showWorkerTypeResults = document.getElementById('showWorkerTypeResults');
+
+        // Populate worker type dropdown with data from table
+        populateWorkerTypeDropdown();
+
+        // Status dropdown toggle
+        statusDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = statusDropdown.classList.contains('active');
+            
+            // Close all other dropdowns first
+            closeAllDropdowns();
+            
+            if (!isActive) {
+                statusDropdown.classList.add('active');
+                statusDropdownMenu.classList.add('show');
+                // Change arrow to up
+                const arrow = statusDropdown.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+                // Disable body scroll
+                document.body.classList.add('no-scroll');
+            }
+        });
+
+        // Worker type dropdown toggle
+        workerTypeDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = workerTypeDropdown.classList.contains('active');
+            
+            // Close all other dropdowns first
+            closeAllDropdowns();
+            
+            if (!isActive) {
+                workerTypeDropdown.classList.add('active');
+                workerTypeDropdownMenu.classList.add('show');
+                // Change arrow to up
+                const arrow = workerTypeDropdown.querySelector('.dropdown-arrow');
+                arrow.src = '/static/images/angle-small-up.png';
+                // Disable body scroll
+                document.body.classList.add('no-scroll');
+            }
+        });
+
+        // Close buttons
+        statusDropdownClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeStatusDropdown();
+        });
+
+        workerTypeDropdownClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeWorkerTypeDropdown();
+        });
+
+        // Select all functionality for status
+        selectAllStatus.addEventListener('change', function(e) {
+            e.stopPropagation();
+            const isChecked = this.checked;
+            const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+            
+            if (isChecked) {
+                selectedStatuses.clear();
+                statusCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedStatuses.add(checkbox.dataset.value);
+                });
+            } else {
+                selectedStatuses.clear();
+                statusCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            updateStatusDropdownLabel();
+        });
+
+        // Select all functionality for worker type
+        selectAllWorkerTypes.addEventListener('change', function(e) {
+            e.stopPropagation();
+            const isChecked = this.checked;
+            const workerTypeCheckboxes = workerTypeOptionsList.querySelectorAll('.dropdown-checkbox');
+            
+            if (isChecked) {
+                selectedWorkerTypes.clear();
+                workerTypeCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedWorkerTypes.add(checkbox.dataset.value);
+                });
+            } else {
+                selectedWorkerTypes.clear();
+                workerTypeCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            updateWorkerTypeDropdownLabel();
+        });
+
+        // Individual checkbox changes for status
+        const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+        statusCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                if (this.checked) {
+                    selectedStatuses.add(this.dataset.value);
+                } else {
+                    selectedStatuses.delete(this.dataset.value);
+                }
+                updateStatusDropdownLabel();
+                updateSelectAllStatusState();
+            });
+            
+            // Add click event to prevent propagation
+            checkbox.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Add click event to the parent option to prevent propagation
+            const parentOption = checkbox.closest('.dropdown-option');
+            if (parentOption) {
+                parentOption.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+
+        // Worker type checkbox changes (will be added dynamically)
+        workerTypeDropdownMenu.addEventListener('change', function(e) {
+            if (e.target.classList.contains('dropdown-checkbox') && e.target !== selectAllWorkerTypes) {
+                e.stopPropagation();
+                if (e.target.checked) {
+                    selectedWorkerTypes.add(e.target.dataset.value);
+                } else {
+                    selectedWorkerTypes.delete(e.target.dataset.value);
+                }
+                updateWorkerTypeDropdownLabel();
+                updateSelectAllWorkerTypesState();
+            }
+        });
+
+        // Reset buttons
+        resetStatusFilters.addEventListener('click', function() {
+            selectedStatuses.clear();
+            selectAllStatus.checked = false;
+            const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+            statusCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateStatusDropdownLabel();
+            
+            // Immediately update table and close popup
+            updateTableViewWithFilters();
+            closeAllDropdowns();
+        });
+
+        resetWorkerTypeFilters.addEventListener('click', function() {
+            selectedWorkerTypes.clear();
+            selectAllWorkerTypes.checked = false;
+            const workerTypeCheckboxes = workerTypeOptionsList.querySelectorAll('.dropdown-checkbox');
+            workerTypeCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateWorkerTypeDropdownLabel();
+            
+            // Immediately update table and close popup
+            updateTableViewWithFilters();
+            closeAllDropdowns();
+        });
+
+        // Show results buttons
+        showStatusResults.addEventListener('click', function() {
+            closeAllDropdowns();
+            updateTableViewWithFilters();
+        });
+
+        showWorkerTypeResults.addEventListener('click', function() {
+            closeAllDropdowns();
+            updateTableViewWithFilters();
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            // Don't close if clicking on profile dropdown
+            if (e.target.closest('#profileDropdown') || e.target.closest('#profileButton')) {
+                return;
+            }
+            
+            // Don't close if clicking on checkboxes or their labels
+            if (e.target.classList.contains('dropdown-checkbox') || 
+                e.target.closest('.dropdown-option') ||
+                e.target.closest('.dropdown-menu')) {
+                return;
+            }
+            
+            if (!statusDropdown.contains(e.target) && !statusDropdownMenu.contains(e.target) &&
+                !workerTypeDropdown.contains(e.target) && !workerTypeDropdownMenu.contains(e.target)) {
+                closeAllDropdownsGlobal();
+            }
+        });
+
+        function closeAllDropdowns() {
+            statusDropdownMenu.classList.remove('show');
+            statusDropdown.classList.remove('active');
+            workerTypeDropdownMenu.classList.remove('show');
+            workerTypeDropdown.classList.remove('active');
+        }
+
+        function closeAllDropdownsGlobal() {
+            closeStatusDropdown();
+            closeWorkerTypeDropdown();
+        }
+
+        function closeStatusDropdown() {
+            statusDropdown.classList.remove('active');
+            statusDropdownMenu.classList.remove('show');
+            const arrow = statusDropdown.querySelector('.dropdown-arrow');
+            arrow.src = '/static/images/angle-small-down.png';
+            document.body.classList.remove('no-scroll');
+        }
+
+        function closeWorkerTypeDropdown() {
+            workerTypeDropdown.classList.remove('active');
+            workerTypeDropdownMenu.classList.remove('show');
+            const arrow = workerTypeDropdown.querySelector('.dropdown-arrow');
+            arrow.src = '/static/images/angle-small-down.png';
+            document.body.classList.remove('no-scroll');
+        }
+
+        // Update dropdown labels
+        function updateStatusDropdownLabel() {
+            const badge = document.getElementById('statusBadge');
+            if (selectedStatuses.size === 0) {
+                badge.style.display = 'none';
+            } else {
+                badge.textContent = selectedStatuses.size;
+                badge.style.display = 'inline-block';
+            }
+        }
+
+        function updateWorkerTypeDropdownLabel() {
+            const badge = document.getElementById('workerTypeBadge');
+            if (selectedWorkerTypes.size === 0) {
+                badge.style.display = 'none';
+            } else {
+                badge.textContent = selectedWorkerTypes.size;
+                badge.style.display = 'inline-block';
+            }
+        }
+
+        // Update select all checkbox states
+        function updateSelectAllStatusState() {
+            const statusCheckboxes = statusOptionsList.querySelectorAll('.dropdown-checkbox');
+            const checkedCount = selectedStatuses.size;
+            const totalCount = statusCheckboxes.length;
+            
+            if (checkedCount === 0) {
+                selectAllStatus.checked = false;
+                selectAllStatus.indeterminate = false;
+            } else if (checkedCount === totalCount) {
+                selectAllStatus.checked = true;
+                selectAllStatus.indeterminate = false;
+            } else {
+                selectAllStatus.checked = false;
+                selectAllStatus.indeterminate = true;
+            }
+        }
+
+        function updateSelectAllWorkerTypesState() {
+            const workerTypeCheckboxes = workerTypeOptionsList.querySelectorAll('.dropdown-checkbox');
+            const checkedCount = selectedWorkerTypes.size;
+            const totalCount = workerTypeCheckboxes.length;
+            
+            if (checkedCount === 0) {
+                selectAllWorkerTypes.checked = false;
+                selectAllWorkerTypes.indeterminate = false;
+            } else if (checkedCount === totalCount) {
+                selectAllWorkerTypes.checked = true;
+                selectAllWorkerTypes.indeterminate = false;
+            } else {
+                selectAllWorkerTypes.checked = false;
+                selectAllWorkerTypes.indeterminate = true;
+            }
+        }
+
+        // Store selected filters for external access
+        window.getCurrentStatusFilter = function() {
+            return selectedStatuses;
+        };
+
+        window.getCurrentWorkerTypeFilter = function() {
+            return selectedWorkerTypes;
+        };
+
+        // Populate worker type dropdown with data from table
+        function populateWorkerTypeDropdown() {
+            const tbody = document.getElementById('membersBody');
+            const rows = tbody.querySelectorAll('tr');
+            const workerTypes = new Set();
+
+            // Collect all unique worker types from the table
+            rows.forEach(row => {
+                if (row.cells.length > 1) { // Skip empty state rows
+                    const workerTypeCell = row.cells[2]; // Worker type column
+                    if (workerTypeCell) {
+                        const workerType = workerTypeCell.textContent.trim();
+                        if (workerType && workerType !== 'Not specified') {
+                            workerTypes.add(workerType);
+                        }
+                    }
+                }
+            });
+
+            // Clear existing options (except select all)
+            workerTypeOptionsList.innerHTML = '';
+
+            // Add options for each unique worker type
+            workerTypes.forEach(workerType => {
+                const option = document.createElement('label');
+                option.className = 'dropdown-option';
+                option.innerHTML = `
+                    <input type="checkbox" class="dropdown-checkbox" data-value="${workerType}">
+                    <span class="option-text">${workerType}</span>
+                `;
+                workerTypeOptionsList.appendChild(option);
+            });
+
+            // If no worker types found, add a default option
+            if (workerTypes.size === 0) {
+                const option = document.createElement('label');
+                option.className = 'dropdown-option';
+                option.innerHTML = `
+                    <input type="checkbox" class="dropdown-checkbox" data-value="Employee">
+                    <span class="option-text">Employee</span>
+                `;
+                workerTypeOptionsList.appendChild(option);
+            }
+        }
+    }
+
+    // Update table view with filtering and search
+    function updateTableViewWithFilters() {
+        const tbody = document.getElementById('membersBody');
+        const rows = tbody.querySelectorAll('tr');
+        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+        
+        rows.forEach(row => {
+            if (row.cells.length > 1) { // Skip empty state rows
+                const statusCell = row.cells[3]; // Status column
+                const workerTypeCell = row.cells[2]; // Worker type column
+                const nameCell = row.querySelector('.member-details h4');
+                const name = nameCell ? nameCell.textContent.trim().toLowerCase() : '';
+                
+                let showRow = true;
+
+                // Apply search filter
+                if (searchTerm) {
+                    if (!name.includes(searchTerm)) {
+                        showRow = false;
+                    }
+                }
+
+                // Apply status filter - if nothing selected, show all
+                if (selectedStatuses.size > 0 && showRow) {
+                    const status = statusCell.textContent.trim().toLowerCase();
+                    showRow = false;
+                    for (const selectedStatus of selectedStatuses) {
+                        if (status.includes(selectedStatus.toLowerCase())) {
+                            showRow = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Apply worker type filter - if nothing selected, show all
+                if (selectedWorkerTypes.size > 0 && showRow) {
+                    const workerType = workerTypeCell.textContent.trim();
+                    showRow = false;
+                    for (const selectedWorkerType of selectedWorkerTypes) {
+                        if (workerType === selectedWorkerType) {
+                            showRow = true;
+                            break;
+                        }
+                    }
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            }
+        });
+    }
+
     // Initialize sorting when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Small delay to ensure all content is loaded
         setTimeout(() => {
             initializeSorting();
+            initializeSearch();
+            initializeDropdowns();
+            setupCustomizeModal();
         }, 100);
     });
+
+    // Customize columns functionality
+    document.getElementById('customizeColumnsBtn').addEventListener('click', function() {
+        openCustomizeModal();
+    });
+
+    function openCustomizeModal() {
+        const modal = document.getElementById('customizeModal');
+        const modalOverlay = document.getElementById('modalOverlay');
+        
+        modal.classList.add('show');
+        modalOverlay.classList.add('show');
+        
+        // Update selection count
+        updateSelectionCount();
+    }
+
+    function setupCustomizeModal() {
+        const modal = document.getElementById('customizeModal');
+        const closeBtn = document.getElementById('customizeCloseBtn');
+        const resetBtn = document.getElementById('customizeResetBtn');
+        const saveBtn = document.getElementById('customizeSaveBtn');
+        const selectAllCheckbox = document.getElementById('selectAllColumns');
+        const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+        const selectionCount = document.getElementById('selectionCount');
+
+        if (!modal || !closeBtn || !resetBtn || !saveBtn || !selectAllCheckbox || !selectionCount) {
+            console.log('Some customize modal elements not found, skipping setup');
+            return;
+        }
+
+        // Close modal function
+        function closeModal() {
+            modal.classList.remove('show');
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        // Close modal when clicking close button
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close modal when clicking overlay
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', function(e) {
+                if (modal.classList.contains('show') && e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Function to update table columns visibility
+        function updateTableColumns() {
+            const columnMapping = {
+                'person': 0,
+                'country': 1,
+                'worker-type': 2,
+                'worker-status': 3,
+                'start-date': 4
+                // Actions column (index 5) is always visible
+            };
+            
+            const table = document.getElementById('membersTable');
+            const rows = table.querySelectorAll('tr');
+            
+            // Update header row
+            const headerRow = rows[0];
+            Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                const headerCell = headerRow.cells[columnIndex];
+                
+                if (checkbox && headerCell) {
+                    if (checkbox.checked) {
+                        headerCell.style.display = 'table-cell';
+                    } else {
+                        headerCell.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Update data rows
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                    const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                    const cell = row.cells[columnIndex];
+                    
+                    if (checkbox && cell) {
+                        if (checkbox.checked) {
+                            cell.style.display = 'table-cell';
+                        } else {
+                            cell.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            // Update empty state colspan
+            updateEmptyStateColspan();
+        }
+
+        // Function to calculate visible columns and update empty state colspan
+        function updateEmptyStateColspan() {
+            const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+            let visibleCount = 0;
+            
+            columnCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    visibleCount++;
+                }
+            });
+            
+            // Add 1 for the actions column which is always visible
+            const totalColspan = visibleCount + 1;
+            
+            // Update empty state row colspan
+            const emptyStateRow = document.querySelector('.no-members').closest('tr');
+            if (emptyStateRow) {
+                emptyStateRow.cells[0].colSpan = totalColspan;
+            }
+        }
+
+        // Function to update selection count
+        function updateSelectionCount() {
+            const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+            const checkedCount = Array.from(columnCheckboxes).filter(cb => cb.checked).length;
+            const totalCount = columnCheckboxes.length;
+            
+            selectionCount.textContent = `${checkedCount} / ${totalCount} selected`;
+            
+            // Update select all checkbox state
+            selectAllCheckbox.checked = checkedCount === totalCount;
+            selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+        }
+
+        // Select all checkbox functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            columnCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateSelectionCount();
+            updateTableColumns();
+        });
+
+        // Individual column checkbox functionality
+        columnCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectionCount();
+                updateTableColumns();
+            });
+        });
+
+        // Reset button functionality
+        resetBtn.addEventListener('click', function() {
+            columnCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+            updateSelectionCount();
+            updateTableColumns();
+        });
+
+        // Save button functionality
+        saveBtn.addEventListener('click', function() {
+            closeModal();
+            // Here you could save the column preferences to localStorage or send to server
+        });
+
+        // Initialize the modal state
+        updateSelectionCount();
+    }
 </script>
 {% endblock %} 

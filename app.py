@@ -348,6 +348,27 @@ def members():
     
     return render_template('members.html', user=user, organization=organization, employees=employees)
 
+@app.route('/employee/<int:employee_id>')
+def employee_detail(employee_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Get the employee details
+    employee = User.query.get(employee_id)
+    if not employee:
+        return redirect('/members')
+    
+    # Check if the employee belongs to the same organization
+    if employee.organization_id != user.organization_id:
+        return redirect('/members')
+    
+    return render_template('employee_detail.html', user=user, employee=employee)
+
 @app.route('/add-people')
 def add_people():
     if 'user_id' not in session:
@@ -2625,6 +2646,21 @@ def check_email():
     except Exception as e:
         logger.error(f"Error checking email: {str(e)}")
         return jsonify({'error': 'Failed to check email'}), 500
+
+@app.route('/schedule')
+def schedule():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    # Get all employees from the same organization
+    employees = User.query.filter_by(organization_id=user.organization_id).all()
+    
+    return render_template('schedule.html', user=user, employees=employees)
 
 @app.route('/api/create-employee', methods=['POST'])
 def create_employee():
