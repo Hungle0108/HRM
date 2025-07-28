@@ -49,6 +49,13 @@
         margin-left: 4px;
     }
 
+    /* Styling for "Not specified" text - matching step 5 */
+    .not-specified {
+        color: #6c757d;
+        font-style: italic;
+        font-weight: normal;
+    }
+
 
 
     .employee-detail-cards {
@@ -323,59 +330,94 @@
                     <span class="employee-card-title">Contract Information</span>
                     <button class="employee-card-edit-btn">Edit</button>
                 </div>
-                                 <div class="employee-card-row employee-name-row">
-                     <div class="employee-name-content">
-                         <div class="employee-name-status">
-                             <span class="employee-card-row-value">{{ employee.name }}</span>
-                             <span class="status-badge">ACTIVE</span>
-                             <button class="view-contract-btn">View contract</button>
-                         </div>
-                     </div>
-                 </div>
+
                 <div class="employee-card-row">
                     <span class="employee-card-row-label">Worker type</span>
-                    <span class="employee-card-row-value">{{ employee.job_title or 'Direct Employee' }}</span>
+                    <span class="employee-card-row-value">
+                        {% if employee.worker_type %}
+                            {{ employee.worker_type.template_name }}
+                        {% else %}
+                            <span class="not-specified">Not specified</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="employee-card-row">
+                    <span class="employee-card-row-label">Worker External ID</span>
+                    <span class="employee-card-row-value">{{ employee.worker_external_id or 'Not assigned' }}</span>
                 </div>
                 <div class="employee-card-row">
                     <span class="employee-card-row-label">Group</span>
-                    <span class="employee-card-row-value">{{ employee.department or 'fdsfsda' }}</span>
+                    <span class="employee-card-row-value">{{ employee.group.name if employee.group else 'Not assigned' }}</span>
                 </div>
-                <div class="employee-card-row">
-                    <span class="employee-card-row-label">Job title</span>
-                    <span class="employee-card-row-value">{{ employee.job_title or 'Not specified' }}</span>
-                </div>
-                <div class="employee-card-row">
-                    <span class="employee-card-row-label">Seniority</span>
-                    <span class="employee-card-row-value">{{ employee.seniority_level or 'Not specified' }}</span>
-                </div>
+
+
                 <div class="employee-card-row">
                     <span class="employee-card-row-label">Contract start date</span>
                     <span class="employee-card-row-value">
                         {{ employee.created_at.strftime('%b %d %Y') if employee.created_at else 'Jun 16th 2025' }}
-                        <img src="/static/images/info.png" alt="Info" class="employee-card-icon">
+                        <img src="/static/images/info (1).png" alt="Info" class="employee-card-icon">
                     </span>
                 </div>
                 <div class="employee-card-row">
                     <span class="employee-card-row-label">Contract end date</span>
-                    <span class="employee-card-row-value">Not specified</span>
+                    <span class="employee-card-row-value">
+                        <span class="not-specified">Not specified</span>
+                    </span>
                 </div>
                 <div class="employee-card-row">
                     <span class="employee-card-row-label">Organization entity</span>
                     <span class="employee-card-row-value">
-                        <a href="#" class="employee-card-link">KASACO JOINT STOCK COMPANY</a>
-                        <img src="/static/images/external-link.png" alt="External" class="employee-card-icon">
+                        {% if employee.organization and employee.organization.name %}
+                            <a href="#" class="employee-card-link">{{ employee.organization.name }}</a>
+                        {% else %}
+                            <span class="not-specified">Not specified</span>
+                        {% endif %}
+                        <img src="/static/images/arrow-turn-down-right.png" alt="External" class="employee-card-icon">
                     </span>
                 </div>
                 <div class="employee-card-row">
-                    <span class="employee-card-row-label">Country</span>
+                    <span class="employee-card-row-label">Citizenship</span>
                     <span class="employee-card-row-value">
-                        <img src="/static/images/flag.png" alt="Flag" class="employee-card-icon">
-                        {{ employee.tax_residence or 'Andorra' }}
+                        {% if employee.country_code %}
+                            <img src="https://flagicons.lipis.dev/flags/4x3/{{ employee.country_code.lower() }}.svg" 
+                                 alt="{{ employee.citizenship or 'Citizenship' }}" 
+                                 class="employee-card-icon"
+                                 style="width: 24px; height: 18px; border-radius: 2px; border: 1px solid #e9ecef;"
+                                 title="Citizenship: {{ employee.citizenship or 'Not specified' }}">
+                        {% else %}
+                            <img src="/static/images/building.png" alt="Flag" class="employee-card-icon">
+                        {% endif %}
+                        {% if employee.citizenship %}
+                            {{ employee.citizenship }}
+                        {% else %}
+                            <span class="not-specified">Not specified</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="employee-card-row">
+                    <span class="employee-card-row-label">Country of Residence</span>
+                    <span class="employee-card-row-value">
+                        {% if employee.residence_country_code %}
+                            <img src="https://flagicons.lipis.dev/flags/4x3/{{ employee.residence_country_code.lower() }}.svg" 
+                                 alt="{{ employee.tax_residence or 'Residence' }}" 
+                                 class="employee-card-icon"
+                                 style="width: 24px; height: 18px; border-radius: 2px; border: 1px solid #e9ecef;"
+                                 title="Residence: {{ employee.tax_residence or 'Not specified' }}">
+                        {% else %}
+                            <img src="/static/images/building.png" alt="Flag" class="employee-card-icon">
+                        {% endif %}
+                        {% if employee.tax_residence %}
+                            {{ employee.tax_residence }}
+                        {% else %}
+                            <span class="not-specified">Not specified</span>
+                        {% endif %}
                     </span>
                 </div>
                 <div class="employee-card-row">
                     <span class="employee-card-row-label">Annual gross salary</span>
-                    <span class="employee-card-row-value">Not specified</span>
+                    <span class="employee-card-row-value">
+                        <span class="not-specified">Not specified</span>
+                    </span>
                 </div>
             </div>
 

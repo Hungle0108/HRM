@@ -44,6 +44,16 @@ db.init_app(app)
 # Initialize Flask-Mail
 mail = Mail(app)
 
+# Custom Jinja2 filter to parse JSON
+@app.template_filter('from_json')
+def from_json_filter(value):
+    if value:
+        try:
+            return json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            return None
+    return None
+
 # User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,8 +66,7 @@ class User(db.Model):
     citizenship = db.Column(db.String(80))
     phone = db.Column(db.String(20))
     tax_residence = db.Column(db.String(80))
-    department = db.Column(db.String(80))
-    job_title = db.Column(db.String(80))
+    worker_external_id = db.Column(db.String(80))
     seniority_level = db.Column(db.String(80))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_completed = db.Column(db.Boolean, default=False)
@@ -66,6 +75,14 @@ class User(db.Model):
     avatar_url = db.Column(db.String(255))
     reset_token = db.Column(db.String(100), unique=True)
     reset_token_expiry = db.Column(db.DateTime)
+    worker_type_id = db.Column(db.Integer, db.ForeignKey('worker_type.id'))
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
+    country_code = db.Column(db.String(2))
+    residence_country_code = db.Column(db.String(2))
+    schedule_id = db.Column(db.Integer, db.ForeignKey('work_schedule.id'))
+    schedule = db.relationship('WorkSchedule', foreign_keys=[schedule_id], backref='assigned_employees')
+    worker_type = db.relationship('WorkerType', foreign_keys=[worker_type_id], backref='employees')
+    group = db.relationship('Group', foreign_keys=[group_id], backref='members')
 
     @property
     def name(self):
@@ -89,11 +106,16 @@ class User(db.Model):
             'citizenship': self.citizenship,
             'phone': self.phone,
             'tax_residence': self.tax_residence,
-            'department': self.department,
-            'job_title': self.job_title,
+            'worker_external_id': self.worker_external_id,
             'seniority_level': self.seniority_level,
             'organization_id': self.organization_id,
-            'avatar_url': self.avatar_url
+            'avatar_url': self.avatar_url,
+            'country_code': self.country_code,
+            'residence_country_code': self.residence_country_code,
+            'schedule_id': self.schedule_id,
+            'schedule_name': self.schedule.name if self.schedule else None,
+            'group_id': self.group_id,
+            'group_name': self.group.name if self.group else None
         }
 
 # Organization model
@@ -187,7 +209,7 @@ class WorkSchedule(db.Model):
     schedule_data = db.Column(db.Text, nullable=False)
     
     organization = db.relationship('Organization', backref='schedules')
-    creator = db.relationship('User', backref='created_schedules')
+    creator = db.relationship('User', foreign_keys=[created_by], backref='created_schedules')
     
     def to_dict(self):
         import json
@@ -249,13 +271,6 @@ class WorkSchedule(db.Model):
         
         working_days_str = ', '.join(sorted_working_days) if sorted_working_days else ''
         
-        # Try to get worker type name from schedule_data
-        worker_type_name = None
-        if 'workerTypeName' in schedule_data:
-            worker_type_name = schedule_data['workerTypeName']
-        elif 'worker_type_name' in schedule_data:
-            worker_type_name = schedule_data['worker_type_name']
-        
         return {
             'id': self.id,
             'name': self.name,
@@ -265,8 +280,7 @@ class WorkSchedule(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'total_hours': int(total_hours) if total_hours.is_integer() else total_hours,
             'working_days': working_days_str,
-            'schedule_data': schedule_data,
-            'worker_type_name': worker_type_name
+            'schedule_data': schedule_data
         }
 
 # Worker Type Model
@@ -279,7 +293,7 @@ class WorkerType(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     organization = db.relationship('Organization', backref='worker_types')
-    creator = db.relationship('User', backref='created_worker_types')
+    creator = db.relationship('User', foreign_keys=[created_by], backref='created_worker_types')
     
     def to_dict(self):
         # Convert UTC to GMT+7 (Asia/Bangkok timezone)
@@ -1949,13 +1963,7 @@ def create_schedule():
         session.pop('user_id', None)
         return redirect('/login')
     
-    worker_types = []
-    user_groups = []
-    if user.organization_id:
-        worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
-        user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
-    
-    return render_template('create_schedule.html', user=user, worker_types=worker_types, groups=user_groups)
+    return render_template('create_schedule.html', user=user)
 
 @app.route('/create-schedule-step2')
 def create_schedule_step2():
@@ -2048,13 +2056,21 @@ def api_delete_schedule(schedule_id):
         if not schedule:
             return jsonify({'error': 'Schedule not found'}), 404
 
+        # Find all employees assigned to this schedule and remove their assignment
+        employees_with_schedule = User.query.filter_by(schedule_id=schedule_id).all()
+        for employee in employees_with_schedule:
+            employee.schedule_id = None
+
         # Optionally, check if the user has permission to delete
         # For now, allow any user in the org to delete
 
         db.session.delete(schedule)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'Schedule deleted successfully'})
+        return jsonify({
+            'success': True, 
+            'message': f'Schedule deleted successfully and removed from {len(employees_with_schedule)} employees'
+        })
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to delete schedule'}), 500
@@ -2075,9 +2091,6 @@ def edit_schedule(schedule_id):
     prefill_data = json.loads(schedule.schedule_data)
     # Add top-level fields for robust prefill
     prefill_data['scheduleName'] = schedule.name
-    prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
-    prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
-    prefill_data['groupId'] = getattr(schedule, 'group_id', None) if hasattr(schedule, 'group_id') else prefill_data.get('groupId')
     prefill_data['workerTypeId'] = prefill_data.get('workerTypeId')
     # Ensure numberOfShifts is set correctly for the frontend dropdown
     def _count_shifts(sd):
@@ -2108,8 +2121,6 @@ def edit_schedule_step2(schedule_id):
     user = User.query.get(session['user_id'])
     prefill_data = json.loads(schedule.schedule_data)
     prefill_data['scheduleName'] = schedule.name
-    prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
-    prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     # Ensure numberOfShifts is set correctly for the frontend dropdown
     def _count_shifts(sd):
         try:
@@ -2141,8 +2152,6 @@ def edit_schedule_step3(schedule_id):
     user = User.query.get(session['user_id'])
     prefill_data = json.loads(schedule.schedule_data)
     prefill_data['scheduleName'] = schedule.name
-    prefill_data['workerType'] = getattr(schedule, 'worker_type', None)
-    prefill_data['workerTypeName'] = getattr(schedule, 'worker_type_name', None)
     return render_template('edit_schedule_step3.html', user=user, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/api/edit-schedule', methods=['POST'])
@@ -2657,10 +2666,13 @@ def schedule():
         session.pop('user_id', None)
         return redirect('/login')
 
-    # Get all employees from the same organization
-    employees = User.query.filter_by(organization_id=user.organization_id).all()
+    # Get all employees from the same organization with their schedules
+    employees = User.query.options(db.joinedload(User.schedule)).filter_by(organization_id=user.organization_id).all()
     
-    return render_template('schedule.html', user=user, employees=employees)
+    # Get all schedules for the organization
+    schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).all()
+    
+    return render_template('schedule.html', user=user, employees=employees, schedules=schedules)
 
 @app.route('/api/create-employee', methods=['POST'])
 def create_employee():
@@ -2682,6 +2694,12 @@ def create_employee():
         step2_data = data.get('step2', {})
         step3_data = data.get('step3', {})
         step4_data = data.get('step4', {})
+        
+        # Debug logging
+        logger.info(f"Step 1 data: {step1_data}")
+        logger.info(f"Step 2 data: {step2_data}")
+        logger.info(f"Step 3 data: {step3_data}")
+        logger.info(f"Step 4 data: {step4_data}")
         
         # Validate required fields
         if not step1_data.get('firstName') or not step1_data.get('lastName') or not step1_data.get('personalEmail'):
@@ -2706,11 +2724,87 @@ def create_employee():
         )
         
         # Add additional fields based on step data
-        if step2_data.get('workerType'):
-            new_employee.job_title = step2_data['workerType']
-        
         if step2_data.get('workerId'):
-            new_employee.department = step2_data['workerId']
+            new_employee.worker_external_id = step2_data['workerId']
+        
+        # Handle country codes
+        country_mappings = {
+            'Afghanistan': 'AF', 'Albania': 'AL', 'Algeria': 'DZ', 'Andorra': 'AD', 'Angola': 'AO',
+            'Antigua and Barbuda': 'AG', 'Argentina': 'AR', 'Armenia': 'AM', 'Australia': 'AU',
+            'Austria': 'AT', 'Azerbaijan': 'AZ', 'Bahamas': 'BS', 'Bahrain': 'BH', 'Bangladesh': 'BD',
+            'Barbados': 'BB', 'Belarus': 'BY', 'Belgium': 'BE', 'Belize': 'BZ', 'Benin': 'BJ',
+            'Bhutan': 'BT', 'Bolivia': 'BO', 'Bosnia and Herzegovina': 'BA', 'Botswana': 'BW',
+            'Brazil': 'BR', 'Brunei': 'BN', 'Bulgaria': 'BG', 'Burkina Faso': 'BF', 'Burundi': 'BI',
+            'Cabo Verde': 'CV', 'Cambodia': 'KH', 'Cameroon': 'CM', 'Canada': 'CA',
+            'Central African Republic': 'CF', 'Chad': 'TD', 'Chile': 'CL', 'China': 'CN',
+            'Colombia': 'CO', 'Comoros': 'KM', 'Congo': 'CG', 'Costa Rica': 'CR', 'Croatia': 'HR',
+            'Cuba': 'CU', 'Cyprus': 'CY', 'Czech Republic': 'CZ', 'Democratic Republic of the Congo': 'CD',
+            'Denmark': 'DK', 'Djibouti': 'DJ', 'Dominica': 'DM', 'Dominican Republic': 'DO',
+            'East Timor': 'TL', 'Ecuador': 'EC', 'Egypt': 'EG', 'El Salvador': 'SV',
+            'Equatorial Guinea': 'GQ', 'Eritrea': 'ER', 'Estonia': 'EE', 'Eswatini': 'SZ',
+            'Ethiopia': 'ET', 'Fiji': 'FJ', 'Finland': 'FI', 'France': 'FR', 'Gabon': 'GA',
+            'Gambia': 'GM', 'Georgia': 'GE', 'Germany': 'DE', 'Ghana': 'GH', 'Greece': 'GR',
+            'Grenada': 'GD', 'Guatemala': 'GT', 'Guinea': 'GN', 'Guinea-Bissau': 'GW', 'Guyana': 'GY',
+            'Haiti': 'HT', 'Honduras': 'HN', 'Hungary': 'HU', 'Iceland': 'IS', 'India': 'IN',
+            'Indonesia': 'ID', 'Iran': 'IR', 'Iraq': 'IQ', 'Ireland': 'IE', 'Israel': 'IL',
+            'Italy': 'IT', 'Ivory Coast': 'CI', 'Jamaica': 'JM', 'Japan': 'JP', 'Jordan': 'JO',
+            'Kazakhstan': 'KZ', 'Kenya': 'KE', 'Kiribati': 'KI', 'Kuwait': 'KW', 'Kyrgyzstan': 'KG',
+            'Laos': 'LA', 'Latvia': 'LV', 'Lebanon': 'LB', 'Lesotho': 'LS', 'Liberia': 'LR',
+            'Libya': 'LY', 'Liechtenstein': 'LI', 'Lithuania': 'LT', 'Luxembourg': 'LU',
+            'Madagascar': 'MG', 'Malawi': 'MW', 'Malaysia': 'MY', 'Maldives': 'MV', 'Mali': 'ML',
+            'Malta': 'MT', 'Marshall Islands': 'MH', 'Mauritania': 'MR', 'Mauritius': 'MU',
+            'Mexico': 'MX', 'Micronesia': 'FM', 'Moldova': 'MD', 'Monaco': 'MC', 'Mongolia': 'MN',
+            'Montenegro': 'ME', 'Morocco': 'MA', 'Mozambique': 'MZ', 'Myanmar': 'MM', 'Namibia': 'NA',
+            'Nauru': 'NR', 'Nepal': 'NP', 'Netherlands': 'NL', 'New Zealand': 'NZ', 'Nicaragua': 'NI',
+            'Niger': 'NE', 'Nigeria': 'NG', 'North Korea': 'KP', 'North Macedonia': 'MK', 'Norway': 'NO',
+            'Oman': 'OM', 'Pakistan': 'PK', 'Palau': 'PW', 'Panama': 'PA', 'Papua New Guinea': 'PG',
+            'Paraguay': 'PY', 'Peru': 'PE', 'Philippines': 'PH', 'Poland': 'PL', 'Portugal': 'PT',
+            'Qatar': 'QA', 'Romania': 'RO', 'Russia': 'RU', 'Rwanda': 'RW', 'Saint Kitts and Nevis': 'KN',
+            'Saint Lucia': 'LC', 'Saint Vincent and the Grenadines': 'VC', 'Samoa': 'WS',
+            'San Marino': 'SM', 'Sao Tome and Principe': 'ST', 'Saudi Arabia': 'SA', 'Senegal': 'SN',
+            'Serbia': 'RS', 'Seychelles': 'SC', 'Sierra Leone': 'SL', 'Singapore': 'SG', 'Slovakia': 'SK',
+            'Slovenia': 'SI', 'Solomon Islands': 'SB', 'Somalia': 'SO', 'South Africa': 'ZA',
+            'South Korea': 'KR', 'South Sudan': 'SS', 'Spain': 'ES', 'Sri Lanka': 'LK', 'Sudan': 'SD',
+            'Suriname': 'SR', 'Sweden': 'SE', 'Switzerland': 'CH', 'Syria': 'SY', 'Taiwan': 'TW',
+            'Tajikistan': 'TJ', 'Tanzania': 'TZ', 'Thailand': 'TH', 'Togo': 'TG', 'Tonga': 'TO',
+            'Trinidad and Tobago': 'TT', 'Tunisia': 'TN', 'Turkey': 'TR', 'Turkmenistan': 'TM',
+            'Tuvalu': 'TV', 'Uganda': 'UG', 'Ukraine': 'UA', 'United Arab Emirates': 'AE',
+            'United Kingdom': 'GB', 'United States': 'US', 'Uruguay': 'UY', 'Uzbekistan': 'UZ',
+            'Vanuatu': 'VU', 'Vatican City': 'VA', 'Venezuela': 'VE', 'Vietnam': 'VN', 'Yemen': 'YE',
+            'Zambia': 'ZM', 'Zimbabwe': 'ZW'
+        }
+        
+        # Assign citizenship country code
+        citizenship = step1_data.get('citizenship', '').strip()
+        if citizenship and citizenship in country_mappings:
+            new_employee.country_code = country_mappings[citizenship]
+        else:
+            new_employee.country_code = None
+            
+        # Assign residence country code
+        residence = step1_data.get('residence', '').strip()
+        if residence and residence in country_mappings:
+            new_employee.residence_country_code = country_mappings[residence]
+        else:
+            new_employee.residence_country_code = None
+        
+        # Handle schedule assignment from step 3
+        logger.info(f"Checking for workSchedule in step3_data: {step3_data.get('workSchedule')}")
+        if step3_data.get('workSchedule'):
+            schedule_id = step3_data['workSchedule']
+            logger.info(f"Found schedule_id: {schedule_id}")
+            # Verify the schedule exists and belongs to the organization
+            schedule = WorkSchedule.query.filter_by(
+                id=schedule_id, 
+                organization_id=user.organization_id
+            ).first()
+            if schedule:
+                new_employee.schedule_id = schedule_id
+                logger.info(f"Assigned schedule {schedule.name} to employee {new_employee.email}")
+            else:
+                logger.warning(f"Schedule {schedule_id} not found or doesn't belong to organization {user.organization_id}")
+        else:
+            logger.warning("No workSchedule found in step3_data")
         
         # Store additional employment data in a structured way
         # For now, we'll store some key information in existing fields
@@ -2721,6 +2815,7 @@ def create_employee():
         db.session.commit()
         
         logger.info(f"Created new employee: {new_employee.email} by user: {user.email}")
+        logger.info(f"Employee schedule_id: {new_employee.schedule_id}")
         
         return jsonify({
             'success': True,
@@ -2733,6 +2828,96 @@ def create_employee():
         db.session.rollback()
         logger.error(f"Error creating employee: {str(e)}")
         return jsonify({'error': 'Failed to create employee'}), 500
+
+@app.route('/api/update-employee-schedule', methods=['POST'])
+def update_employee_schedule():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        employee_id = data.get('employee_id')
+        schedule_id = data.get('schedule_id')  # Can be None to remove assignment
+        
+        # Find the employee
+        employee = User.query.filter_by(
+            id=employee_id,
+            organization_id=user.organization_id
+        ).first()
+        
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+        
+        # Update the employee's schedule
+        employee.schedule_id = schedule_id
+        db.session.commit()
+        
+        # Get schedule name for response
+        schedule_name = None
+        if schedule_id:
+            schedule = WorkSchedule.query.get(schedule_id)
+            if schedule:
+                schedule_name = schedule.name
+        
+        return jsonify({
+            'success': True,
+            'message': f'Employee schedule updated successfully',
+            'schedule_name': schedule_name
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating employee schedule: {str(e)}")
+        return jsonify({'error': 'Failed to update employee schedule'}), 500
+
+@app.route('/api/delete-employee/<int:employee_id>', methods=['DELETE'])
+def delete_employee(employee_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    if not user.organization_id:
+        return jsonify({'error': 'User must belong to an organization'}), 400
+    
+    try:
+        # Get the employee to delete
+        employee = User.query.get(employee_id)
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+        
+        # Check if employee belongs to the same organization
+        if employee.organization_id != user.organization_id:
+            return jsonify({'error': 'Unauthorized to delete this employee'}), 403
+        
+        # Prevent self-deletion
+        if employee.id == user.id:
+            return jsonify({'error': 'Cannot delete yourself'}), 400
+        
+        # Delete the employee
+        db.session.delete(employee)
+        db.session.commit()
+        
+        logger.info(f"Deleted employee: {employee.email} by user: {user.email}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Employee deleted successfully'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting employee: {str(e)}")
+        return jsonify({'error': 'Failed to delete employee'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

@@ -728,8 +728,7 @@
     }
 
     .employee-name-link:hover {
-        color: #007bff;
-        text-decoration: underline;
+        color: #8b5cf6;
     }
 
     .member-details p {
@@ -747,15 +746,33 @@
     }
 
     .flag-icon {
-        width: 20px;
-        height: 14px;
+        width: 24px;
+        height: 18px;
         border-radius: 2px;
-        background: #ddd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
+        object-fit: cover;
         flex-shrink: 0;
+        border: 1px solid #e9ecef;
+    }
+
+    .flag-placeholder {
+        width: 24px;
+        height: 18px;
+        border-radius: 2px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        flex-shrink: 0;
+    }
+
+    .country-name {
+        font-size: 0.875rem;
+        color: #495057;
+    }
+
+    /* Styling for "Not specified" text - matching step 5 */
+    .not-specified {
+        color: #6c757d;
+        font-style: italic;
+        font-weight: normal;
     }
 
     .status-badge {
@@ -1232,6 +1249,140 @@
     .btn-save:hover {
         background: #333;
     }
+
+    /* Delete Modal Styles */
+    .delete-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .delete-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .delete-modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+
+    .delete-modal.show .delete-modal-content {
+        transform: scale(1);
+    }
+
+    .delete-modal-header {
+        margin-bottom: 24px;
+    }
+
+    .delete-icon {
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+
+    .delete-main-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .delete-modal-body {
+        margin-bottom: 32px;
+    }
+
+    .delete-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .delete-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .template-info {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .template-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .template-creator {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .delete-modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-cancel-delete {
+        padding: 12px 24px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel-delete:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .btn-delete-confirm {
+        padding: 12px 24px;
+        background: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-delete-confirm:hover {
+        background: #c82333;
+        border-color: #c82333;
+    }
+
+    .btn-delete-confirm:disabled {
+        background: #6c757d;
+        border-color: #6c757d;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="main-content">
@@ -1388,17 +1539,30 @@
                                     </div>
                                     <div class="member-details">
                                         <h4><a href="/employee/{{ employee.id }}" class="employee-name-link">{{ employee.name }}</a></h4>
-                                        <p>{{ employee.job_title or 'No title specified' }}</p>
+                                        <p>{{ employee.worker_type.template_name if employee.worker_type else 'No title specified' }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="country-flag">
-                                    <div class="flag-icon vietnam-flag"></div>
-                                    {{ employee.tax_residence or 'Not specified' }}
+                                    {% if employee.country_code %}
+                                        <img src="https://flagicons.lipis.dev/flags/4x3/{{ employee.country_code.lower() }}.svg" 
+                                             alt="{{ employee.citizenship or 'Country' }}" 
+                                             class="flag-icon"
+                                             title="{{ employee.citizenship or 'Country' }}">
+                                    {% else %}
+                                        <div class="flag-placeholder"></div>
+                                    {% endif %}
+                                    <span class="country-name">{{ employee.citizenship or 'Not specified' }}</span>
                                 </div>
                             </td>
-                            <td>{{ employee.job_title or 'Employee' }}</td>
+                            <td>
+                                {% if employee.worker_type %}
+                                    {{ employee.worker_type.template_name }}
+                                {% else %}
+                                    <span class="not-specified">Not specified</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 <span class="status-badge status-active">ACTIVE</span>
                             </td>
@@ -1607,17 +1771,23 @@
 
     function deleteEmployee(employeeId) {
         console.log('Delete employee with ID:', employeeId);
-        // Add delete functionality here - could show confirmation modal
-        if (confirm('Are you sure you want to delete this employee?')) {
-            // Proceed with deletion
-            // fetch(`/api/delete-employee/${employeeId}`, { method: 'DELETE' })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.success) {
-            //             // Remove from table or refresh page
-            //             location.reload();
-            //         }
-            //     });
+        
+        // Find the employee data to populate the modal
+        const employeeRow = document.querySelector(`tr[data-employee-id="${employeeId}"]`);
+        if (employeeRow) {
+            const nameElement = employeeRow.querySelector('.member-details h4');
+            const emailElement = employeeRow.querySelector('.member-details p');
+            
+            const employeeName = nameElement ? nameElement.textContent.trim() : 'Unknown Employee';
+            const employeeEmail = emailElement ? emailElement.textContent.trim() : 'No email';
+            
+            // Populate the delete modal
+            document.getElementById('deleteEmployeeName').textContent = employeeName;
+            document.getElementById('deleteEmployeeEmail').textContent = employeeEmail;
+            document.getElementById('deleteModal').setAttribute('data-employee-id', employeeId);
+            
+            // Show delete modal
+            document.getElementById('deleteModal').classList.add('show');
         }
     }
 
@@ -2629,5 +2799,142 @@
         // Initialize the modal state
         updateSelectionCount();
     }
+
+    // Delete Modal functionality
+    function setupDeleteModal() {
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        // Cancel delete
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('show');
+        });
+
+        // Confirm delete
+        confirmDeleteBtn.addEventListener('click', function() {
+            const employeeId = deleteModal.getAttribute('data-employee-id');
+            
+            if (employeeId) {
+                // Show loading state
+                confirmDeleteBtn.textContent = 'Deleting...';
+                confirmDeleteBtn.disabled = true;
+                
+                // Call delete API
+                fetch(`/api/delete-employee/${employeeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Employee deleted successfully:', employeeId);
+                        
+                        // Remove from table and originalData
+                        removeEmployeeFromTable(employeeId);
+                        
+                        // Close modal
+                        deleteModal.classList.remove('show');
+                        
+                        // Reset button
+                        confirmDeleteBtn.textContent = 'Delete';
+                        confirmDeleteBtn.disabled = false;
+                        
+                    } else {
+                        console.error('Delete failed:', data.error);
+                        alert('Error: ' + (data.error || 'Failed to delete employee'));
+                        
+                        // Reset button
+                        confirmDeleteBtn.textContent = 'Delete';
+                        confirmDeleteBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting employee:', error);
+                    alert('Error deleting employee. Please try again.');
+                    
+                    // Reset button
+                    confirmDeleteBtn.textContent = 'Delete';
+                    confirmDeleteBtn.disabled = false;
+                });
+            }
+        });
+
+        // Close modal when clicking outside
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('show');
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+                deleteModal.classList.remove('show');
+            }
+        });
+    }
+
+    function removeEmployeeFromTable(employeeId) {
+        console.log('Removing employee from table:', employeeId);
+        
+        // Find and remove from originalData
+        const index = originalData.findIndex(item => {
+            const row = item.element;
+            return row && row.getAttribute('data-employee-id') == employeeId;
+        });
+        
+        if (index !== -1) {
+            // Remove from originalData
+            originalData.splice(index, 1);
+            
+            // Remove from DOM
+            const row = document.querySelector(`tr[data-employee-id="${employeeId}"]`);
+            if (row) {
+                row.remove();
+                
+                // Check if table is now empty
+                const tbody = document.getElementById('membersBody');
+                const remainingRows = tbody.querySelectorAll('tr:not(.no-members)');
+                if (remainingRows.length === 0) {
+                    // Show empty state
+                    const emptyStateRow = tbody.querySelector('.no-members');
+                    if (emptyStateRow) {
+                        emptyStateRow.style.display = 'table-row';
+                    }
+                }
+            }
+        }
+    }
+
+    // Initialize delete modal when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        setupDeleteModal();
+    });
 </script>
+
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal" id="deleteModal">
+    <div class="delete-modal-content">
+        <div class="delete-modal-header">
+            <div class="delete-icon">
+                <img src="/static/images/delete.png" alt="Delete" class="delete-main-icon">
+            </div>
+        </div>
+        <div class="delete-modal-body">
+            <h3 class="delete-title">Delete employee</h3>
+            <p class="delete-message">Are you sure you want to delete this employee?</p>
+            <div class="template-info">
+                <div class="template-name" id="deleteEmployeeName"></div>
+                <div class="template-creator" id="deleteEmployeeEmail"></div>
+            </div>
+        </div>
+        <div class="delete-modal-footer">
+            <button class="btn-cancel-delete" id="cancelDeleteBtn">Cancel</button>
+            <button class="btn-delete-confirm" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
 {% endblock %} 

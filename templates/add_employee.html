@@ -371,6 +371,13 @@
             position: relative;
         }
 
+        .input-hint {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
         /* Info modal styles */
         .info-modal {
             display: none;
@@ -1964,9 +1971,13 @@
                         <div class="form-row">
                             <div class="form-group full-width">
                                 <div class="dropdown-wrapper">
-                                    <input type="text" class="form-input" id="employeeCitizenshipInput" placeholder="Employee's citizenship (optional)" autocomplete="off">
+                                    <input type="text" class="form-input" id="employeeCitizenshipInput" placeholder="Employee's citizenship (recommended for country flags)" autocomplete="off">
                                     <div class="dropdown-menu" id="employeeCitizenshipDropdown"></div>
+                                    <div class="input-info-icon" id="citizenshipInfoIcon">
+                                        <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="Info" width="16" height="16">
+                                    </div>
                                 </div>
+                                <div class="input-hint">Enter citizenship to display country flags in the members table</div>
                             </div>
                         </div>
 
@@ -2034,6 +2045,16 @@
             <h2 class="info-modal-title">Country of residence</h2>
             <p class="info-modal-text">This is the country where the employee will be working from. This information is important for tax and legal compliance purposes.</p>
             <button type="button" id="residenceInfoModalClose" class="info-modal-close">OK</button>
+        </div>
+    </div>
+
+    <!-- Info popup for citizenship -->
+    <div id="citizenshipInfoModal" class="info-modal">
+        <div class="info-modal-content">
+            <img src="{{ url_for('static', filename='images/information.png') }}" alt="Info">
+            <h2 class="info-modal-title">Citizenship</h2>
+            <p class="info-modal-text">Enter the employee's citizenship to display their country flag in the members table. This helps with visual identification and organization.</p>
+            <button type="button" id="citizenshipInfoModalClose" class="info-modal-close">OK</button>
         </div>
     </div>
 
@@ -2787,6 +2808,29 @@
             residenceInfoModal.addEventListener('click', function(e) {
                 if (e.target === residenceInfoModal) {
                     residenceInfoModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Info modal functionality for citizenship
+        const citizenshipInfoIcon = document.getElementById('citizenshipInfoIcon');
+        const citizenshipInfoModal = document.getElementById('citizenshipInfoModal');
+        const citizenshipInfoModalClose = document.getElementById('citizenshipInfoModalClose');
+
+        if (citizenshipInfoIcon && citizenshipInfoModal && citizenshipInfoModalClose) {
+            citizenshipInfoIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                citizenshipInfoModal.style.display = 'flex';
+            });
+
+            citizenshipInfoModalClose.addEventListener('click', function() {
+                citizenshipInfoModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside the content
+            citizenshipInfoModal.addEventListener('click', function(e) {
+                if (e.target === citizenshipInfoModal) {
+                    citizenshipInfoModal.style.display = 'none';
                 }
             });
         }

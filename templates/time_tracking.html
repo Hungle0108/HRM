@@ -1009,10 +1009,7 @@
                                     <span class="modal-info-label">Work schedule type</span>
                                     <span class="modal-info-value" id="info-type"></span>
                                 </div>
-                                <div class="modal-info-box">
-                                    <span class="modal-info-label">Worker type</span>
-                                    <span class="modal-info-value" id="info-worker-type"></span>
-                                </div>
+
                             </div>
                             <div class="modal-section modal-days" id="info-days-list">
                                 <!-- Days will be populated here -->
@@ -1081,9 +1078,7 @@
             document.getElementById('info-title').textContent = schedule.name || '';
             document.getElementById('info-hours').textContent = schedule.total_hours ? schedule.total_hours + ' hours' : '';
             document.getElementById('info-type').textContent = schedule.schedule_type ? (schedule.schedule_type.charAt(0).toUpperCase() + schedule.schedule_type.slice(1) + (schedule.schedule_type === 'fixed' ? ' work schedule' : '')) : '';
-            document.getElementById('info-worker-type').textContent = schedule.worker_type_name
-                ? schedule.worker_type_name
-                : (schedule.worker_type ? (schedule.worker_type.charAt(0).toUpperCase() + schedule.worker_type.slice(1) + ' worker') : '');
+
             // Days
             const daysList = document.getElementById('info-days-list');
             daysList.innerHTML = '<div class="modal-label" style="margin-bottom:0.5rem; font-weight: bold;">Daily workload detailing</div>';

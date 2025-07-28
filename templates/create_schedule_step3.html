@@ -677,14 +677,7 @@
                     </div>
                 </div>
 
-                <!-- Assigned Worker Types -->
-                <div class="form-section">
-                    <h3 class="section-title" style="margin-bottom: 16px;">Assigned worker types</h3>
-                    <div class="review-item-box">
-                        <span class="review-item-label">Worker types</span>
-                        <span id="reviewWorkerType" class="review-item-value">--</span>
-                    </div>
-                </div>
+
 
                 <!-- Working Hours -->
                 <div class="form-section">
@@ -709,7 +702,7 @@
                 <!-- Working Time Details -->
                 <div class="form-section">
                     <h3 class="section-title">Working time details</h3>
-                    <p class="section-description">Your weekly schedule configuration for this worker type.</p>
+                    <p class="section-description">Your weekly schedule configuration.</p>
                     
                     <div id="schedulePreviewContainer">
                         <!-- Schedule preview will be populated by JavaScript -->
@@ -722,7 +715,7 @@
                 <ol class="steps-list">
                     <li class="step-item completed">
                         <div class="step-number">1</div>
-                        <div class="step-text">Name and worker types</div>
+                        <div class="step-text">Name</div>
                     </li>
                     <li class="step-item completed">
                         <div class="step-number">2</div>
@@ -791,18 +784,7 @@
                 }
             }
             
-            if (data.workerTypeName) {
-                const workerTypeElement = document.getElementById('reviewWorkerType');
-                if (workerTypeElement) {
-                    workerTypeElement.textContent = data.workerTypeName;
-                }
-            } else if (data.workerType) {
-                const workerTypeText = data.workerType.charAt(0).toUpperCase() + data.workerType.slice(1);
-                const workerTypeElement = document.getElementById('reviewWorkerType');
-                if (workerTypeElement) {
-                    workerTypeElement.textContent = workerTypeText;
-                }
-            }
+
             
             // Display schedule details
             if (data.scheduleDetails) {
