@@ -1090,8 +1090,13 @@
                 Object.entries(shifts).forEach(([shiftNum, shift]) => {
                     if (shift.weekdays) {
                         let dayRows = '';
-                        Object.entries(shift.weekdays).forEach(([day, data]) => {
-                            if (data.checked) {
+                        // Define the order of weekdays from Monday to Sunday
+                        const weekdayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                        
+                        // Iterate through weekdays in the correct order
+                        weekdayOrder.forEach(day => {
+                            const data = shift.weekdays[day];
+                            if (data && data.checked) {
                                 let time = '';
                                 if (shift.includeTime && data.startTime && data.endTime) {
                                     time = `${data.startTime} - ${data.endTime}`;

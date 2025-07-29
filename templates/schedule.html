@@ -183,6 +183,55 @@
         flex: 1;
     }
 
+    .filters-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .add-member-btn {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .add-member-btn:hover {
+        background: #333;
+        transform: translateY(-1px);
+    }
+
+    .modal-btn {
+        flex: 1;
+        min-width: 0;
+        padding: 0.85rem 1.5rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+    }
+
+    .modal-btn-assign {
+        background: #f5f5f5;
+        color: #444;
+        border: none;
+    }
+
+    .modal-btn-assign:hover {
+        background: #e9e9e9;
+    }
+
     .search-container {
         position: relative;
         width: 50px;
@@ -497,38 +546,6 @@
 <div class="schedule-container">
     <div class="schedule-header">
         <h1 class="schedule-title">Employee Schedules</h1>
-        
-        <div class="action-buttons">
-            <button class="action-btn primary" onclick="window.location.href='/create-schedule'">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
-                + Create Schedule
-            </button>
-        </div>
-
-        <div class="date-navigation-section">
-            <div class="date-navigation">
-                <button class="nav-btn" onclick="previousWeek()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                </button>
-                <span class="current-period" id="currentPeriod">October 23 - 29, 2023</span>
-                <button class="nav-btn" onclick="nextWeek()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                </button>
-                <button class="today-btn" onclick="goToToday()">Today</button>
-            </div>
-            
-            <div class="view-options">
-                <button class="view-toggle" onclick="setView('day')">Day</button>
-                <button class="view-toggle active" onclick="setView('week')">Week</button>
-                <button class="view-toggle" onclick="setView('month')">Month</button>
-            </div>
-        </div>
     </div>
 
     <!-- Filters Box - matching group page structure -->
@@ -544,6 +561,17 @@
                 </div>
                 <button class="filter-btn" id="filterBtn">
                     <img src="/static/images/bars-filter.png" alt="Filter" style="width: 16px; height: 16px;">
+                </button>
+            </div>
+            <div class="filters-right">
+                <button class="modal-btn modal-btn-assign" onclick="window.location.href='/assign-workers'">
+                    Assign workers
+                </button>
+                <button class="add-member-btn" onclick="window.location.href='/create-schedule'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Create Schedule
                 </button>
             </div>
         </div>
@@ -1181,14 +1209,6 @@
                             </div>
                             <div class="employee-details">
                                 <div class="employee-name">{{ employee.name }}</div>
-                                <div class="employee-group">
-                                    {% if employee.group %}
-                                        {{ employee.group.name }}
-                                    {% else %}
-                                        Not assigned
-                                    {% endif %}
-                                </div>
-
                             </div>
                         </div>
                     </td>
@@ -1206,17 +1226,9 @@
                                         <div class="schedule-block">
                                             <div class="schedule-time">{{ day_data.startTime }} - {{ day_data.endTime }}</div>
                                         </div>
-                                    {% else %}
-                                        <div class="empty-cell">No schedule</div>
                                     {% endif %}
-                                {% else %}
-                                    <div class="empty-cell">No schedule</div>
                                 {% endif %}
-                            {% else %}
-                                <div class="empty-cell">No schedule</div>
                             {% endif %}
-                        {% else %}
-                            <div class="empty-cell">No schedule</div>
                         {% endif %}
                     </td>
                     {% endfor %}
@@ -1250,41 +1262,7 @@
 </div>
 
 <script>
-    let currentWeek = 0;
     let currentView = 'week';
-    const weekStart = new Date('2023-10-23');
-
-    function updatePeriod() {
-        const startDate = new Date(weekStart);
-        startDate.setDate(startDate.getDate() + (currentWeek * 7));
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + 6);
-        
-        const periodText = `${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { day: 'numeric', year: 'numeric' })}`;
-        document.getElementById('currentPeriod').textContent = periodText;
-    }
-
-    function previousWeek() {
-        currentWeek--;
-        updatePeriod();
-    }
-
-    function nextWeek() {
-        currentWeek++;
-        updatePeriod();
-    }
-
-    function goToToday() {
-        const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay() + 1);
-        
-        const diffTime = startOfWeek - weekStart;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        currentWeek = Math.floor(diffDays / 7);
-        
-        updatePeriod();
-    }
 
     function setView(view) {
         currentView = view;
@@ -1298,9 +1276,6 @@
         // Here you would typically reload the schedule data based on the view
         console.log('Switched to', view, 'view');
     }
-
-    // Initialize
-    updatePeriod();
 
     // Search functionality - matching members page
     function initializeSearch() {

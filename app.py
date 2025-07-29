@@ -2083,15 +2083,12 @@ def edit_schedule(schedule_id):
     if not schedule:
         return redirect('/settings/time-tracking')
     user = User.query.get(session['user_id'])
-    worker_types = []
     user_groups = []
     if user and user.organization_id:
-        worker_types = WorkerType.query.filter_by(organization_id=user.organization_id).order_by(WorkerType.created_at.desc()).all()
         user_groups = Group.query.filter_by(organization_id=user.organization_id).all()
     prefill_data = json.loads(schedule.schedule_data)
     # Add top-level fields for robust prefill
     prefill_data['scheduleName'] = schedule.name
-    prefill_data['workerTypeId'] = prefill_data.get('workerTypeId')
     # Ensure numberOfShifts is set correctly for the frontend dropdown
     def _count_shifts(sd):
         try:
@@ -2109,7 +2106,7 @@ def edit_schedule(schedule_id):
         print('DEBUG BACKEND: scheduleDetails:', prefill_data['scheduleDetails'])
         print('DEBUG BACKEND: numberOfShifts:', prefill_data['scheduleDetails']['numberOfShifts'])
         print('DEBUG BACKEND: numberOfShifts sent to template:', prefill_data['scheduleDetails']['numberOfShifts'])
-    return render_template('edit_schedule.html', user=user, worker_types=worker_types, groups=user_groups, prefill_data=prefill_data, schedule_id=schedule_id)
+    return render_template('edit_schedule.html', user=user, groups=user_groups, prefill_data=prefill_data, schedule_id=schedule_id)
 
 @app.route('/edit-schedule-step2/<int:schedule_id>')
 def edit_schedule_step2(schedule_id):

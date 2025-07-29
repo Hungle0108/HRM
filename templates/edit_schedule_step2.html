@@ -125,6 +125,11 @@
             border-radius: 12px;
             padding: 30px 25px;
             height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .sidebar-title {
@@ -140,10 +145,13 @@
             margin: 0;
         }
 
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
         .step-item {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
             font-size: 0.95rem;
         }
 
@@ -1452,14 +1460,12 @@
 
             <!-- Sidebar -->
             <div class="sidebar">
-                
-                
                 <ol class="steps-list">
                     <li class="step-item completed">
                         <div class="step-number">✓</div>
                         <div>
                             <div class="step-badge">Completed</div>
-                            <div class="step-text">Name and worker types</div>
+                            <div class="step-text">Name</div>
                         </div>
                     </li>
                     <li class="step-item active">
@@ -1505,7 +1511,26 @@
         // Prefill script for edit mode
         window.addEventListener('DOMContentLoaded', function() {
             console.log('DEBUG: DOMContentLoaded event fired in edit_schedule_step2.js');
+            
+            // Preserve schedule name from sessionStorage before clearing
+            const savedData = sessionStorage.getItem('scheduleFormData');
+            let preservedScheduleName = null;
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    preservedScheduleName = parsedData.scheduleName;
+                } catch (e) {
+                    console.log('Error parsing saved data:', e);
+                }
+            }
+            
+            // FULL RESET: Always clear sessionStorage and window.shiftData for this schedule
             sessionStorage.removeItem('scheduleFormData');
+            if (preservedScheduleName) {
+                sessionStorage.setItem('scheduleFormData', JSON.stringify({ scheduleName: preservedScheduleName }));
+            }
+            window.shiftData = undefined;
+            
             var prefill = {{ prefill_data | tojson | safe }};
             console.log('Prefill data:', prefill);
             // Always set window.shiftData only from this prefill
@@ -1985,8 +2010,23 @@
 
         // --- Main Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
+            // Preserve schedule name from sessionStorage before clearing
+            const savedData = sessionStorage.getItem('scheduleFormData');
+            let preservedScheduleName = null;
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    preservedScheduleName = parsedData.scheduleName;
+                } catch (e) {
+                    console.log('Error parsing saved data:', e);
+                }
+            }
+            
             // FULL RESET: Always clear sessionStorage and window.shiftData for this schedule
             sessionStorage.removeItem('scheduleFormData');
+            if (preservedScheduleName) {
+                sessionStorage.setItem('scheduleFormData', JSON.stringify({ scheduleName: preservedScheduleName }));
+            }
             window.shiftData = undefined;
             
             // Always set window.shiftData only from this prefill
