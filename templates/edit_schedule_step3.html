@@ -1126,7 +1126,20 @@ if (typeof saveFormStateToSession !== 'function') {
             return url.searchParams.get(name);
         }
         document.addEventListener('DOMContentLoaded', function() {
-            var data = {{ prefill_data|tojson|safe }};
+            // First try to load from sessionStorage (user's latest changes)
+            const savedData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            console.log('Step 3: Loaded saved data from sessionStorage:', savedData);
+            
+            // Use sessionStorage data if available, otherwise fall back to prefill data
+            let data = savedData;
+            if (!data || !data.scheduleDetails) {
+                // Fall back to prefill data from backend
+                data = {{ prefill_data|tojson|safe }};
+                console.log('Step 3: Using prefill data from backend:', data);
+            } else {
+                console.log('Step 3: Using sessionStorage data (user changes):', data);
+            }
+            
             if (!data) return;
             // Display basic information
             if (data.scheduleName) {

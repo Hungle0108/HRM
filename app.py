@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, redirect, session, make_response, render_template
+from flask import Flask, request, jsonify, send_from_directory, redirect, session, make_response, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
@@ -11,6 +11,9 @@ import traceback
 import base64
 import urllib.parse
 import json
+import sqlite3
+from datetime import datetime, timedelta
+import re
 
 app = Flask(__name__)
 
@@ -115,7 +118,8 @@ class User(db.Model):
             'schedule_id': self.schedule_id,
             'schedule_name': self.schedule.name if self.schedule else None,
             'group_id': self.group_id,
-            'group_name': self.group.name if self.group else None
+            'group_name': self.group.name if self.group else None,
+            'has_schedule': self.schedule_id is not None
         }
 
 # Organization model
@@ -2216,8 +2220,8 @@ def api_get_organization_workers():
     if not user or not user.organization_id:
         return jsonify({'error': 'User organization not found'}), 400
     try:
-        # Get all users in the organization
-        workers = User.query.filter_by(organization_id=user.organization_id).all()
+        # Get all users in the organization except the current user
+        workers = User.query.filter_by(organization_id=user.organization_id).filter(User.id != user.id).all()
         
         workers_data = []
         for worker in workers:
@@ -2227,8 +2231,13 @@ def api_get_organization_workers():
             workers_data.append({
                 'id': worker.id,
                 'name': worker.name,
+                'first_name': worker.first_name,
+                'last_name': worker.last_name,
                 'email': worker.email,
-                'is_admin': is_admin
+                'country_code': worker.country_code,
+                'residence_country_code': worker.residence_country_code,
+                'is_admin': is_admin,
+                'has_schedule': worker.schedule_id is not None
             })
         
         return jsonify({
@@ -2663,8 +2672,12 @@ def schedule():
         session.pop('user_id', None)
         return redirect('/login')
 
-    # Get all employees from the same organization with their schedules
-    employees = User.query.options(db.joinedload(User.schedule)).filter_by(organization_id=user.organization_id).all()
+    # Get all employees from the same organization with their schedules, groups, and worker types
+    employees = User.query.options(
+        db.joinedload(User.schedule),
+        db.joinedload(User.group),
+        db.joinedload(User.worker_type)
+    ).filter_by(organization_id=user.organization_id).all()
     
     # Get all schedules for the organization
     schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).all()
@@ -2874,6 +2887,67 @@ def update_employee_schedule():
         logger.error(f"Error updating employee schedule: {str(e)}")
         return jsonify({'error': 'Failed to update employee schedule'}), 500
 
+@app.route('/api/bulk-assign-schedule', methods=['POST'])
+def bulk_assign_schedule():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        employee_ids = data.get('employee_ids', [])
+        schedule_id = data.get('schedule_id')
+        
+        if not employee_ids:
+            return jsonify({'error': 'No employees provided'}), 400
+        
+        if not schedule_id:
+            return jsonify({'error': 'Schedule ID is required'}), 400
+        
+        # Verify the schedule exists and belongs to the organization
+        schedule = WorkSchedule.query.filter_by(
+            id=schedule_id,
+            organization_id=user.organization_id
+        ).first()
+        
+        if not schedule:
+            return jsonify({'error': 'Schedule not found'}), 404
+        
+        # Find all employees and update their schedules
+        employees = User.query.filter(
+            User.id.in_(employee_ids),
+            User.organization_id == user.organization_id
+        ).all()
+        
+        if not employees:
+            return jsonify({'error': 'No valid employees found'}), 404
+        
+        # Update schedules for all employees
+        updated_count = 0
+        for employee in employees:
+            employee.schedule_id = schedule_id
+            updated_count += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully assigned schedule "{schedule.name}" to {updated_count} employee(s)',
+            'updated_count': updated_count,
+            'schedule_name': schedule.name
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error bulk assigning schedule: {str(e)}")
+        return jsonify({'error': 'Failed to assign schedule to employees'}), 500
+
 @app.route('/api/delete-employee/<int:employee_id>', methods=['DELETE'])
 def delete_employee(employee_id):
     if 'user_id' not in session:
@@ -2915,6 +2989,65 @@ def delete_employee(employee_id):
         db.session.rollback()
         logger.error(f"Error deleting employee: {str(e)}")
         return jsonify({'error': 'Failed to delete employee'}), 500
+
+@app.route('/assign-workers')
+def assign_workers():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return redirect('/')
+    
+    # Get all workers in the organization except the current user
+    workers = User.query.filter_by(organization_id=user.organization_id).filter(User.id != user.id).all()
+    
+    # Get workers without schedules
+    workers_without_schedule = [w for w in workers if not w.schedule_id]
+    
+    # Get eligible workers (those without schedules)
+    eligible_workers = workers_without_schedule
+    
+    # Get groups for filtering
+    groups = Group.query.filter_by(organization_id=user.organization_id, status='ACTIVE').all()
+    
+    # Get schedules for selection
+    schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).all()
+    
+    # Convert to list for template
+    workers_list = []
+    for worker in workers:
+        worker_dict = worker.to_dict()
+        workers_list.append(worker_dict)
+    
+    # Convert schedules to list for template
+    schedules_list = []
+    for schedule in schedules:
+        schedules_list.append({
+            'id': schedule.id,
+            'name': schedule.name,
+            'schedule_type': schedule.schedule_type,
+            'is_default': schedule.is_default
+        })
+    
+    return render_template('assign_workers.html', 
+                         user=user, 
+                         workers=workers_list,
+                         groups=groups,
+                         schedules=schedules_list,
+                         workers_without_schedule=len(workers_without_schedule),
+                         eligible_workers_count=len(eligible_workers))
+
+@app.route('/assign-workers-step2')
+def assign_workers_step2():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return redirect(url_for('login'))
+    
+    return render_template('assign_workers_step2.html', user=user)
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1106,7 +1106,10 @@
                             }
                         });
                         if (dayRows) {
-                            if (shiftCount > 1) {
+                            // Only show "Shift X" label for fixed schedules with multiple shifts
+                            // Flexible schedules don't have shifts, so never show shift labels for them
+                            const shouldShowShiftLabel = schedule.schedule_type === 'fixed' && shiftCount > 1;
+                            if (shouldShowShiftLabel) {
                                 shiftSections += `<div style='margin-bottom:1.5rem;'><div class='modal-label' style='margin-bottom:0.5rem; font-weight: bold;'>Shift ${shiftIndex}</div>${dayRows}</div>`;
                             } else {
                                 shiftSections += `<div style='margin-bottom:1.5rem;'>${dayRows}</div>`;

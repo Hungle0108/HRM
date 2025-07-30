@@ -1531,19 +1531,41 @@
             }
             window.shiftData = undefined;
             
+            // Check if we have existing sessionStorage data first
+            const existingSessionData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            console.log('Existing sessionStorage data:', existingSessionData);
+            
             var prefill = {{ prefill_data | tojson | safe }};
             console.log('Prefill data:', prefill);
-            // Always set window.shiftData only from this prefill
-            if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
-                // If only one shift, keep only shift 1
-                if (prefill.scheduleDetails.numberOfShifts === 1) {
-                    prefill.scheduleDetails.shifts = { 1: prefill.scheduleDetails.shifts[1] || {} };
+            
+            // Only use prefill data if there's no existing sessionStorage data
+            if (!existingSessionData || !existingSessionData.scheduleDetails) {
+                console.log('No existing sessionStorage data, using prefill data');
+                // Always set window.shiftData only from this prefill
+                if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
+                    // If only one shift, keep only shift 1
+                    if (prefill.scheduleDetails.numberOfShifts === 1) {
+                        prefill.scheduleDetails.shifts = { 1: prefill.scheduleDetails.shifts[1] || {} };
+                    }
+                    window.shiftData = prefill.scheduleDetails.shifts;
+                    console.log('Window shiftData set from prefill:', window.shiftData);
+                } else {
+                    window.shiftData = { 1: {} };
+                    console.log('Window shiftData set to default:', window.shiftData);
                 }
-                window.shiftData = prefill.scheduleDetails.shifts;
-                console.log('Window shiftData set from prefill:', window.shiftData);
             } else {
-                window.shiftData = { 1: {} };
-                console.log('Window shiftData set to default:', window.shiftData);
+                console.log('Using existing sessionStorage data instead of prefill');
+                // Use existing sessionStorage data
+                if (existingSessionData.scheduleDetails && existingSessionData.scheduleDetails.shifts) {
+                    window.shiftData = existingSessionData.scheduleDetails.shifts;
+                    console.log('Window shiftData set from sessionStorage:', window.shiftData);
+                    
+                    // Load form values from sessionStorage data using the existing restoreFormState function
+                    restoreFormState();
+                } else {
+                    window.shiftData = { 1: {} };
+                    console.log('Window shiftData set to default (no shifts in sessionStorage):', window.shiftData);
+                }
             }
             if (prefill && prefill.scheduleDetails) {
                 // --- PATCH: Detect includeTime from first shift if not present at top level ---
@@ -1560,70 +1582,126 @@
                 var shiftPagination = document.getElementById('shiftPagination');
                 var dropdownSelected = document.getElementById('dropdownSelected');
                 var dropdownOptions = document.getElementById('dropdownOptions');
-                if (isFlexible) {
-                    if (specifyDurationToggle) {
-                        specifyDurationToggle.checked = true;
-                        specifyDurationToggle.disabled = true;
+                
+                // Only run prefill logic if we're using prefill data (not sessionStorage data)
+                if (!existingSessionData || !existingSessionData.scheduleDetails) {
+                    console.log('Running prefill logic to set form values');
+                    if (isFlexible) {
+                        if (specifyDurationToggle) {
+                            specifyDurationToggle.checked = true;
+                            specifyDurationToggle.disabled = true;
+                        }
+                        // Always show the includeTimeToggleSection when specifyDuration is ON
+                        if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'flex';
+                        if (shiftsDropdown) shiftsDropdown.style.display = 'none';
+                        if (shiftPagination) shiftPagination.style.display = 'none';
+                        ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
+                            var startInput = document.getElementById(day + '-start');
+                            var endInput = document.getElementById(day + '-end');
+                            var durInput = document.getElementById(day + '-duration-input');
+                            // By default, show duration input and hide time inputs (unless toggled)
+                            if (startInput) startInput.parentElement.parentElement.style.display = 'none';
+                            if (endInput) endInput.parentElement.parentElement.style.display = 'none';
+                            if (durInput) durInput.parentElement.parentElement.style.display = 'block';
+                        });
+                        
+                        // Pre-fill flexible schedule data
+                        var shift = prefill.scheduleDetails.shifts && prefill.scheduleDetails.shifts[1];
+                        if (shift && shift.weekdays) {
+                            ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
+                                var dayData = shift.weekdays[day] || {};
+                                var checkbox = document.getElementById(day);
+                                var durInput = document.getElementById(day + '-duration-input');
+                                var dayItem = checkbox ? checkbox.closest('.checkbox-item') : null;
+                                var durationUnit = dayItem ? dayItem.querySelector('.duration-unit') : null;
+                                var durationError = document.getElementById(day + '-duration-error');
+                                
+                                if (checkbox) {
+                                    // Check if the day is marked checked or has duration data
+                                    if (dayData.checked || dayData.duration) {
+                                        checkbox.checked = true;
+                                        checkbox.dispatchEvent(new Event('change'));
+                                    } else {
+                                        checkbox.checked = false;
+                                        checkbox.dispatchEvent(new Event('change'));
+                                    }
+                                }
+                                
+                                // Prefill duration values for each day
+                                if (durInput && dayData.duration) {
+                                    durInput.value = dayData.duration;
+                                    durInput.classList.add('has-value');
+                                    // Clear any error states since we have a valid value
+                                    durInput.classList.remove('error', 'warning');
+                                    if (durationError) durationError.classList.remove('show');
+                                    if (durationUnit) durationUnit.style.display = 'inline';
+                                }
+                            });
+                            
+                            // After pre-filling, update validation to ensure no false errors
+                            setTimeout(function() {
+                                if (typeof updateDurationValidation === 'function') {
+                                    updateDurationValidation();
+                                }
+                            }, 100);
+                        }
+                    } else if (isFixed) {
+                        if (specifyDurationToggle) {
+                            specifyDurationToggle.checked = true;
+                            specifyDurationToggle.disabled = true;
+                        }
+                        if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'flex';
+                        if (includeTimeToggle) {
+                            includeTimeToggle.checked = true;
+                            includeTimeToggle.disabled = true;
+                        }
+                        if (shiftsDropdown) shiftsDropdown.style.display = 'block';
+                        if (shiftPagination) shiftPagination.style.display = numShifts > 1 ? 'flex' : 'none';
+                        if (dropdownSelected) dropdownSelected.textContent = numShifts === 1 ? '1 shift' : `${numShifts} shifts`;
+                        if (dropdownOptions) {
+                            dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
+                                if (parseInt(opt.dataset.value) === numShifts) {
+                                    opt.classList.add('selected');
+                                } else {
+                                    opt.classList.remove('selected');
+                                }
+                                opt.style.display = 'block'; // Always show all options
+                            });
+                        }
+                        // --- PATCH: Set weekday checkboxes based on prefill data ---
+                        var shift = prefill.scheduleDetails.shifts && prefill.scheduleDetails.shifts[1];
+                        if (shift && shift.weekdays) {
+                            ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
+                                var dayData = shift.weekdays[day] || {};
+                                var checkbox = document.getElementById(day);
+                                if (checkbox) {
+                                    // Check if the day is marked checked or has start/end time data
+                                    if (dayData.checked || (dayData.startTime && dayData.endTime)) {
+                                        checkbox.checked = true;
+                                        checkbox.dispatchEvent(new Event('change'));
+                                    } else {
+                                        checkbox.checked = false;
+                                        checkbox.dispatchEvent(new Event('change'));
+                                    }
+                                }
+                                // Prefill start and end time values for each day
+                                var startInput = document.getElementById(day + '-start');
+                                var endInput = document.getElementById(day + '-end');
+                                if (startInput && dayData.startTime) startInput.value = dayData.startTime;
+                                if (endInput && dayData.endTime) endInput.value = dayData.endTime;
+                            });
+                            // After setting checkboxes and values, enforce correct visibility:
+                            updateInputVisibility();
+                        }
                     }
-                    if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'none';
-                    if (shiftsDropdown) shiftsDropdown.style.display = 'none';
-                    if (shiftPagination) shiftPagination.style.display = 'none';
-                    ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
-                        var startInput = document.getElementById(day + '-start');
-                        var endInput = document.getElementById(day + '-end');
-                        var durInput = document.getElementById(day + '-duration-input');
-                        if (startInput) startInput.parentElement.parentElement.style.display = 'none';
-                        if (endInput) endInput.parentElement.parentElement.style.display = 'none';
-                        if (durInput) durInput.parentElement.parentElement.style.display = 'block';
-                    });
-                } else if (isFixed) {
+                } else {
+                    console.log('Skipping prefill logic - using sessionStorage data instead');
+                    // Just set basic UI state without overwriting form values
                     if (specifyDurationToggle) {
                         specifyDurationToggle.checked = true;
                         specifyDurationToggle.disabled = true;
                     }
                     if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'flex';
-                    if (includeTimeToggle) {
-                        includeTimeToggle.checked = true;
-                        includeTimeToggle.disabled = true;
-                    }
-                    if (shiftsDropdown) shiftsDropdown.style.display = 'block';
-                    if (shiftPagination) shiftPagination.style.display = numShifts > 1 ? 'flex' : 'none';
-                    if (dropdownSelected) dropdownSelected.textContent = numShifts === 1 ? '1 shift' : `${numShifts} shifts`;
-                    if (dropdownOptions) {
-                        dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
-                            if (parseInt(opt.dataset.value) === numShifts) {
-                                opt.classList.add('selected');
-                            } else {
-                                opt.classList.remove('selected');
-                            }
-                            opt.style.display = 'block'; // Always show all options
-                        });
-                    }
-                    // --- PATCH: Set weekday checkboxes based on prefill data ---
-                    var shift = prefill.scheduleDetails.shifts && prefill.scheduleDetails.shifts[1];
-                    if (shift && shift.weekdays) {
-                        ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].forEach(function(day) {
-                            var dayData = shift.weekdays[day] || {};
-                            var checkbox = document.getElementById(day);
-                            if (checkbox) {
-                                // Check if the day is marked checked or has start/end time data
-                                if (dayData.checked || (dayData.startTime && dayData.endTime)) {
-                                    checkbox.checked = true;
-                                    checkbox.dispatchEvent(new Event('change'));
-                                } else {
-                                    checkbox.checked = false;
-                                    checkbox.dispatchEvent(new Event('change'));
-                                }
-                            }
-                            // Prefill start and end time values for each day
-                            var startInput = document.getElementById(day + '-start');
-                            var endInput = document.getElementById(day + '-end');
-                            if (startInput && dayData.startTime) startInput.value = dayData.startTime;
-                            if (endInput && dayData.endTime) endInput.value = dayData.endTime;
-                        });
-                        // After setting checkboxes and values, enforce correct visibility:
-                        updateInputVisibility();
-                    }
                 }
             }
             window.prefill = prefill;
@@ -1647,6 +1725,11 @@
                     const durInput = document.getElementById(`${day}-duration-input`);
                     console.log(`${day}: checkbox=${checkbox?.checked}, start=${startInput?.value}, end=${endInput?.value}, duration=${durInput?.value}`);
                 });
+                
+                // Final validation update to ensure no false errors for pre-filled values
+                if (typeof updateDurationValidation === 'function') {
+                    updateDurationValidation();
+                }
             }, 1000);
         });
 
@@ -1862,6 +1945,10 @@
                 shiftsDropdown.style.display = 'none';
                 console.log('DEBUG: shiftsDropdown set to none');
             }
+            // Ensure input visibility is updated for all days
+            if (typeof updateInputVisibility === 'function') {
+                updateInputVisibility();
+            }
         });
 
         // Function to update input visibility based on current toggle states
@@ -1886,21 +1973,56 @@
                 const dayItem = checkbox.closest('.checkbox-item');
                 const timeInputs = dayItem.querySelector('.time-inputs');
                 const durationInput = dayItem.querySelector('.duration-input');
+                const dayDuration = dayItem.querySelector('.day-duration');
                 
                 if (checkbox.checked && specifyDuration) {
                     if (includeTime) {
-                        // Show time inputs (start/end time), hide duration input
-                        if (timeInputs) timeInputs.style.display = 'flex';
-                        if (durationInput) durationInput.style.display = 'none';
+                        // Show time inputs (start/end time), hide duration input and summary
+                        if (timeInputs) {
+                            timeInputs.style.display = 'flex';
+                            const timeGroups = timeInputs.querySelectorAll('.time-input-group');
+                            timeGroups.forEach(group => group.style.display = 'flex');
+                        }
+                        if (durationInput) {
+                            durationInput.style.display = 'none';
+                            durationInput.value = '';
+                        }
+                        // Hide the duration summary
+                        if (dayDuration) dayDuration.style.display = 'none';
                     } else {
-                        // Show duration input, hide time inputs
-                        if (timeInputs) timeInputs.style.display = 'none';
+                        // Show duration input, hide time inputs, show summary
+                        if (timeInputs) {
+                            timeInputs.style.display = 'none';
+                            const timeGroups = timeInputs.querySelectorAll('.time-input-group');
+                            timeGroups.forEach(group => group.style.display = 'none');
+                            const startInput = dayItem.querySelector('.time-input[id$="-start"]');
+                            const endInput = dayItem.querySelector('.time-input[id$="-end"]');
+                            if (startInput) startInput.value = '';
+                            if (endInput) endInput.value = '';
+                        }
                         if (durationInput) durationInput.style.display = 'block';
+                        // Show and update the duration summary
+                        if (dayDuration) {
+                            dayDuration.style.display = '';
+                            dayDuration.textContent = durationInput && durationInput.value ? durationInput.value + ' hr' : '';
+                        }
                     }
                 } else {
-                    // Day not checked or specify duration is off - hide all inputs
-                    if (timeInputs) timeInputs.style.display = 'none';
-                    if (durationInput) durationInput.style.display = 'none';
+                    // Day not checked or specify duration is off - hide all inputs and summary
+                    if (timeInputs) {
+                        timeInputs.style.display = 'none';
+                        const timeGroups = timeInputs.querySelectorAll('.time-input-group');
+                        timeGroups.forEach(group => group.style.display = 'none');
+                        const startInput = dayItem.querySelector('.time-input[id$="-start"]');
+                        const endInput = dayItem.querySelector('.time-input[id$="-end"]');
+                        if (startInput) startInput.value = '';
+                        if (endInput) endInput.value = '';
+                    }
+                    if (durationInput) {
+                        durationInput.style.display = 'none';
+                        durationInput.value = '';
+                    }
+                    if (dayDuration) dayDuration.style.display = 'none';
                 }
             });
         }
@@ -2065,6 +2187,20 @@
                 el.addEventListener('change', updateContinueButtonState);
                 el.addEventListener('input', updateContinueButtonState);
                 el.addEventListener('click', updateContinueButtonState); // For dropdown
+                
+                // Also save data immediately when values change
+                el.addEventListener('change', () => {
+                    if (!isLoadingData) {
+                        saveCurrentShiftData();
+                        saveFormStateToSession();
+                    }
+                });
+                el.addEventListener('input', () => {
+                    if (!isLoadingData) {
+                        saveCurrentShiftData();
+                        saveFormStateToSession();
+                    }
+                });
             });
             
             // Initial button state update
@@ -2783,16 +2919,31 @@
                 if (checkbox.checked && isDurationMode) {
                     if (includeTimeToggle.checked) {
                         // Show time inputs for checked days when include time is on
-                        if (timeInputs) timeInputs.style.display = 'flex';
+                        if (timeInputs) {
+                            timeInputs.style.display = 'flex';
+                            // Show all .time-input-group children
+                            const timeGroups = timeInputs.querySelectorAll('.time-input-group');
+                            timeGroups.forEach(group => group.style.display = 'flex');
+                        }
                         if (durationInput) durationInput.style.display = 'none';
                 } else {
                         // Show duration inputs for checked days when include time is off
-                        if (timeInputs) timeInputs.style.display = 'none';
+                        if (timeInputs) {
+                            timeInputs.style.display = 'none';
+                            // Hide all .time-input-group children
+                            const timeGroups = timeInputs.querySelectorAll('.time-input-group');
+                            timeGroups.forEach(group => group.style.display = 'none');
+                        }
                         if (durationInput) durationInput.style.display = 'block';
                     }
                 } else {
                     // Hide all inputs for unchecked days or when duration mode is off
-                    if (timeInputs) timeInputs.style.display = 'none';
+                    if (timeInputs) {
+                        timeInputs.style.display = 'none';
+                        // Hide all .time-input-group children
+                        const timeGroups = timeInputs.querySelectorAll('.time-input-group');
+                        timeGroups.forEach(group => group.style.display = 'none');
+                    }
                     if (durationInput) durationInput.style.display = 'none';
                 }
             });
@@ -3067,44 +3218,20 @@
                         return;
                     }
                     console.log('Form is valid, saving and navigating');
+                    
+                    // Force save current form state immediately
+                    saveCurrentShiftData();
                     saveFormStateToSession();
-
-                    // Prepare data for backend
+                    
+                    // Debug: show what's being saved
+                    const savedData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                    console.log('Data being saved to sessionStorage:', savedData);
+                    
                     let scheduleId = {{ schedule_id|tojson }};
-                    let data = JSON.parse(sessionStorage.getItem('scheduleFormData')) || {};
-                    data.id = scheduleId;
-                    data.schedule_id = scheduleId;
-                    var scheduleNameInput = document.querySelector('#schedule-form-step2 [name="scheduleName"]');
-                    if (scheduleNameInput) {
-                        data.scheduleName = scheduleNameInput.value;
-                    } else {
-                        data.scheduleName = data.scheduleName || '';
-                    }
-                    // Add any other top-level fields as needed
-
-                    // Show loading state
-                    continueBtn.disabled = true;
-                    continueBtn.textContent = 'Saving...';
-
-                    try {
-                        const response = await fetch('/api/edit-schedule', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(data)
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            window.location.href = '/edit-schedule-step3/' + scheduleId;
-                        } else {
-                            alert('Failed to save schedule: ' + (result.error || 'Unknown error'));
-                            continueBtn.disabled = false;
-                            continueBtn.textContent = 'Continue';
-                        }
-                    } catch (err) {
-                        alert('Error saving schedule: ' + err);
-                        continueBtn.disabled = false;
-                        continueBtn.textContent = 'Continue';
-                    }
+                    // Wait one animation frame to ensure sessionStorage is updated
+                    requestAnimationFrame(() => {
+                        window.location.href = '/edit-schedule-step3/' + scheduleId;
+                    });
                 });
             } else {
                 console.error('Continue button not found');
@@ -3350,6 +3477,8 @@
                 console.log('DEBUG: dropdownOptions set to block');
             }
         });
+
+
     </script>
 </body>
 </html> 

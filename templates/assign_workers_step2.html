@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign workers to this schedule - Step 2 - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: #f8f9fa;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: #f8f9fa;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* Selected Workers Section */
+        .selected-workers-container {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .selected-workers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .selected-worker-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            gap: 12px;
+        }
+
+        .worker-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .worker-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .worker-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+        }
+
+        .country-flag {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        /* Schedule Info Section */
+        .schedule-info-container {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
+        .schedule-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .schedule-info-label {
+            font-weight: 500;
+            color: #6c757d;
+            min-width: 120px;
+            font-size: 0.875rem;
+        }
+
+        .schedule-info-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .schedule-default-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        /* Sidebar styles - matching create office page */
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        /* Bottom Navigation */
+        .bottom-navigation {
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-back {
+            background: none;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            text-align: right;
+        }
+
+        .btn-finish {
+            background: #1a1a1a;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-finish:hover {
+            background: #333;
+        }
+
+        .btn-finish:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="window.close()">×</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Assign workers</h1>
+                <p class="page-subtitle">Review and confirm the assignment</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Selected Workers Section -->
+                <div class="selected-workers-container">
+                    <div class="section-title">Selected workers (2)</div>
+                    <div class="selected-workers-list" id="selectedWorkersList">
+                        <!-- Worker items will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Schedule Info Section -->
+                <div class="schedule-info-container">
+                    <div class="section-title">Schedule Information</div>
+                    <div class="schedule-info-item">
+                        <div class="schedule-info-label">Schedule Name:</div>
+                        <div class="schedule-info-value" id="scheduleName">Morning Shift</div>
+                    </div>
+                    <div class="schedule-info-item">
+                        <div class="schedule-info-label">Schedule Type:</div>
+                        <div class="schedule-info-value" id="scheduleType">Fixed</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ol class="steps-list">
+                    <li class="step-item completed">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Workers selection</div>
+                    </li>
+                    <li class="step-item active">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Review and finish</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <div class="nav-left">
+                    <button class="btn-back" onclick="goBack()">Back</button>
+                </div>
+                <div class="nav-right">
+                    <div class="step-info">Step 2 of 2<br>Review and confirm</div>
+                    <button class="btn-finish" onclick="finishAssignment()">Finish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedWorkers = [];
+        let selectedSchedule = null;
+
+        // Load data from session storage
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromSession();
+        });
+
+        function loadDataFromSession() {
+            const selectedData = sessionStorage.getItem('selectedWorkers');
+            if (selectedData) {
+                const data = JSON.parse(selectedData);
+                selectedSchedule = data.selectedSchedule || null;
+                
+                // Fetch worker data from the server
+                if (data.allEmployees) {
+                    // If all employees were selected, fetch all workers
+                    fetchAllWorkers();
+                } else if (data.individualWorkers && data.individualWorkers.length > 0) {
+                    // If specific workers were selected, fetch their data
+                    fetchSelectedWorkers(data.individualWorkers);
+                } else {
+                    // No workers selected
+                    populateSelectedWorkers([]);
+                }
+                
+                populateScheduleInfo();
+            }
+        }
+
+        async function fetchAllWorkers() {
+            try {
+                const response = await fetch('/api/get-organization-workers');
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Don't filter out workers who already have schedules - show all workers
+                    selectedWorkers = result.workers;
+                    populateSelectedWorkers(result.workers);
+                } else {
+                    console.error('Failed to fetch workers:', result.error);
+                    populateSelectedWorkers([]);
+                }
+            } catch (error) {
+                console.error('Error fetching workers:', error);
+                populateSelectedWorkers([]);
+            }
+        }
+
+        async function fetchSelectedWorkers(workerIds) {
+            try {
+                const response = await fetch('/api/get-organization-workers');
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Filter workers by the selected IDs
+                    const selectedWorkerData = result.workers.filter(worker => 
+                        workerIds.includes(worker.id)
+                    );
+                    selectedWorkers = selectedWorkerData;
+                    populateSelectedWorkers(selectedWorkerData);
+                } else {
+                    console.error('Failed to fetch workers:', result.error);
+                    populateSelectedWorkers([]);
+                }
+            } catch (error) {
+                console.error('Error fetching workers:', error);
+                populateSelectedWorkers([]);
+            }
+        }
+
+        function populateSelectedWorkers(workers) {
+            const workersList = document.getElementById('selectedWorkersList');
+            const title = document.querySelector('.selected-workers-container .section-title');
+            
+            if (!workers || workers.length === 0) {
+                title.textContent = 'Selected workers (0)';
+                workersList.innerHTML = '<div style="color: #6c757d; text-align: center; padding: 20px;">No workers selected</div>';
+                return;
+            }
+
+            title.textContent = `Selected workers (${workers.length})`;
+            
+            workersList.innerHTML = workers.map(worker => `
+                <div class="selected-worker-item">
+                    <div class="worker-avatar">
+                        ${getInitials(worker)}
+                    </div>
+                    <div class="worker-info">
+                        <div class="worker-name">${worker.name}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateScheduleInfo() {
+            if (selectedSchedule) {
+                document.getElementById('scheduleName').textContent = selectedSchedule.name;
+                document.getElementById('scheduleType').textContent = selectedSchedule.schedule_type || 'Fixed';
+            }
+        }
+
+        function getInitials(worker) {
+            if (worker.first_name && worker.last_name) {
+                return worker.first_name[0] + worker.last_name[0];
+            } else if (worker.name) {
+                return worker.name.substring(0, 2).toUpperCase();
+            }
+            return 'U';
+        }
+
+        function getCountryFlag(countryCode) {
+            if (!countryCode) return '🌍';
+            
+            // Simple country flag emoji mapping
+            const flags = {
+                'RO': '🇷🇴',
+                'US': '🇺🇸',
+                'GB': '🇬🇧',
+                'DE': '🇩🇪',
+                'FR': '🇫🇷',
+                'JP': '🇯🇵',
+                'CN': '🇨🇳',
+                'IN': '🇮🇳',
+                'BR': '🇧🇷',
+                'CA': '🇨🇦'
+            };
+            return flags[countryCode] || '🌍';
+        }
+
+        function getCountryName(countryCode) {
+            if (!countryCode) return 'Unknown';
+            
+            const countries = {
+                'RO': 'Romania',
+                'US': 'United States',
+                'GB': 'United Kingdom',
+                'DE': 'Germany',
+                'FR': 'France',
+                'JP': 'Japan',
+                'CN': 'China',
+                'IN': 'India',
+                'BR': 'Brazil',
+                'CA': 'Canada'
+            };
+            return countries[countryCode] || 'Unknown';
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        async function finishAssignment() {
+            if (!selectedSchedule || !selectedWorkers || selectedWorkers.length === 0) {
+                alert('Please select a schedule and at least one worker.');
+                return;
+            }
+
+            // Check if any workers already have schedules
+            const workersWithSchedules = selectedWorkers.filter(worker => worker.has_schedule);
+            if (workersWithSchedules.length > 0) {
+                const workerNames = workersWithSchedules.map(worker => worker.name).join(', ');
+                const confirmMessage = `The following workers already have schedules assigned:\n${workerNames}\n\nDo you want to reassign them to the new schedule?`;
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+            }
+
+            try {
+                // Show loading state
+                const finishButton = document.querySelector('.btn-finish');
+                const originalText = finishButton.textContent;
+                finishButton.textContent = 'Assigning...';
+                finishButton.disabled = true;
+
+                // Prepare data for bulk assignment
+                const employeeIds = selectedWorkers.map(worker => worker.id);
+                
+                const response = await fetch('/api/bulk-assign-schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        employee_ids: employeeIds,
+                        schedule_id: selectedSchedule.id
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    alert(result.message);
+                    
+                    // Clear session storage
+                    sessionStorage.removeItem('selectedWorkers');
+                    
+                    // Redirect to time tracking page or close window
+                    window.location.href = '/settings/time-tracking';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error assigning schedule:', error);
+                alert('An error occurred while assigning the schedule. Please try again.');
+            } finally {
+                // Restore button state
+                const finishButton = document.querySelector('.btn-finish');
+                finishButton.textContent = 'Finish';
+                finishButton.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

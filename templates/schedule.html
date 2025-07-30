@@ -722,22 +722,7 @@
                                 <input type="checkbox" class="dropdown-checkbox" id="selectAllGroups" data-value="all">
                                 <span class="option-text">Select all</span>
                             </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="Marketing">
-                                <span class="option-text">Marketing</span>
-                            </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="IT">
-                                <span class="option-text">IT</span>
-                            </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="Sales">
-                                <span class="option-text">Sales</span>
-                            </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="HR">
-                                <span class="option-text">HR</span>
-                            </label>
+                            <!-- Dynamic group options will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -755,40 +740,12 @@
                                 <input type="checkbox" class="dropdown-checkbox" id="selectAllWorkerTypes" data-value="all">
                                 <span class="option-text">Select all</span>
                             </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="Direct Employee">
-                                <span class="option-text">Direct Employee</span>
-                            </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="Contractor">
-                                <span class="option-text">Contractor</span>
-                            </label>
-                            <label class="dropdown-option">
-                                <input type="checkbox" class="dropdown-checkbox" data-value="Intern">
-                                <span class="option-text">Intern</span>
-                            </label>
+                            <!-- Dynamic worker type options will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
 
-                <div class="filter-section">
-                    <div class="dropdown-filter">
-                        <button class="dropdown-toggle" id="employeeNameDropdown">
-                            <span class="dropdown-label">Employee Name</span>
-                            <span class="filter-badge" id="employeeNameBadge" style="display:none;">0</span>
-                            <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow arrow-down">
-                            <img src="/static/images/angle-small-up.png" alt="Dropdown" class="dropdown-arrow arrow-up" style="display:none;">
-                        </button>
-                        <div class="dropdown-menu" id="employeeNameDropdownMenu">
-                            <div class="search-input-container">
-                                <input type="text" class="dropdown-search-input" id="employeeNameSearch" placeholder="Search employees...">
-                            </div>
-                            <div class="dropdown-options-list" id="employeeNameOptionsList">
-                                <!-- Dynamic employee options will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
 
             <div class="filter-modal-footer">
@@ -1197,7 +1154,7 @@
             </thead>
             <tbody>
                 {% for employee in employees %}
-                <tr>
+                <tr data-group="{{ employee.group.name if employee.group else 'No Group' }}" data-worker-type="{{ employee.worker_type.template_name if employee.worker_type else 'No Type' }}">
                     <td>
                         <div class="employee-info">
                             <div class="employee-avatar">
@@ -1212,6 +1169,7 @@
                             </div>
                         </div>
                     </td>
+
                     {% for day in range(1, 8) %}
                     <td class="schedule-cell">
                         {% if employee.schedule %}
@@ -1371,23 +1329,28 @@
     const workerTypeBadge = document.getElementById('workerTypeBadge');
     const selectAllWorkerTypes = document.getElementById('selectAllWorkerTypes');
 
-    const employeeNameDropdown = document.getElementById('employeeNameDropdown');
-    const employeeNameDropdownMenu = document.getElementById('employeeNameDropdownMenu');
-    const employeeNameBadge = document.getElementById('employeeNameBadge');
-    const employeeNameSearch = document.getElementById('employeeNameSearch');
+
 
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Small delay to ensure all content is loaded
         setTimeout(() => {
             initializeSearch();
+            // Populate filter options from table data
+            populateGroupOptions();
+            populateWorkerTypeOptions();
+            
+            // Initialize filters
+            updateGroupBadge();
+            updateWorkerTypeBadge();
+            updateSelectAllGroups();
+            updateSelectAllWorkerTypes();
         }, 100);
     });
 
     // Filter state
     let selectedGroups = [];
     let selectedWorkerTypes = [];
-    let selectedEmployeeNames = [];
 
     // Open filter modal
     filterBtn.addEventListener('click', function() {
@@ -1433,14 +1396,7 @@
         updateWorkerTypeArrow();
     });
 
-    // Employee Name dropdown functionality
-    employeeNameDropdown.addEventListener('click', function(e) {
-        e.stopPropagation();
-        employeeNameDropdownMenu.classList.toggle('show');
-        employeeNameDropdown.classList.toggle('active');
-        populateEmployeeOptions();
-        updateEmployeeNameArrow();
-    });
+
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
@@ -1449,11 +1405,8 @@
             groupDropdown.classList.remove('active');
             workerTypeDropdownMenu.classList.remove('show');
             workerTypeDropdown.classList.remove('active');
-            employeeNameDropdownMenu.classList.remove('show');
-            employeeNameDropdown.classList.remove('active');
             updateGroupArrow();
             updateWorkerTypeArrow();
-            updateEmployeeNameArrow();
         }
     });
 
@@ -1464,14 +1417,13 @@
             checkbox.checked = this.checked;
         });
         updateGroupBadge();
-        applyAllFilters();
+        updateSelectAllGroups();
     });
 
     groupDropdownMenu.addEventListener('change', function(e) {
         if (e.target.classList.contains('dropdown-checkbox') && e.target.id !== 'selectAllGroups') {
             updateGroupBadge();
             updateSelectAllGroups();
-            applyAllFilters();
         }
     });
 
@@ -1482,39 +1434,19 @@
             checkbox.checked = this.checked;
         });
         updateWorkerTypeBadge();
-        applyAllFilters();
+        updateSelectAllWorkerTypes();
     });
 
     workerTypeDropdownMenu.addEventListener('change', function(e) {
         if (e.target.classList.contains('dropdown-checkbox') && e.target.id !== 'selectAllWorkerTypes') {
             updateWorkerTypeBadge();
             updateSelectAllWorkerTypes();
-            applyAllFilters();
         }
     });
 
-    // Employee Name search functionality
-    employeeNameSearch.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const options = employeeNameDropdownMenu.querySelectorAll('.dropdown-option');
-        
-        options.forEach(option => {
-            const text = option.querySelector('.option-text').textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                option.style.display = 'flex';
-            } else {
-                option.style.display = 'none';
-            }
-        });
-    });
 
-    // Employee Name checkbox functionality
-    employeeNameDropdownMenu.addEventListener('change', function(e) {
-        if (e.target.classList.contains('dropdown-checkbox')) {
-            updateEmployeeNameBadge();
-            applyAllFilters();
-        }
-    });
+
+
 
     // Update badge functions
     function updateGroupBadge() {
@@ -1537,15 +1469,7 @@
         }
     }
 
-    function updateEmployeeNameBadge() {
-        const checkedBoxes = employeeNameDropdownMenu.querySelectorAll('.dropdown-checkbox:checked');
-        if (checkedBoxes.length > 0) {
-            employeeNameBadge.textContent = checkedBoxes.length;
-            employeeNameBadge.style.display = 'inline';
-        } else {
-            employeeNameBadge.style.display = 'none';
-        }
-    }
+
 
     // Update select all functions
     function updateSelectAllGroups() {
@@ -1562,24 +1486,61 @@
         selectAllWorkerTypes.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
     }
 
-    // Populate employee options
-    function populateEmployeeOptions() {
-        const employeeOptionsList = document.getElementById('employeeNameOptionsList');
-        const rows = document.querySelectorAll('.schedule-table tbody tr');
+    // Populate group options from table data
+    function populateGroupOptions() {
+        const groupOptionsList = groupDropdownMenu.querySelectorAll('.dropdown-option:not(:first-child)');
+        groupOptionsList.forEach(option => option.remove()); // Remove existing options except "Select all"
         
-        employeeOptionsList.innerHTML = '';
+        const rows = document.querySelectorAll('.schedule-table tbody tr');
+        const groups = new Set();
         
         rows.forEach(row => {
-            const employeeName = row.querySelector('.employee-name').textContent;
+            const groupName = row.getAttribute('data-group');
+            if (groupName && groupName !== 'No Group') {
+                groups.add(groupName);
+            }
+        });
+        
+        // Add group options
+        groups.forEach(groupName => {
             const option = document.createElement('label');
             option.className = 'dropdown-option';
             option.innerHTML = `
-                <input type="checkbox" class="dropdown-checkbox" data-value="${employeeName}">
-                <span class="option-text">${employeeName}</span>
+                <input type="checkbox" class="dropdown-checkbox" data-value="${groupName}">
+                <span class="option-text">${groupName}</span>
             `;
-            employeeOptionsList.appendChild(option);
+            groupDropdownMenu.appendChild(option);
         });
     }
+
+    // Populate worker type options from table data
+    function populateWorkerTypeOptions() {
+        const workerTypeOptionsList = workerTypeDropdownMenu.querySelectorAll('.dropdown-option:not(:first-child)');
+        workerTypeOptionsList.forEach(option => option.remove()); // Remove existing options except "Select all"
+        
+        const rows = document.querySelectorAll('.schedule-table tbody tr');
+        const workerTypes = new Set();
+        
+        rows.forEach(row => {
+            const workerTypeName = row.getAttribute('data-worker-type');
+            if (workerTypeName && workerTypeName !== 'No Type') {
+                workerTypes.add(workerTypeName);
+            }
+        });
+        
+        // Add worker type options
+        workerTypes.forEach(workerTypeName => {
+            const option = document.createElement('label');
+            option.className = 'dropdown-option';
+            option.innerHTML = `
+                <input type="checkbox" class="dropdown-checkbox" data-value="${workerTypeName}">
+                <span class="option-text">${workerTypeName}</span>
+            `;
+            workerTypeDropdownMenu.appendChild(option);
+        });
+    }
+
+
 
     // Reset functions
     document.getElementById('clearAllFilters').addEventListener('click', function() {
@@ -1590,21 +1551,16 @@
         // Reset badges
         updateGroupBadge();
         updateWorkerTypeBadge();
-        updateEmployeeNameBadge();
         
         // Reset select all states
         updateSelectAllGroups();
         updateSelectAllWorkerTypes();
         
-        // Clear search
-        employeeNameSearch.value = '';
-        
         // Clear filter state
         selectedGroups = [];
         selectedWorkerTypes = [];
-        selectedEmployeeNames = [];
         
-        // Apply filters
+        // Apply filters immediately and close popup
         applyAllFilters();
     });
 
@@ -1620,11 +1576,9 @@
         // Get selected values from checkboxes
         const groupCheckboxes = groupDropdownMenu.querySelectorAll('.dropdown-checkbox:checked:not(#selectAllGroups)');
         const workerTypeCheckboxes = workerTypeDropdownMenu.querySelectorAll('.dropdown-checkbox:checked:not(#selectAllWorkerTypes)');
-        const employeeNameCheckboxes = employeeNameDropdownMenu.querySelectorAll('.dropdown-checkbox:checked');
 
         selectedGroups = Array.from(groupCheckboxes).map(cb => cb.dataset.value);
         selectedWorkerTypes = Array.from(workerTypeCheckboxes).map(cb => cb.dataset.value);
-        selectedEmployeeNames = Array.from(employeeNameCheckboxes).map(cb => cb.dataset.value);
 
         // Close modal
         filterModal.classList.remove('show');
@@ -1644,10 +1598,8 @@
             if (row.cells.length > 1) { // Skip empty state rows
                 const employeeName = row.querySelector('.employee-name');
                 const name = employeeName ? employeeName.textContent.trim().toLowerCase() : '';
-                const group = row.querySelector('.employee-group');
-                const groupText = group ? group.textContent.trim() : '';
-                const workerType = row.querySelector('.employee-worker-type');
-                const workerTypeText = workerType ? workerType.textContent.trim() : '';
+                const groupText = row.getAttribute('data-group') || '';
+                const workerTypeText = row.getAttribute('data-worker-type') || '';
                 
                 let showRow = true;
 
@@ -1680,16 +1632,7 @@
                     }
                 }
 
-                // Apply employee name filter
-                if (selectedEmployeeNames.length > 0 && showRow) {
-                    showRow = false;
-                    for (const selectedEmployeeName of selectedEmployeeNames) {
-                        if (name.includes(selectedEmployeeName.toLowerCase())) {
-                            showRow = true;
-                            break;
-                        }
-                    }
-                }
+
 
                 row.style.display = showRow ? '' : 'none';
             }
@@ -1725,19 +1668,7 @@
         }
     }
 
-    function updateEmployeeNameArrow() {
-        const employeeNameToggle = document.getElementById('employeeNameDropdown');
-        const employeeNameArrowDown = employeeNameToggle.querySelector('.arrow-down');
-        const employeeNameArrowUp = employeeNameToggle.querySelector('.arrow-up');
 
-        if (employeeNameDropdownMenu.classList.contains('show')) {
-            employeeNameArrowDown.style.display = 'none';
-            employeeNameArrowUp.style.display = 'block';
-        } else {
-            employeeNameArrowDown.style.display = 'block';
-            employeeNameArrowUp.style.display = 'none';
-        }
-    }
 
 
 </script>
