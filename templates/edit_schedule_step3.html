@@ -1129,18 +1129,26 @@ if (typeof saveFormStateToSession !== 'function') {
             // First try to load from sessionStorage (user's latest changes)
             const savedData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
             console.log('Step 3: Loaded saved data from sessionStorage:', savedData);
+            console.log('Step 3: savedData.scheduleDetails exists:', !!savedData.scheduleDetails);
+            console.log('Step 3: savedData.scheduleDetails.shifts exists:', !!(savedData.scheduleDetails && savedData.scheduleDetails.shifts));
             
             // Use sessionStorage data if available, otherwise fall back to prefill data
             let data = savedData;
-            if (!data || !data.scheduleDetails) {
+            if (!data || !data.scheduleDetails || !data.scheduleDetails.shifts) {
                 // Fall back to prefill data from backend
                 data = {{ prefill_data|tojson|safe }};
-                console.log('Step 3: Using prefill data from backend:', data);
+                console.log('Step 3: Using prefill data from backend (fallback):', data);
             } else {
                 console.log('Step 3: Using sessionStorage data (user changes):', data);
+                console.log('Step 3: SessionStorage shifts data:', data.scheduleDetails.shifts);
             }
             
             if (!data) return;
+            
+            // Store the data we're using for debugging
+            window.currentStep3Data = data;
+            console.log('Step 3: Final data being used:', window.currentStep3Data);
+            
             // Display basic information
             if (data.scheduleName) {
                 const scheduleNameElement = document.getElementById('reviewScheduleName');
@@ -1204,12 +1212,9 @@ if (typeof saveFormStateToSession !== 'function') {
                 generateSchedulePreview(details);
             }
 
-            // Check the schedule type from sessionStorage and update the text
-            const saved = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-            console.log('Step 3: Loaded saved data:', saved);
-            
-            if (saved.scheduleDetails && saved.scheduleDetails.shifts) {
-                const firstShift = saved.scheduleDetails.shifts[1];
+            // Check the schedule type from the data we already loaded and update the text
+            if (data.scheduleDetails && data.scheduleDetails.shifts) {
+                const firstShift = data.scheduleDetails.shifts[1];
                 const scheduleTypeElement = document.querySelector('.schedule-type-value');
                 if (scheduleTypeElement) {
                     if (firstShift && firstShift.includeTime) {

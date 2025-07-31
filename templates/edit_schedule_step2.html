@@ -1524,10 +1524,11 @@
                 }
             }
             
-            // FULL RESET: Always clear sessionStorage and window.shiftData for this schedule
-            sessionStorage.removeItem('scheduleFormData');
+            // Preserve schedule name without clearing existing data
             if (preservedScheduleName) {
-                sessionStorage.setItem('scheduleFormData', JSON.stringify({ scheduleName: preservedScheduleName }));
+                const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                existingData.scheduleName = preservedScheduleName;
+                sessionStorage.setItem('scheduleFormData', JSON.stringify(existingData));
             }
             window.shiftData = undefined;
             
@@ -1539,7 +1540,7 @@
             console.log('Prefill data:', prefill);
             
             // Only use prefill data if there's no existing sessionStorage data
-            if (!existingSessionData || !existingSessionData.scheduleDetails) {
+            if (!existingSessionData || !existingSessionData.scheduleDetails || !existingSessionData.scheduleDetails.shifts) {
                 console.log('No existing sessionStorage data, using prefill data');
                 // Always set window.shiftData only from this prefill
                 if (prefill && prefill.scheduleDetails && prefill.scheduleDetails.shifts) {
@@ -1584,7 +1585,7 @@
                 var dropdownOptions = document.getElementById('dropdownOptions');
                 
                 // Only run prefill logic if we're using prefill data (not sessionStorage data)
-                if (!existingSessionData || !existingSessionData.scheduleDetails) {
+                if (!existingSessionData || !existingSessionData.scheduleDetails || !existingSessionData.scheduleDetails.shifts) {
                     console.log('Running prefill logic to set form values');
                     if (isFlexible) {
                         if (specifyDurationToggle) {
@@ -1702,6 +1703,11 @@
                         specifyDurationToggle.disabled = true;
                     }
                     if (includeTimeToggleSection) includeTimeToggleSection.style.display = 'flex';
+                    
+                    // Call restoreFormState to load the actual form values from sessionStorage
+                    setTimeout(() => {
+                        restoreFormState();
+                    }, 100);
                 }
             }
             window.prefill = prefill;
@@ -2144,10 +2150,11 @@
                 }
             }
             
-            // FULL RESET: Always clear sessionStorage and window.shiftData for this schedule
-            sessionStorage.removeItem('scheduleFormData');
+            // Preserve schedule name without clearing existing data
             if (preservedScheduleName) {
-                sessionStorage.setItem('scheduleFormData', JSON.stringify({ scheduleName: preservedScheduleName }));
+                const existingData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                existingData.scheduleName = preservedScheduleName;
+                sessionStorage.setItem('scheduleFormData', JSON.stringify(existingData));
             }
             window.shiftData = undefined;
             
