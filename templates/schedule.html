@@ -371,6 +371,12 @@
         transition: background-color 0.2s ease;
     }
 
+    .schedule-table th:last-child {
+        width: 60px;
+        min-width: 60px;
+        text-align: center;
+    }
+
     .schedule-table td {
         padding: 16px;
         border-bottom: 1px solid #e9ecef;
@@ -382,6 +388,8 @@
 
     .schedule-table td:last-child {
         border-right: none;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .schedule-table tr:last-child td {
@@ -447,18 +455,74 @@
         justify-content: center;
         align-items: center;
         gap: 4px;
+        position: relative;
     }
 
     .schedule-time {
         font-size: 0.8rem;
         font-weight: 600;
         color: #1ca97a;
+        text-align: center;
+        width: 100%;
+        display: block;
     }
 
     .schedule-type {
         font-size: 0.75rem;
         color: #1ca97a;
         font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .shift-count {
+        font-size: 0.7rem;
+        color: #666;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 4px;
+    }
+
+    .detailed-shifts {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .shift-detail {
+        background: #e6f7ec;
+        border: 1px solid #1ca97a;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        color: #1ca97a;
+        text-align: center;
+        font-weight: 600;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .summary-view {
+        display: block;
+    }
+
+    .shift-time {
+        font-weight: 600;
+        color: #1ca97a;
+    }
+
+    .schedule-block.expanded {
+        background: #f0f8f4;
+        border-color: #1ca97a;
+    }
+
+    .schedule-divider {
+        height: 1px;
+        background-color: rgba(28, 169, 122, 0.3);
+        margin: 4px 0;
     }
 
     .weekend-header {
@@ -540,6 +604,90 @@
     }
     .filter-btn:active {
         background: #dee2e6;
+    }
+
+    /* Edit button styles - matching members page */
+    .edit-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+    }
+
+    .edit-btn:hover {
+        background: #f8f9fa;
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .edit-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Actions container */
+    .actions-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+    }
+
+    .action-menu {
+        position: fixed;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        min-width: 150px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .action-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .action-item.delete:hover {
+        background: #fdf2f2;
+        color: #dc3545;
+    }
+
+    .action-icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.7;
+    }
+
+    .action-item:hover .action-icon {
+        opacity: 1;
     }
 </style>
 
@@ -1150,6 +1298,7 @@
                     <th>Fri<br>27</th>
                     <th>Sat<br>28</th>
                     <th>Sun<br>29</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -1177,19 +1326,73 @@
                             {% set day_name = ['', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][day] %}
                             {% if schedule_data and schedule_data.scheduleDetails and schedule_data.scheduleDetails.shifts %}
                                 {% set shifts = schedule_data.scheduleDetails.shifts %}
-                                {% set shift_1 = shifts["1"] if "1" in shifts else None %}
-                                {% if shift_1 and shift_1.weekdays and day_name in shift_1.weekdays %}
-                                    {% set day_data = shift_1.weekdays[day_name] %}
-                                    {% if day_data.checked and day_data.startTime and day_data.endTime %}
-                                        <div class="schedule-block">
-                                            <div class="schedule-time">{{ day_data.startTime }} - {{ day_data.endTime }}</div>
+                                {% set active_shifts = [] %}
+                                {% set has_flexible = false %}
+                                {% set flexible_duration = '' %}
+                                
+                                <!-- Collect all active shifts for this day -->
+                                {% for shift_key, shift_data in shifts.items() %}
+                                    {% if shift_data.weekdays and day_name in shift_data.weekdays %}
+                                        {% set day_data = shift_data.weekdays[day_name] %}
+                                        {% if day_data.checked %}
+                                            {% if day_data.startTime and day_data.endTime %}
+                                                {% set _ = active_shifts.append({'start': day_data.startTime, 'end': day_data.endTime}) %}
+                                            {% elif day_data.duration %}
+                                                {% set has_flexible = true %}
+                                                {% set flexible_duration = day_data.duration %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <!-- Display the schedule -->
+                                {% if active_shifts or has_flexible %}
+                                    {% if has_flexible %}
+                                        <!-- Flexible schedule -->
+                                        <div class="schedule-block" data-employee-id="{{ employee.id }}" data-day="{{ day }}">
+                                            <div class="schedule-time">{{ flexible_duration }} hours</div>
                                         </div>
+                                    {% else %}
+                                        <!-- Fixed schedule(s) -->
+                                        {% if active_shifts|length > 1 %}
+                                            <!-- Multiple shifts - show separate containers -->
+                                            <div class="detailed-shifts" style="display: none;">
+                                                {% for shift in active_shifts %}
+                                                <div class="schedule-block shift-detail" data-employee-id="{{ employee.id }}" data-day="{{ day }}">
+                                                    <div class="schedule-time">{{ shift.start }} - {{ shift.end }}</div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <!-- Summary view -->
+                                            <div class="schedule-block summary-view" data-employee-id="{{ employee.id }}" data-day="{{ day }}">
+                                                <div class="shift-count">{{ active_shifts|length }} shifts</div>
+                                                <div class="schedule-time">{{ active_shifts[0].start }} - {{ active_shifts[-1].end }}</div>
+                                            </div>
+                                        {% else %}
+                                            <!-- Single shift - show normal container -->
+                                            <div class="schedule-block" data-employee-id="{{ employee.id }}" data-day="{{ day }}">
+                                                <div class="schedule-time">{{ active_shifts[0].start }} - {{ active_shifts[0].end }}</div>
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% endif %}
                     </td>
                     {% endfor %}
+                    <td>
+                        <div class="actions-container">
+                            <button class="edit-btn" data-employee-id="{{ employee.id }}" onclick="toggleActionMenu(event, this.getAttribute('data-employee-id'))" title="More actions">
+                                <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                            </button>
+                            <div class="action-menu" id="menu-{{ employee.id }}">
+                                <div class="action-item" data-employee-id="{{ employee.id }}" onclick="viewEmployeeProfile(this.getAttribute('data-employee-id'))">
+                                    <img src="/static/images/eye.png" alt="View" class="action-icon">
+                                    <span>View detail</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -1667,6 +1870,82 @@
             workerTypeArrowUp.style.display = 'none';
         }
     }
+
+    // Action menu functions
+    function toggleActionMenu(event, employeeId) {
+        event.stopPropagation();
+        
+        // Close all other menus first
+        document.querySelectorAll('.action-menu').forEach(menu => {
+            if (menu.id !== `menu-${employeeId}`) {
+                menu.classList.remove('show');
+            }
+        });
+        
+        const menu = document.getElementById(`menu-${employeeId}`);
+        if (menu) {
+            menu.classList.toggle('show');
+            
+            // Position the menu
+            const button = event.target.closest('.edit-btn');
+            const rect = button.getBoundingClientRect();
+            menu.style.left = `${rect.left}px`;
+            menu.style.top = `${rect.bottom + 5}px`;
+        }
+    }
+
+    function viewEmployeeProfile(employeeId) {
+        // Close the action menu
+        document.querySelectorAll('.action-menu').forEach(menu => {
+            menu.classList.remove('show');
+        });
+        
+        // Find all detailed shifts containers for this specific employee
+        const detailedShiftsContainers = document.querySelectorAll(`.detailed-shifts`);
+        const summaryViews = document.querySelectorAll(`.summary-view[data-employee-id="${employeeId}"]`);
+        
+        // Check if any detailed shifts for this employee are already visible
+        let isExpanded = false;
+        detailedShiftsContainers.forEach(container => {
+            const shiftDetails = container.querySelectorAll(`.shift-detail[data-employee-id="${employeeId}"]`);
+            if (shiftDetails.length > 0 && container.style.display !== 'none') {
+                isExpanded = true;
+            }
+        });
+        
+        if (isExpanded) {
+            // Collapse - hide detailed shifts for this employee, show summary
+            detailedShiftsContainers.forEach(container => {
+                const shiftDetails = container.querySelectorAll(`.shift-detail[data-employee-id="${employeeId}"]`);
+                if (shiftDetails.length > 0) {
+                    container.style.display = 'none';
+                }
+            });
+            summaryViews.forEach(summary => {
+                summary.style.display = 'block';
+            });
+        } else {
+            // Expand - show detailed shifts for this employee, hide summary
+            detailedShiftsContainers.forEach(container => {
+                const shiftDetails = container.querySelectorAll(`.shift-detail[data-employee-id="${employeeId}"]`);
+                if (shiftDetails.length > 0) {
+                    container.style.display = 'flex';
+                }
+            });
+            summaryViews.forEach(summary => {
+                summary.style.display = 'none';
+            });
+        }
+    }
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.actions-container')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
 
 
 
