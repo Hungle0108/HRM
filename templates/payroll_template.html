@@ -1,0 +1,1282 @@
+{% extends "base.html" %}
+
+{% block title %}Payroll Template | Canvascript{% endblock %}
+
+<!-- Backend sets current user information -->
+<meta name="current-user" content="{{ user.name if user else 'Current User' }}">
+
+{% block styles %}
+<style>
+    /* Settings layout */
+    .settings-layout {
+        display: flex;
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+        position: relative;
+    }
+
+    /* Sidebar styles */
+    .settings-sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e9ecef;
+        padding: 24px 0 32px 0;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        border-radius: 0 0 12px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+
+    .sidebar-header {
+        padding: 0 24px 20px 24px;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 14px;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: #f8f9fa;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+    }
+
+    /* Navigation sections */
+    .nav-section {
+        margin-bottom: 24px;
+    }
+
+    .nav-section:last-child {
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 24px 8px 24px;
+        margin-bottom: 6px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .nav-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .nav-item.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .nav-item-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-icon {
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.7;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-item:hover .nav-icon,
+    .nav-item.active .nav-icon {
+        opacity: 1;
+    }
+
+    .dropdown-arrow {
+        width: 16px;
+        height: 16px;
+        margin-left: 8px;
+        align-self: center;
+        vertical-align: middle;
+        display: flex;
+        transition: transform 0.3s ease;
+        transform-origin: 50% 50%;
+    }
+
+    .dropdown-arrow img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .dropdown-arrow .arrow-up { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-down { display: none; }
+    .nav-item.expandable.expanded .dropdown-arrow .arrow-up { display: inline; }
+
+    .dropdown-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        background-color: transparent;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+    }
+
+    .dropdown-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .dropdown-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .dropdown-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .option-text {
+        color: #1a1a1a;
+        font-size: 0.875rem;
+    }
+
+    .nav-item.expandable:hover .dropdown-arrow {
+        color: #495057;
+    }
+
+    .nav-item.expandable {
+        position: relative;
+    }
+
+    .nav-item.expandable .dropdown-arrow {
+        transition: transform 0.3s ease;
+    }
+
+    /* Sub-items */
+    .nav-subitems {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-subitems.expanded {
+        max-height: 500px;
+    }
+
+    .nav-subitem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 24px 10px 56px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-subitem:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .nav-subitem.active {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 500;
+        border-right: 2px solid #1a1a1a;
+    }
+
+    .settings-sidebar .nav-subitem a {
+        color: inherit;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .settings-sidebar .nav-subitem a:hover,
+    .settings-sidebar .nav-subitem.active a {
+        color: #1a1a1a;
+        text-decoration: none;
+    }
+
+    /* Main content area */
+    .settings-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 40px;
+        background: #f8f9fa;
+        transition: margin-right 0.3s ease;
+    }
+
+    .settings-content.modal-open {
+        margin-right: 400px;
+    }
+
+    .content-header {
+        margin-bottom: 32px;
+    }
+
+    .content-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .action-button {
+        padding: 12px 20px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .action-button:hover {
+        background: #333;
+        border-color: #333;
+        text-decoration: none;
+        color: white;
+    }
+
+    .customize-columns-btn {
+        padding: 12px 20px;
+        background: white;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .customize-columns-btn:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+
+    .action-buttons-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Customize Columns Modal */
+    .customize-modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 400px;
+        background: white;
+        border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1020;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customize-modal.show {
+        transform: translateX(0);
+    }
+
+    .customize-modal-content {
+        background: white;
+        border-radius: 0;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .customize-modal-header {
+        padding: 24px 24px 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .customize-modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .customize-modal-body {
+        padding: 24px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .column-option {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .column-option:hover {
+        background: #f8f9fa;
+    }
+
+    .column-option:last-child {
+        margin-bottom: 0;
+    }
+
+    .select-all-option {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .select-all-option .column-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 0;
+    }
+    .select-all-option .column-name {
+        margin-left: 0;
+    }
+
+    .select-all-option:hover {
+        background: #e9ecef;
+    }
+
+    .column-checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 0;
+    }
+
+    .column-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .column-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .column-checkbox:indeterminate {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:indeterminate::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        background: white;
+        transform: translate(-50%, -50%);
+    }
+
+    .column-info {
+        display: flex;
+        flex-direction: column;
+        margin-left: 12px;
+    }
+
+    .column-name {
+        font-weight: 600;
+        color: #1a1a1a;
+        font-size: 0.875rem;
+        margin-bottom: 4px;
+    }
+
+    .column-description {
+        font-size: 0.75rem;
+        color: #6c757d;
+        line-height: 1.4;
+    }
+
+    /* Filters Box */
+    .filters-box {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .filters-section {
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .filters-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .filters-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* Filter dropdown styles */
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 120px;
+    }
+
+    .dropdown-toggle:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+    }
+
+    .dropdown-label {
+        font-weight: 500;
+    }
+
+    .dropdown-arrow {
+        width: 12px;
+        height: 12px;
+        transition: transform 0.2s;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        margin-top: 4px;
+        min-width: 200px;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .dropdown-title {
+        font-weight: 600;
+        color: #1a1a1a;
+        font-size: 0.875rem;
+    }
+
+    .dropdown-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .dropdown-close:hover {
+        background: #f8f9fa;
+    }
+
+    .dropdown-content {
+        padding: 8px 0;
+    }
+
+    .dropdown-footer {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .btn-reset {
+        padding: 6px 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #6c757d;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+    }
+
+    .btn-show-results {
+        padding: 6px 12px;
+        background: #1a1a1a;
+        border: 1px solid #1a1a1a;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-show-results:hover {
+        background: #333;
+        border-color: #333;
+    }
+
+    /* Search functionality */
+    .search-container {
+        position: relative;
+        width: 0;
+        transition: width 0.3s ease;
+        overflow: hidden;
+    }
+
+    .search-container.expanded {
+        width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .search-clear-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 2;
+    }
+
+    .search-clear-btn.show {
+        opacity: 0.6;
+    }
+
+    .search-clear-btn:hover {
+        opacity: 1;
+    }
+
+    /* Table styles */
+    .payroll-templates-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: none;
+        border-radius: 0;
+        overflow: visible;
+    }
+
+    .payroll-templates-table th {
+        padding: 16px;
+        text-align: left;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        background: #f8f9fa;
+        user-select: none;
+        position: relative;
+        transition: background-color 0.2s ease;
+    }
+
+    .payroll-templates-table th .sort-icon {
+        display: inline-block;
+        margin-left: 8px;
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        vertical-align: baseline;
+        transform: translateY(-2px);
+        cursor: pointer;
+    }
+
+    .payroll-templates-table th .sort-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        vertical-align: middle;
+        transition: none;
+    }
+
+    .payroll-templates-table th.sortable:hover .sort-icon,
+    .payroll-templates-table th.sorted .sort-icon {
+        opacity: 1;
+    }
+
+    .header-menu-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        z-index: 2;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .payroll-templates-table th:hover .header-menu-icon {
+        opacity: 0.7;
+    }
+
+    .header-menu-icon:hover {
+        opacity: 1;
+    }
+
+    .payroll-templates-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        font-size: 0.875rem;
+        color: #495057;
+        vertical-align: top;
+    }
+
+    .payroll-templates-table td:last-child {
+        border-right: none;
+    }
+
+    .payroll-templates-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .payroll-templates-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    /* Table Box */
+    .table-box {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        border-radius: 12px;
+        overflow: visible;
+    }
+
+    .table-summary {
+        background: white;
+        color: #6c757d;
+        font-size: 0.875rem;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e9ecef;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    /* Edit button styles */
+    .edit-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+    }
+
+    .edit-btn:hover {
+        background: #f8f9fa;
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .edit-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Actions container */
+    .actions-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+    }
+
+    .action-menu {
+        position: fixed;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        min-width: 150px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .action-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .action-item.delete:hover {
+        background: #fdf2f2;
+        color: #dc3545;
+    }
+
+    .action-icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.7;
+    }
+
+    .action-item:hover .action-icon {
+        opacity: 1;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        margin-bottom: 16px;
+    }
+
+    .empty-state-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* Scrollbar styles */
+    .settings-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .settings-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    .dropdown-option:first-child {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 16px;
+    }
+
+    .table-wrapper {
+        border-radius: 12px;
+        overflow: visible;
+    }
+
+    .table-summary {
+        background: white;
+        color: #6c757d;
+        font-size: 0.875rem;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e9ecef;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    /* Data table styles */
+    .payroll-templates-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    /* Hide Active contracts column by default */
+    .payroll-templates-table th:nth-child(2),
+    .payroll-templates-table td:nth-child(2) {
+        display: none;
+    }
+
+    /* Icons */
+    .icon-organization {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'/%3e%3c/svg%3e");
+    }
+
+    .icon-security {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'/%3e%3c/svg%3e");
+    }
+
+    .icon-dollar {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1'/%3e%3c/svg%3e");
+    }
+
+    .icon-people {
+        background-image: url('/static/images/users-alt.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .icon-customize {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3e%3c/svg%3e");
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-layout">
+    <!-- Sidebar -->
+    {% include 'org_settings_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="settings-content" id="settingsContent">
+        <!-- Header -->
+        <div class="content-header">
+            <h1 class="content-title">Payroll Template</h1>
+        </div>
+
+        <!-- Payroll templates section -->
+        <div class="payroll-templates-section">
+            <!-- Filters Box -->
+            <div class="filters-box">
+                <div class="filters-section">
+                    <div class="filters-left">
+                        <div class="search-container" id="searchContainer">
+                            <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                            <input type="text" class="search-input" placeholder="Search by template name..." id="searchInput">
+                            <button class="search-clear-btn" id="searchClearBtn">
+                                <img src="/static/images/cross.png" alt="Clear" style="width: 16px; height: 16px;">
+                            </button>
+                        </div>
+                        <div class="filter-dropdown creator-filter">
+                            <button class="dropdown-toggle" id="creatorDropdown">
+                                <span class="dropdown-label">Creator</span>
+                                <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu" id="creatorDropdownMenu">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-title">Creator</span>
+                                    <button class="dropdown-close" id="dropdownClose">
+                                        <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+                                    </button>
+                                </div>
+                                <div class="dropdown-content">
+                                    <label class="dropdown-option">
+                                        <input type="checkbox" class="dropdown-checkbox" id="selectAll" data-value="all">
+                                        <span class="option-text">Select all</span>
+                                    </label>
+                                    <div class="dropdown-options-list" id="creatorOptionsList">
+                                        <!-- Dynamic creator options will be added here -->
+                                    </div>
+                                </div>
+                                <div class="dropdown-footer">
+                                    <button class="btn-reset" id="resetFilters">Reset</button>
+                                    <button class="btn-show-results" id="showResults">Show results</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons-group">
+                        <button class="customize-columns-btn" id="customizeColumnsBtn">
+                            Customize columns
+                        </button>
+                        <a href="#" class="action-button" id="headerCreateBtn">Create payroll template</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Box -->
+            <div class="table-box">
+                <div class="table-wrapper">
+                    <div class="table-summary" id="tableSummary">Total 0 items</div>
+                    <!-- Data table -->
+                    <table class="payroll-templates-table" id="payrollTemplatesTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="name">
+                                    Template name
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'name')">
+                                </th>
+                                <th class="sortable" data-sort="type">
+                                    Template type
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'type')">
+                                </th>
+                                <th class="sortable" data-sort="created">
+                                    Created by
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'created')">
+                                </th>
+                                <th class="sortable sorted" data-sort="creation">
+                                    Creation day
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-down.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'creation')">
+                                </th>
+                                <th style="width: 60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="payrollTemplatesBody">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><img src="/static/images/legal.png" alt="Legal document" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+                                        <div class="empty-state-title">No payroll templates yet</div>
+                                        <div class="empty-state-description">Create your first payroll template to standardize compensation structures</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Payroll Template page loaded');
+        
+        // Initialize search functionality
+        initializeSearch();
+        
+        // Initialize filters
+        initializeFilters();
+    });
+
+    // Search functionality
+    function initializeSearch() {
+        const searchContainer = document.getElementById('searchContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchIcon = document.getElementById('searchIcon');
+        const searchClearBtn = document.getElementById('searchClearBtn');
+
+        // Search container click handler
+        searchContainer.addEventListener('click', function() {
+            if (!this.classList.contains('expanded')) {
+                this.classList.add('expanded');
+                searchInput.focus();
+            }
+        });
+
+        // Search input handlers
+        searchInput.addEventListener('input', function() {
+            const hasValue = this.value.trim().length > 0;
+            searchClearBtn.classList.toggle('show', hasValue);
+            
+            // Filter table based on search term
+            updatePayrollTemplatesTable();
+        });
+
+        searchInput.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                searchContainer.classList.remove('expanded');
+            }
+        });
+
+        // Clear search button
+        searchClearBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            searchInput.value = '';
+            searchContainer.classList.remove('expanded');
+            this.classList.remove('show');
+            updatePayrollTemplatesTable();
+        });
+
+        // Click outside to collapse search
+        document.addEventListener('click', function(e) {
+            if (!searchContainer.contains(e.target) && !searchInput.value.trim()) {
+                searchContainer.classList.remove('expanded');
+            }
+        });
+    }
+
+    // Initialize filters
+    function initializeFilters() {
+        // Creator filter functionality
+        const creatorDropdown = document.getElementById('creatorDropdown');
+        const creatorDropdownMenu = document.getElementById('creatorDropdownMenu');
+        const dropdownClose = document.getElementById('dropdownClose');
+
+        creatorDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            creatorDropdownMenu.classList.toggle('show');
+        });
+
+        dropdownClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            creatorDropdownMenu.classList.remove('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!creatorDropdown.contains(e.target) && !creatorDropdownMenu.contains(e.target)) {
+                creatorDropdownMenu.classList.remove('show');
+            }
+        });
+    }
+
+    // Update table with filters
+    function updatePayrollTemplatesTable() {
+        // This function would filter the table based on search and filter criteria
+        console.log('Updating payroll templates table with filters');
+    }
+
+    // Action menu functions
+    function toggleActionMenu(event, templateId) {
+        event.stopPropagation();
+        
+        // Close all other menus first
+        document.querySelectorAll('.action-menu').forEach(menu => {
+            if (menu.id !== `menu-${templateId}`) {
+                menu.classList.remove('show');
+            }
+        });
+        
+        const menu = document.getElementById(`menu-${templateId}`);
+        if (menu) {
+            menu.classList.toggle('show');
+            
+            // Position the menu
+            const button = event.target.closest('.edit-btn');
+            const rect = button.getBoundingClientRect();
+            menu.style.left = `${rect.left}px`;
+            menu.style.top = `${rect.bottom + 5}px`;
+        }
+    }
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.actions-container')) {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+</script>
+{% endblock %} 

@@ -44,11 +44,18 @@
         <!-- Payroll section -->
         <div class="nav-section">
             <div class="section-title">Payroll</div>
-            <div class="nav-item" data-section="expenses">
+            <div class="nav-item expandable" data-section="expenses">
                 <div class="nav-item-content">
                     <div class="nav-icon icon-dollar"></div>
                     <span>Expenses & adjustments</span>
+                    <span class="dropdown-arrow">
+                        <img class="arrow-down" src="/static/images/angle-small-down.png" alt="Expand">
+                        <img class="arrow-up" src="/static/images/angle-small-up.png" alt="Collapse">
+                    </span>
                 </div>
+            </div>
+            <div class="nav-subitems" data-parent="expenses">
+                <div class="nav-subitem{% if active_page == 'payroll_template' %} active{% endif %}"><a href="/settings/payroll-template" style="color:inherit;text-decoration:none;">Payroll template</a></div>
             </div>
         </div>
         <!-- Human Resources section -->
@@ -65,7 +72,6 @@
                 </div>
             </div>
             <div class="nav-subitems" data-parent="hr-settings">
-                <div class="nav-subitem">Employee settings</div>
                 <div class="nav-subitem{% if active_page == 'time_tracking' %} active{% endif %}"><a href="/settings/time-tracking" style="color:inherit;text-decoration:none;">Time tracking</a></div>
                 <div class="nav-subitem{% if active_page == 'worker_type' %} active{% endif %}"><a href="/settings/worker-type" style="color:inherit;text-decoration:none;">Worker type</a></div>
             </div>

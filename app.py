@@ -1779,6 +1779,24 @@ def worker_type():
 
     return render_template('worker_type.html', user=user, organization=organization, worker_types=worker_types, active_page='worker_type')
 
+@app.route('/settings/payroll-template')
+def payroll_template():
+    """Payroll template settings page"""
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Get the user's organization
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('payroll_template.html', user=user, organization=organization, active_page='payroll_template')
+
 
 @app.route('/api/get-worker-types', methods=['GET'])
 def api_get_worker_types():
