@@ -1797,6 +1797,27 @@ def payroll_template():
     
     return render_template('payroll_template.html', user=user, organization=organization, active_page='payroll_template')
 
+@app.route('/create-payroll')
+def create_payroll():
+    """Create payroll template page"""
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Get the user's organization
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    # Get existing templates for replication (placeholder for now)
+    templates = []  # This would be populated from database
+    
+    return render_template('create_payroll.html', user=user, organization=organization, templates=templates)
+
 
 @app.route('/api/get-worker-types', methods=['GET'])
 def api_get_worker_types():

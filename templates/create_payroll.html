@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Payroll Template - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: #f8f9fa;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: #f8f9fa;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .main-container:has(.sidebar.hidden),
+        .main-container.single-step {
+            justify-content: center;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.hidden {
+            display: none;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .form-input.error::placeholder {
+            color: #dc3545;
+        }
+
+        .error-message {
+            font-size: 0.75rem;
+            color: #dc3545;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .char-count {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        /* Radio options */
+        .options-group {
+            margin-bottom: 48px;
+        }
+
+        .options-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .option:hover {
+            border-color: #adb5bd;
+            background: #f8f9fa;
+        }
+
+        .option.selected {
+            border-color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        .option input[type="radio"] {
+            margin: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 50%;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .option input[type="radio"]:checked {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+        }
+
+        .option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-description {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+
+        /* Bottom navigation */
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
+        }
+
+        .btn-continue {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-continue:hover {
+            background: #333;
+        }
+
+        .btn-continue:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Custom dropdown styles */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .dropdown-toggle:hover {
+            border-color: #adb5bd;
+        }
+
+        .dropdown-toggle.open {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s;
+        }
+
+        .dropdown-toggle.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-option:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .dropdown-option.disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .option-main {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .option-subtitle {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="sessionStorage.removeItem('payrollData'); window.location.href='/settings/payroll-template'">✕</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Create payroll template</h1>
+                <p class="page-subtitle">For {{ organization.name if organization else 'CATSKY' }}</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="payroll-form">
+                    <div class="form-group">
+                        <label for="templateName" class="form-label">Template name</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="templateName" 
+                                class="form-input" 
+                                placeholder="Template name"
+                                maxlength="48"
+                                required
+                            >
+                            <span class="char-count">0/48</span>
+                        </div>
+                        <div class="error-message">
+                            Template name is required
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="templateType" class="form-label">Template type</label>
+                        <div class="custom-dropdown" id="templateTypeDropdown">
+                            <button type="button" class="dropdown-toggle" id="templateTypeDropdownBtn">
+                                <span id="templateTypeDropdownLabel">Select template type</span>
+                                <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu" id="templateTypeDropdownMenu">
+                                <div class="dropdown-option" data-value="hourly">
+                                    <div class="option-main">Hourly</div>
+                                    <div class="option-subtitle">Pay based on hours worked</div>
+                                </div>
+                                <div class="dropdown-option" data-value="salary">
+                                    <div class="option-main">Salary</div>
+                                    <div class="option-subtitle">Fixed monthly/annual salary</div>
+                                </div>
+                                <div class="dropdown-option" data-value="commission">
+                                    <div class="option-main">Commission</div>
+                                    <div class="option-subtitle">Pay based on performance/sales</div>
+                                </div>
+                                <div class="dropdown-option" data-value="piece_rate">
+                                    <div class="option-main">Piece Rate</div>
+                                    <div class="option-subtitle">Pay per unit produced</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedTemplateType" name="selectedTemplateType">
+                        </div>
+                    </div>
+
+                    <div class="options-group">
+                        <div class="options-title">How would you like to set up the payroll template?</div>
+                        
+                        <label class="option selected">
+                            <input type="radio" name="setupMethod" value="manual" checked>
+                            <div class="option-content">
+                                <div class="option-title">Configure manually</div>
+                                <div class="option-description">Manually configure pay rates, overtime rules, deductions, and benefits.</div>
+                            </div>
+                        </label>
+
+                        <label class="option">
+                            <input type="radio" name="setupMethod" value="replicate">
+                            <div class="option-content">
+                                <div class="option-title">
+                                    Replicate existing template
+                                </div>
+                                <div class="option-description">Select an existing payroll template and replicate its settings, including pay rates, rules, and deductions.</div>
+                            </div>
+                        </label>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ol class="steps-list">
+                    <li class="step-item active">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Define template settings</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Configure pay rates</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Set deductions & review</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <div class="nav-right">
+                <div class="step-info">Step 1 of 3<br>Next step: Configure pay rates</div>
+                <button type="submit" class="btn-continue" id="continueBtn" form="payroll-form" disabled>Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic form validation
+        const templateNameInput = document.getElementById('templateName');
+        const charCount = document.querySelector('.char-count');
+        const continueBtn = document.getElementById('continueBtn');
+        const errorMessage = document.querySelector('.error-message');
+
+        function validateForm() {
+            const templateName = templateNameInput.value.trim();
+            const templateType = document.getElementById('selectedTemplateType').value;
+            
+            if (!templateName || !templateType) {
+                continueBtn.disabled = true;
+                return false;
+            }
+            
+            continueBtn.disabled = false;
+            return true;
+        }
+
+        templateNameInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = `${length}/48`;
+            validateForm();
+        });
+
+        // Template type dropdown
+        function setupTemplateTypeDropdown() {
+            const dropdown = document.getElementById('templateTypeDropdown');
+            const btn = document.getElementById('templateTypeDropdownBtn');
+            const menu = document.getElementById('templateTypeDropdownMenu');
+            const label = document.getElementById('templateTypeDropdownLabel');
+            const hiddenInput = document.getElementById('selectedTemplateType');
+            const options = menu.querySelectorAll('.dropdown-option');
+
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                menu.classList.toggle('show');
+                btn.classList.toggle('open');
+            });
+
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    label.textContent = this.querySelector('.option-main').textContent;
+                    hiddenInput.value = this.getAttribute('data-value');
+                    
+                    validateForm();
+                    
+                    menu.classList.remove('show');
+                    btn.classList.remove('open');
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    menu.classList.remove('show');
+                    btn.classList.remove('open');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTemplateTypeDropdown();
+        });
+    </script>
+</body>
+</html> 
