@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
-    <!-- Add Google Sign-In API -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
+    <!-- Google Sign-In API removed to fix configuration errors -->
     <style>
         * {
             margin: 0;
@@ -322,79 +322,7 @@
             outline: none;
         }
 
-        /* Custom Google Sign-In Button Styles */
-        .g_id_signin {
-            width: 100% !important;
-            margin-bottom: 20px;
-            max-width: 450px !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-        }
-
-        .g_id_signin > div {
-            width: 100% !important;
-            background: rgb(245, 245, 245) !important;  /* Light gray background */
-            border: none !important;
-            border-radius: 6px !important;
-            box-shadow: none !important;
-            transition: all 0.3s ease !important;
-            position: relative !important;
-            height: 40px !important;
-            overflow: hidden !important;
-        }
-
-        .g_id_signin > div:hover {
-            background: rgb(240, 240, 240) !important;  /* Slightly darker on hover */
-        }
-
-        .g_id_signin > div > div {
-            position: relative !important;
-            height: 100% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding-left: 48px !important;
-            border: none !important;
-            outline: none !important;
-            background: transparent !important;
-        }
-
-        .g_id_signin > div > div > span {
-            text-align: center !important;
-            border: none !important;
-            outline: none !important;
-            background: transparent !important;
-            color: #444 !important;  /* Darker text color */
-        }
-
-        .g_id_signin iframe {
-            position: absolute !important;
-            left: 12px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            border: none !important;
-            outline: none !important;
-            background: transparent !important;
-        }
-
-        /* Remove all borders and set background */
-        .g_id_signin *,
-        .g_id_signin *::before,
-        .g_id_signin *::after,
-        .g_id_signin > div[role="button"] {
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-        }
-
-        /* Override any default styles */
-        .nsm7Bb-HzV7m-LgbsSe,
-        .nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe {
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-            background: transparent !important;
-        }
+        /* Google Sign-In styles removed */
 
         /* Add error message styling */
         .error-message {
@@ -521,29 +449,12 @@
                 <p class="helper-text">Make sure your password is secure.</p>
             </div>
 
+            <!-- Google Sign-In temporarily disabled to fix configuration errors -->
             <div class="continue-with"><span>Continue with</span></div>
             
-            <!-- Google Sign-In button configuration -->
-            <div id="g_id_onload"
-                 data-client_id="36720020978-877sp06tqf0tslnhembg2jvd3hr8aleo.apps.googleusercontent.com"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-login_uri="http://localhost:8000/surface.html"
-                 data-auto_prompt="false"
-                 data-callback="handleGoogleSignIn"
-                 data-locale="en"
-                 data-use_fedcm_for_prompt="false">
-            </div>
-            
-            <div class="g_id_signin gmail-button"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="filled_white"
-                 data-text="sign_in_with"
-                 data-shape="rectangular"
-                 data-width="550"
-                 data-logo_alignment="left"
-                 data-locale="en">
+            <div class="gmail-button" style="opacity: 0.5; cursor: not-allowed;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2LjUgOS4yNEMxNi4zNCA5LjA4IDE2LjE4IDkgMTYgOUg5VjZIMTZDMjAuNDIgNiAyNCA5LjU4IDI0IDE0QzI0IDE4LjQyIDIwLjQyIDIyIDE2IDIySDlWMTlIMTZDMjAuNDIgMTkgMjQgMTUuNDIgMjQgMTFDMjQgNi41OCAyMC40MiAzIDE2IDNIOVYwSDJWM0g1QzAuNTggMyAtMyA2LjU4IC0zIDExQy0zIDE1LjQyIDAuNTggMTkgNSAxOUg4VjIySDVDLTAuNTggMjIgLTQgMTguNDIgLTQgMTRDLTQgOS41OCAtMC41OCA2IDUgNkg4VjNIMTFWNkgxNkMxNi4xOCA2IDE2LjM0IDUuOTIgMTYuNSA1Ljc2TDE2LjUgOS4yNFoiIGZpbGw9IiM0MjQyNDIiLz4KPC9zdmc+" alt="Google" style="width: 20px; margin-right: 10px;">
+                Google Sign-In (Temporarily Disabled)
             </div>
 
             <div class="actions">
@@ -616,15 +527,27 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
+            // Check if user is already logged in (silently handle 401)
             fetch('/api/check-login')
-                .then(response => response.json())
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else if (response.status === 401) {
+                        // User is not logged in, which is expected on login page
+                        return null;
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                })
                 .then(data => {
-                    if (data.message === 'Logged in') {
+                    if (data && data.message === 'Logged in') {
                         window.location.href = '/';
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    // Silently ignore all errors on login page
+                    // 401 is expected, other errors are not critical for login page
+                });
 
             // Handle form submission
             document.querySelector('form').addEventListener('submit', function(e) {
@@ -707,37 +630,9 @@
             }
         });
 
-        // Google Sign-In handling function
+        // Google Sign-In temporarily disabled
         function handleGoogleSignIn(response) {
-            const credential = response.credential;
-            const decodedToken = JSON.parse(atob(credential.split('.')[1]));
-            
-            fetch('/api/google-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: decodedToken.email,
-                    name: decodedToken.name
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'Google login failed');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Redirect to homepage on successful login
-                window.location.href = '/';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(error.message || 'An error occurred during Google Sign-In');
-            });
+            showMessage('error', 'Google Sign-In is temporarily disabled. Please use email login instead.');
         }
 
         // Language translations
@@ -816,45 +711,7 @@
                 showMessage('error', newErrorMessage);
             }
             
-            // Update Google Sign-In button text
-            const googleButton = document.querySelector('.g_id_signin');
-            if (googleButton && window.google && window.google.accounts) {
-                try {
-                    // First destroy the existing button
-                    google.accounts.id.cancel();
-                    
-                    // Remove the existing button content
-                    googleButton.innerHTML = '';
-                    
-                    // Force English language for Google Sign-In
-                    document.documentElement.setAttribute('lang', 'en');
-                    
-                    // Reinitialize Google Sign-In with new language
-                    google.accounts.id.initialize({
-                        client_id: '36720020978-877sp06tqf0tslnhembg2jvd3hr8aleo.apps.googleusercontent.com',
-                        callback: handleGoogleSignIn,
-                        auto_prompt: false,
-                        ux_mode: 'popup',
-                        locale: 'en'  // Force English
-                    });
-                    
-                    // Render the button with new language
-                    google.accounts.id.renderButton(
-                        googleButton,
-                        {
-                            type: 'standard',
-                            theme: 'filled_white',
-                            size: 'large',
-                            text: 'signin_with',
-                            width: 550,
-                            logo_alignment: 'left',
-                            locale: 'en'  // Force English
-                        }
-                    );
-                } catch (error) {
-                    console.error('Error updating Google button:', error);
-                }
-            }
+            // Google Sign-In button update removed
             
             // Update title and subtitle
             const title = document.querySelector('h1');

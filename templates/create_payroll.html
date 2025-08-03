@@ -611,7 +611,7 @@
             <div class="bottom-nav-content">
                 <div class="nav-right">
                 <div class="step-info">Step 1 of 3<br>Next step: Configure pay rates</div>
-                <button type="submit" class="btn-continue" id="continueBtn" form="payroll-form" disabled>Continue</button>
+                <button type="button" class="btn-continue" id="continueBtn" disabled>Continue</button>
                 </div>
             </div>
         </div>
@@ -628,11 +628,17 @@
             const templateName = templateNameInput.value.trim();
             const templateType = document.getElementById('selectedTemplateType').value;
             
+            console.log('Validating form:');
+            console.log('- Template name:', templateName);
+            console.log('- Template type:', templateType);
+            
             if (!templateName || !templateType) {
+                console.log('Validation failed: missing template name or type');
                 continueBtn.disabled = true;
                 return false;
             }
             
+            console.log('Validation passed');
             continueBtn.disabled = false;
             return true;
         }
@@ -666,6 +672,9 @@
                     label.textContent = this.querySelector('.option-main').textContent;
                     hiddenInput.value = this.getAttribute('data-value');
                     
+                    console.log('Template type selected:', this.getAttribute('data-value'));
+                    console.log('Hidden input value:', hiddenInput.value);
+                    
                     validateForm();
                     
                     menu.classList.remove('show');
@@ -681,8 +690,54 @@
             });
         }
 
+        // Form submission
+        document.getElementById('payroll-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            console.log('Form submitted');
+            console.log('Template name:', templateNameInput.value.trim());
+            console.log('Template type:', document.getElementById('selectedTemplateType').value);
+            console.log('Setup method:', document.querySelector('input[name="setupMethod"]:checked').value);
+            
+            if (!validateForm()) {
+                console.log('Form validation failed');
+                return;
+            }
+
+            console.log('Form validation passed');
+
+            // Collect form data
+            const formData = {
+                templateName: templateNameInput.value.trim(),
+                templateType: document.getElementById('selectedTemplateType').value,
+                setupMethod: document.querySelector('input[name="setupMethod"]:checked').value
+            };
+
+            console.log('Form data:', formData);
+
+            // Save to session storage
+            sessionStorage.setItem('payrollData', JSON.stringify({ step1: formData }));
+
+            console.log('Data saved to session storage');
+
+            // Navigate to next step
+            console.log('Navigating to step 2...');
+            window.location.href = '/create-payroll-step2';
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             setupTemplateTypeDropdown();
+            
+            // Add click handler to continue button as backup
+            continueBtn.addEventListener('click', function(e) {
+                console.log('Continue button clicked');
+                if (validateForm()) {
+                    console.log('Manual continue button validation passed');
+                    document.getElementById('payroll-form').dispatchEvent(new Event('submit'));
+                } else {
+                    console.log('Manual continue button validation failed');
+                }
+            });
         });
     </script>
 </body>

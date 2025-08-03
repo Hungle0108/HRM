@@ -1819,6 +1819,25 @@ def create_payroll():
     return render_template('create_payroll.html', user=user, organization=organization, templates=templates)
 
 
+@app.route('/create-payroll-step2')
+def create_payroll_step2():
+    """Create payroll template step 2 - Configure pay rates"""
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Get the user's organization
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('create_payroll_step2.html', user=user, organization=organization)
+
+
 @app.route('/api/get-worker-types', methods=['GET'])
 def api_get_worker_types():
     """API endpoint to get worker types for current user's organization"""

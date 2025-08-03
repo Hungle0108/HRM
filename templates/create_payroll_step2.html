@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Pay Rates - HR Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+         <style>
+         * {
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+         }
+
+         body {
+             margin: 0;
+             padding: 0;
+             background: #f8f9fa;
+             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+         }
+
+         .page-container {
+             min-height: 100vh;
+             display: flex;
+             flex-direction: column;
+         }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: #f8f9fa;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: #f8f9fa;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .main-container:has(.sidebar.hidden),
+        .main-container.single-step {
+            justify-content: center;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.hidden {
+            display: none;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            margin-top: 32px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .section-description {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle.active {
+            background: #1a1a1a;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .conditional-section {
+            display: none;
+            padding: 24px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .conditional-section.show {
+            display: block;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .info-box-text {
+            font-size: 0.875rem;
+            color: #1976d2;
+            line-height: 1.5;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+
+
+
+
+
+
+        .btn-continue {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-continue:hover {
+            background: #333;
+        }
+
+        .btn-continue:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .step-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+            text-align: right;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        /* Form styles */
+        .form-input.error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .form-input.error::placeholder {
+            color: #dc3545;
+        }
+
+        .error-message {
+            font-size: 0.75rem;
+            color: #dc3545;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .char-count {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+                 .input-wrapper {
+             position: relative;
+         }
+
+         /* Calendar Styles */
+         .date-input-wrapper {
+             position: relative;
+             width: 100%;
+         }
+
+         .date-input {
+             padding-right: 50px;
+         }
+
+         .calendar-icon {
+             position: absolute;
+             right: 16px;
+             top: 50%;
+             transform: translateY(-50%);
+             background: none;
+             border: none;
+             cursor: pointer;
+             padding: 4px;
+             border-radius: 4px;
+             transition: all 0.2s;
+         }
+
+         .calendar-icon:hover {
+             background: #f8f9fa;
+         }
+
+         .calendar-icon img {
+             width: 16px;
+             height: 16px;
+             object-fit: contain;
+             transition: all 0.2s;
+         }
+
+                   .calendar-popup {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              z-index: 2000;
+              margin-top: 4px;
+          }
+
+                                       .calendar {
+               height: 300px;
+               width: 320px;
+               background-color: #fdfdfd;
+               border-radius: 12px;
+               padding: 20px;
+               position: relative;
+               overflow: hidden;
+               box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+               border: 1px solid #e9ecef;
+           }
+
+         .calendar-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             font-size: 16px;
+             font-weight: 600;
+             color: #151426;
+             padding: 10px;
+         }
+
+         .calendar-body {
+             padding: 10px;
+         }
+
+         .calendar-week-day {
+             height: 40px;
+             display: grid;
+             grid-template-columns: repeat(7, 1fr);
+             font-weight: 600;
+             font-size: 14px;
+         }
+
+         .calendar-week-day div {
+             display: grid;
+             place-items: center;
+             color: #c3c2c8;
+         }
+
+         .calendar-days {
+             display: grid;
+             grid-template-columns: repeat(7, 1fr);
+             gap: 2px;
+             color: #151426;
+         }
+
+         .calendar-days div {
+             width: 40px;
+             height: 40px;
+             display: grid;
+             place-items: center;
+             cursor: pointer;
+             position: relative;
+             transition: all 0.2s;
+             border-radius: 8px;
+         }
+
+         .calendar-days div:hover {
+             background-color: #edf0f5;
+         }
+
+         .calendar-days div.selected-date {
+             background-color: #1a1a1a;
+             color: white;
+         }
+
+         .calendar-days div.selected-date:hover {
+             background-color: #333;
+         }
+
+         .year-picker {
+             display: flex;
+             align-items: center;
+             gap: 8px;
+         }
+
+         .year-change {
+             cursor: pointer;
+             padding: 4px 8px;
+             border-radius: 4px;
+             transition: all 0.2s;
+         }
+
+         .year-change:hover {
+             background-color: #edf0f5;
+         }
+
+         .month-picker {
+             cursor: pointer;
+             padding: 4px 8px;
+             border-radius: 4px;
+             transition: all 0.2s;
+         }
+
+                   .month-picker:hover {
+              background-color: #edf0f5;
+          }
+
+          .calendar-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: #151426;
+          }
+
+                                 /* Month List Styles */
+                         .month-list {
+                 position: absolute;
+                 width: 100%;
+                 height: 100%;
+                 top: 0;
+                 left: 0;
+                 background-color: #fdfdfd;
+                 padding: 16px;
+                 grid-template-columns: repeat(3, 1fr);
+                 gap: 6px;
+                 display: grid;
+                 transform: scale(1.5);
+                 visibility: hidden;
+                 pointer-events: none;
+                 border-radius: 12px;
+             }
+
+           .month-list.show {
+               transform: scale(1);
+               visibility: visible;
+               pointer-events: visible;
+               transition: all 0.2s ease-in-out;
+           }
+
+           .month-list > div {
+               display: grid;
+               place-items: center;
+           }
+
+                                   .month-list > div > div {
+                 width: 100%;
+                 padding: 6px 8px;
+                 border-radius: 8px;
+                 text-align: center;
+                 cursor: pointer;
+                 color: #151426;
+                 font-size: 12px;
+                 font-weight: 500;
+             }
+
+           .month-list > div > div:hover {
+               background-color: #edf0f5;
+           }
+     </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="sessionStorage.removeItem('payrollData'); window.location.href='/settings/payroll-template'">✕</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Configure pay rates</h1>
+                <p class="page-subtitle">Set up the pay structure for your payroll template</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="payroll-step2-form">
+                    <!-- Base Pay Section -->
+                    <div class="section-title">Base Pay</div>
+                    <div class="section-description">
+                        Define the base pay structure for your employees. This will be the foundation for all pay calculations.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="basePayRate" class="form-label">Base pay rate</label>
+                        <input 
+                            type="number" 
+                            id="basePayRate" 
+                            class="form-input" 
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payFrequency" class="form-label">Pay frequency</label>
+                        <select id="payFrequency" class="form-input" required>
+                            <option value="">Select pay frequency</option>
+                            <option value="hourly">Per hour</option>
+                            <option value="daily">Per day</option>
+                            <option value="weekly">Per week</option>
+                            <option value="biweekly">Bi-weekly</option>
+                            <option value="monthly">Per month</option>
+                            <option value="annually">Per year</option>
+                        </select>
+                    </div>
+
+                    <!-- Overtime Section -->
+                    <div class="section-title">Overtime</div>
+                    <div class="section-description">
+                        Configure overtime pay rates for hours worked beyond the standard work week.
+                    </div>
+
+                    <div class="toggle-switch">
+                        <div class="toggle" id="overtimeToggle"></div>
+                        <div class="toggle-label">Enable overtime pay</div>
+                    </div>
+
+                    <div class="conditional-section" id="overtimeSection">
+                        <div class="info-box">
+                            <div class="info-box-title">Overtime Information</div>
+                            <div class="info-box-text">
+                                Overtime is typically paid at 1.5x the regular rate for hours worked beyond 40 hours per week.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="overtimeThreshold" class="form-label">Overtime threshold (hours per week)</label>
+                            <input 
+                                type="number" 
+                                id="overtimeThreshold" 
+                                class="form-input" 
+                                placeholder="40"
+                                value="40"
+                                min="1"
+                                max="168"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="overtimeRate" class="form-label">Overtime rate multiplier</label>
+                            <input 
+                                type="number" 
+                                id="overtimeRate" 
+                                class="form-input" 
+                                placeholder="1.5"
+                                value="1.5"
+                                step="0.1"
+                                min="1"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Holiday Pay Section -->
+                    <div class="section-title">Holiday Pay</div>
+                    <div class="section-description">
+                        Set up holiday pay rates for employees working on recognized holidays.
+                    </div>
+
+                    <div class="toggle-switch">
+                        <div class="toggle" id="holidayPayToggle"></div>
+                        <div class="toggle-label">Enable holiday pay</div>
+                    </div>
+
+                    <div class="conditional-section" id="holidayPaySection">
+                        <div class="form-group">
+                            <label for="holidayPayRate" class="form-label">Holiday pay rate multiplier</label>
+                            <input 
+                                type="number" 
+                                id="holidayPayRate" 
+                                class="form-input" 
+                                placeholder="1.5"
+                                value="1.5"
+                                step="0.1"
+                                min="1"
+                            >
+                        </div>
+                    </div>
+
+                                         <!-- Weekend Pay Section -->
+                     <div class="section-title">Weekend Pay</div>
+                     <div class="section-description">
+                         Configure additional pay rates for weekend work.
+                     </div>
+
+                     <div class="toggle-switch">
+                         <div class="toggle" id="weekendPayToggle"></div>
+                         <div class="toggle-label">Enable weekend pay</div>
+                     </div>
+
+                     <div class="conditional-section" id="weekendPaySection">
+                         <div class="form-group">
+                             <label for="weekendPayRate" class="form-label">Weekend pay rate multiplier</label>
+                             <input 
+                                 type="number" 
+                                 id="weekendPayRate" 
+                                 class="form-input" 
+                                 placeholder="1.25"
+                                 value="1.25"
+                                 step="0.1"
+                                 min="1"
+                             >
+                         </div>
+                     </div>
+
+                     <!-- Apply Time Section -->
+                     <div class="section-title">Apply Time</div>
+                                            <div class="section-description">
+                           Set which month this payroll template should take effect.
+                       </div>
+
+                                            <div class="form-group">
+                           <label for="applyTime" class="form-label">Apply from month</label>
+                         <div class="date-input-wrapper">
+                             <input 
+                                 type="text" 
+                                 id="applyTime" 
+                                 class="form-input date-input" 
+                                 placeholder="Select apply month"
+                                 readonly
+                                 required
+                             >
+                             <button type="button" class="calendar-icon" id="applyTimeCalendarToggle">
+                                 <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
+                             </button>
+                             <div class="calendar-popup" id="applyTimeCalendarPopup" style="display: none;">
+                                 <div class="calendar light">
+                                                                                                                 <div class="calendar-header">
+                                          <span class="calendar-title">Select Month</span>
+                                      </div>
+                                      <div class="calendar-body">
+                                      </div>
+                                     <div class="month-list"></div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ol class="steps-list">
+                    <li class="step-item completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-text">Define template settings</div>
+                    </li>
+                    <li class="step-item active">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Configure pay rates</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Set deductions & review</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <a href="/create-payroll" class="btn-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </a>
+                <div class="nav-right">
+                    <div class="step-info">Step 2 of 3<br>Next step: Set deductions & review</div>
+                    <button type="submit" class="btn-continue" id="continueBtn" form="payroll-step2-form" disabled>Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load data from previous step
+        let payrollData = JSON.parse(sessionStorage.getItem('payrollData') || '{}');
+
+        // Form elements
+        const form = document.getElementById('payroll-step2-form');
+        const basePayRateInput = document.getElementById('basePayRate');
+        const payFrequencySelect = document.getElementById('payFrequency');
+        const continueBtn = document.getElementById('continueBtn');
+
+        // Toggle switches
+        const overtimeToggle = document.getElementById('overtimeToggle');
+        const overtimeSection = document.getElementById('overtimeSection');
+        const holidayPayToggle = document.getElementById('holidayPayToggle');
+        const holidayPaySection = document.getElementById('holidayPaySection');
+        const weekendPayToggle = document.getElementById('weekendPayToggle');
+        const weekendPaySection = document.getElementById('weekendPaySection');
+
+        // Setup toggle switches
+        function setupToggle(toggle, section) {
+            toggle.addEventListener('click', function() {
+                toggle.classList.toggle('active');
+                section.classList.toggle('show');
+            });
+        }
+
+        setupToggle(overtimeToggle, overtimeSection);
+        setupToggle(holidayPayToggle, holidayPaySection);
+        setupToggle(weekendPayToggle, weekendPaySection);
+
+                 // Form validation
+         function validateForm() {
+             const basePayRate = basePayRateInput.value.trim();
+             const payFrequency = payFrequencySelect.value;
+             const applyTime = document.getElementById('applyTime').value.trim();
+             
+             if (!basePayRate || !payFrequency || parseFloat(basePayRate) <= 0 || !applyTime) {
+                 continueBtn.disabled = true;
+                 return false;
+             }
+             
+             continueBtn.disabled = false;
+             return true;
+         }
+
+        // Event listeners
+        basePayRateInput.addEventListener('input', validateForm);
+        payFrequencySelect.addEventListener('change', validateForm);
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+                         // Collect form data
+             const formData = {
+                 basePayRate: parseFloat(basePayRateInput.value),
+                 payFrequency: payFrequencySelect.value,
+                 applyTime: document.getElementById('applyTime').value,
+                 overtime: {
+                     enabled: overtimeToggle.classList.contains('active'),
+                     threshold: document.getElementById('overtimeThreshold').value,
+                     rate: document.getElementById('overtimeRate').value
+                 },
+                 holidayPay: {
+                     enabled: holidayPayToggle.classList.contains('active'),
+                     rate: document.getElementById('holidayPayRate').value
+                 },
+                 weekendPay: {
+                     enabled: weekendPayToggle.classList.contains('active'),
+                     rate: document.getElementById('weekendPayRate').value
+                 }
+             };
+
+            // Save to session storage
+            payrollData.step2 = formData;
+            sessionStorage.setItem('payrollData', JSON.stringify(payrollData));
+
+            // Navigate to next step
+            window.location.href = '/create-payroll-step3';
+        });
+
+
+
+                 // Initialize
+         document.addEventListener('DOMContentLoaded', function() {
+                            // Load saved data if available
+               if (payrollData.step2) {
+                   const data = payrollData.step2;
+                   basePayRateInput.value = data.basePayRate;
+                   payFrequencySelect.value = data.payFrequency;
+
+                   // Set toggles
+                   if (data.overtime.enabled) {
+                       overtimeToggle.click();
+                   }
+                   if (data.holidayPay.enabled) {
+                       holidayPayToggle.click();
+                   }
+                   if (data.weekendPay.enabled) {
+                       weekendPayToggle.click();
+                   }
+
+                   // Set values
+                   document.getElementById('overtimeThreshold').value = data.overtime.threshold;
+                   document.getElementById('overtimeRate').value = data.overtime.rate;
+                   document.getElementById('holidayPayRate').value = data.holidayPay.rate;
+                   document.getElementById('weekendPayRate').value = data.weekendPay.rate;
+                   
+                   // Set apply time if available
+                   if (data.applyTime) {
+                       document.getElementById('applyTime').value = data.applyTime;
+                   }
+               }
+
+             validateForm();
+
+             // Initialize Apply Time Calendar
+             initializeApplyTimeCalendar();
+         });
+
+                    // Apply Time Calendar Functions
+           function initializeApplyTimeCalendar() {
+               const applyTimeInput = document.getElementById('applyTime');
+               const calendarToggle = document.getElementById('applyTimeCalendarToggle');
+               const calendarPopup = document.getElementById('applyTimeCalendarPopup');
+
+               if (applyTimeInput && calendarToggle && calendarPopup) {
+                   let calendar = calendarPopup.querySelector('.calendar');
+                   let selectedMonth = null;
+                   let selectedYear = null;
+
+                   const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+                                       const updateCalendar = () => {
+                        // Update selected month if exists
+                        if (selectedMonth !== null) {
+                            const monthItems = calendar.querySelectorAll('.month-list > div > div');
+                            monthItems.forEach(item => item.classList.remove('selected'));
+                            monthItems[selectedMonth].classList.add('selected');
+                        }
+                    };
+
+                                   // Get current year for month selection
+                  const currentYear = new Date().getFullYear();
+
+                                                       // Month selection from list
+                  const monthList = calendar.querySelector('.month-list');
+                  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                  
+                  monthNames.forEach((monthName, index) => {
+                      const monthDiv = document.createElement('div');
+                      monthDiv.innerHTML = `<div data-month="${index}">${monthName}</div>`;
+                      monthDiv.querySelector('div').onclick = () => {
+                          monthList.classList.remove('show');
+                          
+                          // Remove selected class from all months
+                          monthList.querySelectorAll('div > div').forEach(month => month.classList.remove('selected'));
+                          
+                          // Add selected class to clicked month
+                          monthDiv.querySelector('div').classList.add('selected');
+                          
+                          selectedMonth = index;
+                          selectedYear = currentYear;
+                          
+                          // Format month/year for input (MM/YYYY)
+                          const formattedMonth = (index + 1).toString().padStart(2, '0');
+                          applyTimeInput.value = `${formattedMonth}/${currentYear}`;
+                          
+                          // Close calendar
+                          calendarPopup.style.display = 'none';
+                          
+                          // Validate form
+                          validateForm();
+                      };
+                      monthList.appendChild(monthDiv);
+                  });
+
+                                   // Toggle calendar popup
+                  calendarToggle.addEventListener('click', (e) => {
+                      e.stopPropagation();
+                      
+                      if (calendarPopup.style.display === 'none') {
+                          calendarPopup.style.display = 'block';
+                          updateCalendar();
+                          
+                          // Show month list immediately
+                          const monthList = calendar.querySelector('.month-list');
+                          monthList.classList.add('show');
+                          
+                          // Check if popup would be cut off by bottom navigation
+                          const popupRect = calendarPopup.getBoundingClientRect();
+                          const bottomNav = document.querySelector('.bottom-navigation');
+                          const bottomNavRect = bottomNav.getBoundingClientRect();
+                          
+                          if (popupRect.bottom > bottomNavRect.top) {
+                              // Position popup above the input
+                              calendarPopup.style.top = 'auto';
+                              calendarPopup.style.bottom = '100%';
+                              calendarPopup.style.marginTop = '0';
+                              calendarPopup.style.marginBottom = '4px';
+                          } else {
+                              // Reset to default position below input
+                              calendarPopup.style.top = '100%';
+                              calendarPopup.style.bottom = 'auto';
+                              calendarPopup.style.marginTop = '4px';
+                              calendarPopup.style.marginBottom = '0';
+                          }
+                      } else {
+                          calendarPopup.style.display = 'none';
+                      }
+                  });
+
+                 // Close calendar when clicking outside
+                 document.addEventListener('click', (e) => {
+                     if (!calendarPopup.contains(e.target) && !calendarToggle.contains(e.target)) {
+                         calendarPopup.style.display = 'none';
+                     }
+                 });
+             }
+         }
+    </script>
+</body>
+</html> 
