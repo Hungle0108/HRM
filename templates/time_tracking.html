@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Time tracking - HR Management System{% endblock %}
+{% block title %}Schedule - HR Management System{% endblock %}
 
 {% block styles %}
 <style>
@@ -957,15 +957,17 @@
     <div class="settings-content" style="display: flex; flex-direction: column; gap: 16px;">
         <div class="content-header" style="margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
             <div>
-                <h1 class="content-title" style="font-size:2rem; font-weight:700; color:#1a1a1a; margin-bottom: 4px;">Time tracking</h1>
+                <h1 class="content-title" style="font-size:2rem; font-weight:700; color:#1a1a1a; margin-bottom: 4px;">Schedule</h1>
                 <div style="font-size:1rem; color:#444;">Manage weekly fixed schedules for your hourly and salaried workers</div>
         </div>
-            <a href="/create-schedule" class="create-btn">Create</a>
         </div>
         <div class="schedule-panels" id="schedule-panels">
             <div class="schedule-list-panel">
         <div class="work-schedules-section">
-                    <div style="font-size: 1rem; font-weight: 500; color: #222; margin-bottom: 4px;">{{ schedules|length }} Schedules</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <div style="font-size: 1rem; font-weight: 500; color: #222;">{{ schedules|length }} Schedules</div>
+                        <a href="/create-schedule" class="create-btn">Create</a>
+                    </div>
             <div class="schedules-header">
                         <div class="schedules-info"></div>
                 </div>

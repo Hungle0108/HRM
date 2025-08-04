@@ -1726,6 +1726,23 @@ def time_tracking():
     
     return render_template('time_tracking.html', user=user, organization=organization, schedules=schedules, active_page='time_tracking')
 
+@app.route('/settings/time-keeping')
+def time_keeping():
+    """Time keeping page"""
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    # Get the user's organization
+    organization = None
+    if user.organization_id:
+        organization = Organization.query.get(user.organization_id)
+    
+    return render_template('time_keeping.html', user=user, organization=organization, active_page='time_keeping')
+
 @app.route('/settings/worker-type')
 def worker_type():
     """Worker type settings page"""
