@@ -44,6 +44,66 @@
         transform: translateY(-1px);
     }
 
+    .update-flags-btn {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        margin-right: 0.5rem;
+    }
+
+    .update-flags-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-1px);
+    }
+
+    .update-flags-btn svg {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .update-flags-btn:active svg {
+        transform: rotate(180deg);
+    }
+
+    /* Animation keyframes */
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
     /* Filters box - matching groups page */
     .filters-box {
         background: white;
@@ -1475,6 +1535,15 @@
             </div>
             
             <div class="action-buttons-group">
+                <button class="update-flags-btn" onclick="updateCountryCodes()" title="Update country flags for existing employees">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    </svg>
+                    Update Flags
+                </button>
                 <button class="customize-columns-btn" id="customizeColumnsBtn">Customize columns</button>
                 <button class="add-member-btn" onclick="window.location.href='/add-people'">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1550,6 +1619,60 @@
                                              alt="{{ employee.citizenship or 'Country' }}" 
                                              class="flag-icon"
                                              title="{{ employee.citizenship or 'Country' }}">
+                                    {% elif employee.citizenship %}
+                                        {% set country_mappings = {
+                                            'Afghanistan': 'af', 'Albania': 'al', 'Algeria': 'dz', 'Andorra': 'ad', 'Angola': 'ao',
+                                            'Antigua and Barbuda': 'ag', 'Argentina': 'ar', 'Armenia': 'am', 'Australia': 'au',
+                                            'Austria': 'at', 'Azerbaijan': 'az', 'Bahamas': 'bs', 'Bahrain': 'bh', 'Bangladesh': 'bd',
+                                            'Barbados': 'bb', 'Belarus': 'by', 'Belgium': 'be', 'Belize': 'bz', 'Benin': 'bj',
+                                            'Bhutan': 'bt', 'Bolivia': 'bo', 'Bosnia and Herzegovina': 'ba', 'Botswana': 'bw',
+                                            'Brazil': 'br', 'Brunei': 'bn', 'Bulgaria': 'bg', 'Burkina Faso': 'bf', 'Burundi': 'bi',
+                                            'Cabo Verde': 'cv', 'Cambodia': 'kh', 'Cameroon': 'cm', 'Canada': 'ca',
+                                            'Central African Republic': 'cf', 'Chad': 'td', 'Chile': 'cl', 'China': 'cn',
+                                            'Colombia': 'co', 'Comoros': 'km', 'Congo': 'cg', 'Costa Rica': 'cr', 'Croatia': 'hr',
+                                            'Cuba': 'cu', 'Cyprus': 'cy', 'Czech Republic': 'cz', 'Democratic Republic of the Congo': 'cd',
+                                            'Denmark': 'dk', 'Djibouti': 'dj', 'Dominica': 'dm', 'Dominican Republic': 'do',
+                                            'East Timor': 'tl', 'Ecuador': 'ec', 'Egypt': 'eg', 'El Salvador': 'sv',
+                                            'Equatorial Guinea': 'gq', 'Eritrea': 'er', 'Estonia': 'ee', 'Eswatini': 'sz',
+                                            'Ethiopia': 'et', 'Fiji': 'fj', 'Finland': 'fi', 'France': 'fr', 'Gabon': 'ga',
+                                            'Gambia': 'gm', 'Georgia': 'ge', 'Germany': 'de', 'Ghana': 'gh', 'Greece': 'gr',
+                                            'Grenada': 'gd', 'Guatemala': 'gt', 'Guinea': 'gn', 'Guinea-Bissau': 'gw', 'Guyana': 'gy',
+                                            'Haiti': 'ht', 'Honduras': 'hn', 'Hungary': 'hu', 'Iceland': 'is', 'India': 'in',
+                                            'Indonesia': 'id', 'Iran': 'ir', 'Iraq': 'iq', 'Ireland': 'ie', 'Israel': 'il',
+                                            'Italy': 'it', 'Ivory Coast': 'ci', 'Jamaica': 'jm', 'Japan': 'jp', 'Jordan': 'jo',
+                                            'Kazakhstan': 'kz', 'Kenya': 'ke', 'Kiribati': 'ki', 'Kuwait': 'kw', 'Kyrgyzstan': 'kg',
+                                            'Laos': 'la', 'Latvia': 'lv', 'Lebanon': 'lb', 'Lesotho': 'ls', 'Liberia': 'lr',
+                                            'Libya': 'ly', 'Liechtenstein': 'li', 'Lithuania': 'lt', 'Luxembourg': 'lu',
+                                            'Madagascar': 'mg', 'Malawi': 'mw', 'Malaysia': 'my', 'Maldives': 'mv', 'Mali': 'ml',
+                                            'Malta': 'mt', 'Marshall Islands': 'mh', 'Mauritania': 'mr', 'Mauritius': 'mu',
+                                            'Mexico': 'mx', 'Micronesia': 'fm', 'Moldova': 'md', 'Monaco': 'mc', 'Mongolia': 'mn',
+                                            'Montenegro': 'me', 'Morocco': 'ma', 'Mozambique': 'mz', 'Myanmar': 'mm', 'Namibia': 'na',
+                                            'Nauru': 'nr', 'Nepal': 'np', 'Netherlands': 'nl', 'New Zealand': 'nz', 'Nicaragua': 'ni',
+                                            'Niger': 'ne', 'Nigeria': 'ng', 'North Korea': 'kp', 'North Macedonia': 'mk', 'Norway': 'no',
+                                            'Oman': 'om', 'Pakistan': 'pk', 'Palau': 'pw', 'Panama': 'pa', 'Papua New Guinea': 'pg',
+                                            'Paraguay': 'py', 'Peru': 'pe', 'Philippines': 'ph', 'Poland': 'pl', 'Portugal': 'pt',
+                                            'Qatar': 'qa', 'Romania': 'ro', 'Russia': 'ru', 'Rwanda': 'rw', 'Saint Kitts and Nevis': 'kn',
+                                            'Saint Lucia': 'lc', 'Saint Vincent and the Grenadines': 'vc', 'Samoa': 'ws',
+                                            'San Marino': 'sm', 'Sao Tome and Principe': 'st', 'Saudi Arabia': 'sa', 'Senegal': 'sn',
+                                            'Serbia': 'rs', 'Seychelles': 'sc', 'Sierra Leone': 'sl', 'Singapore': 'sg', 'Slovakia': 'sk',
+                                            'Slovenia': 'si', 'Solomon Islands': 'sb', 'Somalia': 'so', 'South Africa': 'za',
+                                            'South Korea': 'kr', 'South Sudan': 'ss', 'Spain': 'es', 'Sri Lanka': 'lk', 'Sudan': 'sd',
+                                            'Suriname': 'sr', 'Sweden': 'se', 'Switzerland': 'ch', 'Syria': 'sy', 'Taiwan': 'tw',
+                                            'Tajikistan': 'tj', 'Tanzania': 'tz', 'Thailand': 'th', 'Togo': 'tg', 'Tonga': 'to',
+                                            'Trinidad and Tobago': 'tt', 'Tunisia': 'tn', 'Turkey': 'tr', 'Turkmenistan': 'tm',
+                                            'Tuvalu': 'tv', 'Uganda': 'ug', 'Ukraine': 'ua', 'United Arab Emirates': 'ae',
+                                            'United Kingdom': 'gb', 'United States': 'us', 'Uruguay': 'uy', 'Uzbekistan': 'uz',
+                                            'Vanuatu': 'vu', 'Vatican City': 'va', 'Venezuela': 've', 'Vietnam': 'vn', 'Yemen': 'ye',
+                                            'Zambia': 'zm', 'Zimbabwe': 'zw'
+                                        } %}
+                                        {% if employee.citizenship in country_mappings %}
+                                            <img src="https://flagicons.lipis.dev/flags/4x3/{{ country_mappings[employee.citizenship] }}.svg" 
+                                                 alt="{{ employee.citizenship }}" 
+                                                 class="flag-icon"
+                                                 title="{{ employee.citizenship }}">
+                                        {% else %}
+                                            <div class="flag-placeholder"></div>
+                                        {% endif %}
                                     {% else %}
                                         <div class="flag-placeholder"></div>
                                     {% endif %}
@@ -1771,6 +1894,94 @@
 
     function deleteEmployee(employeeId) {
         console.log('Delete employee with ID:', employeeId);
+
+    // Update country codes function
+    function updateCountryCodes() {
+        const button = event.target.closest('.update-flags-btn');
+        const originalText = button.innerHTML;
+        
+        // Show loading state
+        button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                <path d="M3 21v-5h5"/>
+            </svg>
+            Updating...
+        `;
+        button.disabled = true;
+
+        fetch('/api/update-country-codes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showNotification(data.message, 'success');
+                // Reload the page to show updated flags
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                throw new Error(data.error || 'Failed to update country codes');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating country codes:', error);
+            showNotification(error.message || 'Failed to update country codes', 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+
+    // Notification function
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        
+        // Add styles
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        `;
+        
+        if (type === 'success') {
+            notification.style.backgroundColor = '#10b981';
+        } else if (type === 'error') {
+            notification.style.backgroundColor = '#ef4444';
+        } else {
+            notification.style.backgroundColor = '#3b82f6';
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
         
         // Find the employee data to populate the modal
         const employeeRow = document.querySelector(`tr[data-employee-id="${employeeId}"]`);
