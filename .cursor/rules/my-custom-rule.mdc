@@ -41,7 +41,7 @@ Planning- Create a clear todo list in markdown format:
 - [ ] Step 2: Description
 
 - [ ] Step 3: Description
-
+- Don't create any additional database if I didn't ask for
 Update with when complete
 Show updated list after each step
 Implementation

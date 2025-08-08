@@ -8,7 +8,9 @@ def verify_database_connection():
     print()
     
     # Check if users.db file exists
-    db_path = os.path.join(os.getcwd(), 'users.db')
+    # Always resolve to repository root users.db
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(base_dir, 'users.db')
     print(f"Database file path: {db_path}")
     print(f"Database file exists: {'✅ YES' if os.path.exists(db_path) else '❌ NO'}")
     

@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Shift - HR Management System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: #f8f9fa;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            min-height: 80px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+            min-height: 44px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: #f8f9fa;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 120px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            min-height: 120px;
+        }
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+                 .form-section {
+             background: white;
+             border: 1px solid #e9ecef;
+             border-radius: 12px;
+             padding: 32px;
+             margin-bottom: 24px;
+             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+             overflow: visible !important;
+             position: relative;
+         }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23666666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 48px;
+            cursor: pointer;
+        }
+
+        .form-select:hover {
+            border-color: #adb5bd;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23495057' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        .form-select:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23007bff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        .form-input::placeholder {
+            color: #6c757d;
+        }
+
+                         .input-hint {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        /* Ensure body scroll is locked when modal is open */
+        body.modal-open {
+            overflow: hidden !important;
+        }
+
+                                                                                                                                                                                                                                                                                                                               /* Time input styles matching create schedule step 2 */
+              .time-inputs {
+                  display: flex;
+                  flex-direction: row;
+                  gap: 16px;
+                  margin-top: 16px;
+                  align-items: flex-start;
+                  flex-wrap: wrap;
+              }
+
+          .time-input-group {
+              display: flex;
+              flex-direction: column;
+              position: relative;
+          }
+
+         .time-input-wrapper {
+             position: relative;
+             display: flex;
+             flex-direction: column;
+         }
+
+                                                                                                                                                                                                                                                                                                                               .time-input {
+                  padding: 20px 14px 8px 14px;
+                  border: 1px solid #e9ecef;
+                  border-radius: 8px;
+                  font-size: 0.9rem;
+                  color: #495057;
+                  background: white;
+                  transition: all 0.2s;
+                  width: 250px;
+                  max-width: 300px;
+                  outline: none;
+                  height: 52px;
+                  box-sizing: border-box;
+              }
+
+         .time-input:hover {
+             border-color: #1a1a1a;
+         }
+
+         .time-input:focus {
+             border-color: #1a1a1a;
+             box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+         }
+
+         .time-input::placeholder {
+             color: #adb5bd;
+             opacity: 0;
+             transition: opacity 0.2s ease;
+         }
+
+         .time-input:focus::placeholder {
+             opacity: 1;
+         }
+
+         .time-input.has-value::placeholder {
+             opacity: 1;
+         }
+
+         .time-label {
+             position: absolute;
+             left: 16px;
+             top: 50%;
+             transform: translateY(-50%);
+             font-size: 0.9rem;
+             color: #6c757d;
+             background: white;
+             padding: 0 4px;
+             pointer-events: none;
+             transition: all 0.2s ease;
+             z-index: 2;
+             opacity: 1;
+         }
+
+         .time-input:focus + .time-label,
+         .time-input:not(:placeholder-shown) + .time-label,
+         .time-input.has-value + .time-label {
+             top: 0;
+             transform: translateY(-50%);
+             font-size: 0.75rem;
+             color: #1a1a1a;
+             font-weight: 500;
+             opacity: 1;
+         }
+
+         .time-input:focus + .time-label {
+             color: #1a1a1a;
+         }
+
+         .time-input.has-value:not(:focus) + .time-label {
+             color: #6b7280;
+         }
+
+         .time-input.error {
+             border-color: #dc2626;
+             color: #dc2626;
+         }
+
+         .time-input.error::placeholder {
+             color: #dc2626;
+         }
+
+                   .time-input.error + .time-label {
+              color: #dc2626 !important;
+          }
+
+                                                                                                                                   /* Toggle switch styles */
+              .toggle-section {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 12px 16px;
+                  background: white;
+                  border: 1px solid #e9ecef;
+                  border-radius: 8px;
+                  margin-bottom: 16px;
+                  width: 250px;
+                  max-width: 300px;
+                  height: 52px;
+                  box-sizing: border-box;
+              }
+
+          .toggle-label {
+              font-size: 0.95rem;
+              color: #495057;
+              flex: 1;
+          }
+
+          .toggle-switch {
+              position: relative;
+              width: 52px;
+              height: 28px;
+              margin-left: 16px;
+          }
+
+          .toggle-switch input {
+              opacity: 0;
+              width: 0;
+              height: 0;
+          }
+
+          .toggle-slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: #ccc;
+              transition: .4s;
+              border-radius: 28px;
+          }
+
+          .toggle-slider:before {
+              position: absolute;
+              content: "";
+              height: 20px;
+              width: 20px;
+              left: 4px;
+              bottom: 4px;
+              background-color: white;
+              transition: .4s;
+              border-radius: 50%;
+          }
+
+          input:checked + .toggle-slider {
+              background-color: #1a1a1a;
+          }
+
+          input:checked + .toggle-slider:before {
+              transform: translateX(24px);
+          }
+
+        /* Time configuration styles */
+        .time-config-section {
+            margin-top: 16px;
+        }
+
+        .time-type-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .time-type-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .time-type-label {
+            font-size: 0.9rem;
+            color: #495057;
+            cursor: pointer;
+            user-select: none;
+        }
+
+                 .time-inputs {
+             display: flex;
+             gap: 16px;
+         }
+
+        .time-inputs .form-group {
+            flex: 1;
+        }
+
+        .time-separator {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* Working days styles */
+        .working-days-section {
+            margin-top: 16px;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .day-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .day-item:hover {
+            border-color: #80bdff;
+            background: #f8f9fa;
+        }
+
+        .day-item.selected {
+            border-color: #1a1a1a;
+            background: #f8f9fa;
+        }
+
+        .day-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a1a1a;
+            cursor: pointer;
+        }
+
+                 .day-label {
+             font-size: 0.875rem;
+             font-weight: 500;
+             color: #495057;
+             cursor: pointer;
+             user-select: none;
+         }
+
+         /* Break time styles */
+         .break-time-section {
+             margin-top: 16px;
+         }
+
+                   .break-time-item {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              padding: 0;
+              background: transparent;
+              border: none;
+              border-radius: 0;
+              transition: none;
+              margin-left: 16px;
+          }
+
+          .break-time-item:hover {
+              border-color: transparent;
+          }
+
+         .break-time-label {
+             font-size: 0.95rem;
+             color: #495057;
+             font-weight: 500;
+         }
+
+                   .break-checkbox {
+              margin-right: 12px;
+              width: 16px;
+              height: 16px;
+              accent-color: #1a1a1a;
+              appearance: none;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              background-image: url('/static/images/box.png');
+              background-size: contain;
+              background-repeat: no-repeat;
+              background-position: center;
+              cursor: pointer;
+              position: relative;
+          }
+
+          .break-checkbox:checked {
+              background-image: none;
+              background-color: #1a1a1a;
+              border-radius: 3px;
+          }
+
+          .break-checkbox:checked::after {
+              content: '';
+              position: absolute;
+              left: 50%;
+              top: 50%;
+              width: 4px;
+              height: 8px;
+              border: solid white;
+              border-width: 0 2px 2px 0;
+              transform: translate(-50%, -65%) rotate(45deg);
+          }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+                 .bottom-nav-content {
+             max-width: 930px;
+             width: 100%;
+             display: flex;
+             justify-content: flex-end;
+             align-items: center;
+         }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .next-step-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .next-step-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .next-step-title {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .btn-create {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-create:hover {
+            background: #333;
+        }
+
+        .btn-create:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Form validation notification */
+        .form-validation-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #343a40;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 600px;
+            min-width: 500px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .form-validation-notification.show {
+            display: flex;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .notification-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            color: #dc3545;
+        }
+
+        .notification-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .notification-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+                 /* Custom dropdown styles - matching organization position dropdown */
+         .custom-dropdown {
+             position: relative;
+             width: 100%;
+             z-index: 100;
+         }
+
+         .dropdown-toggle {
+             width: 100%;
+             padding: 14px 16px;
+             border: 1px solid #ced4da;
+             border-radius: 8px;
+             font-size: 0.95rem;
+             background: white;
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             cursor: pointer;
+             transition: border-color 0.2s;
+             min-height: 52px;
+             position: relative;
+         }
+
+         .dropdown-arrow {
+             width: 18px;
+             height: 18px;
+             margin-left: 8px;
+             opacity: 0.7;
+             flex-shrink: 0;
+             position: absolute;
+             right: 16px;
+             top: 50%;
+             transform: translateY(-50%);
+         }
+
+         .dropdown-toggle:focus {
+             outline: none;
+             border-color: #80bdff;
+             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+         }
+
+         .dropdown-menu {
+             position: absolute;
+             top: 110%;
+             left: 0;
+             right: 0;
+             background: white;
+             border: 1px solid #e9ecef;
+             border-radius: 10px;
+             box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+             z-index: 100;
+             display: none;
+             max-height: 220px;
+             overflow-y: auto;
+             padding: 8px 0;
+         }
+         .dropdown-menu.show {
+             display: block;
+         }
+         .dropdown-menu.open-up {
+             top: auto;
+             bottom: 110%;
+             box-shadow: 0 -8px 24px rgba(0,0,0,0.10);
+         }
+
+         .dropdown-option {
+             padding: 12px 16px;
+             cursor: pointer;
+             transition: background-color 0.2s;
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+         }
+
+         .dropdown-option .option-main {
+             flex: 1;
+         }
+
+         .dropdown-option:hover {
+             background-color: #f8f9fa;
+         }
+
+         .dropdown-option.selected {
+             background-color: #e3f2fd;
+             color: #1a1a1a;
+             font-weight: 500;
+         }
+
+         .custom-dropdown.error .dropdown-toggle {
+             border-color: #dc3545;
+         }
+
+         /* Responsive design */
+         @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                gap: 30px;
+                padding: 20px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .time-inputs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .days-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="window.location.href='/shifts'">×</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Create Shift</h1>
+                <p class="page-subtitle">Define a new work shift with specific time requirements and working days.</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <form id="createShiftForm" method="POST" action="/create-shift-step2">
+                                         <!-- Basic Information -->
+                     <div class="form-section">
+                         <h2 class="section-title">Basic Information</h2>
+                         
+                         <div class="form-row">
+                             <div class="form-group full-width">
+                                 <input type="text" id="shiftName" name="shiftName" class="form-input" placeholder="Shift name *" required>
+                             </div>
+                         </div>
+                         
+                         <div class="form-row">
+                             <div class="form-group full-width">
+                                 <input type="text" id="shiftId" name="shiftId" class="form-input" placeholder="Shift ID *" required>
+                             </div>
+                         </div>
+                     </div>
+
+                                         <!-- Time Configuration -->
+                     <div class="form-section">
+                         <h2 class="section-title">Time Configuration</h2>
+                         
+                                                                              <div class="time-inputs">
+                               <div class="time-input-group">
+                                   <div class="time-input-wrapper">
+                                       <input type="text" class="time-input" placeholder="hh:mm" id="startTime" name="startTime" maxlength="5" required>
+                                       <label class="time-label" for="startTime">Start time</label>
+                                   </div>
+                               </div>
+                               <div class="toggle-section">
+                                   <span class="toggle-label">Check in</span>
+                                   <div class="toggle-switch">
+                                       <input type="checkbox" id="checkInToggle" name="checkIn">
+                                       <span class="toggle-slider"></span>
+                                   </div>
+                               </div>
+                           </div>
+                           
+                                                       <!-- Check-in time range (hidden by default) -->
+                            <div id="checkInTimeRange" class="time-inputs" style="display: none; margin-top: 16px;">
+                                <div class="time-input-group">
+                                    <div class="time-input-wrapper">
+                                        <input type="text" class="time-input" placeholder="hh:mm" id="checkInStartTime" name="checkInStartTime" maxlength="5">
+                                        <label class="time-label" for="checkInStartTime">Check-in from</label>
+                                    </div>
+                                </div>
+                                <div class="time-input-group">
+                                    <div class="time-input-wrapper">
+                                        <input type="text" class="time-input" placeholder="hh:mm" id="checkInEndTime" name="checkInEndTime" maxlength="5">
+                                        <label class="time-label" for="checkInEndTime">Check-in to</label>
+                                    </div>
+                                </div>
+                            </div>
+                          
+                                                     <div class="time-inputs">
+                               <div class="time-input-group">
+                                   <div class="time-input-wrapper">
+                                       <input type="text" class="time-input" placeholder="hh:mm" id="endTime" name="endTime" maxlength="5" required>
+                                       <label class="time-label" for="endTime">End time</label>
+                                   </div>
+                               </div>
+                               <div class="toggle-section">
+                                   <span class="toggle-label">Check out</span>
+                                   <div class="toggle-switch">
+                                       <input type="checkbox" id="checkOutToggle" name="checkOut">
+                                       <span class="toggle-slider"></span>
+                                   </div>
+                               </div>
+                           </div>
+                           
+                                                       <!-- Check-out time range (hidden by default) -->
+                            <div id="checkOutTimeRange" class="time-inputs" style="display: none; margin-top: 16px;">
+                                <div class="time-input-group">
+                                    <div class="time-input-wrapper">
+                                        <input type="text" class="time-input" placeholder="hh:mm" id="checkOutStartTime" name="checkOutStartTime" maxlength="5">
+                                        <label class="time-label" for="checkOutStartTime">Check-out from</label>
+                                    </div>
+                                </div>
+                                <div class="time-input-group">
+                                    <div class="time-input-wrapper">
+                                        <input type="text" class="time-input" placeholder="hh:mm" id="checkOutEndTime" name="checkOutEndTime" maxlength="5">
+                                        <label class="time-label" for="checkOutEndTime">Check-out to</label>
+                                    </div>
+                                </div>
+                                                         </div>
+                             
+                                                           <!-- Break time section -->
+                              <div class="break-time-section" style="margin-top: 16px;">
+                                  <div class="break-time-item">
+                                      <span class="break-time-label">Break time</span>
+                                      <input type="checkbox" id="breakToggle" name="break" class="break-checkbox">
+                                  </div>
+                              </div>
+                              
+                              <!-- Break time range (hidden by default) -->
+                              <div id="breakTimeRange" class="time-inputs" style="display: none; margin-top: 16px;">
+                                  <div class="time-input-group">
+                                      <div class="time-input-wrapper">
+                                          <input type="text" class="time-input" placeholder="hh:mm" id="breakStartTime" name="breakStartTime" maxlength="5">
+                                          <label class="time-label" for="breakStartTime">Break from</label>
+                                      </div>
+                                  </div>
+                                  <div class="time-input-group">
+                                      <div class="time-input-wrapper">
+                                          <input type="text" class="time-input" placeholder="hh:mm" id="breakEndTime" name="breakEndTime" maxlength="5">
+                                          <label class="time-label" for="breakEndTime">Break to</label>
+                                      </div>
+                                  </div>
+                              </div>
+                      </div>
+
+                                                                                   <!-- Time Tracking -->
+                      <div class="form-section">
+                          <h2 class="section-title">Time Tracking</h2>
+                          
+                          <div class="form-row">
+                              <div class="form-group full-width">
+                                  <div class="custom-dropdown" id="timeSubmissionDropdown">
+                                      <button type="button" class="dropdown-toggle" id="timeSubmissionDropdownBtn">
+                                          <span id="timeSubmissionDropdownLabel">Time submission method</span>
+                                          <img src="/static/images/angle-small-down.png" alt="Dropdown" class="dropdown-arrow">
+                                      </button>
+                                      <div class="dropdown-menu" id="timeSubmissionDropdownMenu">
+                                          <div class="dropdown-option" data-value="manual">
+                                              <div class="option-main">Manual entry</div>
+                                          </div>
+                                          <div class="dropdown-option" data-value="automatic">
+                                              <div class="option-main">Automatic tracking</div>
+                                          </div>
+                                          <div class="dropdown-option" data-value="hybrid">
+                                              <div class="option-main">Hybrid (manual + automatic)</div>
+                                          </div>
+                                      </div>
+                                      <input type="hidden" name="timeSubmissionMethod" id="timeSubmissionMethodInput">
+                                  </div>
+                              </div>
+                          </div>
+
+                          <!-- Giờ công and Ngày công input boxes -->
+                          <div class="form-row">
+                              <div class="form-group">
+                                  <input type="number" class="form-input" id="hoursWorked" name="hoursWorked" placeholder="Giờ công" min="0" step="0.5">
+                              </div>
+                              <div class="form-group">
+                                  <input type="number" class="form-input" id="daysWorked" name="daysWorked" placeholder="Ngày công" min="0" step="0.25">
+                              </div>
+                          </div>
+                     </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ol class="steps-list">
+                    <li class="step-item active"><div class="step-number">1</div><div class="step-text">Shift Details</div></li>
+                    <li class="step-item"><div class="step-number">2</div><div class="step-text">Shift Settings</div></li>
+                    <li class="step-item"><div class="step-number">3</div><div class="step-text">Review & Create</div></li>
+                </ol>
+            </div>
+        </div>
+
+                 <!-- Bottom Navigation -->
+         <div class="bottom-navigation">
+             <div class="bottom-nav-content">
+                 <div style="display: flex; align-items: center; gap: 16px;">
+                     <div class="next-step-info">
+                         <div class="next-step-label">Next step:</div>
+                         <div class="next-step-title">2. Shift Settings</div>
+                     </div>
+                     <button type="submit" class="btn-create" form="createShiftForm">Continue</button>
+                 </div>
+             </div>
+         </div>
+    </div>
+
+    <!-- Form validation notification -->
+    <div id="formValidationNotification" class="form-validation-notification" style="display: none;">
+        <div class="notification-content">
+            <div class="notification-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="notification-text">Please make sure to fill in all required fields before proceeding</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('createShiftForm');
+            const notification = document.getElementById('formValidationNotification');
+
+            // --- State Persistence ---
+            const formFields = [
+                'shiftName',
+                'shiftId',
+                'startTime',
+                'endTime',
+                'hoursWorked',
+                'daysWorked',
+                'timeSubmissionMethodInput',
+                'checkInToggle',
+                'checkInStartTime',
+                'checkInEndTime',
+                'checkOutToggle',
+                'checkOutStartTime',
+                'checkOutEndTime',
+                'breakToggle',
+                'breakStartTime',
+                'breakEndTime'
+            ];
+            
+            let isRestoring = false; // Flag to prevent clearing during restoration
+
+            // Save form state to localStorage on input change
+            function saveFormState() {
+                if (isRestoring) return; // Don't save during restoration
+                console.log('saveFormState called');
+                const data = {};
+                let hasData = false;
+                
+                formFields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            data[id] = el.checked;
+                            if (el.checked) hasData = true;
+                        } else {
+                            data[id] = el.value;
+                            if (el.value && el.value.trim() !== '') hasData = true;
+                        }
+                    }
+                });
+                
+                // Only save if there's actual user input
+                if (hasData) {
+                    console.log('Saving form data (has user input):', data);
+                    try {
+                        localStorage.setItem('createShiftFormState', JSON.stringify(data));
+                        console.log('Form state saved to localStorage successfully');
+                        // Verify the save worked
+                        const saved = localStorage.getItem('createShiftFormState');
+                        console.log('Verification - saved data:', saved);
+                    } catch (e) {
+                        console.error('Error saving to localStorage:', e);
+                    }
+                } else {
+                    console.log('No user input detected, not saving empty state');
+                }
+            }
+            
+            // Add event listeners for all form fields
+            formFields.forEach(id => {
+                const el = document.getElementById(id);
+                console.log(`Setting up event listeners for ${id}:`, el);
+                if (el) {
+                    el.addEventListener('input', saveFormState);
+                    el.addEventListener('change', saveFormState);
+                    console.log(`Event listeners added for ${id}`);
+                } else {
+                    console.warn(`Element with id "${id}" not found`);
+                }
+            });
+            
+            // Restore form state from localStorage AFTER all other setup is complete
+            setTimeout(() => {
+                isRestoring = true; // Set flag during restoration
+                console.log('=== STATE RESTORATION DEBUG ===');
+                console.log('All localStorage keys:', Object.keys(localStorage));
+                console.log('All localStorage values:');
+                Object.keys(localStorage).forEach(key => {
+                    console.log(`${key}:`, localStorage.getItem(key));
+                });
+                
+                // Check both localStorage and sessionStorage for saved data
+                let saved = localStorage.getItem('createShiftFormState');
+                if (!saved) {
+                    saved = sessionStorage.getItem('shiftStep1Data');
+                    console.log('Found data in sessionStorage:', saved);
+                } else {
+                    console.log('Found data in localStorage:', saved);
+                }
+                
+                if (saved) {
+                    try {
+                        console.log('Restoring form state from localStorage:', saved);
+                        const data = JSON.parse(saved);
+                        console.log('Parsed data:', data);
+                        
+                        // Restore all fields including break times
+                        formFields.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                // Handle both localStorage and sessionStorage field name mappings
+                                let value = data[id];
+                                
+                                // Map sessionStorage field names to localStorage field names
+                                if (value === undefined) {
+                                    if (id === 'timeSubmissionMethodInput' && data.timeSubmissionMethod !== undefined) {
+                                        value = data.timeSubmissionMethod;
+                                    } else if (id === 'checkInToggle' && data.checkIn !== undefined) {
+                                        value = data.checkIn;
+                                    } else if (id === 'checkOutToggle' && data.checkOut !== undefined) {
+                                        value = data.checkOut;
+                                    } else if (id === 'breakToggle' && data.break !== undefined) {
+                                        value = data.break;
+                                    }
+                                }
+                                
+                                if (value !== undefined) {
+                                    if (el.type === 'checkbox') {
+                                        el.checked = value;
+                                        // Update the UI immediately for toggles
+                                        if (id === 'checkInToggle') {
+                                            const checkInTimeRange = document.getElementById('checkInTimeRange');
+                                            if (checkInTimeRange) {
+                                                checkInTimeRange.style.display = value ? 'flex' : 'none';
+                                            }
+                                            if (value) {
+                                                document.getElementById('checkInStartTime').required = true;
+                                                document.getElementById('checkInEndTime').required = true;
+                                            } else {
+                                                document.getElementById('checkInStartTime').required = false;
+                                                document.getElementById('checkInEndTime').required = false;
+                                            }
+                                        } else if (id === 'checkOutToggle') {
+                                            const checkOutTimeRange = document.getElementById('checkOutTimeRange');
+                                            if (checkOutTimeRange) {
+                                                checkOutTimeRange.style.display = value ? 'flex' : 'none';
+                                            }
+                                            if (value) {
+                                                document.getElementById('checkOutStartTime').required = true;
+                                                document.getElementById('checkOutEndTime').required = true;
+                                            } else {
+                                                document.getElementById('checkOutStartTime').required = false;
+                                                document.getElementById('checkOutEndTime').required = false;
+                                            }
+                                        } else if (id === 'breakToggle') {
+                                            const breakTimeRange = document.getElementById('breakTimeRange');
+                                            if (breakTimeRange) {
+                                                breakTimeRange.style.display = value ? 'flex' : 'none';
+                                            }
+                                            if (value) {
+                                                document.getElementById('breakStartTime').required = true;
+                                                document.getElementById('breakEndTime').required = true;
+                                            } else {
+                                                document.getElementById('breakStartTime').required = false;
+                                                document.getElementById('breakEndTime').required = false;
+                                            }
+                                        }
+                                        el.dispatchEvent(new Event('change'));
+                                    } else {
+                                        el.value = value;
+                                        if (el.classList.contains('time-input') && el.value) {
+                                            el.classList.add('has-value');
+                                        }
+                                        // Special handling for timeSubmissionMethodInput
+                                        if (id === 'timeSubmissionMethodInput') {
+                                            const label = document.getElementById('timeSubmissionDropdownLabel');
+                                            if (label) {
+                                                let text = '';
+                                                if (value === 'manual') text = 'Manual entry';
+                                                else if (value === 'automatic') text = 'Automatic tracking';
+                                                else if (value === 'hybrid') text = 'Hybrid (manual + automatic)';
+                                                if (text) label.textContent = text;
+                                            }
+                                            
+                                            // Update dropdown option selected state
+                                            const dropdownOptions = document.querySelectorAll('#timeSubmissionDropdownMenu .dropdown-option');
+                                            dropdownOptions.forEach(option => {
+                                                const optionValue = option.getAttribute('data-value');
+                                                if (optionValue === value) {
+                                                    option.classList.add('selected');
+                                                } else {
+                                                    option.classList.remove('selected');
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Error restoring form state:', e);
+                    }
+                } else {
+                    console.log('No saved form state found in localStorage');
+                }
+                isRestoring = false; // Clear flag after restoration
+                console.log('=== END STATE RESTORATION DEBUG ===');
+                
+                // Update continue button state after restoration
+                updateContinueButton();
+            }, 500); // Increased delay to 500ms
+
+            // Handle time input formatting and floating labels
+         const timeInputs = document.querySelectorAll('.time-input');
+         timeInputs.forEach(input => {
+             // Handle floating label behavior
+             input.addEventListener('focus', function() {
+                 this.classList.add('has-value');
+             });
+             
+             input.addEventListener('blur', function() {
+                 if (!this.value) {
+                     this.classList.remove('has-value');
+                 }
+             });
+             
+             // Handle time input formatting (hh:mm)
+             input.addEventListener('input', function() {
+                 let value = this.value.replace(/\D/g, ''); // Remove non-digits
+                 
+                 if (value.length >= 2) {
+                     const hours = value.substring(0, 2);
+                     const minutes = value.substring(2, 4);
+                     
+                     if (parseInt(hours) > 23) {
+                         value = '23' + minutes;
+                     }
+                     
+                     if (parseInt(minutes) > 59) {
+                         value = hours + '59';
+                     }
+                     
+                     if (value.length >= 4) {
+                         this.value = value.substring(0, 2) + ':' + value.substring(2, 4);
+                     } else {
+                         this.value = value;
+                     }
+                 } else {
+                     this.value = value;
+                 }
+                 
+                 // Add has-value class if there's content
+                 if (this.value) {
+                     this.classList.add('has-value');
+                 }
+             });
+             
+             // Handle backspace to remove colon
+             input.addEventListener('keydown', function(e) {
+                 if (e.key === 'Backspace' && this.value.endsWith(':')) {
+                     e.preventDefault();
+                     this.value = this.value.slice(0, -1);
+                 }
+             });
+         });
+
+                   
+
+                     // Handle check-in toggle
+           const checkInToggle = document.getElementById('checkInToggle');
+           const checkInTimeRange = document.getElementById('checkInTimeRange');
+           
+           checkInToggle.addEventListener('change', function() {
+               if (this.checked) {
+                   checkInTimeRange.style.display = 'flex';
+                   // Make check-in time inputs required when toggle is on
+                   document.getElementById('checkInStartTime').required = true;
+                   document.getElementById('checkInEndTime').required = true;
+               } else {
+                   checkInTimeRange.style.display = 'none';
+                   // Remove required attribute when toggle is off
+                   document.getElementById('checkInStartTime').required = false;
+                   document.getElementById('checkInEndTime').required = false;
+                   // Clear the values
+                   document.getElementById('checkInStartTime').value = '';
+                   document.getElementById('checkInEndTime').value = '';
+               }
+               updateContinueButton();
+           });
+
+                       // Handle check-out toggle
+            const checkOutToggle = document.getElementById('checkOutToggle');
+            const checkOutTimeRange = document.getElementById('checkOutTimeRange');
+            
+            checkOutToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    checkOutTimeRange.style.display = 'flex';
+                    // Make check-out time inputs required when toggle is on
+                    document.getElementById('checkOutStartTime').required = true;
+                    document.getElementById('checkOutEndTime').required = true;
+                } else {
+                    checkOutTimeRange.style.display = 'none';
+                    // Remove required attribute when toggle is off
+                    document.getElementById('checkOutStartTime').required = false;
+                    document.getElementById('checkOutEndTime').required = false;
+                    // Clear the values
+                    document.getElementById('checkOutStartTime').value = '';
+                    document.getElementById('checkOutEndTime').value = '';
+                }
+                updateContinueButton();
+            });
+
+                         // Handle break toggle
+             const breakToggle = document.getElementById('breakToggle');
+             const breakTimeRange = document.getElementById('breakTimeRange');
+             
+             breakToggle.addEventListener('change', function() {
+                 if (this.checked) {
+                     breakTimeRange.style.display = 'flex';
+                     // Make break time inputs required when toggle is on
+                     document.getElementById('breakStartTime').required = true;
+                     document.getElementById('breakEndTime').required = true;
+                 } else {
+                     breakTimeRange.style.display = 'none';
+                     // Remove required attribute when toggle is off
+                     document.getElementById('breakStartTime').required = false;
+                     document.getElementById('breakEndTime').required = false;
+                     // Clear the values
+                     document.getElementById('breakStartTime').value = '';
+                     document.getElementById('breakEndTime').value = '';
+                 }
+                 updateContinueButton();
+             });
+
+            
+
+                       // Add click event listeners to toggle sliders for better UX
+            const toggleSliders = document.querySelectorAll('.toggle-slider');
+            toggleSliders.forEach(slider => {
+                slider.addEventListener('click', function() {
+                    const checkbox = this.previousElementSibling;
+                    checkbox.checked = !checkbox.checked;
+                    // Trigger the change event
+                    checkbox.dispatchEvent(new Event('change'));
+                });
+            });
+
+            // Handle time submission method dropdown
+            const timeSubmissionDropdown = document.getElementById('timeSubmissionDropdown');
+            const timeSubmissionDropdownBtn = document.getElementById('timeSubmissionDropdownBtn');
+            const timeSubmissionDropdownMenu = document.getElementById('timeSubmissionDropdownMenu');
+            const timeSubmissionDropdownLabel = document.getElementById('timeSubmissionDropdownLabel');
+            const timeSubmissionMethodInput = document.getElementById('timeSubmissionMethodInput');
+
+                         timeSubmissionDropdownBtn.addEventListener('click', function(e) {
+                 e.stopPropagation();
+                 
+                 // Toggle dropdown visibility
+                 const isVisible = timeSubmissionDropdownMenu.classList.contains('show');
+                 
+                 if (!isVisible) {
+                     // Show dropdown and calculate position
+                     timeSubmissionDropdownMenu.classList.add('show');
+                     
+                     // Lock body scroll using both methods for better compatibility
+                     document.body.style.overflow = 'hidden';
+                     document.body.classList.add('modal-open');
+                     
+                     // Get button position and dimensions
+                     const buttonRect = timeSubmissionDropdownBtn.getBoundingClientRect();
+                     const menuHeight = 220; // max-height from CSS
+                     const windowHeight = window.innerHeight;
+                     const spaceBelow = windowHeight - buttonRect.bottom;
+                     const spaceAbove = buttonRect.top;
+                     
+                     // Determine if we should show dropdown up or down
+                     if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
+                         // Not enough space below, but more space above - show dropdown up
+                         timeSubmissionDropdownMenu.classList.add('open-up');
+                     } else {
+                         // Enough space below or more space below - show dropdown down
+                         timeSubmissionDropdownMenu.classList.remove('open-up');
+                     }
+                 } else {
+                     // Hide dropdown
+                     timeSubmissionDropdownMenu.classList.remove('show');
+                     
+                     // Unlock body scroll using both methods for better compatibility
+                     document.body.style.overflow = '';
+                     document.body.classList.remove('modal-open');
+                 }
+             });
+                         // Close dropdown when clicking outside
+             document.addEventListener('click', function(e) {
+                 if (!timeSubmissionDropdown.contains(e.target)) {
+                     timeSubmissionDropdownMenu.classList.remove('show');
+                     // Unlock body scroll using both methods for better compatibility
+                     document.body.style.overflow = '';
+                     document.body.classList.remove('modal-open');
+                 }
+             });
+
+                         // Handle dropdown option selection
+             const dropdownOptions = timeSubmissionDropdownMenu.querySelectorAll('.dropdown-option');
+             dropdownOptions.forEach(option => {
+                 option.addEventListener('click', function() {
+                     const value = this.getAttribute('data-value');
+                     const text = this.querySelector('.option-main').textContent;
+                     
+                     // Update label and hidden input
+                     timeSubmissionDropdownLabel.textContent = text;
+                     timeSubmissionMethodInput.value = value;
+                     
+                     // Update selected state
+                     dropdownOptions.forEach(opt => opt.classList.remove('selected'));
+                     this.classList.add('selected');
+                     
+                     // Close dropdown
+                     timeSubmissionDropdownMenu.classList.remove('show');
+                     
+                     // Unlock body scroll using both methods for better compatibility
+                     document.body.style.overflow = '';
+                     document.body.classList.remove('modal-open');
+                     
+                     // Save form state after selection
+                     saveFormState();
+                     updateContinueButton();
+                 });
+             });
+
+        // Form validation function
+        function validateForm() {
+            const requiredFields = {
+                'shiftName': 'Shift Name',
+                'shiftId': 'Shift ID',
+                'startTime': 'Start Time',
+                'endTime': 'End Time',
+                'timeSubmissionMethodInput': 'Time Submission Method',
+                'hoursWorked': 'Giờ công',
+                'daysWorked': 'Ngày công'
+            };
+
+            const errors = [];
+
+            // Check required fields
+            for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    errors.push(`${fieldName} is required`);
+                }
+            }
+
+            // Check conditional fields
+            const checkInToggle = document.getElementById('checkInToggle');
+            if (checkInToggle && checkInToggle.checked) {
+                const checkInStartTime = document.getElementById('checkInStartTime').value.trim();
+                const checkInEndTime = document.getElementById('checkInEndTime').value.trim();
+                if (!checkInStartTime || !checkInEndTime) {
+                    errors.push('Check-in start and end times are required when check-in is enabled');
+                }
+            }
+
+            const checkOutToggle = document.getElementById('checkOutToggle');
+            if (checkOutToggle && checkOutToggle.checked) {
+                const checkOutStartTime = document.getElementById('checkOutStartTime').value.trim();
+                const checkOutEndTime = document.getElementById('checkOutEndTime').value.trim();
+                if (!checkOutStartTime || !checkOutEndTime) {
+                    errors.push('Check-out start and end times are required when check-out is enabled');
+                }
+            }
+
+            const breakToggle = document.getElementById('breakToggle');
+            if (breakToggle && breakToggle.checked) {
+                const breakStartTime = document.getElementById('breakStartTime').value.trim();
+                const breakEndTime = document.getElementById('breakEndTime').value.trim();
+                if (!breakStartTime || !breakEndTime) {
+                    errors.push('Break start and end times are required when break is enabled');
+                }
+            }
+
+            return errors;
+        }
+
+        // Update continue button state
+        function updateContinueButton() {
+            const continueBtn = document.querySelector('.btn-create');
+            const errors = validateForm();
+            
+            if (errors.length === 0) {
+                continueBtn.disabled = false;
+                continueBtn.style.opacity = '1';
+                continueBtn.style.cursor = 'pointer';
+            } else {
+                continueBtn.disabled = true;
+                continueBtn.style.opacity = '0.5';
+                continueBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        // Add validation listeners to all form fields
+        formFields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', function() {
+                    saveFormState();
+                    updateContinueButton();
+                });
+                el.addEventListener('change', updateContinueButton);
+            }
+        });
+
+        // Initial validation
+        updateContinueButton();
+
+        // Handle form submission - collect data and allow normal form submission
+        form.addEventListener('submit', function(e) {
+            const errors = validateForm();
+            
+            if (errors.length > 0) {
+                e.preventDefault();
+                // Show validation notification
+                const notification = document.getElementById('formValidationNotification');
+                const notificationText = notification.querySelector('.notification-text');
+                notificationText.textContent = errors.join(', ');
+                notification.style.display = 'block';
+                
+                // Hide notification after 3 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            // Collect form data for sessionStorage
+            const formData = {
+                shiftName: document.getElementById('shiftName').value,
+                shiftId: document.getElementById('shiftId').value,
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                checkIn: document.getElementById('checkInToggle').checked,
+                checkInStartTime: document.getElementById('checkInStartTime').value,
+                checkInEndTime: document.getElementById('checkInEndTime').value,
+                checkOut: document.getElementById('checkOutToggle').checked,
+                checkOutStartTime: document.getElementById('checkOutStartTime').value,
+                checkOutEndTime: document.getElementById('checkOutEndTime').value,
+                break: document.getElementById('breakToggle').checked,
+                breakStartTime: document.getElementById('breakStartTime').value,
+                breakEndTime: document.getElementById('breakEndTime').value,
+                timeSubmissionMethod: document.getElementById('timeSubmissionMethodInput').value,
+                hoursWorked: document.getElementById('hoursWorked').value,
+                daysWorked: document.getElementById('daysWorked').value,
+            };
+
+            // Store form data in sessionStorage for step 2
+            sessionStorage.setItem('shiftStep1Data', JSON.stringify(formData));
+            
+            // Also store in localStorage for step 3 compatibility
+            localStorage.setItem('createShiftFormState', JSON.stringify(formData));
+            
+            // Allow form to submit normally to step 2
+        });
+    });
+    </script>
+</body>
+</html> 

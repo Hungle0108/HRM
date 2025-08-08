@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Shift - Step 2 - HR Management System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: #f8f9fa;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            min-height: 80px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+            min-height: 44px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: #f8f9fa;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 120px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            min-height: 120px;
+        }
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: visible !important;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+
+
+        /* Checkbox styles (like groups custom columns) */
+        .penalty-checkbox-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .penalty-checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            gap: 0;
+            flex: 1;
+        }
+
+        .penalty-checkbox {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            accent-color: #1a1a1a;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('/static/images/box.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .penalty-checkbox:checked {
+            background-image: none;
+            background-color: #1a1a1a;
+            border-radius: 3px;
+        }
+
+        .penalty-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: translate(-50%, -65%) rotate(45deg);
+        }
+
+        .penalty-label-text {
+            font-size: 0.95rem;
+            color: #495057;
+            flex: 1;
+        }
+
+        /* Penalty Table Styles - Simple version like groups table */
+        .penalty-table-container {
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+
+        .penalty-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .penalty-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .penalty-table th:last-child {
+            border-right: none;
+        }
+
+        .penalty-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            font-size: 0.8rem;
+            color: #495057;
+            vertical-align: middle;
+        }
+
+        .penalty-table td:last-child {
+            border-right: none;
+        }
+
+        .penalty-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .penalty-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Make Rule Type column text bold */
+        .penalty-table td:first-child {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .penalty-select, .penalty-input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: white;
+            color: #495057;
+        }
+
+        .penalty-select:focus, .penalty-input:focus {
+            outline: none;
+            border-color: #80bdff;
+        }
+
+        .btn-add-penalty {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-add-penalty:hover {
+            background: #333;
+        }
+
+        /* Edit button styles - matching members page */
+        .edit-btn {
+            background: none;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+        }
+
+        .edit-btn:hover {
+            background: #f8f9fa;
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .edit-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Actions container */
+        .actions-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .action-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            min-width: 150px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .action-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-item:hover {
+            background: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        .action-item.delete:hover {
+            background: #fdf2f2;
+            color: #dc3545;
+        }
+
+        .action-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .action-item:hover .action-icon {
+            opacity: 1;
+        }
+
+        /* Actions column width */
+        .penalty-table td:last-child,
+        .penalty-table th:last-child {
+            width: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            text-align: center;
+        }
+
+        /* Custom dropdown styles */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .dropdown-toggle:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            z-index: 100;
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu.open-up {
+            top: auto;
+            bottom: 110%;
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.10);
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dropdown-option .option-main {
+            flex: 1;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e3f2fd;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .custom-dropdown.error .dropdown-toggle {
+            border-color: #dc3545;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .next-step-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .next-step-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .next-step-title {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .btn-create {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-create:hover {
+            background: #333;
+        }
+
+        .btn-create:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Penalty Modal styles */
+        .penalty-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Ensure body scroll is locked when modal is open */
+        body.modal-open {
+            overflow: hidden !important;
+            position: fixed;
+            width: 100%;
+        }
+
+        .penalty-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 480px;
+            padding: 32px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .penalty-modal-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .penalty-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+        }
+
+        .penalty-modal-close {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .penalty-modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .penalty-modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .penalty-form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .penalty-form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+
+
+        .penalty-form-input, .penalty-form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .penalty-form-input:focus, .penalty-form-select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .penalty-form-input::placeholder {
+            color: #6c757d;
+        }
+
+        .penalty-time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .penalty-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+        }
+
+        .penalty-btn-apply {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .penalty-btn-apply:hover {
+            background: #333;
+        }
+
+        /* No Entry Penalty Input Styles */
+        .penalty-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0;
+            margin-bottom: 16px;
+            gap: 20px;
+        }
+
+        .penalty-input-group {
+            flex: 1;
+        }
+
+        .penalty-input-group input {
+            width: 100%;
+            padding: 20px 24px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .penalty-input-group input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .penalty-input-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        /* Custom Dropdown Styles (matching create schedule step 2) */
+        .custom-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-header {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .dropdown-header:hover {
+            border-color: #80bdff;
+        }
+
+        .dropdown-header.active {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+
+        .dropdown-selected {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #6c757d;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-header.active .dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            margin-top: 4px;
+            overflow: hidden;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-option {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-option.selected {
+            background-color: #e7f3ff;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .check-icon {
+            width: 16px;
+            height: 16px;
+            color: #1a1a1a;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dropdown-option.selected .check-icon {
+            opacity: 1;
+        }
+
+
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                gap: 30px;
+                padding: 20px;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="window.location.href='/shifts'">×</button>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Shift Settings</h1>
+                <p class="page-subtitle">Configure advanced settings and preferences for this shift including scheduling options and assignment rules.</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <div class="content-area">
+                <form id="assignScheduleForm" method="POST">
+                    <!-- Penalty Settings -->
+                    <div class="form-section">
+                        <h2 class="section-title">Penalty Settings</h2>
+                        <p class="section-subtitle">Configure penalty rules and enforcement for this shift to ensure compliance with attendance requirements.</p>
+                        
+                        <div class="penalty-checkbox-section">
+                            <label class="penalty-checkbox-label" for="penaltyToggle">
+                                <input type="checkbox" class="penalty-checkbox" id="penaltyToggle">
+                                <span class="penalty-label-text">Phạt đi muộn/về sớm</span>
+                            </label>
+                            <button type="button" class="btn-add-penalty" id="addPenaltyBtn" style="display: none;">+ Add Penalty</button>
+                        </div>
+
+                        <!-- Penalty Table (hidden by default) -->
+                        <div id="penaltyTableContainer" class="penalty-table-container" style="display: none;">
+                            
+                            <table class="penalty-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rule Type</th>
+                                        <th>Duration</th>
+                                        <th>Amount</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="penaltyTableBody">
+                                    <!-- Penalty rows will be added here dynamically -->
+                                    <tr id="penaltyTableEmptyState" style="display: none;">
+                                        <td colspan="6">
+                                            <div style="text-align:center; padding: 32px 0;">
+                                                <div style="margin-bottom: 12px;">
+                                                    <img src="/static/images/triangle-warning.png" alt="No penalties" style="width: 48px; height: 48px; opacity: 0.5;">
+                                                </div>
+                                                <div style="font-size: 1.1em; font-weight: 600; color: #888; margin-bottom: 4px;">No penalties yet</div>
+                                                <div style="color: #aaa;">Add a penalty to see it listed here</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="penalty-checkbox-section" id="noEntryPenaltySection">
+                            <label class="penalty-checkbox-label" for="noEntryPenaltyToggle">
+                                <input type="checkbox" class="penalty-checkbox" id="noEntryPenaltyToggle">
+                                <span class="penalty-label-text">Phạt không có giờ vào</span>
+                            </label>
+                            <button type="button" class="btn-add-penalty" id="addNoEntryPenaltyBtn" style="display: none;">+ Add Penalty</button>
+                        </div>
+
+                        <!-- No Entry Penalty Input Fields (hidden by default) -->
+                        <div id="noEntryPenaltyInputs" style="display: none;">
+                            <div class="penalty-input-row">
+                                <div class="penalty-input-group">
+                                    <input type="number" class="penalty-form-input" id="noEntryHoursDeducted" name="noEntryHoursDeducted" placeholder="Số giờ bị trừ" min="0" step="0.5">
+                                </div>
+                                <div class="penalty-input-group">
+                                    <input type="number" class="penalty-form-input" id="noEntryDaysDeducted" name="noEntryDaysDeducted" placeholder="Số ngày bị trừ" min="0" step="0.25">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="penalty-checkbox-section" id="noExitPenaltySection">
+                            <label class="penalty-checkbox-label" for="noExitPenaltyToggle">
+                                <input type="checkbox" class="penalty-checkbox" id="noExitPenaltyToggle">
+                                <span class="penalty-label-text">Phạt không có giờ ra</span>
+                            </label>
+                            <button type="button" class="btn-add-penalty" id="addNoExitPenaltyBtn" style="display: none;">+ Add Penalty</button>
+                        </div>
+
+                        <!-- No Exit Penalty Input Fields (hidden by default) -->
+                        <div id="noExitPenaltyInputs" style="display: none;">
+                            <div class="penalty-input-row">
+                                <div class="penalty-input-group">
+                                    <input type="number" class="penalty-form-input" id="noExitHoursDeducted" name="noExitHoursDeducted" placeholder="Số giờ bị trừ" min="0" step="0.5">
+                                </div>
+                                <div class="penalty-input-group">
+                                    <input type="number" class="penalty-form-input" id="noExitDaysDeducted" name="noExitDaysDeducted" placeholder="Số ngày bị trừ" min="0" step="0.25">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ol class="steps-list">
+                    <li class="step-item completed"><div class="step-number">1</div><div class="step-text">Shift Details</div></li>
+                    <li class="step-item active"><div class="step-number">2</div><div class="step-text">Shift Settings</div></li>
+                    <li class="step-item"><div class="step-number">3</div><div class="step-text">Review & Create</div></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <a href="/create-shift" class="btn-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </a>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="next-step-info">
+                        <div class="next-step-label">Next step:</div>
+                        <div class="next-step-title">3. Review & Create</div>
+                    </div>
+                    <a href="/create-shift-step3" class="btn-create" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Continue</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Penalty Modal -->
+    <div id="penaltyModal" class="penalty-modal">
+        <div class="penalty-modal-content">
+            <div class="penalty-modal-header">
+                <h2 class="penalty-modal-title">Thêm khung giờ phạt</h2>
+                <button type="button" class="penalty-modal-close" id="penaltyModalClose">×</button>
+            </div>
+            <form class="penalty-modal-form" id="penaltyForm">
+                <div class="penalty-form-group">
+                    <label class="penalty-form-label" for="penaltyType">Loại</label>
+                    <div class="custom-dropdown-wrapper">
+                        <div class="custom-dropdown" id="penaltyTypeDropdown">
+                            <div class="dropdown-header" id="penaltyTypeDropdownHeader">
+                                <span class="dropdown-selected" id="penaltyTypeDropdownSelected">Chọn loại phạt</span>
+                                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                            </div>
+                            <div class="dropdown-options" id="penaltyTypeDropdownOptions" style="display: none;">
+                                <div class="dropdown-option" data-value="late_arrival">
+                                    <span>Đi muộn</span>
+                                    <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-option" data-value="early_departure">
+                                    <span>Về sớm</span>
+                                    <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="penaltyTypeInput" name="penaltyType" required>
+                    </div>
+                </div>
+                
+                <div class="penalty-time-row">
+                    <div class="penalty-form-group">
+                        <label class="penalty-form-label" for="penaltyTimeFrom">Thời gian từ</label>
+                        <input type="number" class="penalty-form-input" id="penaltyTimeFrom" name="penaltyTimeFrom" placeholder="phút" min="0" required>
+                    </div>
+                    <div class="penalty-form-group">
+                        <label class="penalty-form-label" for="penaltyTimeTo">Đến</label>
+                        <input type="number" class="penalty-form-input" id="penaltyTimeTo" name="penaltyTimeTo" placeholder="phút" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="penalty-form-group">
+                    <label class="penalty-form-label" for="penaltyHoursDeducted">Giờ công bị trừ</label>
+                    <input type="number" class="penalty-form-input" id="penaltyHoursDeducted" name="penaltyHoursDeducted" placeholder="Số giờ bị trừ" min="0" step="0.5" required>
+                </div>
+                
+                <div class="penalty-form-group">
+                    <label class="penalty-form-label" for="penaltyDaysDeducted">Ngày công bị trừ</label>
+                    <input type="number" class="penalty-form-input" id="penaltyDaysDeducted" name="penaltyDaysDeducted" placeholder="Số ngày bị trừ" min="0" step="0.25" required>
+                </div>
+                
+                <div class="penalty-modal-actions">
+                    <button type="submit" class="penalty-btn-apply" id="penaltyBtnApply" disabled style="opacity:0.5;cursor:not-allowed;filter:grayscale(60%);background:#e0e0e0;color:#b0b0b0;border:none;transition:opacity 0.2s,filter 0.2s;">Áp dụng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('assignScheduleForm');
+
+            // Declare penaltyTableContainer once at the top
+            const penaltyTableContainer = document.getElementById('penaltyTableContainer');
+
+            // --- State Persistence for Step 2 ---
+            const step2FormFields = [
+                'penaltyToggle',
+                'noEntryPenaltyToggle',
+                'noExitPenaltyToggle',
+                'noEntryHoursDeducted',
+                'noEntryDaysDeducted',
+                'noExitHoursDeducted',
+                'noExitDaysDeducted'
+            ];
+
+            // Save form state to localStorage on input change
+            function saveStep2FormState() {
+                const data = {};
+                step2FormFields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            data[id] = el.checked;
+                        } else {
+                            data[id] = el.value;
+                        }
+                    }
+                });
+                // Save penalty table data
+                const penaltyTableBody = document.getElementById('penaltyTableBody');
+                if (penaltyTableBody) {
+                    const penaltyRows = Array.from(penaltyTableBody.children).filter(row => row.id !== 'penaltyTableEmptyState');
+                    console.log('Saving penalty rows:', penaltyRows.length);
+                    data.penaltyRows = penaltyRows.map(row => {
+                        // Parse the displayed text back to original data structure
+                        const typeText = row.cells[0].textContent.trim();
+                        const durationText = row.cells[1].textContent.trim();
+                        const amountText = row.cells[2].textContent.trim();
+                        
+                        console.log('Parsing row:', { typeText, durationText, amountText });
+                        
+                        // Parse type
+                        let type = '';
+                        if (typeText.includes('đi muộn')) {
+                            type = 'late_arrival';
+                        } else if (typeText.includes('về sớm')) {
+                            type = 'early_departure';
+                        } else if (typeText.includes('không có giờ vào')) {
+                            type = 'no_entry';
+                        }
+                        
+                        // Parse duration (e.g., "5 - 15 phút" -> timeFrom: "5", timeTo: "15")
+                        const durationMatch = durationText.match(/(\d+)\s*-\s*(\d+)\s*phút/);
+                        const timeFrom = durationMatch ? durationMatch[1] : '';
+                        const timeTo = durationMatch ? durationMatch[2] : '';
+                        
+                        // Parse amount (e.g., "Giờ công: 2\nNgày công: 1" -> hoursDeducted: "2", daysDeducted: "1")
+                        const hoursMatch = amountText.match(/Giờ công:\s*(\d+)/);
+                        const daysMatch = amountText.match(/Ngày công:\s*(\d+)/);
+                        const hoursDeducted = hoursMatch ? hoursMatch[1] : '';
+                        const daysDeducted = daysMatch ? daysMatch[1] : '';
+                        
+                        const parsedData = {
+                            type: type,
+                            timeFrom: timeFrom,
+                            timeTo: timeTo,
+                            hoursDeducted: hoursDeducted,
+                            daysDeducted: daysDeducted
+                        };
+                        
+                        console.log('Parsed data:', parsedData);
+                        return parsedData;
+                    });
+                    console.log('Final penalty data to save:', data.penaltyRows);
+                }
+                localStorage.setItem('createShiftStep2FormState', JSON.stringify(data));
+            }
+
+            // Add event listeners for state saving
+            step2FormFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', saveStep2FormState);
+                    el.addEventListener('input', saveStep2FormState);
+                }
+            });
+
+            // Restore form state from localStorage on page load - will be called after event listeners are set up
+            function restoreStep2FormState() {
+                const savedStep2 = localStorage.getItem('createShiftStep2FormState');
+                if (savedStep2) {
+                    try {
+                        const data = JSON.parse(savedStep2);
+                        step2FormFields.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el && data[id] !== undefined) {
+                                if (el.type === 'checkbox') {
+                                    el.checked = data[id];
+                                    // Trigger change event for checkboxes to show/hide related elements
+                                    el.dispatchEvent(new Event('change'));
+                                } else {
+                                    el.value = data[id];
+                                }
+                                // Custom UI restoration for dropdowns or special fields can be added here
+                                // Example: if you have a custom dropdown for penalty type, update its label here
+                            }
+                        });
+                        // Restore penalty table data if exists
+                        if (data.penaltyRows && data.penaltyRows.length > 0) {
+                            console.log('Restoring penalty rows:', data.penaltyRows);
+                            data.penaltyRows.forEach(penaltyData => {
+                                console.log('Adding penalty row with data:', penaltyData);
+                                addPenaltyRow(penaltyData);
+                            });
+                        } else {
+                            console.log('No penalty rows to restore');
+                        }
+                    } catch (e) {
+                        console.error('Error restoring step 2 form state:', e);
+                    }
+                }
+            }
+
+            // Clear state on successful form submission
+            form.addEventListener('submit', function() {
+                localStorage.removeItem('createShiftStep2FormState');
+            });
+
+            // Handle penalty toggle
+            const penaltyToggle = document.getElementById('penaltyToggle');
+            const addPenaltyBtn = document.getElementById('addPenaltyBtn');
+            const penaltyTableBody = document.getElementById('penaltyTableBody');
+            const penaltyTableEmptyState = document.getElementById('penaltyTableEmptyState');
+            const noEntryPenaltySection = document.getElementById('noEntryPenaltySection');
+            
+            penaltyToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('Penalty enabled');
+                    penaltyTableContainer.style.display = 'block';
+                    addPenaltyBtn.style.display = 'block';
+                    updatePenaltyTableEmptyState();
+                } else {
+                    console.log('Penalty disabled');
+                    penaltyTableContainer.style.display = 'none';
+                    addPenaltyBtn.style.display = 'none';
+                    document.getElementById('penaltyTableEmptyState').style.display = 'none';
+                }
+            });
+
+            // Handle no entry penalty toggle
+            const noEntryPenaltyToggle = document.getElementById('noEntryPenaltyToggle');
+            const noEntryPenaltyInputs = document.getElementById('noEntryPenaltyInputs');
+
+            noEntryPenaltyToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('No entry penalty enabled');
+                    noEntryPenaltyInputs.style.display = 'block';
+                } else {
+                    console.log('No entry penalty disabled');
+                    noEntryPenaltyInputs.style.display = 'none';
+                }
+            });
+
+            // Handle no exit penalty toggle
+            const noExitPenaltyToggle = document.getElementById('noExitPenaltyToggle');
+            const noExitPenaltyInputs = document.getElementById('noExitPenaltyInputs');
+
+            noExitPenaltyToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    console.log('No exit penalty enabled');
+                    noExitPenaltyInputs.style.display = 'block';
+                } else {
+                    console.log('No exit penalty disabled');
+                    noExitPenaltyInputs.style.display = 'none';
+                }
+            });
+
+            // No additional click handlers needed - checkbox label handles clicking
+
+            // Handle "Add Penalty" button
+            addPenaltyBtn.addEventListener('click', function() {
+                showPenaltyModal();
+            });
+
+            // Restore form state after all event listeners are set up
+            setTimeout(() => {
+                restoreStep2FormState();
+            }, 100);
+
+            // Penalty Modal functionality
+            const penaltyModal = document.getElementById('penaltyModal');
+            const penaltyModalClose = document.getElementById('penaltyModalClose');
+            const penaltyBtnCancel = document.getElementById('penaltyBtnCancel');
+            const penaltyForm = document.getElementById('penaltyForm');
+
+            function showPenaltyModal() {
+                // Check if we're adding a new penalty (not editing)
+                const editingPenaltyId = penaltyForm.getAttribute('data-editing-penalty-id');
+                if (!editingPenaltyId) {
+                    // Clear form for new penalty
+                    penaltyTypeInput.value = '';
+                    document.getElementById('penaltyTypeDropdownSelected').textContent = 'Chọn loại phạt';
+                    document.getElementById('penaltyTimeFrom').value = '';
+                    document.getElementById('penaltyTimeTo').value = '';
+                    document.getElementById('penaltyHoursDeducted').value = '';
+                    document.getElementById('penaltyDaysDeducted').value = '';
+                    
+                    // Reset modal title
+                    document.querySelector('.penalty-modal-title').textContent = 'Thêm khung giờ phạt';
+                }
+                
+                penaltyModal.style.display = 'flex';
+                // Lock body scroll using both methods for better compatibility
+                document.body.style.overflow = 'hidden';
+                document.body.classList.add('modal-open');
+                // Set flag to track modal state
+                window.penaltyModalOpen = true;
+            }
+
+            function hidePenaltyModal() {
+                penaltyModal.style.display = 'none';
+                // Unlock body scroll using both methods for better compatibility
+                document.body.style.overflow = '';
+                document.body.classList.remove('modal-open');
+                // Clear modal state flag
+                window.penaltyModalOpen = false;
+                // Reset form
+                penaltyForm.reset();
+            }
+
+            // Close modal when clicking close button
+            penaltyModalClose.addEventListener('click', hidePenaltyModal);
+
+            // Close modal when clicking outside the content
+            penaltyModal.addEventListener('click', function(e) {
+                if (e.target === penaltyModal) {
+                    hidePenaltyModal();
+                }
+            });
+
+            // Penalty Type Dropdown functionality
+            const penaltyTypeDropdown = document.getElementById('penaltyTypeDropdown');
+            const penaltyTypeDropdownHeader = document.getElementById('penaltyTypeDropdownHeader');
+            const penaltyTypeDropdownOptions = document.getElementById('penaltyTypeDropdownOptions');
+            const penaltyTypeDropdownSelected = document.getElementById('penaltyTypeDropdownSelected');
+            const penaltyTypeInput = document.getElementById('penaltyTypeInput');
+
+            penaltyTypeDropdownHeader.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const isVisible = penaltyTypeDropdownOptions.style.display === 'block';
+                
+                if (!isVisible) {
+                    penaltyTypeDropdownOptions.style.display = 'block';
+                    penaltyTypeDropdownHeader.classList.add('active');
+                    // Only lock scroll if modal is not already open
+                    if (!window.penaltyModalOpen) {
+                        document.body.style.overflow = 'hidden';
+                        document.body.classList.add('modal-open');
+                    }
+                } else {
+                    penaltyTypeDropdownOptions.style.display = 'none';
+                    penaltyTypeDropdownHeader.classList.remove('active');
+                    // Only unlock scroll if modal is not open
+                    if (!window.penaltyModalOpen) {
+                        document.body.style.overflow = '';
+                        document.body.classList.remove('modal-open');
+                    }
+                }
+            });
+
+            // Handle dropdown option selection for Penalty Type
+            const penaltyTypeOptions = penaltyTypeDropdownOptions.querySelectorAll('.dropdown-option');
+            penaltyTypeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const text = this.querySelector('span').textContent;
+                    
+                    penaltyTypeDropdownSelected.textContent = text;
+                    penaltyTypeInput.value = value;
+                    
+                    penaltyTypeOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    penaltyTypeDropdownOptions.style.display = 'none';
+                    penaltyTypeDropdownHeader.classList.remove('active');
+                    // Only unlock scroll if modal is not open
+                    if (!window.penaltyModalOpen) {
+                        document.body.style.overflow = '';
+                        document.body.classList.remove('modal-open');
+                    }
+                });
+            });
+
+            // Close penalty type dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!penaltyTypeDropdown.contains(e.target)) {
+                    penaltyTypeDropdownOptions.style.display = 'none';
+                    penaltyTypeDropdownHeader.classList.remove('active');
+                    // Only unlock scroll if modal is not open
+                    if (!window.penaltyModalOpen) {
+                        document.body.style.overflow = '';
+                        document.body.classList.remove('modal-open');
+                    }
+                }
+            });
+
+            // Handle penalty form submission
+            penaltyForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(penaltyForm);
+                const penaltyData = {
+                    type: penaltyTypeInput.value, // Use the hidden input value
+                    timeFrom: formData.get('penaltyTimeFrom'),
+                    timeTo: formData.get('penaltyTimeTo'),
+                    hoursDeducted: formData.get('penaltyHoursDeducted'),
+                    daysDeducted: formData.get('penaltyDaysDeducted')
+                };
+
+                // Check if we're editing an existing penalty
+                const editingPenaltyId = penaltyForm.getAttribute('data-editing-penalty-id');
+                
+                if (editingPenaltyId) {
+                    // Update existing penalty row
+                    updatePenaltyRow(editingPenaltyId, penaltyData);
+                    penaltyForm.removeAttribute('data-editing-penalty-id');
+                } else {
+                    // Add new penalty to table
+                    addPenaltyRow(penaltyData);
+                }
+                
+                // Clear all form inputs for next use
+                penaltyTypeInput.value = '';
+                document.getElementById('penaltyTypeDropdownSelected').textContent = 'Chọn loại phạt';
+                document.getElementById('penaltyTimeFrom').value = '';
+                document.getElementById('penaltyTimeTo').value = '';
+                document.getElementById('penaltyHoursDeducted').value = '';
+                document.getElementById('penaltyDaysDeducted').value = '';
+                
+                // Reset modal title
+                document.querySelector('.penalty-modal-title').textContent = 'Thêm khung giờ phạt';
+                
+                // Hide modal
+                hidePenaltyModal();
+            });
+
+            // Function to add a new penalty row
+            function addPenaltyRow(penaltyData = null) {
+                const rowId = 'penalty_' + Date.now();
+                const row = document.createElement('tr');
+                row.id = rowId;
+                
+                if (penaltyData) {
+                    // Add penalty from modal data
+                    row.innerHTML = `
+                        <td>${getPenaltyTypeText(penaltyData.type)}</td>
+                        <td>${penaltyData.timeFrom} - ${penaltyData.timeTo} phút</td>
+                        <td>
+                            <div style="line-height: 1.4;">
+                                <div>Giờ công: ${penaltyData.hoursDeducted}</div>
+                                <div>Ngày công: ${penaltyData.daysDeducted}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="actions-container">
+                                <button class="edit-btn" data-penalty-id="${rowId}" onclick="event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); togglePenaltyActionMenu(event, '${rowId}');" title="More actions">
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 10px; height: 10px;">
+                                </button>
+                                <div class="action-menu" id="penalty-menu-${rowId}">
+                                    <div class="action-item" data-penalty-id="${rowId}" onclick="editPenalty('${rowId}')">
+                                        <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                        <span>Edit penalty</span>
+                                    </div>
+                                    <div class="action-item delete" data-penalty-id="${rowId}" onclick="deletePenaltyRow('${rowId}')">
+                                        <img src="/static/images/trash.png" alt="Delete" class="action-icon">
+                                        <span>Delete</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    // Default empty row (for backward compatibility)
+                    row.innerHTML = `
+                        <td>
+                            <select class="penalty-select">
+                                <option value="">Chọn loại phạt</option>
+                                <option value="late_arrival">Đi muộn</option>
+                                <option value="early_departure">Về sớm</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="penalty-input" placeholder="Thời gian từ - Đến">
+                        </td>
+                        <td>
+                            <div style="line-height: 1.4;">
+                                <div>Giờ công: [Data]</div>
+                                <div>Ngày công: [Data]</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="actions-container">
+                                <button class="edit-btn" data-penalty-id="${rowId}" onclick="event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); togglePenaltyActionMenu(event, '${rowId}');" title="More actions">
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 10px; height: 10px;">
+                                </button>
+                                <div class="action-menu" id="penalty-menu-${rowId}">
+                                    <div class="action-item" data-penalty-id="${rowId}" onclick="editPenalty('${rowId}')">
+                                        <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                        <span>Edit penalty</span>
+                                    </div>
+                                    <div class="action-item delete" data-penalty-id="${rowId}" onclick="deletePenaltyRow('${rowId}')">
+                                        <img src="/static/images/trash.png" alt="Delete" class="action-icon">
+                                        <span>Delete</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                }
+                penaltyTableBody.appendChild(row);
+                
+                // Save form state after adding penalty row
+                saveStep2FormState();
+            }
+
+            // Function to get penalty type text
+            function getPenaltyTypeText(type) {
+                const typeMap = {
+                    'late_arrival': 'đi muộn',
+                    'early_departure': 'về sớm',
+                    'no_entry': 'không có giờ vào'
+                };
+                return typeMap[type] ? `Phạt ${typeMap[type]}` : type;
+            }
+
+            // Function to update an existing penalty row
+            function updatePenaltyRow(penaltyId, penaltyData) {
+                const penaltyRow = document.getElementById(penaltyId);
+                if (!penaltyRow) {
+                    console.error('Penalty row not found for update:', penaltyId);
+                    return;
+                }
+                
+                // Update the row content with new data
+                penaltyRow.cells[0].textContent = getPenaltyTypeText(penaltyData.type);
+                penaltyRow.cells[1].textContent = `${penaltyData.timeFrom} - ${penaltyData.timeTo} phút`;
+                penaltyRow.cells[2].innerHTML = `
+                    <div style="line-height: 1.4;">
+                        <div>Giờ công: ${penaltyData.hoursDeducted}</div>
+                        <div>Ngày công: ${penaltyData.daysDeducted}</div>
+                    </div>
+                `;
+                
+                // Save form state after updating penalty row
+                saveStep2FormState();
+            }
+
+            // Function to delete a penalty row
+            window.deletePenaltyRow = function(rowId) {
+                const row = document.getElementById(rowId);
+                if (row) {
+                    row.remove();
+                    // Save form state after deleting penalty row
+                    saveStep2FormState();
+                    // Update empty state after deleting penalty row
+                    updatePenaltyTableEmptyState();
+                }
+            };
+
+            // Penalty action menu functionality
+            window.togglePenaltyActionMenu = function(event, penaltyId) {
+                event.stopPropagation();
+                
+                // Close all other action menus
+                document.querySelectorAll('.action-menu.show').forEach(openMenu => {
+                    openMenu.classList.remove('show');
+                });
+                
+                const menu = document.getElementById(`penalty-menu-${penaltyId}`);
+                if (menu) {
+                    const isOpen = menu.classList.contains('show');
+                    menu.classList.toggle('show');
+                    
+                    // Lock/unlock scrolling based on menu state
+                    if (!isOpen) {
+                        // Menu is opening - lock scroll
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        // Menu is closing - restore scroll
+                        document.body.style.overflow = '';
+                    }
+                    
+                    // Position the menu
+                    const button = event.target.closest('.edit-btn');
+                    if (button) {
+                        const buttonRect = button.getBoundingClientRect();
+                        menu.style.left = buttonRect.left + 'px';
+                        menu.style.top = (buttonRect.bottom + 5) + 'px';
+                    }
+                }
+            };
+
+            // Edit penalty function
+            window.editPenalty = function(penaltyId, event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Get the penalty row data
+                const penaltyRow = document.getElementById(penaltyId);
+                if (!penaltyRow) {
+                    console.error('Penalty row not found:', penaltyId);
+                    return false;
+                }
+                
+                // Extract data from the table row
+                const typeCell = penaltyRow.cells[0].textContent.trim();
+                const durationCell = penaltyRow.cells[1].textContent.trim();
+                const amountCell = penaltyRow.cells[2].textContent.trim();
+                
+                // Parse the data
+                const type = typeCell === 'Phạt đi muộn' ? 'late_arrival' : 
+                             typeCell === 'Phạt về sớm' ? 'early_departure' : 
+                             typeCell === 'Phạt không có giờ vào' ? 'no_entry' : 'late_arrival';
+                const durationMatch = durationCell.match(/(\d+)\s*-\s*(\d+)\s*phút/);
+                const timeFrom = durationMatch ? durationMatch[1] : '';
+                const timeTo = durationMatch ? durationMatch[2] : '';
+                
+                const hoursMatch = amountCell.match(/Giờ công:\s*([\d.]+)/);
+                const daysMatch = amountCell.match(/Ngày công:\s*([\d.]+)/);
+                const hoursDeducted = hoursMatch ? hoursMatch[1] : '';
+                const daysDeducted = daysMatch ? daysMatch[1] : '';
+                
+                // Populate the modal with existing data
+                document.getElementById('penaltyTypeInput').value = type;
+                document.getElementById('penaltyTypeDropdownSelected').textContent = typeCell;
+                document.getElementById('penaltyTimeFrom').value = timeFrom;
+                document.getElementById('penaltyTimeTo').value = timeTo;
+                document.getElementById('penaltyHoursDeducted').value = hoursDeducted;
+                document.getElementById('penaltyDaysDeducted').value = daysDeducted;
+                
+                // Store the penalty ID for updating
+                penaltyForm.setAttribute('data-editing-penalty-id', penaltyId);
+                
+                // Change modal title to indicate editing
+                document.querySelector('.penalty-modal-title').textContent = 'Chỉnh sửa khung giờ phạt';
+                
+                // Show the modal
+                showPenaltyModal();
+                
+                // Close the action menu
+                document.querySelectorAll('.action-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+                
+                return false;
+            };
+
+            // Close action menus when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.actions-container')) {
+                    document.querySelectorAll('.action-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                    // Restore scrolling when closing menus
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Prevent form submission when clicking on action items
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.action-item')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+
+            // --- Enable/disable Áp dụng button based on form completeness ---
+            const penaltyBtnApply = document.getElementById('penaltyBtnApply');
+            const requiredPenaltyFields = [
+                document.getElementById('penaltyTypeInput'),
+                document.getElementById('penaltyTimeFrom'),
+                document.getElementById('penaltyTimeTo'),
+                document.getElementById('penaltyHoursDeducted'),
+                document.getElementById('penaltyDaysDeducted')
+            ];
+
+            function checkPenaltyFormComplete() {
+                let allFilled = requiredPenaltyFields.every(field => {
+                    if (field.type === 'number') {
+                        return field.value !== '' && !isNaN(field.value) && Number(field.value) >= 0;
+                    }
+                    return field.value && field.value.trim() !== '';
+                });
+                penaltyBtnApply.disabled = !allFilled;
+                if (!allFilled) {
+                    penaltyBtnApply.style.opacity = '0.5';
+                    penaltyBtnApply.style.cursor = 'not-allowed';
+                    penaltyBtnApply.style.filter = 'grayscale(60%)';
+                    penaltyBtnApply.style.background = '#e0e0e0';
+                    penaltyBtnApply.style.color = '#b0b0b0';
+                    penaltyBtnApply.style.border = 'none';
+                } else {
+                    penaltyBtnApply.style.opacity = '';
+                    penaltyBtnApply.style.cursor = '';
+                    penaltyBtnApply.style.filter = '';
+                    penaltyBtnApply.style.background = '';
+                    penaltyBtnApply.style.color = '';
+                    penaltyBtnApply.style.border = '';
+                }
+            }
+
+            requiredPenaltyFields.forEach(field => {
+                field.addEventListener('input', checkPenaltyFormComplete);
+            });
+            // Also check when penalty type is selected via dropdown
+            penaltyTypeOptions.forEach(option => {
+                option.addEventListener('click', checkPenaltyFormComplete);
+            });
+            // Reset button state when modal is shown
+            function showPenaltyModalWithButtonReset() {
+                showPenaltyModal();
+                checkPenaltyFormComplete();
+            }
+            // Replace showPenaltyModal usage with showPenaltyModalWithButtonReset
+            addPenaltyBtn.removeEventListener('click', showPenaltyModal);
+            addPenaltyBtn.addEventListener('click', showPenaltyModalWithButtonReset);
+
+            // --- Penalty Table Empty State Management ---
+            function updatePenaltyTableEmptyState() {
+                const penaltyTableBody = document.getElementById('penaltyTableBody');
+                const emptyState = document.getElementById('penaltyTableEmptyState');
+                // Only count rows that are not the empty state row
+                const penaltyRows = Array.from(penaltyTableBody.children).filter(row => row.id !== 'penaltyTableEmptyState');
+                if (penaltyRows.length === 0) {
+                    emptyState.style.display = '';
+                } else {
+                    emptyState.style.display = 'none';
+                }
+            }
+            // Call this after adding/removing penalties
+            // Patch addPenaltyRow to call updatePenaltyTableEmptyState
+            const originalAddPenaltyRow = addPenaltyRow;
+            addPenaltyRow = function(...args) {
+                originalAddPenaltyRow.apply(this, args);
+                updatePenaltyTableEmptyState();
+            };
+            document.addEventListener('DOMContentLoaded', updatePenaltyTableEmptyState);
+
+            // Improved scroll lock for penalty edit dropdown using event delegation
+            penaltyTableContainer.addEventListener('click', function(e) {
+                // Check if an edit dropdown toggle was clicked
+                const toggleBtn = e.target.closest('.dropdown-toggle');
+                if (toggleBtn) {
+                    // Find the corresponding dropdown menu
+                    const row = toggleBtn.closest('tr');
+                    if (!row) return;
+                    const menu = row.querySelector('.penalty-edit-dropdown-menu');
+                    if (!menu) return;
+                    const isOpen = menu.style.display === 'block';
+                    // Close all other open dropdowns first
+                    document.querySelectorAll('.penalty-edit-dropdown-menu').forEach(m => {
+                        m.style.display = 'none';
+                    });
+                    if (!isOpen) {
+                        menu.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        menu.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                    e.stopPropagation();
+                }
+            });
+            // Close dropdown and unlock scroll when clicking outside any dropdown
+            window.addEventListener('click', function(e) {
+                document.querySelectorAll('.penalty-edit-dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+                document.body.style.overflow = '';
+            });
+            // Prevent closing when clicking inside the dropdown
+            penaltyTableContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.penalty-edit-dropdown-menu')) {
+                    e.stopPropagation();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

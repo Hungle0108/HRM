@@ -22,7 +22,10 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Always point explicitly to the users.db at the repository root
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_FILE = os.path.join(BASE_DIR, 'users.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_FILE}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-secret-key'  # Change this to a secure secret key
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -56,6 +59,92 @@ def from_json_filter(value):
         except (json.JSONDecodeError, TypeError):
             return None
     return None
+
+# Shift model for storing comprehensive shift data
+class Shift(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    shift_id = db.Column(db.String(80), nullable=False)
+    start_time = db.Column(db.String(10), nullable=False)  # Format: "HH:MM"
+    end_time = db.Column(db.String(10), nullable=False)    # Format: "HH:MM"
+    
+    # Check-in/Check-out settings
+    check_in_enabled = db.Column(db.Boolean, default=False)
+    check_in_start_time = db.Column(db.String(10))  # Format: "HH:MM"
+    check_in_end_time = db.Column(db.String(10))    # Format: "HH:MM"
+    check_out_enabled = db.Column(db.Boolean, default=False)
+    check_out_start_time = db.Column(db.String(10))  # Format: "HH:MM"
+    check_out_end_time = db.Column(db.String(10))    # Format: "HH:MM"
+    
+    # Break time settings
+    break_enabled = db.Column(db.Boolean, default=False)
+    break_start_time = db.Column(db.String(10))  # Format: "HH:MM"
+    break_end_time = db.Column(db.String(10))    # Format: "HH:MM"
+    
+    # Time tracking settings
+    time_submission_method = db.Column(db.String(50), nullable=False)  # manual, automatic, hybrid
+    hours_worked = db.Column(db.Float, nullable=False)  # Giờ công
+    days_worked = db.Column(db.Float, nullable=False)   # Ngày công
+    
+    # Penalty settings
+    late_early_penalty_enabled = db.Column(db.Boolean, default=False)
+    penalty_rules = db.Column(db.Text)  # JSON string for penalty rules
+    
+    no_entry_penalty_enabled = db.Column(db.Boolean, default=False)
+    no_entry_hours_deducted = db.Column(db.Float, default=0)
+    no_entry_days_deducted = db.Column(db.Float, default=0)
+    
+    no_exit_penalty_enabled = db.Column(db.Boolean, default=False)
+    no_exit_hours_deducted = db.Column(db.Float, default=0)
+    no_exit_days_deducted = db.Column(db.Float, default=0)
+    
+    # Metadata
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    # Relationships
+    organization = db.relationship('Organization', backref='shifts')
+    creator = db.relationship('User', foreign_keys=[created_by], backref='created_shifts')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'shift_id': self.shift_id,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'check_in_enabled': self.check_in_enabled,
+            'check_in_start_time': self.check_in_start_time,
+            'check_in_end_time': self.check_in_end_time,
+            'check_out_enabled': self.check_out_enabled,
+            'check_out_start_time': self.check_out_start_time,
+            'check_out_end_time': self.check_out_end_time,
+            'break_enabled': self.break_enabled,
+            'break_start_time': self.break_start_time,
+            'break_end_time': self.break_end_time,
+            'time_submission_method': self.time_submission_method,
+            'hours_worked': self.hours_worked,
+            'days_worked': self.days_worked,
+            'late_early_penalty_enabled': self.late_early_penalty_enabled,
+            'penalty_rules': self.penalty_rules,
+            'no_entry_penalty_enabled': self.no_entry_penalty_enabled,
+            'no_entry_hours_deducted': self.no_entry_hours_deducted,
+            'no_entry_days_deducted': self.no_entry_days_deducted,
+            'no_exit_penalty_enabled': self.no_exit_penalty_enabled,
+            'no_exit_hours_deducted': self.no_exit_hours_deducted,
+            'no_exit_days_deducted': self.no_exit_days_deducted,
+            'organization_id': self.organization_id,
+            'created_by': self.created_by,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'is_active': self.is_active
+        }
+    
+    def __repr__(self):
+        return f'<Shift {self.name}>'
+
+
 
 # User model
 class User(db.Model):
@@ -2067,6 +2156,141 @@ def create_schedule_step3():
     
     return render_template('create_schedule_step3.html', user=user)
 
+@app.route('/shifts')
+def shifts():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Get all shifts from both sources
+    shifts = []
+    
+    if user.organization_id:
+        # Get shifts from the new Shift model (step 3 created shifts)
+        new_shifts = Shift.query.filter_by(
+            organization_id=user.organization_id,
+            is_active=True
+        ).order_by(Shift.created_at.desc()).all()
+        
+        for shift in new_shifts:
+            shifts.append({
+                'id': f"shift_{shift.id}",
+                'name': shift.name,
+                'shift_id': shift.shift_id,
+                'description': f"Time: {shift.start_time} - {shift.end_time}",
+                'schedule_name': 'Standalone Shift',
+                'schedule_id': None,
+                'include_time': True,
+                'start_time': shift.start_time,
+                'end_time': shift.end_time,
+                'duration': '',
+                'working_days': {},
+                'created_at': shift.created_at,
+                'time_submission_method': shift.time_submission_method,
+                'hours_worked': shift.hours_worked,
+                'days_worked': shift.days_worked,
+                'check_in_enabled': shift.check_in_enabled,
+                'check_out_enabled': shift.check_out_enabled,
+                'break_enabled': shift.break_enabled,
+                'late_early_penalty_enabled': shift.late_early_penalty_enabled,
+                'no_entry_penalty_enabled': shift.no_entry_penalty_enabled,
+                'no_exit_penalty_enabled': shift.no_exit_penalty_enabled,
+                'shift_type': 'new'
+            })
+        
+        # Get shifts from WorkSchedule model (legacy shifts)
+        schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).order_by(WorkSchedule.created_at.desc()).all()
+        for schedule in schedules:
+            schedule_data = json.loads(schedule.schedule_data)
+            if 'scheduleDetails' in schedule_data and 'shifts' in schedule_data['scheduleDetails']:
+                for shift_id, shift_data in schedule_data['scheduleDetails']['shifts'].items():
+                    shifts.append({
+                        'id': f"{schedule.id}_{shift_id}",
+                        'name': shift_data.get('name', 'Unnamed Shift'),
+                        'shift_id': shift_id,
+                        'description': shift_data.get('description', ''),
+                        'schedule_name': schedule.name,
+                        'schedule_id': schedule.id,
+                        'include_time': shift_data.get('includeTime', False),
+                        'start_time': shift_data.get('startTime', ''),
+                        'end_time': shift_data.get('endTime', ''),
+                        'duration': shift_data.get('duration', ''),
+                        'working_days': shift_data.get('weekdays', {}),
+                        'created_at': schedule.created_at,
+                        'shift_type': 'legacy'
+                    })
+    
+    # Sort all shifts by creation date (newest first)
+    shifts.sort(key=lambda x: x['created_at'], reverse=True)
+    
+    return render_template('shifts.html', user=user, shifts=shifts, active_page='shifts')
+
+@app.route('/create-shift')
+def create_shift():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('create_shift.html', user=user)
+
+@app.route('/create-shift-step2', methods=['GET', 'POST'])
+def create_shift_step2():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Handle POST request from step 1 form submission
+    if request.method == 'POST':
+        # Store step 1 data in session for later use
+        session['shift_step1_data'] = {
+            'shift_name': request.form.get('shiftName'),
+            'shift_id': request.form.get('shiftId'),
+            'description': request.form.get('description'),
+            'start_time': request.form.get('startTime'),
+            'end_time': request.form.get('endTime'),
+            'working_days': request.form.getlist('workingDays'),
+            'check_in': request.form.get('checkIn') == 'on',
+            'check_in_start_time': request.form.get('checkInStartTime'),
+            'check_in_end_time': request.form.get('checkInEndTime'),
+            'check_out': request.form.get('checkOut') == 'on',
+            'check_out_start_time': request.form.get('checkOutStartTime'),
+            'check_out_end_time': request.form.get('checkOutEndTime'),
+            'break': request.form.get('break') == 'on',
+            'break_start_time': request.form.get('breakStartTime'),
+            'break_end_time': request.form.get('breakEndTime'),
+            'time_submission_method': request.form.get('timeSubmissionMethod'),
+            'hours_worked': request.form.get('hoursWorked'),
+            'days_worked': request.form.get('daysWorked')
+        }
+        # Redirect to step 2 GET to avoid form resubmission
+        return redirect('/create-shift-step2')
+    
+    return render_template('create_shift_step2.html', user=user)
+
+@app.route('/create-shift-step3')
+def create_shift_step3():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('create_shift_step3.html', user=user)
+
 @app.route('/api/create-schedule', methods=['POST'])
 def api_create_schedule():
     if 'user_id' not in session:
@@ -2153,6 +2377,256 @@ def api_delete_schedule(schedule_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to delete schedule'}), 500
+
+@app.route('/api/create-shift-step3', methods=['POST'])
+def api_create_shift_step3():
+    """Create a new shift from step 3 data"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'User not logged in'}), 401
+    
+    try:
+        user_id = session['user_id']
+        user = User.query.get(user_id)
+        if not user or not user.organization_id:
+            return jsonify({'error': 'User not found or no organization'}), 400
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Extract step 1 data
+        step1_data = data.get('step1', {})
+        step2_data = data.get('step2', {})
+
+        def coerce_bool(value):
+            """Return True for truthy representations in strings/bools/ints."""
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, (int, float)):
+                return value == 1
+            if isinstance(value, str):
+                return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+            return False
+        
+        def get_first(*keys):
+            for key in keys:
+                if key in step1_data and step1_data.get(key) not in (None, ''):
+                    return step1_data.get(key)
+            return ''
+        
+        # Validate required fields from step 1
+        shift_name = str(step1_data.get('shiftName', '') or '').strip()
+        shift_id = str(step1_data.get('shiftId', '') or '').strip()
+        start_time = str(step1_data.get('startTime', '') or '').strip()
+        end_time = str(step1_data.get('endTime', '') or '').strip()
+        # Accept both timeSubmissionMethodInput (localStorage) and timeSubmissionMethod (sessionStorage)
+        time_submission_method = str(
+            step1_data.get('timeSubmissionMethodInput')
+            or step1_data.get('timeSubmissionMethod')
+            or ''
+        ).strip()
+        hours_worked_raw = step1_data.get('hoursWorked', '')
+        days_worked_raw = step1_data.get('daysWorked', '')
+        
+        # Validation
+        if not shift_name:
+            return jsonify({'error': 'Shift name is required'}), 400
+        if not shift_id:
+            return jsonify({'error': 'Shift ID is required'}), 400
+        if not start_time:
+            return jsonify({'error': 'Start time is required'}), 400
+        if not end_time:
+            return jsonify({'error': 'End time is required'}), 400
+        if not time_submission_method:
+            return jsonify({'error': 'Time submission method is required'}), 400
+        if hours_worked_raw in (None, ''):
+            return jsonify({'error': 'Giờ công is required'}), 400
+        if days_worked_raw in (None, ''):
+            return jsonify({'error': 'Ngày công is required'}), 400
+        
+        # Parse numeric fields safely
+        try:
+            hours_worked = float(hours_worked_raw)
+        except Exception:
+            return jsonify({'error': 'Giờ công must be a number'}), 400
+        try:
+            days_worked = float(days_worked_raw)
+        except Exception:
+            return jsonify({'error': 'Ngày công must be a number'}), 400
+        
+        # Check if shift ID already exists for this organization
+        existing_shift = Shift.query.filter_by(
+            shift_id=shift_id, 
+            organization_id=user.organization_id,
+            is_active=True
+        ).first()
+        if existing_shift:
+            return jsonify({'error': 'Shift ID already exists'}), 400
+        
+        # Create new shift
+        new_shift = Shift(
+            name=shift_name,
+            shift_id=shift_id,
+            start_time=start_time,
+            end_time=end_time,
+            
+            # Check-in settings
+            check_in_enabled=coerce_bool(get_first('checkInToggle', 'checkIn')),
+            check_in_start_time=step1_data.get('checkInStartTime', ''),
+            check_in_end_time=step1_data.get('checkInEndTime', ''),
+            
+            # Check-out settings
+            check_out_enabled=coerce_bool(get_first('checkOutToggle', 'checkOut')),
+            check_out_start_time=step1_data.get('checkOutStartTime', ''),
+            check_out_end_time=step1_data.get('checkOutEndTime', ''),
+            
+            # Break settings
+            break_enabled=coerce_bool(get_first('breakToggle', 'break')),
+            break_start_time=step1_data.get('breakStartTime', ''),
+            break_end_time=step1_data.get('breakEndTime', ''),
+            
+            # Time tracking settings
+            time_submission_method=time_submission_method,
+            hours_worked=hours_worked,
+            days_worked=days_worked,
+            
+            # Penalty settings from step 2
+            late_early_penalty_enabled=coerce_bool(step2_data.get('penaltyToggle')),
+            penalty_rules=json.dumps(step2_data.get('penaltyRows', [])) if step2_data.get('penaltyRows') else None,
+            
+            no_entry_penalty_enabled=coerce_bool(step2_data.get('noEntryPenaltyToggle')),
+            no_entry_hours_deducted=float(step2_data.get('noEntryHoursDeducted', 0)),
+            no_entry_days_deducted=float(step2_data.get('noEntryDaysDeducted', 0)),
+            
+            no_exit_penalty_enabled=coerce_bool(step2_data.get('noExitPenaltyToggle')),
+            no_exit_hours_deducted=float(step2_data.get('noExitHoursDeducted', 0)),
+            no_exit_days_deducted=float(step2_data.get('noExitDaysDeducted', 0)),
+            
+            # Metadata
+            organization_id=user.organization_id,
+            created_by=user_id
+        )
+        
+        db.session.add(new_shift)
+        db.session.commit()
+        
+        logger.info(f"Shift '{shift_name}' created successfully by user {user_id}")
+        
+        return jsonify({
+            'message': 'Shift created successfully',
+            'shift_id': new_shift.id,
+            'shift_name': new_shift.name
+        }), 201
+        
+    except ValueError as e:
+        logger.error(f"Validation error creating shift: {str(e)}")
+        return jsonify({'error': 'Invalid data format'}), 400
+    except Exception as e:
+        logger.error(f"Error creating shift: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to create shift'}), 500
+
+@app.route('/api/create-shift', methods=['POST'])
+def api_create_shift():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Extract shift data
+        shift_name = data.get('shiftName', '').strip()
+        shift_type = data.get('shiftType', '')
+        shift_description = data.get('shiftDescription', '').strip()
+        include_time = data.get('includeTime', False)
+        start_time = data.get('startTime', '')
+        end_time = data.get('endTime', '')
+        duration = data.get('duration', '')
+        working_days = data.get('workingDays', {})
+        
+        # Validate required fields
+        if not shift_name:
+            return jsonify({'error': 'Shift name is required'}), 400
+        
+        if not shift_type:
+            return jsonify({'error': 'Shift type is required'}), 400
+        
+        # Validate time configuration
+        if include_time:
+            if not start_time or not end_time:
+                return jsonify({'error': 'Start and end times are required for fixed time shifts'}), 400
+        else:
+            if not duration or float(duration) <= 0:
+                return jsonify({'error': 'Valid duration is required for flexible shifts'}), 400
+        
+        # Validate working days
+        if not any(working_days.values()):
+            return jsonify({'error': 'At least one working day must be selected'}), 400
+        
+        # Create shift data structure (similar to schedule format)
+        shift_data = {
+            'shiftName': shift_name,
+            'shiftType': shift_type,
+            'shiftDescription': shift_description,
+            'includeTime': include_time,
+            'startTime': start_time,
+            'endTime': end_time,
+            'duration': duration,
+            'workingDays': working_days
+        }
+        
+        # For now, we'll store this as a simple schedule with one shift
+        # In a real implementation, you might want a separate Shift model
+        schedule_name = f"Schedule - {shift_name}"
+        schedule_type = 'fixed' if include_time else 'flexible'
+        
+        # Create schedule data structure
+        schedule_data = {
+            'scheduleName': schedule_name,
+            'scheduleDetails': {
+                'numberOfShifts': 1,
+                'shifts': {
+                    'shift1': {
+                        'name': shift_name,
+                        'description': shift_description,
+                        'includeTime': include_time,
+                        'startTime': start_time,
+                        'endTime': end_time,
+                        'duration': duration,
+                        'weekdays': working_days
+                    }
+                }
+            }
+        }
+        
+        # Create new schedule
+        new_schedule = WorkSchedule(
+            name=schedule_name,
+            schedule_type=schedule_type,
+            organization_id=user.organization_id,
+            created_by=user.id,
+            schedule_data=json.dumps(schedule_data)
+        )
+        
+        db.session.add(new_schedule)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Shift created successfully',
+            'schedule_id': new_schedule.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error creating shift: {str(e)}")
+        return jsonify({'error': 'Failed to create shift'}), 500
 
 @app.route('/edit-schedule/<int:schedule_id>')
 def edit_schedule(schedule_id):

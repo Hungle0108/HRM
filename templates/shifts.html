@@ -1,0 +1,651 @@
+{% extends "base.html" %}
+
+{% block title %}Shifts | Canvascript{% endblock %}
+
+{% block head %}
+<!-- Backend sets current user information -->
+<meta name="current-user" content="{{ user.name if user else 'Current User' }}">
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Settings layout */
+    .settings-layout {
+        display: flex;
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+        position: relative;
+    }
+
+    /* Main content area */
+    .settings-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 32px 40px;
+        background: #f8f9fa;
+    }
+
+    .content-header {
+        margin-bottom: 32px;
+    }
+
+    .content-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .content-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+    }
+
+    /* Shifts section */
+    .shifts-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 40px;
+    }
+
+    /* Filters box */
+    .filters-box {
+        background: white;
+        border-radius: 12px;
+        padding: 24px 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Table box */
+    .table-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 32px;
+    }
+
+    .section-info {
+        flex: 1;
+    }
+
+    .section-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+
+    .section-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+        line-height: 1.5;
+        margin-bottom: 24px;
+    }
+
+    .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 16px;
+    }
+
+    .create-btn {
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .create-btn:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        text-decoration: none;
+        color: #495057;
+    }
+
+    /* Filters section */
+    .filters-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .filters-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Search container styles */
+    .filters-section .search-container {
+        position: relative;
+        height: 44px;
+        width: 44px;
+        max-width: 300px;
+        transition: width 0.3s ease;
+        cursor: pointer;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Expanded state */
+    .filters-section .search-container.expanded {
+        width: 300px;
+        background: white;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .filters-section .search-container:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .filters-section .search-container.expanded:hover {
+        background: white;
+        border-color: #80bdff;
+    }
+
+    .filters-section .search-input {
+        width: 0;
+        padding: 0;
+        border: none !important;
+        outline: none !important;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        opacity: 0;
+        margin-left: 40px;
+        box-shadow: none !important;
+    }
+
+    /* Visible input in expanded state */
+    .filters-section .search-container.expanded .search-input {
+        width: calc(100% - 50px);
+        padding: 10px 16px 10px 0;
+        opacity: 1;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .filters-section .search-input:focus {
+        outline: none !important;
+        background: transparent;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .filters-section .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+
+    .filters-section .search-container.expanded .search-icon {
+        opacity: 0.8;
+    }
+
+    .filters-section .search-icon:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 3;
+        display: none;
+    }
+
+    .search-clear-btn:hover {
+        opacity: 1;
+    }
+
+    .search-clear-btn.show {
+        display: block;
+        opacity: 0.6;
+    }
+
+    /* Table styles */
+    .shifts-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: none;
+        border-radius: 0;
+        overflow: visible;
+    }
+
+    .shifts-table th {
+        padding: 16px;
+        text-align: left;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        background: #f8f9fa;
+        user-select: none;
+        position: relative;
+        transition: background-color 0.2s ease;
+    }
+
+    .shifts-table th:last-child {
+        border-right: none;
+    }
+
+    .shifts-table td {
+        padding: 16px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        vertical-align: top;
+    }
+
+    .shifts-table td:last-child {
+        border-right: none;
+    }
+
+    .shifts-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Shift name and description */
+    .shift-name {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+        font-size: 0.875rem;
+    }
+
+    .shift-description {
+        color: #6c757d;
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+
+    .shift-schedule {
+        color: #6c757d;
+        font-size: 0.75rem;
+        font-style: italic;
+    }
+
+    /* Time information */
+    .time-info {
+        font-size: 0.875rem;
+        color: #495057;
+    }
+
+    .time-type {
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .time-details {
+        color: #6c757d;
+        font-size: 0.75rem;
+    }
+
+    /* Working days */
+    .working-days {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .day-badge {
+        padding: 2px 6px;
+        background: #e9ecef;
+        color: #495057;
+        border-radius: 4px;
+        font-size: 0.625rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .day-badge.active {
+        background: #1a1a1a;
+        color: white;
+    }
+
+    /* Actions */
+    .actions-cell {
+        text-align: right;
+    }
+
+    .action-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+        margin-left: 4px;
+    }
+
+    .action-button:hover {
+        background: #e9ecef;
+    }
+
+    .action-button img {
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+    }
+
+    .action-button:hover img {
+        opacity: 1;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        opacity: 0.3;
+    }
+
+    .empty-state-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-description {
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .settings-sidebar {
+            display: none;
+        }
+        
+        .settings-content {
+            margin-left: 0;
+            padding: 20px;
+        }
+        
+        .filters-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filters-left {
+            justify-content: space-between;
+        }
+        
+        .shifts-table {
+            font-size: 0.75rem;
+        }
+        
+        .shifts-table th,
+        .shifts-table td {
+            padding: 12px 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-layout">
+    <!-- Organization Settings Sidebar -->
+    {% include 'org_settings_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="settings-content">
+        <div class="content-header">
+            <h1 class="content-title">Shifts</h1>
+            <p class="content-subtitle">Manage and view all work shifts in your organization.</p>
+        </div>
+
+        <div class="shifts-section">
+            <!-- Filters -->
+            <div class="filters-box">
+                <div class="section-header">
+                    <div class="section-info">
+                        <h2 class="section-name">All Shifts</h2>
+                        <p class="section-description">View and manage work shifts across all schedules.</p>
+                    </div>
+                    <div class="section-actions">
+                        <a href="/create-shift" class="create-btn">Create Shift</a>
+                        <a href="/create-schedule" class="create-btn">Create Schedule</a>
+                    </div>
+                </div>
+
+                <div class="filters-section">
+                    <div class="filters-left">
+                        <div class="search-container" id="searchContainer">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search shifts...">
+                            <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                            <button class="search-clear-btn" id="searchClearBtn">
+                                <img src="/static/images/cross-small.png" alt="Clear" width="16" height="16">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-box">
+                {% if shifts %}
+                <table class="shifts-table">
+                    <thead>
+                        <tr>
+                            <th>Shift Name</th>
+                            <th>Schedule</th>
+                            <th>Time Configuration</th>
+                            <th>Working Days</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for shift in shifts %}
+                        <tr data-shift-name="{{ shift.name.lower() }}" data-shift-description="{{ shift.description.lower() }}">
+                            <td>
+                                <div class="shift-name">{{ shift.name }}</div>
+                                {% if shift.description %}
+                                <div class="shift-description">{{ shift.description }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="shift-schedule">{{ shift.schedule_name }}</div>
+                            </td>
+                            <td>
+                                <div class="time-info">
+                                    {% if shift.include_time %}
+                                    <div class="time-type">Fixed Time</div>
+                                    <div class="time-details">{{ shift.start_time }} - {{ shift.end_time }}</div>
+                                    {% else %}
+                                    <div class="time-type">Flexible</div>
+                                    <div class="time-details">{{ shift.duration }} hours</div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                                                         <td>
+                                 <div class="working-days">
+                                     <span class="day-badge {% if shift.working_days.get('monday', False) %}active{% endif %}">Mon</span>
+                                     <span class="day-badge {% if shift.working_days.get('tuesday', False) %}active{% endif %}">Tue</span>
+                                     <span class="day-badge {% if shift.working_days.get('wednesday', False) %}active{% endif %}">Wed</span>
+                                     <span class="day-badge {% if shift.working_days.get('thursday', False) %}active{% endif %}">Thu</span>
+                                     <span class="day-badge {% if shift.working_days.get('friday', False) %}active{% endif %}">Fri</span>
+                                     <span class="day-badge {% if shift.working_days.get('saturday', False) %}active{% endif %}">Sat</span>
+                                     <span class="day-badge {% if shift.working_days.get('sunday', False) %}active{% endif %}">Sun</span>
+                                 </div>
+                             </td>
+                            <td class="actions-cell">
+                                <button class="action-button" title="Edit shift" onclick="editShift('{{ shift.schedule_id }}')">
+                                    <img src="/static/images/pen.png" alt="Edit">
+                                </button>
+                                <button class="action-button" title="Delete shift" onclick="deleteShift('{{ shift.id }}')">
+                                    <img src="/static/images/trash.png" alt="Delete">
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <img src="/static/images/calendar-lines.png" alt="No shifts" width="64" height="64">
+                    </div>
+                    <div class="empty-state-title">No shifts found</div>
+                    <div class="empty-state-description">Create your first schedule to add shifts to your organization.</div>
+                    <a href="/create-schedule" class="create-btn">Create Schedule</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchContainer = document.getElementById('searchContainer');
+    const searchInput = document.getElementById('searchInput');
+    const searchIcon = document.getElementById('searchIcon');
+    const searchClearBtn = document.getElementById('searchClearBtn');
+
+    // Search functionality
+    searchIcon.addEventListener('click', function() {
+        searchContainer.classList.add('expanded');
+        searchInput.focus();
+    });
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.shifts-table tbody tr');
+        
+        rows.forEach(row => {
+            const shiftName = row.getAttribute('data-shift-name') || '';
+            const shiftDescription = row.getAttribute('data-shift-description') || '';
+            
+            if (shiftName.includes(searchTerm) || shiftDescription.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide clear button
+        if (searchTerm.length > 0) {
+            searchClearBtn.classList.add('show');
+        } else {
+            searchClearBtn.classList.remove('show');
+        }
+    });
+
+    searchClearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+    });
+
+    // Close search on click outside
+    document.addEventListener('click', function(e) {
+        if (!searchContainer.contains(e.target)) {
+            searchContainer.classList.remove('expanded');
+        }
+    });
+
+    // Escape key to close search
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchContainer.classList.remove('expanded');
+            searchInput.blur();
+        }
+    });
+});
+
+function editShift(scheduleId) {
+    // Redirect to edit schedule page
+    window.location.href = `/edit-schedule/${scheduleId}`;
+}
+
+function deleteShift(shiftId) {
+    if (confirm('Are you sure you want to delete this shift? This action cannot be undone.')) {
+        // Extract schedule ID from shift ID (format: scheduleId_shiftId)
+        const scheduleId = shiftId.split('_')[0];
+        
+        // For now, redirect to delete schedule page
+        // In a real implementation, you might want to delete just the shift
+        if (confirm('This will delete the entire schedule containing this shift. Continue?')) {
+            fetch(`/api/delete-schedule/${scheduleId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Schedule deleted successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Error deleting schedule: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting schedule. Please try again.');
+            });
+        }
+    }
+}
+</script>
+{% endblock %} 
