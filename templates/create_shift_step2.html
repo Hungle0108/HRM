@@ -1137,7 +1137,7 @@
                         <div class="next-step-label">Next step:</div>
                         <div class="next-step-title">3. Review & Create</div>
                     </div>
-                    <a href="/create-shift-step3" class="btn-create" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Continue</a>
+                    <a href="/create-shift-step3" class="btn-create" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" onclick="localStorage.removeItem('formClearedByEscape');">Continue</a>
                 </div>
             </div>
         </div>
@@ -1228,6 +1228,44 @@
                 'noExitDaysDeducted'
             ];
 
+            // Check if this is a fresh start (no referrer or coming from shifts list)
+            function isFreshStart() {
+                const referrer = document.referrer;
+                const isFromShiftsList = referrer.includes('/shifts') || referrer.includes('/shifts/');
+                const isFromStep1 = referrer.includes('/create-shift');
+                const isFromStep3 = referrer.includes('/create-shift-step3');
+                
+                // If coming from shifts list or no referrer, it's a fresh start
+                if (!referrer || isFromShiftsList) {
+                    return true;
+                }
+                
+                // If coming from step 1 or 3, it's not a fresh start (user is going back/forward)
+                if (isFromStep1 || isFromStep3) {
+                    return false;
+                }
+                
+                // Default to fresh start for safety
+                return true;
+            }
+
+            // Clear all stored form data
+            function clearStoredFormData() {
+                console.log('Clearing stored form data for fresh start');
+                localStorage.removeItem('createShiftFormState');
+                sessionStorage.removeItem('shiftStep1Data');
+                localStorage.removeItem('createShiftStep2FormState');
+                localStorage.removeItem('formClearedByEscape');
+            }
+
+            // Check if this is a fresh start and clear data if needed
+            if (isFreshStart()) {
+                console.log('Fresh start detected - clearing stored form data');
+                clearStoredFormData();
+            } else {
+                console.log('Not a fresh start - will restore previous data if available');
+            }
+
             // Save form state to localStorage on input change
             function saveStep2FormState() {
                 const data = {};
@@ -1302,6 +1340,14 @@
 
             // Restore form state from localStorage on page load - will be called after event listeners are set up
             function restoreStep2FormState() {
+                // Check if form was cleared by escape key
+                const formClearedByEscape = localStorage.getItem('formClearedByEscape');
+                if (formClearedByEscape === 'true') {
+                    console.log('Form was cleared by escape key, skipping restoration');
+                    localStorage.removeItem('formClearedByEscape'); // Clean up the flag
+                    return;
+                }
+                
                 const savedStep2 = localStorage.getItem('createShiftStep2FormState');
                 if (savedStep2) {
                     try {
@@ -1359,6 +1405,30 @@
                     penaltyTableContainer.style.display = 'none';
                     addPenaltyBtn.style.display = 'none';
                     document.getElementById('penaltyTableEmptyState').style.display = 'none';
+                    
+                    // Clear all penalty data when checkbox is unticked
+                    const penaltyRows = Array.from(penaltyTableBody.children).filter(row => row.id !== 'penaltyTableEmptyState');
+                    penaltyRows.forEach(row => row.remove());
+                    
+                    // Clear penalty data from localStorage
+                    const savedStep2 = localStorage.getItem('createShiftStep2FormState');
+                    if (savedStep2) {
+                        const data = JSON.parse(savedStep2);
+                        delete data.penaltyRows;
+                        localStorage.setItem('createShiftStep2FormState', JSON.stringify(data));
+                    }
+                    
+                    // Reset penalty-related form fields
+                    const noEntryPenaltyToggle = document.getElementById('noEntryPenaltyToggle');
+                    const noExitPenaltyToggle = document.getElementById('noExitPenaltyToggle');
+                    if (noEntryPenaltyToggle) {
+                        noEntryPenaltyToggle.checked = false;
+                        noEntryPenaltyToggle.dispatchEvent(new Event('change'));
+                    }
+                    if (noExitPenaltyToggle) {
+                        noExitPenaltyToggle.checked = false;
+                        noExitPenaltyToggle.dispatchEvent(new Event('change'));
+                    }
                 }
             });
 
@@ -1373,6 +1443,15 @@
                 } else {
                     console.log('No entry penalty disabled');
                     noEntryPenaltyInputs.style.display = 'none';
+                    
+                    // Clear no entry penalty input values when checkbox is unticked
+                    const noEntryHoursInput = document.getElementById('noEntryHoursDeducted');
+                    const noEntryDaysInput = document.getElementById('noEntryDaysDeducted');
+                    if (noEntryHoursInput) noEntryHoursInput.value = '';
+                    if (noEntryDaysInput) noEntryDaysInput.value = '';
+                    
+                    // Save the cleared state
+                    saveStep2FormState();
                 }
             });
 
@@ -1387,6 +1466,15 @@
                 } else {
                     console.log('No exit penalty disabled');
                     noExitPenaltyInputs.style.display = 'none';
+                    
+                    // Clear no exit penalty input values when checkbox is unticked
+                    const noExitHoursInput = document.getElementById('noExitHoursDeducted');
+                    const noExitDaysInput = document.getElementById('noExitDaysDeducted');
+                    if (noExitHoursInput) noExitHoursInput.value = '';
+                    if (noExitDaysInput) noExitDaysInput.value = '';
+                    
+                    // Save the cleared state
+                    saveStep2FormState();
                 }
             });
 
@@ -1902,6 +1990,47 @@
                 if (e.target.closest('.penalty-edit-dropdown-menu')) {
                     e.stopPropagation();
                 }
+            });
+
+            // Escape key functionality to clear all form data
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Clear all form inputs
+                    const form = document.getElementById('assignScheduleForm');
+                    const inputs = form.querySelectorAll('input, textarea, select');
+                    inputs.forEach(input => {
+                        if (input.type === 'checkbox') {
+                            input.checked = false;
+                        } else {
+                            input.value = '';
+                        }
+                    });
+
+                    // Clear sessionStorage and localStorage
+                    sessionStorage.removeItem('shiftStep1Data');
+                    sessionStorage.removeItem('shiftStep2Data');
+                    localStorage.removeItem('createShiftFormState');
+                    
+                    // Set a flag to prevent auto-restoration
+                    localStorage.setItem('formClearedByEscape', 'true');
+                    
+                    // Reset any penalty data
+                    const penaltyTableBody = document.getElementById('penaltyTableBody');
+                    if (penaltyTableBody) {
+                        // Remove all penalty rows except the empty state
+                        const penaltyRows = Array.from(penaltyTableBody.children).filter(row => row.id !== 'penaltyTableEmptyState');
+                        penaltyRows.forEach(row => row.remove());
+                        updatePenaltyTableEmptyState();
+                    }
+                    
+                    // Show notification that form was cleared
+                    alert('Form data cleared');
+                }
+            });
+
+            // Also clear the flag when page is refreshed or loaded fresh
+            window.addEventListener('beforeunload', function() {
+                localStorage.removeItem('formClearedByEscape');
             });
         });
     </script>

@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+
+{% block title %}{{ shift.name }} - Shift Details{% endblock %}
+
+{% block content %}
+<style>
+    .shift-detail-container {
+        max-width: 1200px;
+        margin: 32px auto 0 auto;
+        padding: 0 24px 48px 24px;
+    }
+
+    .shift-detail-header {
+        margin-bottom: 24px;
+    }
+
+    .shift-detail-back {
+        color: #222;
+        font-size: 0.95rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        font-weight: 500;
+    }
+
+    .shift-detail-title-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 8px;
+    }
+
+    .shift-detail-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .status-badge {
+        background: #e6f7ec;
+        color: #1ca97a;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 16px;
+        padding: 4px 14px;
+        display: inline-block;
+        margin-left: 4px;
+    }
+
+    .status-badge.inactive {
+        background: #fdf2f2;
+        color: #dc3545;
+    }
+
+    /* Styling for "Not specified" text */
+    .not-specified {
+        color: #6c757d;
+        font-style: italic;
+        font-weight: normal;
+    }
+
+    .shift-detail-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+        .shift-detail-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .shift-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 24px 24px 18px 24px;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .shift-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .shift-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .shift-card-edit-btn {
+        background: #f5f5f5;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 18px;
+        font-size: 1rem;
+        color: #222;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .shift-card-edit-btn:hover {
+        background: #ececec;
+    }
+
+    .shift-card-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fafbfc;
+        border-radius: 8px;
+        padding: 14px 18px;
+        font-size: 1rem;
+        color: #222;
+    }
+
+    .shift-card-row-label {
+        color: #888;
+        font-size: 1rem;
+    }
+
+    .shift-card-row-value {
+        font-weight: 500;
+    }
+
+    .shift-card-info {
+        color: #666;
+        font-size: 0.98rem;
+        margin-bottom: 0;
+    }
+
+    .shift-card-link {
+        color: #1a73e8;
+        text-decoration: underline;
+        font-size: 0.98rem;
+    }
+
+    .shift-card-icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+        margin-left: 8px;
+    }
+
+    .shift-card-copy-icon {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        margin-left: 8px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .shift-card-copy-icon:hover {
+        opacity: 1;
+    }
+
+    .shift-name-row {
+        background: #fafbfc;
+        border-radius: 8px;
+        padding: 14px 18px;
+        font-size: 1rem;
+        color: #222;
+    }
+
+    .shift-name-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .shift-name-status {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+
+
+    .toggle-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .toggle-indicator.enabled {
+        background: #28a745;
+    }
+
+    .toggle-indicator.disabled {
+        background: #6c757d;
+    }
+
+    .penalty-rules {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 12px;
+        font-size: 0.9rem;
+        color: #856404;
+    }
+
+    .penalty-rules ul {
+        margin: 8px 0 0 0;
+        padding-left: 20px;
+    }
+
+    .penalty-rules li {
+        margin-bottom: 4px;
+    }
+
+    /* Penalty Table Display Styles */
+    .penalty-rules-display {
+        margin-top: 8px;
+    }
+
+    .penalty-table-display {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        overflow: hidden;
+        font-size: 0.8rem;
+    }
+
+    .penalty-table-display th {
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        background: #f8f9fa;
+    }
+
+    .penalty-table-display th:last-child {
+        border-right: none;
+    }
+
+    .penalty-table-display td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+        font-size: 0.8rem;
+        color: #495057;
+        vertical-align: middle;
+    }
+
+    .penalty-table-display td:last-child {
+        border-right: none;
+    }
+
+    .penalty-table-display tr:last-child td {
+        border-bottom: none;
+    }
+
+    .penalty-table-display tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+         .penalty-table-display td:first-child {
+         font-weight: 600;
+         color: #1a1a1a;
+     }
+
+     .no-penalty-rules {
+         text-align: center;
+         padding: 20px;
+         color: #6c757d;
+         font-style: italic;
+     }
+
+     .no-penalty-rules p {
+         margin: 0;
+         font-size: 0.9rem;
+     }
+
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .action-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .action-card:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .action-icon {
+        width: 24px;
+        height: 24px;
+        opacity: 0.7;
+        flex-shrink: 0;
+    }
+
+    .action-content {
+        flex: 1;
+    }
+
+    .action-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 4px 0;
+    }
+
+    .action-description {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .action-arrow {
+        width: 16px;
+        height: 16px;
+        opacity: 0.4;
+        transition: opacity 0.2s;
+    }
+
+    .action-card:hover .action-arrow {
+        opacity: 0.7;
+    }
+
+    .special-action {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .special-action-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .edit-shift-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        width: fit-content;
+    }
+
+    .edit-shift-btn:hover {
+        background: #0056b3;
+    }
+</style>
+
+<div class="shift-detail-container">
+    <div class="shift-detail-header">
+        <a href="/shifts" class="shift-detail-back">&larr; Back to Shifts</a>
+        <div class="shift-detail-title-row">
+            <span class="shift-detail-title">{{ shift.name }}</span>
+            <span class="status-badge {% if not shift.is_active %}inactive{% endif %}">
+                {% if shift.is_active %}ACTIVE{% else %}INACTIVE{% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="shift-detail-cards">
+        <div class="shift-card">
+            <div class="shift-card-header">
+                <span class="shift-card-title">Basic Information</span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">Shift ID</span>
+                <span class="shift-card-row-value">
+                    {{ shift.shift_id }}
+                </span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">Shift Name</span>
+                <span class="shift-card-row-value">{{ shift.name }}</span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">
+                    Start Time<br>
+                    Check-in
+                </span>
+                <span class="shift-card-row-value">
+                    {{ shift.start_time }}<br>
+                    {{ shift.check_in_start_time or 'Not set' }} - {{ shift.check_in_end_time or 'Not set' }}
+                </span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">
+                    End Time<br>
+                    Check-out
+                </span>
+                <span class="shift-card-row-value">
+                    {{ shift.end_time }}<br>
+                    {% if shift.check_out_enabled %}
+                        {{ shift.check_out_start_time or 'Not set' }} - {{ shift.check_out_end_time or 'Not set' }}
+                    {% else %}
+                        Not enabled
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if shift.break_enabled %}
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">Break Time</span>
+                <span class="shift-card-row-value">
+                    {{ shift.break_start_time or 'Not set' }} - {{ shift.break_end_time or 'Not set' }}
+                </span>
+            </div>
+            {% endif %}
+
+
+
+
+        </div>
+
+        <div class="shift-card">
+            <div class="shift-card-header">
+                <span class="shift-card-title">Time Tracking Settings</span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">Time Submission Method</span>
+                <span class="shift-card-row-value">
+                    {% if shift.time_submission_method == 'manual' %}
+                        Manual Entry
+                    {% elif shift.time_submission_method == 'automatic' %}
+                        Automatic Tracking
+                    {% elif shift.time_submission_method == 'hybrid' %}
+                        Hybrid (Manual + Automatic)
+                    {% else %}
+                        {{ shift.time_submission_method|title }}
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">Hours Worked</span>
+                <span class="shift-card-row-value">{{ shift.hours_worked }}h</span>
+            </div>
+
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">Days Worked</span>
+                <span class="shift-card-row-value">{{ shift.days_worked }} days</span>
+            </div>
+
+        </div>
+
+        <div class="shift-card">
+            <div class="shift-card-header">
+                <span class="shift-card-title">Penalty Settings</span>
+            </div>
+
+            {% if shift.late_early_penalty_enabled %}
+            <div class="penalty-rules-display">
+                {% if shift.penalty_rules %}
+                    {% set penalty_data = shift.penalty_rules|from_json %}
+                    {% if penalty_data %}
+                        <table class="penalty-table-display">
+                            <thead>
+                                <tr>
+                                    <th>Rule Type</th>
+                                    <th>Time Range</th>
+                                    <th>Deduction</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rule in penalty_data %}
+                                <tr>
+                                    <td>{{ rule.type or 'N/A' }}</td>
+                                    <td>{{ rule.timeFrom or 'N/A' }} - {{ rule.timeTo or 'N/A' }} minute</td>
+                                    <td>{{ rule.hoursDeducted or 'N/A' }}h / {{ rule.daysDeducted or 'N/A' }} days</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="no-penalty-rules">
+                            <p>No penalty rules configured (JSON parsing failed)</p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="no-penalty-rules">
+                        <p>No penalty rules configured (field is empty)</p>
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if shift.no_entry_penalty_enabled %}
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">No Entry Deduction</span>
+                <span class="shift-card-row-value">
+                    {{ shift.no_entry_hours_deducted }}h / {{ shift.no_entry_days_deducted }} days
+                </span>
+            </div>
+            {% endif %}
+
+            {% if shift.no_exit_penalty_enabled %}
+            <div class="shift-card-row">
+                <span class="shift-card-row-label">No Exit Deduction</span>
+                <span class="shift-card-row-value">
+                    {{ shift.no_exit_hours_deducted }}h / {{ shift.no_exit_days_deducted }} days
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+
+    </div>
+
+
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // Show a brief success message
+            const copyIcon = event.target;
+            const originalSrc = copyIcon.src;
+            copyIcon.src = '/static/images/check.png';
+            setTimeout(() => {
+                copyIcon.src = originalSrc;
+            }, 1000);
+        });
+    }
+
+
+</script>
+{% endblock %}

@@ -915,7 +915,7 @@
         <div class="main-container">
             <!-- Content Area -->
             <div class="content-area">
-                <form id="createShiftForm" method="POST" action="/create-shift-step2">
+                <form id="createShiftForm" method="POST" action="/create-shift-step2" novalidate>
                                          <!-- Basic Information -->
                      <div class="form-section">
                          <h2 class="section-title">Basic Information</h2>
@@ -1129,6 +1129,42 @@
             
             let isRestoring = false; // Flag to prevent clearing during restoration
 
+            // Check if this is a fresh start (no referrer or coming from shifts list)
+            function isFreshStart() {
+                const referrer = document.referrer;
+                const isFromShiftsList = referrer.includes('/shifts') || referrer.includes('/shifts/');
+                const isFromSamePage = referrer.includes('/create-shift');
+                const isFromStep2 = referrer.includes('/create-shift-step2');
+                const isFromStep3 = referrer.includes('/create-shift-step3');
+                
+                // If coming from shifts list or no referrer, it's a fresh start
+                if (!referrer || isFromShiftsList) {
+                    return true;
+                }
+                
+                // If coming from step 2 or 3, it's not a fresh start (user is going back)
+                if (isFromStep2 || isFromStep3) {
+                    return false;
+                }
+                
+                // If coming from same page, it's not a fresh start
+                if (isFromSamePage) {
+                    return false;
+                }
+                
+                // Default to fresh start for safety
+                return true;
+            }
+
+            // Clear all stored form data
+            function clearStoredFormData() {
+                console.log('Clearing stored form data for fresh start');
+                localStorage.removeItem('createShiftFormState');
+                sessionStorage.removeItem('shiftStep1Data');
+                localStorage.removeItem('createShiftStep2FormState');
+                localStorage.removeItem('formClearedByEscape');
+            }
+
             // Save form state to localStorage on input change
             function saveFormState() {
                 if (isRestoring) return; // Don't save during restoration
@@ -1179,134 +1215,155 @@
                 }
             });
             
+            // Check if this is a fresh start and clear data if needed
+            if (isFreshStart()) {
+                console.log('Fresh start detected - clearing stored form data');
+                clearStoredFormData();
+            } else {
+                console.log('Not a fresh start - will restore previous data if available');
+            }
+            
             // Restore form state from localStorage AFTER all other setup is complete
             setTimeout(() => {
-                isRestoring = true; // Set flag during restoration
-                console.log('=== STATE RESTORATION DEBUG ===');
-                console.log('All localStorage keys:', Object.keys(localStorage));
-                console.log('All localStorage values:');
-                Object.keys(localStorage).forEach(key => {
-                    console.log(`${key}:`, localStorage.getItem(key));
-                });
-                
-                // Check both localStorage and sessionStorage for saved data
-                let saved = localStorage.getItem('createShiftFormState');
-                if (!saved) {
-                    saved = sessionStorage.getItem('shiftStep1Data');
-                    console.log('Found data in sessionStorage:', saved);
-                } else {
-                    console.log('Found data in localStorage:', saved);
-                }
-                
-                if (saved) {
-                    try {
-                        console.log('Restoring form state from localStorage:', saved);
-                        const data = JSON.parse(saved);
-                        console.log('Parsed data:', data);
-                        
-                        // Restore all fields including break times
-                        formFields.forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) {
-                                // Handle both localStorage and sessionStorage field name mappings
-                                let value = data[id];
-                                
-                                // Map sessionStorage field names to localStorage field names
-                                if (value === undefined) {
-                                    if (id === 'timeSubmissionMethodInput' && data.timeSubmissionMethod !== undefined) {
-                                        value = data.timeSubmissionMethod;
-                                    } else if (id === 'checkInToggle' && data.checkIn !== undefined) {
-                                        value = data.checkIn;
-                                    } else if (id === 'checkOutToggle' && data.checkOut !== undefined) {
-                                        value = data.checkOut;
-                                    } else if (id === 'breakToggle' && data.break !== undefined) {
-                                        value = data.break;
-                                    }
-                                }
-                                
-                                if (value !== undefined) {
-                                    if (el.type === 'checkbox') {
-                                        el.checked = value;
-                                        // Update the UI immediately for toggles
-                                        if (id === 'checkInToggle') {
-                                            const checkInTimeRange = document.getElementById('checkInTimeRange');
-                                            if (checkInTimeRange) {
-                                                checkInTimeRange.style.display = value ? 'flex' : 'none';
-                                            }
-                                            if (value) {
-                                                document.getElementById('checkInStartTime').required = true;
-                                                document.getElementById('checkInEndTime').required = true;
-                                            } else {
-                                                document.getElementById('checkInStartTime').required = false;
-                                                document.getElementById('checkInEndTime').required = false;
-                                            }
-                                        } else if (id === 'checkOutToggle') {
-                                            const checkOutTimeRange = document.getElementById('checkOutTimeRange');
-                                            if (checkOutTimeRange) {
-                                                checkOutTimeRange.style.display = value ? 'flex' : 'none';
-                                            }
-                                            if (value) {
-                                                document.getElementById('checkOutStartTime').required = true;
-                                                document.getElementById('checkOutEndTime').required = true;
-                                            } else {
-                                                document.getElementById('checkOutStartTime').required = false;
-                                                document.getElementById('checkOutEndTime').required = false;
-                                            }
-                                        } else if (id === 'breakToggle') {
-                                            const breakTimeRange = document.getElementById('breakTimeRange');
-                                            if (breakTimeRange) {
-                                                breakTimeRange.style.display = value ? 'flex' : 'none';
-                                            }
-                                            if (value) {
-                                                document.getElementById('breakStartTime').required = true;
-                                                document.getElementById('breakEndTime').required = true;
-                                            } else {
-                                                document.getElementById('breakStartTime').required = false;
-                                                document.getElementById('breakEndTime').required = false;
-                                            }
-                                        }
-                                        el.dispatchEvent(new Event('change'));
-                                    } else {
-                                        el.value = value;
-                                        if (el.classList.contains('time-input') && el.value) {
-                                            el.classList.add('has-value');
-                                        }
-                                        // Special handling for timeSubmissionMethodInput
-                                        if (id === 'timeSubmissionMethodInput') {
-                                            const label = document.getElementById('timeSubmissionDropdownLabel');
-                                            if (label) {
-                                                let text = '';
-                                                if (value === 'manual') text = 'Manual entry';
-                                                else if (value === 'automatic') text = 'Automatic tracking';
-                                                else if (value === 'hybrid') text = 'Hybrid (manual + automatic)';
-                                                if (text) label.textContent = text;
-                                            }
-                                            
-                                            // Update dropdown option selected state
-                                            const dropdownOptions = document.querySelectorAll('#timeSubmissionDropdownMenu .dropdown-option');
-                                            dropdownOptions.forEach(option => {
-                                                const optionValue = option.getAttribute('data-value');
-                                                if (optionValue === value) {
-                                                    option.classList.add('selected');
-                                                } else {
-                                                    option.classList.remove('selected');
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } catch (e) {
-                        console.error('Error restoring form state:', e);
+                // Only restore if this is not a fresh start
+                if (!isFreshStart()) {
+                    isRestoring = true; // Set flag during restoration
+                    console.log('=== STATE RESTORATION DEBUG ===');
+                    console.log('All localStorage keys:', Object.keys(localStorage));
+                    console.log('All localStorage values:');
+                    Object.keys(localStorage).forEach(key => {
+                        console.log(`${key}:`, localStorage.getItem(key));
+                    });
+                    
+                    // Check if form was cleared by escape key
+                    const formClearedByEscape = localStorage.getItem('formClearedByEscape');
+                    if (formClearedByEscape === 'true') {
+                        console.log('Form was cleared by escape key, skipping restoration');
+                        localStorage.removeItem('formClearedByEscape'); // Clean up the flag
+                        return;
                     }
+                    
+                    // Check both localStorage and sessionStorage for saved data
+                    let saved = localStorage.getItem('createShiftFormState');
+                    if (!saved) {
+                        saved = sessionStorage.getItem('shiftStep1Data');
+                        console.log('Found data in sessionStorage:', saved);
+                    } else {
+                        console.log('Found data in localStorage:', saved);
+                    }
+                    
+                    if (saved) {
+                        try {
+                            console.log('Restoring form state from localStorage:', saved);
+                            const data = JSON.parse(saved);
+                            console.log('Parsed data:', data);
+                            
+                            // Restore all fields including break times
+                            formFields.forEach(id => {
+                                const el = document.getElementById(id);
+                                if (el) {
+                                    // Handle both localStorage and sessionStorage field name mappings
+                                    let value = data[id];
+                                    
+                                    // Map sessionStorage field names to localStorage field names
+                                    if (value === undefined) {
+                                        if (id === 'timeSubmissionMethodInput' && data.timeSubmissionMethod !== undefined) {
+                                            value = data.timeSubmissionMethod;
+                                        } else if (id === 'checkInToggle' && data.checkIn !== undefined) {
+                                            value = data.checkIn;
+                                        } else if (id === 'checkOutToggle' && data.checkOut !== undefined) {
+                                            value = data.checkOut;
+                                        } else if (id === 'breakToggle' && data.break !== undefined) {
+                                            value = data.break;
+                                        }
+                                    }
+                                    
+                                    if (value !== undefined) {
+                                        if (el.type === 'checkbox') {
+                                            el.checked = value;
+                                            // Update the UI immediately for toggles
+                                            if (id === 'checkInToggle') {
+                                                const checkInTimeRange = document.getElementById('checkInTimeRange');
+                                                if (checkInTimeRange) {
+                                                    checkInTimeRange.style.display = value ? 'flex' : 'none';
+                                                }
+                                                if (value) {
+                                                    document.getElementById('checkInStartTime').required = true;
+                                                    document.getElementById('checkInEndTime').required = true;
+                                                } else {
+                                                    document.getElementById('checkInStartTime').required = false;
+                                                    document.getElementById('checkInEndTime').required = false;
+                                                }
+                                            } else if (id === 'checkOutToggle') {
+                                                const checkOutTimeRange = document.getElementById('checkOutTimeRange');
+                                                if (checkOutTimeRange) {
+                                                    checkOutTimeRange.style.display = value ? 'flex' : 'none';
+                                                }
+                                                if (value) {
+                                                    document.getElementById('checkOutStartTime').required = true;
+                                                    document.getElementById('checkOutEndTime').required = true;
+                                                } else {
+                                                    document.getElementById('checkOutStartTime').required = false;
+                                                    document.getElementById('checkOutEndTime').required = false;
+                                                }
+                                            } else if (id === 'breakToggle') {
+                                                const breakTimeRange = document.getElementById('breakTimeRange');
+                                                if (breakTimeRange) {
+                                                    breakTimeRange.style.display = value ? 'flex' : 'none';
+                                                }
+                                                if (value) {
+                                                    document.getElementById('breakStartTime').required = true;
+                                                    document.getElementById('breakEndTime').required = true;
+                                                } else {
+                                                    document.getElementById('breakStartTime').required = false;
+                                                    document.getElementById('breakEndTime').required = false;
+                                                }
+                                            }
+                                            el.dispatchEvent(new Event('change'));
+                                        } else {
+                                            el.value = value;
+                                            if (el.classList.contains('time-input') && el.value) {
+                                                el.classList.add('has-value');
+                                            }
+                                            // Special handling for timeSubmissionMethodInput
+                                            if (id === 'timeSubmissionMethodInput') {
+                                                const label = document.getElementById('timeSubmissionDropdownLabel');
+                                                if (label) {
+                                                    let text = '';
+                                                    if (value === 'manual') text = 'Manual entry';
+                                                    else if (value === 'automatic') text = 'Automatic tracking';
+                                                    else if (value === 'hybrid') text = 'Hybrid (manual + automatic)';
+                                                    if (text) label.textContent = text;
+                                                }
+                                                
+                                                // Update dropdown option selected state
+                                                const dropdownOptions = document.querySelectorAll('#timeSubmissionDropdownMenu .dropdown-option');
+                                                dropdownOptions.forEach(option => {
+                                                    const optionValue = option.getAttribute('data-value');
+                                                    if (optionValue === value) {
+                                                        option.classList.add('selected');
+                                                    } else {
+                                                        option.classList.remove('selected');
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        } catch (e) {
+                            console.error('Error restoring form state:', e);
+                        }
+                    } else {
+                        console.log('No saved form state found in localStorage');
+                    }
+                    isRestoring = false; // Clear flag after restoration
+                    console.log('=== END STATE RESTORATION DEBUG ===');
                 } else {
-                    console.log('No saved form state found in localStorage');
+                    console.log('Fresh start - no data restoration needed');
                 }
-                isRestoring = false; // Clear flag after restoration
-                console.log('=== END STATE RESTORATION DEBUG ===');
                 
-                // Update continue button state after restoration
+                // Update continue button state after restoration (or fresh start)
                 updateContinueButton();
             }, 500); // Increased delay to 500ms
 
@@ -1542,6 +1599,19 @@
 
             const errors = [];
 
+            // Fallback: if hidden method input is empty but label shows a selection, derive the value
+            const methodInputEl = document.getElementById('timeSubmissionMethodInput');
+            if (methodInputEl && (!methodInputEl.value || methodInputEl.value.trim() === '')) {
+                const labelEl = document.getElementById('timeSubmissionDropdownLabel');
+                if (labelEl) {
+                    const text = labelEl.textContent.trim();
+                    const dict = { 'Manual entry': 'manual', 'Automatic tracking': 'automatic', 'Hybrid (manual + automatic)': 'hybrid' };
+                    if (dict[text]) {
+                        methodInputEl.value = dict[text];
+                    }
+                }
+            }
+
             // Check required fields
             for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
                 const field = document.getElementById(fieldId);
@@ -1585,15 +1655,29 @@
         function updateContinueButton() {
             const continueBtn = document.querySelector('.btn-create');
             const errors = validateForm();
-            
-            if (errors.length === 0) {
-                continueBtn.disabled = false;
-                continueBtn.style.opacity = '1';
-                continueBtn.style.cursor = 'pointer';
-            } else {
-                continueBtn.disabled = true;
-                continueBtn.style.opacity = '0.5';
-                continueBtn.style.cursor = 'not-allowed';
+
+            let enable = errors.length === 0;
+
+            // Failsafe: if DOM checks failed, confirm completeness using stored state
+            if (!enable) {
+                try {
+                    const savedRaw = localStorage.getItem('createShiftFormState') || sessionStorage.getItem('shiftStep1Data');
+                    if (savedRaw) {
+                        const data = JSON.parse(savedRaw);
+                        const required = ['shiftName','shiftId','startTime','endTime','timeSubmissionMethod','hoursWorked','daysWorked'];
+                        const haveAll = required.every(k => (data[k] ?? '').toString().trim() !== '');
+                        const ciOK = data.checkIn ? (data.checkInStartTime && data.checkInEndTime) : true;
+                        const coOK = data.checkOut ? (data.checkOutStartTime && data.checkOutEndTime) : true;
+                        const brOK = data.break ? (data.breakStartTime && data.breakEndTime) : true;
+                        if (haveAll && ciOK && coOK && brOK) enable = true;
+                    }
+                } catch (_) {}
+            }
+
+            if (continueBtn) {
+                continueBtn.disabled = !enable;
+                continueBtn.style.opacity = enable ? '1' : '0.5';
+                continueBtn.style.cursor = enable ? 'pointer' : 'not-allowed';
             }
         }
 
@@ -1612,22 +1696,65 @@
         // Initial validation
         updateContinueButton();
 
+        // Escape key functionality to clear all form data
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Clear all form inputs
+                const form = document.getElementById('createShiftForm');
+                const inputs = form.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
+                    }
+                });
+
+                // Clear sessionStorage and localStorage
+                sessionStorage.removeItem('shiftStep1Data');
+                localStorage.removeItem('createShiftFormState');
+                
+                // Set a flag to prevent auto-restoration
+                localStorage.setItem('formClearedByEscape', 'true');
+                
+                // Reset form validation state
+                updateContinueButton();
+                
+                // Show notification that form was cleared
+                const notification = document.getElementById('formValidationNotification');
+                const notificationText = notification.querySelector('.notification-text');
+                notificationText.textContent = 'Form data cleared';
+                notification.style.display = 'block';
+                
+                // Hide notification after 2 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 2000);
+            }
+        });
+
+        // Also clear the flag when page is refreshed or loaded fresh
+        window.addEventListener('beforeunload', function() {
+            localStorage.removeItem('formClearedByEscape');
+        });
+
         // Handle form submission - collect data and allow normal form submission
         form.addEventListener('submit', function(e) {
             const errors = validateForm();
-            
+            // If BFCache or timing issues cause stale disabled state, force-enable submission when fields are valid
+            const continueBtn = document.querySelector('.btn-create');
+            if (errors.length === 0 && continueBtn) {
+                continueBtn.disabled = false;
+                continueBtn.style.opacity = '1';
+                continueBtn.style.cursor = 'pointer';
+            }
             if (errors.length > 0) {
                 e.preventDefault();
-                // Show validation notification
                 const notification = document.getElementById('formValidationNotification');
                 const notificationText = notification.querySelector('.notification-text');
                 notificationText.textContent = errors.join(', ');
                 notification.style.display = 'block';
-                
-                // Hide notification after 3 seconds
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 3000);
+                setTimeout(() => { notification.style.display = 'none'; }, 3000);
                 return;
             }
 
@@ -1657,8 +1784,115 @@
             // Also store in localStorage for step 3 compatibility
             localStorage.setItem('createShiftFormState', JSON.stringify(formData));
             
+            // Clear the escape key flag since we're proceeding to next step
+            localStorage.removeItem('formClearedByEscape');
+            
             // Allow form to submit normally to step 2
         });
+    });
+    </script>
+    <script>
+    // Ensure the Continue button state is recalculated when navigating back (bfcache) or refocusing the tab
+    window.addEventListener('pageshow', function() {
+        try {
+            // If coming back from step2/step3, rehydrate from storage synchronously
+            const saved = localStorage.getItem('createShiftFormState') || sessionStorage.getItem('shiftStep1Data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const map = {
+                    shiftName: 'shiftName',
+                    shiftId: 'shiftId',
+                    startTime: 'startTime',
+                    endTime: 'endTime',
+                    timeSubmissionMethodInput: 'timeSubmissionMethod',
+                    hoursWorked: 'hoursWorked',
+                    daysWorked: 'daysWorked',
+                    checkInToggle: 'checkIn',
+                    checkOutToggle: 'checkOut',
+                    breakToggle: 'break',
+                    checkInStartTime: 'checkInStartTime',
+                    checkInEndTime: 'checkInEndTime',
+                    checkOutStartTime: 'checkOutStartTime',
+                    checkOutEndTime: 'checkOutEndTime',
+                    breakStartTime: 'breakStartTime',
+                    breakEndTime: 'breakEndTime'
+                };
+                Object.entries(map).forEach(([id, key]) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const val = data[key] !== undefined ? data[key] : data[id];
+                    if (val === undefined) return;
+                    if (el.type === 'checkbox') {
+                        el.checked = !!val;
+                        // reflect dependent ranges
+                        if (id === 'checkInToggle') document.getElementById('checkInTimeRange').style.display = el.checked ? 'flex' : 'none';
+                        if (id === 'checkOutToggle') document.getElementById('checkOutTimeRange').style.display = el.checked ? 'flex' : 'none';
+                        if (id === 'breakToggle') document.getElementById('breakTimeRange').style.display = el.checked ? 'flex' : 'none';
+                    } else {
+                        el.value = val || '';
+                        if (el.classList && el.classList.contains('time-input') && el.value) el.classList.add('has-value');
+                        if (id === 'timeSubmissionMethodInput') {
+                            const label = document.getElementById('timeSubmissionDropdownLabel');
+                            const dict = { manual: 'Manual entry', automatic: 'Automatic tracking', hybrid: 'Hybrid (manual + automatic)' };
+                            if (label && dict[el.value]) label.textContent = dict[el.value];
+                            const opts = document.querySelectorAll('#timeSubmissionDropdownMenu .dropdown-option');
+                            opts.forEach(o => {
+                                const v = o.getAttribute('data-value');
+                                if (v === el.value) o.classList.add('selected'); else o.classList.remove('selected');
+                            });
+                        }
+                    }
+                });
+            }
+            if (typeof updateContinueButton === 'function') updateContinueButton();
+        } catch (e) {}
+    });
+    // Fallback: if BFCache provided DOM values but storage was cleared, re-sync derived state
+    function resyncFromDOMAndValidate() {
+        try {
+            // sync time input visual state
+            document.querySelectorAll('.time-input').forEach(el => {
+                if (el.value) el.classList.add('has-value');
+            });
+            // sync dropdown hidden input if missing
+            const methodInput = document.getElementById('timeSubmissionMethodInput');
+            const label = document.getElementById('timeSubmissionDropdownLabel');
+            if (methodInput && (!methodInput.value || methodInput.value.trim() === '')) {
+                const selected = document.querySelector('#timeSubmissionDropdownMenu .dropdown-option.selected');
+                const map = { 'Manual entry': 'manual', 'Automatic tracking': 'automatic', 'Hybrid (manual + automatic)': 'hybrid' };
+                if (selected) {
+                    const v = selected.getAttribute('data-value');
+                    if (v) methodInput.value = v;
+                } else if (label && map[label.textContent.trim()]) {
+                    methodInput.value = map[label.textContent.trim()];
+                }
+            }
+            // sync ranges visibility and required attrs from toggles
+            const ci = document.getElementById('checkInToggle');
+            const co = document.getElementById('checkOutToggle');
+            const br = document.getElementById('breakToggle');
+            const setReq = (id, on) => { const el = document.getElementById(id); if (el) el.required = !!on; };
+            if (ci) {
+                const show = !!ci.checked; const range = document.getElementById('checkInTimeRange'); if (range) range.style.display = show ? 'flex' : 'none';
+                setReq('checkInStartTime', show); setReq('checkInEndTime', show);
+            }
+            if (co) {
+                const show = !!co.checked; const range = document.getElementById('checkOutTimeRange'); if (range) range.style.display = show ? 'flex' : 'none';
+                setReq('checkOutStartTime', show); setReq('checkOutEndTime', show);
+            }
+            if (br) {
+                const show = !!br.checked; const range = document.getElementById('breakTimeRange'); if (range) range.style.display = show ? 'flex' : 'none';
+                setReq('breakStartTime', show); setReq('breakEndTime', show);
+            }
+            if (typeof updateContinueButton === 'function') updateContinueButton();
+        } catch (e) {}
+    }
+    window.addEventListener('pageshow', function(){ setTimeout(resyncFromDOMAndValidate, 0); const btn=document.querySelector('.btn-create'); if(btn) { btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }});
+    window.addEventListener('focus', function(){ setTimeout(resyncFromDOMAndValidate, 0); });
+    document.addEventListener('visibilitychange', function(){
+        if (!document.hidden) {
+            try { if (typeof updateContinueButton === 'function') updateContinueButton(); } catch (e) {}
+        }
     });
     </script>
 </body>

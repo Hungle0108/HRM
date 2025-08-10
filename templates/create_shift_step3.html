@@ -303,6 +303,21 @@
             position: relative;
         }
 
+        .add-penalty-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .add-penalty-btn:hover {
+            background: #333;
+        }
+
         /* Actions Container and Edit Button Styles */
         .actions-container {
             position: relative;
@@ -1159,9 +1174,12 @@
                  <button class="close-modal" onclick="closeModal('penaltySettingsModal')">&times;</button>
              </div>
              <div class="modal-body">
-                 <div class="checkbox-group">
-                     <input type="checkbox" id="modalPenaltyToggle">
-                     <label for="modalPenaltyToggle">Phạt đi muộn/về sớm</label>
+                 <div class="checkbox-group" style="display: flex; align-items: center; justify-content: space-between;">
+                     <div style="display: flex; align-items: center;">
+                         <input type="checkbox" id="modalPenaltyToggle">
+                         <label for="modalPenaltyToggle">Phạt đi muộn/về sớm</label>
+                     </div>
+                     <button type="button" id="modalAddPenaltyBtn" class="add-penalty-btn" style="display: none;">+ Add Penalty</button>
                  </div>
                  
                  <!-- Penalty Table for Phạt đi muộn/về sớm -->
@@ -1223,6 +1241,7 @@
                              <input type="number" id="modalEditPenaltyDays" class="form-input" min="0" step="0.25">
                          </div>
                      </div>
+                     
                  </div>
                  
                  <div class="checkbox-group">
@@ -1256,11 +1275,12 @@
                  </div>
              </div>
              <div class="modal-footer">
-                 <button class="modal-btn modal-btn-secondary" onclick="closeModal('penaltySettingsModal')">Cancel</button>
                   <button class="modal-btn modal-btn-primary" onclick="savePenaltySettings()">Save</button>
              </div>
          </div>
      </div>
+
+
 
      <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1271,6 +1291,32 @@
             document.getElementById('createShiftBtn').addEventListener('click', function() {
                 const shiftData = getShiftData();
                 console.log('Creating shift with data:', shiftData);
+                console.log('Step 1 data keys:', Object.keys(shiftData.step1 || {}));
+                console.log('Step 2 data keys:', Object.keys(shiftData.step2 || {}));
+                
+                // Validate required fields before sending
+                const step1 = shiftData.step1 || {};
+                const requiredFields = ['shiftName', 'shiftId', 'startTime', 'endTime', 'hoursWorked', 'daysWorked'];
+                const missingFields = [];
+                
+                for (const field of requiredFields) {
+                    if (!step1[field] || step1[field].toString().trim() === '') {
+                        missingFields.push(field);
+                    }
+                }
+                
+                // Check time submission method (could be either field name)
+                const timeSubmissionMethod = step1.timeSubmissionMethodInput || step1.timeSubmissionMethod;
+                if (!timeSubmissionMethod || timeSubmissionMethod.toString().trim() === '') {
+                    missingFields.push('timeSubmissionMethod');
+                }
+                
+                if (missingFields.length > 0) {
+                    alert('Missing required fields: ' + missingFields.join(', ') + '. Please go back and fill in all required information.');
+                    return;
+                }
+                
+                console.log('All required fields present, proceeding with creation...');
                 
                 // Show loading state
                 const createBtn = document.getElementById('createShiftBtn');
@@ -1286,8 +1332,12 @@
                     },
                     body: JSON.stringify(shiftData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Response data:', data);
                     if (data.message) {
                         // Success
                 alert('Shift created successfully!');
@@ -1315,6 +1365,14 @@
         });
 
         function loadSavedData() {
+            // Check if form was cleared by escape key
+            const formClearedByEscape = localStorage.getItem('formClearedByEscape');
+            if (formClearedByEscape === 'true') {
+                console.log('Form was cleared by escape key, skipping restoration');
+                localStorage.removeItem('formClearedByEscape'); // Clean up the flag
+                return;
+            }
+            
             // Load data from Step 1 - check both sessionStorage and localStorage
             let savedStep1 = localStorage.getItem('createShiftFormState');
             if (!savedStep1) {
@@ -1522,6 +1580,12 @@
         }
 
         function getShiftData() {
+             // Check if form was cleared by escape key
+             const formClearedByEscape = localStorage.getItem('formClearedByEscape');
+             if (formClearedByEscape === 'true') {
+                 return { step1: {}, step2: {} };
+             }
+             
              // Check both localStorage and sessionStorage for step 1 data
              let step1Data = localStorage.getItem('createShiftFormState');
              if (!step1Data) {
@@ -1574,6 +1638,12 @@
           let originalPenaltySettings = {};
 
          function loadModalData(modalId) {
+             // Check if form was cleared by escape key
+             const formClearedByEscape = localStorage.getItem('formClearedByEscape');
+             if (formClearedByEscape === 'true') {
+                 return; // Don't load any data if form was cleared
+             }
+             
              // Check both localStorage and sessionStorage for step 1 data
              let step1Data = localStorage.getItem('createShiftFormState');
              if (!step1Data) {
@@ -1731,6 +1801,10 @@
                   document.getElementById('modalNoExitPenaltyToggle').parentElement.style.display = 'block';
                   document.querySelector('#penaltySettingsModal .modal-footer').style.display = 'flex';
                   
+                  // Set initial visibility of Add Penalty button based on penalty toggle state
+                  const penaltyToggleChecked = data.penaltyToggle === true || data.penaltyToggle === 'true';
+                  document.getElementById('modalAddPenaltyBtn').style.display = penaltyToggleChecked ? 'flex' : 'none';
+                  
                   // Store original values
                   originalPenaltySettings = {
                       penaltyToggle: data.penaltyToggle === true || data.penaltyToggle === 'true',
@@ -1803,14 +1877,19 @@
                   document.getElementById('modalPenaltyToggle').addEventListener('change', function() {
                       // Show/hide penalty table based on toggle state
                       const tableContainer = document.getElementById('modalPenaltyTableContainer');
+                      const addPenaltyBtn = document.getElementById('modalAddPenaltyBtn');
+                      
                       if (this.checked) {
-                          // Load penalty rows from step 2 data and display table
+                          // Always show the table when checkbox is checked
+                          tableContainer.style.display = 'block';
+                          addPenaltyBtn.style.display = 'flex';
+                          const tableBody = document.getElementById('modalPenaltyTableBody');
+                          
+                          // Load penalty rows from step 2 data if available
                           const step2Data = localStorage.getItem('createShiftStep2FormState');
                           if (step2Data) {
                               const data = JSON.parse(step2Data);
                               if (data.penaltyRows && data.penaltyRows.length > 0) {
-                                  const tableBody = document.getElementById('modalPenaltyTableBody');
-                                  tableContainer.style.display = 'block';
                                   tableBody.innerHTML = '';
                                   
                                   data.penaltyRows.forEach((penaltyData, index) => {
@@ -1846,10 +1925,17 @@
                                       `;
                                       tableBody.appendChild(row);
                                   });
+                              } else {
+                                  // Show empty state when no penalty rules exist
+                                  tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6c757d; padding: 20px;">No penalty rules configured yet</td></tr>';
                               }
+                          } else {
+                              // Show empty state when no step 2 data exists
+                              tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6c757d; padding: 20px;">No penalty rules configured yet</td></tr>';
                           }
                       } else {
                           tableContainer.style.display = 'none';
+                          addPenaltyBtn.style.display = 'none';
                       }
                       updatePenaltySettingsSaveButton();
                   });
@@ -1861,6 +1947,11 @@
                      togglePenaltyInputs('modalNoExitInputs', this.checked);
                       updatePenaltySettingsSaveButton();
                  });
+                 
+                 // Add Penalty button event listener
+                 document.getElementById('modalAddPenaltyBtn').addEventListener('click', function() {
+                     showAddPenaltyForm();
+                 });
              }
          }
 
@@ -1870,6 +1961,174 @@
 
          function togglePenaltyInputs(inputsId, show) {
              document.getElementById(inputsId).style.display = show ? 'block' : 'none';
+         }
+
+         function showAddPenaltyForm() {
+             // Hide all penalty sections (toggle, table, other checkboxes, and add penalty button)
+             document.getElementById('modalPenaltyToggle').parentElement.style.display = 'none';
+             document.getElementById('modalPenaltyTableContainer').style.display = 'none';
+             document.getElementById('modalAddPenaltyBtn').style.display = 'none';
+             document.getElementById('modalNoEntryPenaltyToggle').parentElement.style.display = 'none';
+             document.getElementById('modalNoEntryInputs').style.display = 'none';
+             document.getElementById('modalNoExitPenaltyToggle').parentElement.style.display = 'none';
+             document.getElementById('modalNoExitInputs').style.display = 'none';
+
+             // Clear form for new penalty
+             document.getElementById('modalEditPenaltyType').value = '';
+             document.getElementById('modalEditPenaltyTypeDropdownLabel').textContent = 'Select rule type';
+             document.getElementById('modalEditPenaltyTimeFrom').value = '';
+             document.getElementById('modalEditPenaltyTimeTo').value = '';
+             document.getElementById('modalEditPenaltyHours').value = '';
+             document.getElementById('modalEditPenaltyDays').value = '';
+
+             // Show the edit form
+             document.getElementById('modalEditPenaltyForm').style.display = 'block';
+             
+             // Setup the custom dropdown for rule type
+             setupModalDropdown('modalEditPenaltyTypeDropdown', 'modalEditPenaltyTypeDropdownBtn', 'modalEditPenaltyTypeDropdownMenu', 'modalEditPenaltyTypeDropdownLabel', 'modalEditPenaltyType');
+             
+             // Update the modal footer buttons for add mode
+             const modalFooter = document.querySelector('#penaltySettingsModal .modal-footer');
+             modalFooter.innerHTML = `
+                 <button class="modal-btn modal-btn-secondary" onclick="returnFromAddPenalty()">Back</button>
+                 <button class="modal-btn modal-btn-primary" id="addPenaltySubmitBtn" onclick="saveAddPenalty()" disabled>Add Penalty</button>
+             `;
+             
+             // Add input listeners to enable/disable the add penalty button
+             setupAddPenaltyValidation();
+             
+             // Set the current mode
+             window.currentPenaltyMode = 'add';
+         }
+
+         function setupAddPenaltyValidation() {
+             const fields = [
+                 'modalEditPenaltyType',
+                 'modalEditPenaltyTimeFrom',
+                 'modalEditPenaltyTimeTo',
+                 'modalEditPenaltyHours',
+                 'modalEditPenaltyDays'
+             ];
+             
+             function checkAddPenaltyFormComplete() {
+                 const allFieldsFilled = fields.every(fieldId => {
+                     const field = document.getElementById(fieldId);
+                     return field && field.value.trim() !== '';
+                 });
+                 
+                 const submitBtn = document.getElementById('addPenaltySubmitBtn');
+                 if (submitBtn) {
+                     submitBtn.disabled = !allFieldsFilled;
+                 }
+             }
+             
+             // Add event listeners to all fields
+             fields.forEach(fieldId => {
+                 const field = document.getElementById(fieldId);
+                 if (field) {
+                     field.addEventListener('input', checkAddPenaltyFormComplete);
+                     field.addEventListener('change', checkAddPenaltyFormComplete);
+                 }
+             });
+             
+             // Also listen for dropdown changes
+             const dropdownOptions = document.querySelectorAll('#modalEditPenaltyTypeDropdownMenu .dropdown-option');
+             dropdownOptions.forEach(option => {
+                 option.addEventListener('click', checkAddPenaltyFormComplete);
+             });
+         }
+
+         function saveAddPenalty() {
+             const type = document.getElementById('modalEditPenaltyType').value;
+             const timeFrom = document.getElementById('modalEditPenaltyTimeFrom').value;
+             const timeTo = document.getElementById('modalEditPenaltyTimeTo').value;
+             const hours = document.getElementById('modalEditPenaltyHours').value;
+             const days = document.getElementById('modalEditPenaltyDays').value;
+
+             if (!type || !timeFrom || !timeTo || !hours || !days) {
+                 alert('Please fill in all fields');
+                 return;
+             }
+
+             // Create penalty data
+             const penaltyData = {
+                 type: type,
+                 timeFrom: timeFrom,
+                 timeTo: timeTo,
+                 hoursDeducted: hours,
+                 daysDeducted: days
+             };
+
+             // Add to table
+             addModalPenaltyRow(penaltyData);
+
+             // Return to main penalty settings view
+             returnFromAddPenalty();
+         }
+
+         function returnFromAddPenalty() {
+             // Show all penalty sections again
+             document.getElementById('modalPenaltyToggle').parentElement.style.display = '';
+             document.getElementById('modalPenaltyTableContainer').style.display = 'block';
+             document.getElementById('modalAddPenaltyBtn').style.display = document.getElementById('modalPenaltyToggle').checked ? 'flex' : 'none';
+             document.getElementById('modalNoEntryPenaltyToggle').parentElement.style.display = '';
+             document.getElementById('modalNoEntryInputs').style.display = document.getElementById('modalNoEntryPenaltyToggle').checked ? 'block' : 'none';
+             document.getElementById('modalNoExitPenaltyToggle').parentElement.style.display = '';
+             document.getElementById('modalNoExitInputs').style.display = document.getElementById('modalNoExitPenaltyToggle').checked ? 'block' : 'none';
+
+             // Hide the edit form
+             document.getElementById('modalEditPenaltyForm').style.display = 'none';
+             
+             // Restore the original modal footer
+             const modalFooter = document.querySelector('#penaltySettingsModal .modal-footer');
+             modalFooter.innerHTML = `
+                 <button class="modal-btn modal-btn-primary" onclick="savePenaltySettings()">Save</button>
+             `;
+             
+             // Clear the current mode
+             window.currentPenaltyMode = null;
+         }
+
+         function addModalPenaltyRow(penaltyData) {
+             const tableBody = document.getElementById('modalPenaltyTableBody');
+             const rowId = 'modal_penalty_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+             
+             // Remove empty state if it exists
+             const emptyState = tableBody.querySelector('tr td[colspan="4"]');
+             if (emptyState) {
+                 emptyState.parentElement.remove();
+             }
+
+             const row = document.createElement('tr');
+             row.id = rowId;
+             row.innerHTML = `
+                 <td>${getPenaltyTypeText(penaltyData.type)}</td>
+                 <td>${penaltyData.timeFrom} - ${penaltyData.timeTo} phút</td>
+                 <td>
+                     <div style="line-height: 1.4;">
+                         <div>Giờ công: ${penaltyData.hoursDeducted}</div>
+                         <div>Ngày công: ${penaltyData.daysDeducted}</div>
+                     </div>
+                 </td>
+                 <td>
+                     <div class="actions-container">
+                         <button class="edit-btn" data-penalty-id="${rowId}" onclick="event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation(); toggleModalPenaltyActionMenu(event, '${rowId}');" title="More actions">
+                             <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 10px; height: 10px;">
+                         </button>
+                         <div class="action-menu" id="modal-penalty-menu-${rowId}">
+                             <div class="action-item" data-penalty-id="${rowId}" onclick="editModalPenalty('${rowId}')">
+                                 <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                 <span>Edit penalty</span>
+                             </div>
+                             <div class="action-item delete" data-penalty-id="${rowId}" onclick="deleteModalPenaltyRow('${rowId}')">
+                                 <img src="/static/images/trash.png" alt="Delete" class="action-icon">
+                                 <span>Delete</span>
+                             </div>
+                         </div>
+                     </div>
+                 </td>
+             `;
+             tableBody.appendChild(row);
          }
 
          function setupModalDropdown(dropdownId, btnId, menuId, labelId, inputId, saveCallback) {
@@ -2191,6 +2450,7 @@
              // Hide all penalty sections and show only the edit form
              document.getElementById('modalPenaltyToggle').parentElement.style.display = 'none';
              document.getElementById('modalPenaltyTableContainer').style.display = 'none';
+             document.getElementById('modalAddPenaltyBtn').style.display = 'none';
              document.getElementById('modalNoEntryPenaltyToggle').parentElement.style.display = 'none';
              document.getElementById('modalNoEntryInputs').style.display = 'none';
              document.getElementById('modalNoExitPenaltyToggle').parentElement.style.display = 'none';
@@ -2307,6 +2567,7 @@
              // Show all penalty sections and hide the edit form
              document.getElementById('modalPenaltyToggle').parentElement.style.display = 'block';
              document.getElementById('modalPenaltyTableContainer').style.display = 'block';
+             document.getElementById('modalAddPenaltyBtn').style.display = document.getElementById('modalPenaltyToggle').checked ? 'flex' : 'none';
              document.getElementById('modalNoEntryPenaltyToggle').parentElement.style.display = 'block';
              document.getElementById('modalNoEntryInputs').style.display = 'block';
              document.getElementById('modalNoExitPenaltyToggle').parentElement.style.display = 'block';
@@ -2347,7 +2608,99 @@
              window.currentEditingPenaltyId = null;
          }
 
+         // Escape key functionality to clear all form data
+         document.addEventListener('keydown', function(e) {
+             if (e.key === 'Escape') {
+                 // Clear all form inputs in the main form
+                 const mainForm = document.querySelector('form');
+                 if (mainForm) {
+                     const inputs = mainForm.querySelectorAll('input, textarea, select');
+                     inputs.forEach(input => {
+                         if (input.type === 'checkbox') {
+                             input.checked = false;
+                         } else {
+                             input.value = '';
+                         }
+                     });
+                 }
 
+                 // Clear all modal form inputs
+                 const modalInputs = document.querySelectorAll('#penaltySettingsModal input, #penaltySettingsModal textarea, #penaltySettingsModal select');
+                 modalInputs.forEach(input => {
+                     if (input.type === 'checkbox') {
+                         input.checked = false;
+                     } else {
+                         input.value = '';
+                     }
+                 });
+
+                 // Clear sessionStorage and localStorage
+                 sessionStorage.removeItem('shiftStep1Data');
+                 sessionStorage.removeItem('shiftStep2Data');
+                 localStorage.removeItem('createShiftFormState');
+                 localStorage.removeItem('createShiftStep2FormState');
+                 
+                 // Set a flag to prevent auto-restoration
+                 localStorage.setItem('formClearedByEscape', 'true');
+                 
+                 // Reset any penalty data in the modal
+                 const modalPenaltyTableBody = document.getElementById('modalPenaltyTableBody');
+                 if (modalPenaltyTableBody) {
+                     // Remove all penalty rows except the empty state
+                     const penaltyRows = Array.from(modalPenaltyTableBody.children).filter(row => row.id !== 'modalPenaltyTableEmptyState');
+                     penaltyRows.forEach(row => row.remove());
+                 }
+                 
+                 // Show notification that form was cleared
+                 alert('Form data cleared');
+             }
+         });
+
+        // Check if this is a fresh start (no referrer or coming from shifts list)
+        function isFreshStart() {
+            const referrer = document.referrer;
+            const isFromShiftsList = referrer.includes('/shifts') || referrer.includes('/shifts/');
+            const isFromStep1 = referrer.includes('/create-shift');
+            const isFromStep2 = referrer.includes('/create-shift-step2');
+            
+            // If coming from shifts list or no referrer, it's a fresh start
+            if (!referrer || isFromShiftsList) {
+                return true;
+            }
+            
+            // If coming from step 1 or 2, it's not a fresh start (user is going back/forward)
+            if (isFromStep1 || isFromStep2) {
+                return false;
+            }
+            
+            // Default to fresh start for safety
+            return true;
+        }
+
+        // Clear all stored form data
+        function clearStoredFormData() {
+            console.log('Clearing stored form data for fresh start');
+            localStorage.removeItem('createShiftFormState');
+            sessionStorage.removeItem('shiftStep1Data');
+            localStorage.removeItem('createShiftStep2FormState');
+            localStorage.removeItem('formClearedByEscape');
+        }
+
+        // Check if this is a fresh start and clear data if needed
+        if (isFreshStart()) {
+            console.log('Fresh start detected - clearing stored form data');
+            clearStoredFormData();
+        } else {
+            console.log('Not a fresh start - will restore previous data if available');
+        }
+
+        // Restore form state from localStorage AFTER all other setup is complete
+        setTimeout(() => {
+            // Only restore if this is not a fresh start
+            if (!isFreshStart()) {
+                loadSavedData();
+            }
+        }, 100);
      </script>
 </body>
 </html> 

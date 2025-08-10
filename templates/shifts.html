@@ -72,6 +72,23 @@
         position: relative;
     }
 
+    .table-wrapper {
+        padding: 0;
+        border-radius: 12px;
+        overflow: visible;
+    }
+
+    .table-summary {
+        padding: 16px 24px;
+        background: white;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-weight: 500;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
     .section-header {
         display: flex;
         justify-content: space-between;
@@ -252,7 +269,7 @@
         opacity: 0.6;
     }
 
-    /* Table styles */
+    /* Table styles - matching members page */
     .shifts-table {
         width: 100%;
         border-collapse: separate;
@@ -287,15 +304,63 @@
         padding: 16px;
         border-bottom: 1px solid #e9ecef;
         border-right: 1px solid #e9ecef;
+        font-size: 0.875rem;
+        color: #495057;
         vertical-align: top;
+    }
+
+    /* Center content vertically in specific columns to match members table */
+    .shifts-table td:nth-child(2),
+    .shifts-table td:nth-child(3),
+    .shifts-table td:nth-child(4),
+    .shifts-table td:nth-child(5),
+    .shifts-table td:last-child {
+        vertical-align: middle;
     }
 
     .shifts-table td:last-child {
         border-right: none;
     }
 
+    /* Actions column width - matching members page */
+    .shifts-table td:last-child,
+    .shifts-table th:last-child {
+        width: 60px;
+        text-align: center;
+        padding: 12px 8px;
+        position: relative;
+    }
+
+    .shifts-table tr:last-child td {
+        border-bottom: none;
+    }
+
     .shifts-table tr:hover {
-        background-color: #f8f9fa;
+        background: #f8f9fa;
+    }
+
+    /* Ensure rounded corners are respected */
+    .shifts-table thead tr:first-child th:first-child {
+        border-top-left-radius: 0;
+    }
+    
+    .shifts-table thead tr:first-child th:last-child {
+        border-top-right-radius: 0;
+    }
+    
+    .shifts-table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+    }
+    
+    .shifts-table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
+    }
+
+    /* Shift ID styles */
+    .shift-id {
+        font-weight: 600;
+        color: #1a1a1a;
+        font-size: 0.875rem;
     }
 
     /* Shift name and description */
@@ -304,6 +369,15 @@
         color: #1a1a1a;
         margin-bottom: 4px;
         font-size: 0.875rem;
+    }
+
+    .shift-name.clickable {
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .shift-name.clickable:hover {
+        color: #8b5cf6;
     }
 
     .shift-description {
@@ -333,6 +407,7 @@
     .time-details {
         color: #6c757d;
         font-size: 0.75rem;
+        font-weight: 700;
     }
 
     /* Working days */
@@ -357,32 +432,160 @@
         color: white;
     }
 
-    /* Actions */
-    .actions-cell {
-        text-align: right;
+            /* Working hours */
+        .working-hours {
+            text-align: left;
+        }
+
+        /* Action buttons group */
+        .action-buttons-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .customize-columns-btn {
+            padding: 10px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .customize-columns-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .action-button {
+            padding: 10px 16px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-button:hover {
+            background: #333;
+            text-decoration: none;
+            color: white;
+        }
+
+    .hours-info {
+        font-weight: 500;
+        color: #495057;
+        font-size: 0.875rem;
+        padding: 4px 8px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        display: inline-block;
     }
 
-    .action-button {
+    .simple-hours {
+        font-weight: 500;
+        color: #495057;
+        font-size: 0.875rem;
+        text-align: left;
+    }
+
+    /* Actions */
+    .actions-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Edit button styles - matching members page */
+    .edit-btn {
         background: none;
         border: none;
+        padding: 8px;
         cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-        margin-left: 4px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
     }
 
-    .action-button:hover {
-        background: #e9ecef;
+    .edit-btn:hover {
+        background: #f8f9fa;
+        opacity: 1;
+        transform: scale(1.1);
     }
 
-    .action-button img {
+    .edit-btn:active {
+        transform: scale(0.95);
+    }
+
+    .action-menu {
+        position: fixed;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        min-width: 150px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .action-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .action-menu.positioned-above {
+        transform: translateY(0);
+    }
+
+    /* Body scroll lock when menus are open */
+    body.no-scroll {
+        overflow: hidden;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-item:hover {
+        background: #f8f9fa;
+        color: #1a1a1a;
+    }
+
+    .action-item.delete:hover {
+        background: #fdf2f2;
+        color: #dc3545;
+    }
+
+    .action-icon {
         width: 16px;
         height: 16px;
-        opacity: 0.6;
+        opacity: 0.7;
     }
 
-    .action-button:hover img {
+    .action-item:hover .action-icon {
         opacity: 1;
     }
 
@@ -391,6 +594,21 @@
         text-align: center;
         padding: 60px 20px;
         color: #6c757d;
+    }
+
+    /* Hide scrollbars */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* For Firefox */
+    * {
+        scrollbar-width: none;
+    }
+
+    /* For IE and Edge */
+    * {
+        -ms-overflow-style: none;
     }
 
     .empty-state-icon {
@@ -457,101 +675,103 @@
         </div>
 
         <div class="shifts-section">
-            <!-- Filters -->
+            <!-- Search row -->
             <div class="filters-box">
-                <div class="section-header">
-                    <div class="section-info">
-                        <h2 class="section-name">All Shifts</h2>
-                        <p class="section-description">View and manage work shifts across all schedules.</p>
-                    </div>
-                    <div class="section-actions">
-                        <a href="/create-shift" class="create-btn">Create Shift</a>
-                        <a href="/create-schedule" class="create-btn">Create Schedule</a>
-                    </div>
-                </div>
-
                 <div class="filters-section">
                     <div class="filters-left">
                         <div class="search-container" id="searchContainer">
-                            <input type="text" class="search-input" id="searchInput" placeholder="Search shifts...">
                             <img src="/static/images/search.png" alt="Search" class="search-icon" id="searchIcon">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search shifts...">
                             <button class="search-clear-btn" id="searchClearBtn">
-                                <img src="/static/images/cross-small.png" alt="Clear" width="16" height="16">
+                                <img src="/static/images/cross.png" alt="Clear" width="16" height="16">
                             </button>
                         </div>
+                    </div>
+                    <div class="action-buttons-group">
+                        <button class="customize-columns-btn" id="customizeColumnsBtn">
+                            Customize columns
+                        </button>
+                        <a href="/create-shift" class="action-button" id="headerCreateBtn">Create shift</a>
                     </div>
                 </div>
             </div>
 
             <!-- Table -->
             <div class="table-box">
-                {% if shifts %}
-                <table class="shifts-table">
-                    <thead>
-                        <tr>
-                            <th>Shift Name</th>
-                            <th>Schedule</th>
-                            <th>Time Configuration</th>
-                            <th>Working Days</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for shift in shifts %}
-                        <tr data-shift-name="{{ shift.name.lower() }}" data-shift-description="{{ shift.description.lower() }}">
-                            <td>
-                                <div class="shift-name">{{ shift.name }}</div>
-                                {% if shift.description %}
-                                <div class="shift-description">{{ shift.description }}</div>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="shift-schedule">{{ shift.schedule_name }}</div>
-                            </td>
-                            <td>
-                                <div class="time-info">
-                                    {% if shift.include_time %}
-                                    <div class="time-type">Fixed Time</div>
-                                    <div class="time-details">{{ shift.start_time }} - {{ shift.end_time }}</div>
+                <div class="table-wrapper">
+                    <div class="table-summary">Total {{ shifts|length }} shift{% if shifts|length != 1 %}s{% endif %}</div>
+                    {% if shifts %}
+                    <table class="shifts-table">
+                        <thead>
+                            <tr>
+                                <th>Shift Name</th>
+                                <th>Shift ID</th>
+                                <th>Time Configuration</th>
+                                <th>Ngày công</th>
+                                <th>Giờ công</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shift in shifts %}
+                            <tr data-shift-name="{{ shift.name.lower() }}">
+                                <td>
+                                    {% if shift.shift_type == 'new' %}
+                                    <div class="shift-name clickable" onclick="viewShiftDetails('{{ shift.id }}')" title="Click to view details">{{ shift.name }}</div>
                                     {% else %}
-                                    <div class="time-type">Flexible</div>
-                                    <div class="time-details">{{ shift.duration }} hours</div>
+                                    <div class="shift-name">{{ shift.name }}</div>
                                     {% endif %}
-                                </div>
-                            </td>
-                                                         <td>
-                                 <div class="working-days">
-                                     <span class="day-badge {% if shift.working_days.get('monday', False) %}active{% endif %}">Mon</span>
-                                     <span class="day-badge {% if shift.working_days.get('tuesday', False) %}active{% endif %}">Tue</span>
-                                     <span class="day-badge {% if shift.working_days.get('wednesday', False) %}active{% endif %}">Wed</span>
-                                     <span class="day-badge {% if shift.working_days.get('thursday', False) %}active{% endif %}">Thu</span>
-                                     <span class="day-badge {% if shift.working_days.get('friday', False) %}active{% endif %}">Fri</span>
-                                     <span class="day-badge {% if shift.working_days.get('saturday', False) %}active{% endif %}">Sat</span>
-                                     <span class="day-badge {% if shift.working_days.get('sunday', False) %}active{% endif %}">Sun</span>
-                                 </div>
-                             </td>
-                            <td class="actions-cell">
-                                <button class="action-button" title="Edit shift" onclick="editShift('{{ shift.schedule_id }}')">
-                                    <img src="/static/images/pen.png" alt="Edit">
-                                </button>
-                                <button class="action-button" title="Delete shift" onclick="deleteShift('{{ shift.id }}')">
-                                    <img src="/static/images/trash.png" alt="Delete">
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <img src="/static/images/calendar-lines.png" alt="No shifts" width="64" height="64">
+                                </td>
+                                <td>
+                                    <div class="shift-id">{{ shift.shift_id }}</div>
+                                </td>
+                                <td>
+                                    <div class="time-info">
+                                        {% if shift.include_time %}
+                                        <div class="time-details">{{ shift.start_time }} - {{ shift.end_time }}</div>
+                                        {% else %}
+                                        <div class="time-details">{{ shift.duration }} hours</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="simple-hours">{{ shift.days_worked }}</div>
+                                </td>
+                                <td>
+                                    <div class="simple-hours">{{ shift.hours_worked }}h</div>
+                                </td>
+                                <td>
+                                    <div class="actions-container">
+                                        <button class="edit-btn" data-shift-id="{{ shift.id }}" onclick="toggleShiftActionMenu(event, this.getAttribute('data-shift-id'))" title="More actions">
+                                            <img src="/static/images/menu-dots-vertical.png" alt="Menu" style="width: 16px; height: 16px;">
+                                        </button>
+                                        <div class="action-menu" id="menu-{{ shift.id }}">
+                                            <div class="action-item" data-shift-id="{{ shift.id }}" onclick="editShift('{{ shift.id }}', '{{ shift.shift_type }}')">
+                                                <img src="/static/images/pen.png" alt="Edit" class="action-icon">
+                                                <span>Edit shift</span>
+                                            </div>
+                                            <div class="action-item delete" data-shift-id="{{ shift.id }}" onclick="deleteShift('{{ shift.id }}')">
+                                                <img src="/static/images/trash.png" alt="Delete" class="action-icon">
+                                                <span>Delete shift</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <img src="/static/images/calendar-lines.png" alt="No shifts" width="64" height="64">
+                        </div>
+                        <div class="empty-state-title">No shifts found</div>
+                        <div class="empty-state-description">Create your first schedule to add shifts to your organization.</div>
+                        <a href="/create-schedule" class="create-btn">Create Schedule</a>
                     </div>
-                    <div class="empty-state-title">No shifts found</div>
-                    <div class="empty-state-description">Create your first schedule to add shifts to your organization.</div>
-                    <a href="/create-schedule" class="create-btn">Create Schedule</a>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -564,8 +784,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchIcon = document.getElementById('searchIcon');
     const searchClearBtn = document.getElementById('searchClearBtn');
 
-    // Search functionality
-    searchIcon.addEventListener('click', function() {
+    // Search container click handler (match groups page)
+    searchContainer.addEventListener('click', function() {
+        if (!this.classList.contains('expanded')) {
+            this.classList.add('expanded');
+            searchInput.focus();
+        }
+    });
+
+    // Also expand when clicking the icon
+    searchIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
         searchContainer.classList.add('expanded');
         searchInput.focus();
     });
@@ -576,9 +805,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         rows.forEach(row => {
             const shiftName = row.getAttribute('data-shift-name') || '';
-            const shiftDescription = row.getAttribute('data-shift-description') || '';
             
-            if (shiftName.includes(searchTerm) || shiftDescription.includes(searchTerm)) {
+            if (shiftName.includes(searchTerm)) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
@@ -593,15 +821,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    searchClearBtn.addEventListener('click', function() {
+    // Clear search button behavior (match groups page)
+    searchClearBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
         searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input'));
-        searchInput.focus();
+        searchContainer.classList.remove('expanded');
+        this.classList.remove('show');
+        // Trigger filtering reset
+        const rows = document.querySelectorAll('.shifts-table tbody tr');
+        rows.forEach(row => { row.style.display = ''; });
     });
 
-    // Close search on click outside
+    // Collapse on blur if empty (match groups page)
+    searchInput.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            searchContainer.classList.remove('expanded');
+        }
+    });
+
+    // Close search on click outside (preserve if has value)
     document.addEventListener('click', function(e) {
-        if (!searchContainer.contains(e.target)) {
+        if (!searchContainer.contains(e.target) && !searchInput.value.trim()) {
             searchContainer.classList.remove('expanded');
         }
     });
@@ -613,11 +853,102 @@ document.addEventListener('DOMContentLoaded', function() {
             searchInput.blur();
         }
     });
+
+    // Close action menus when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.actions-container')) {
+            const allMenus = document.querySelectorAll('.action-menu');
+            allMenus.forEach(menu => {
+                menu.classList.remove('show');
+            });
+            document.body.classList.remove('no-scroll');
+        }
+    });
 });
 
-function editShift(scheduleId) {
-    // Redirect to edit schedule page
-    window.location.href = `/edit-schedule/${scheduleId}`;
+function toggleShiftActionMenu(event, shiftId) {
+    event.stopPropagation();
+
+    // Close all other action menus
+    document.querySelectorAll('.action-menu.show').forEach(openMenu => {
+        if (openMenu.id !== `menu-${shiftId}`) {
+            openMenu.classList.remove('show');
+        }
+    });
+
+    const menu = document.getElementById(`menu-${shiftId}`);
+    const button = event.currentTarget;
+
+    // If the clicked menu is already open, close it and re-enable scrolling.
+    if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        document.body.classList.remove('no-scroll');
+        return;
+    }
+
+    // --- The Correct Way to Measure a Hidden Element ---
+    // 1. Make the menu measurable but keep it invisible and off-screen.
+    // This forces the browser to calculate its true dimensions.
+    menu.style.visibility = 'hidden';
+    menu.style.position = 'fixed'; // Prevents page jump during measurement
+    menu.style.top = '-9999px';
+    menu.classList.add('show');
+
+    // 2. Now that it's rendered (but off-screen), we can get its actual width and height.
+    const menuWidth = menu.offsetWidth;
+    const menuHeight = menu.offsetHeight;
+
+    // 3. Hide it again before we calculate the final position.
+    menu.classList.remove('show');
+    menu.style.visibility = '';
+    menu.style.position = '';
+    menu.style.top = '';
+    // --- End of Measurement Technique ---
+
+    const buttonRect = button.getBoundingClientRect();
+    
+    // Reset any previous positioning class
+    menu.classList.remove('positioned-above');
+
+    // Calculate final position, defaulting to below the button
+    let top = buttonRect.bottom + 5;
+    const rightOffset = window.innerWidth - buttonRect.right;
+    
+    // If it overflows the bottom of the viewport, flip it to be above the button
+    if (top + menuHeight > window.innerHeight) {
+        top = buttonRect.top - menuHeight - 5;
+        menu.classList.add('positioned-above');
+    }
+
+    // Apply the final, correct coordinates and show the menu
+    menu.style.top = `${top}px`;
+    menu.style.left = '';
+    menu.style.right = `${rightOffset}px`;
+    menu.classList.add('show');
+
+    // Lock body scrolling
+    document.body.classList.add('no-scroll');
+}
+
+function viewShiftDetails(shiftId) {
+    // Normalize id: incoming id may be 'shift_<number>' for DB-backed shifts
+    let dbId = shiftId;
+    if (typeof shiftId === 'string' && shiftId.startsWith('shift_')) {
+        dbId = shiftId.split('_')[1];
+    }
+    window.location.href = `/shift/${dbId}`;
+}
+
+function editShift(shiftId, shiftType) {
+    if (shiftType === 'new') {
+        // Extract actual shift ID from the composite ID (format: shift_X)
+        const actualShiftId = shiftId.replace('shift_', '');
+        window.location.href = `/edit-shift/${actualShiftId}`;
+    } else {
+        // Legacy shift - redirect to edit schedule page
+        const scheduleId = shiftId.split('_')[0];
+        window.location.href = `/edit-schedule/${scheduleId}`;
+    }
 }
 
 function deleteShift(shiftId) {

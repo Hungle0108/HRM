@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, redirect, session, make_response, render_template, url_for
+from flask import Flask, request, jsonify, send_from_directory, redirect, session, make_response, render_template, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
@@ -2495,12 +2495,12 @@ def api_create_shift_step3():
             penalty_rules=json.dumps(step2_data.get('penaltyRows', [])) if step2_data.get('penaltyRows') else None,
             
             no_entry_penalty_enabled=coerce_bool(step2_data.get('noEntryPenaltyToggle')),
-            no_entry_hours_deducted=float(step2_data.get('noEntryHoursDeducted', 0)),
-            no_entry_days_deducted=float(step2_data.get('noEntryDaysDeducted', 0)),
+            no_entry_hours_deducted=float(step2_data.get('noEntryHoursDeducted') or 0),
+            no_entry_days_deducted=float(step2_data.get('noEntryDaysDeducted') or 0),
             
             no_exit_penalty_enabled=coerce_bool(step2_data.get('noExitPenaltyToggle')),
-            no_exit_hours_deducted=float(step2_data.get('noExitHoursDeducted', 0)),
-            no_exit_days_deducted=float(step2_data.get('noExitDaysDeducted', 0)),
+            no_exit_hours_deducted=float(step2_data.get('noExitHoursDeducted') or 0),
+            no_exit_days_deducted=float(step2_data.get('noExitDaysDeducted') or 0),
             
             # Metadata
             organization_id=user.organization_id,
@@ -3690,6 +3690,164 @@ def api_update_country_codes():
     except Exception as e:
         logger.error(f"Error updating country codes: {str(e)}")
         return jsonify({'error': 'Failed to update country codes'}), 500
+
+@app.route('/shift/shift_<int:shift_id>')
+def shift_detail_compat(shift_id):
+    return redirect(f'/shift/{shift_id}')
+
+@app.route('/shift/<int:shift_id>')
+def shift_detail(shift_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    shift = Shift.query.get(shift_id)
+    if not shift:
+        flash('Shift not found', 'error')
+        return redirect('/shifts')
+    
+    # Check if user has access to this shift's organization
+    if shift.organization_id != user.organization_id:
+        flash('Access denied', 'error')
+        return redirect('/shifts')
+    
+    return render_template('shift_detail.html', shift=shift, user=user)
+
+@app.route('/edit-shift/shift_<int:shift_id>')
+def edit_shift_compat(shift_id):
+    # Compatibility route in case frontend passes 'shift_123' directly
+    return redirect(f'/edit-shift/{shift_id}')
+
+@app.route('/edit-shift/<int:shift_id>')
+def edit_shift(shift_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    shift = Shift.query.get(shift_id)
+    if not shift:
+        flash('Shift not found', 'error')
+        return redirect('/shifts')
+    
+    # Check if user has access to this shift's organization
+    if shift.organization_id != user.organization_id:
+        flash('Access denied', 'error')
+        return redirect('/shifts')
+    
+    # Parse penalty_rules JSON string for template rendering
+    parsed_penalty_rules = []
+    if shift.penalty_rules:
+        try:
+            parsed_penalty_rules = json.loads(shift.penalty_rules)
+        except (json.JSONDecodeError, TypeError):
+            parsed_penalty_rules = []
+    
+    return render_template('edit_shift.html', shift=shift, penalty_rules=parsed_penalty_rules, user=user)
+
+@app.route('/api/update-shift/<int:shift_id>', methods=['POST'])
+def update_shift(shift_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+    
+    shift = Shift.query.get(shift_id)
+    if not shift:
+        return jsonify({'error': 'Shift not found'}), 404
+    
+    # Check if user has access to this shift's organization
+    if shift.organization_id != user.organization_id:
+        return jsonify({'error': 'Access denied'}), 403
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Update shift fields
+        if 'shiftName' in data:
+            shift.name = data['shiftName']
+        if 'shiftId' in data:
+            # Check if new shift ID already exists (excluding current shift)
+            existing_shift = Shift.query.filter_by(
+                shift_id=data['shiftId'], 
+                organization_id=user.organization_id,
+                is_active=True
+            ).filter(Shift.id != shift_id).first()
+            if existing_shift:
+                return jsonify({'error': 'Shift ID already exists'}), 400
+            shift.shift_id = data['shiftId']
+        if 'startTime' in data:
+            shift.start_time = data['startTime']
+        if 'endTime' in data:
+            shift.end_time = data['endTime']
+        if 'hoursWorked' in data:
+            shift.hours_worked = float(data['hoursWorked'])
+        if 'daysWorked' in data:
+            shift.days_worked = float(data['daysWorked'])
+        if 'timeSubmissionMethod' in data:
+            shift.time_submission_method = data['timeSubmissionMethod']
+        
+        # Update check-in/check-out settings
+        if 'checkInEnabled' in data:
+            shift.check_in_enabled = data['checkInEnabled']
+        if 'checkInStartTime' in data:
+            shift.check_in_start_time = data['checkInStartTime']
+        if 'checkInEndTime' in data:
+            shift.check_in_end_time = data['checkInEndTime']
+        if 'checkOutEnabled' in data:
+            shift.check_out_enabled = data['checkOutEnabled']
+        if 'checkOutStartTime' in data:
+            shift.check_out_start_time = data['checkOutStartTime']
+        if 'checkOutEndTime' in data:
+            shift.check_out_end_time = data['checkOutEndTime']
+        
+        # Update break settings
+        if 'breakEnabled' in data:
+            shift.break_enabled = data['breakEnabled']
+        if 'breakStartTime' in data:
+            shift.break_start_time = data['breakStartTime']
+        if 'breakEndTime' in data:
+            shift.break_end_time = data['breakEndTime']
+        
+        # Update penalty settings
+        if 'penaltyEnabled' in data:
+            shift.late_early_penalty_enabled = data['penaltyEnabled']
+        if 'penaltyRules' in data:
+            shift.penalty_rules = json.dumps(data['penaltyRules'])
+        if 'noEntryPenaltyEnabled' in data:
+            shift.no_entry_penalty_enabled = data['noEntryPenaltyEnabled']
+        if 'noEntryHoursDeducted' in data:
+            shift.no_entry_hours_deducted = float(data['noEntryHoursDeducted'] or 0)
+        if 'noEntryDaysDeducted' in data:
+            shift.no_entry_days_deducted = float(data['noEntryDaysDeducted'] or 0)
+        if 'noExitPenaltyEnabled' in data:
+            shift.no_exit_penalty_enabled = data['noExitPenaltyEnabled']
+        if 'noExitHoursDeducted' in data:
+            shift.no_exit_hours_deducted = float(data['noExitHoursDeducted'] or 0)
+        if 'noExitDaysDeducted' in data:
+            shift.no_exit_days_deducted = float(data['noExitDaysDeducted'] or 0)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Shift updated successfully',
+            'shift': shift.to_dict()
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating shift: {str(e)}")
+        return jsonify({'error': 'Failed to update shift'}), 500
 
 if __name__ == '__main__':
     with app.app_context():

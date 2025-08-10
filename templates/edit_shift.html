@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Shift - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .page-header {
+            background: #f8f9fa;
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: center;
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            min-height: 80px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+            min-height: 44px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            background: #f8f9fa;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .section-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            margin-bottom: 8px;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            font-size: 0.95rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .summary-value.primary {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .review-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .section-edit-btn {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-size: 1rem;
+            color: #222;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .section-edit-btn:hover {
+            background: #ececec;
+        }
+
+        .penalty-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .penalty-table th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .penalty-table td {
+            padding: 12px 16px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.9rem;
+            color: #1a1a1a;
+        }
+
+        .penalty-table td:first-child {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .penalty-table td:last-child {
+            overflow: visible;
+            position: relative;
+        }
+
+        .penalty-status {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .penalty-status.enabled {
+            color: #1a1a1a;
+        }
+
+        .penalty-status.disabled {
+            color: #6c757d;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            min-width: 120px;
+        }
+
+        .nav-btn.secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+
+        .nav-btn.secondary:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .nav-btn.primary {
+            background: #1a1a1a;
+            color: white;
+            flex: 1;
+        }
+
+        .nav-btn.primary:hover {
+            background: #333;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .checkbox.checked {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .time-range-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            margin-left: 26px;
+        }
+
+        .time-range-group .form-control {
+            width: 120px;
+        }
+
+        .time-range-separator {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .conditional-fields {
+            margin-left: 26px;
+            margin-top: 12px;
+            padding-left: 16px;
+            border-left: 2px solid #e9ecef;
+        }
+
+        .conditional-fields.hidden {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        * {
+            scrollbar-width: none;
+        }
+
+        * {
+            -ms-overflow-style: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <button class="close-btn" onclick="window.location.href='/shifts'" title="Close">&times;</button>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Edit Shift</h1>
+                <p class="page-subtitle">Update shift details, time settings, and penalty rules.</p>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="content-area">
+                <form id="editShiftForm">
+                    <!-- Shift Details Section -->
+                    <div class="form-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="section-title" style="margin-bottom: 0;">Shift Details</h3>
+                            <button class="section-edit-btn" type="button" onclick="openShiftDetailsModal()">Edit</button>
+                        </div>
+                        <div class="review-items-container">
+                            <div class="summary-item">
+                                <div class="summary-label">Shift Name</div>
+                                <div class="summary-value primary" id="reviewShiftName">{{ shift.name }}</div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="summary-label">Shift ID</div>
+                                <div class="summary-value" id="reviewShiftId">{{ shift.shift_id }}</div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="summary-label">Working Hours</div>
+                                <div class="summary-value time-display" id="reviewWorkingHours">{{ shift.start_time }} - {{ shift.end_time }}</div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="summary-label">Check-in Time</div>
+                                <div class="summary-value" id="reviewShiftCheckInTime">
+                                    {% if shift.check_in_enabled and shift.check_in_start_time and shift.check_in_end_time %}
+                                        {{ shift.check_in_start_time }} - {{ shift.check_in_end_time }}
+                                    {% else %}
+                                        Not configured
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="summary-label">Check-out Time</div>
+                                <div class="summary-value" id="reviewShiftCheckOutTime">
+                                    {% if shift.check_out_enabled and shift.check_out_start_time and shift.check_out_end_time %}
+                                        {{ shift.check_out_start_time }} - {{ shift.check_out_end_time }}
+                                    {% else %}
+                                        Not configured
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="summary-label">Break Time</div>
+                                <div class="summary-value" id="reviewShiftBreakTime">
+                                    {% if shift.break_enabled and shift.break_start_time and shift.break_end_time %}
+                                        {{ shift.break_start_time }} - {{ shift.break_end_time }}
+                                    {% else %}
+                                        Not configured
+                                    {% endif %}
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Tracking Section -->
+                    <div class="form-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="section-title" style="margin-bottom: 0;">Time Tracking</h3>
+                            <button class="section-edit-btn" type="button" onclick="openTimeTrackingModal()">Edit</button>
+                        </div>
+                        <div class="review-items-container">
+                            <div class="summary-item">
+                                <div class="summary-label">Time Submission Method</div>
+                                <div class="summary-value" id="reviewTimeSubmissionMethod">
+                                    {% if shift.time_submission_method == 'manual' %}Manual Entry
+                                    {% elif shift.time_submission_method == 'automatic' %}Automatic Tracking
+                                    {% elif shift.time_submission_method == 'hybrid' %}Hybrid (Manual + Automatic)
+                                    {% else %}{{ shift.time_submission_method }}
+                                    {% endif %}
+                            </div>
+                        </div>
+
+                            <div class="summary-item">
+                                <div class="summary-label">Giờ công</div>
+                                <div class="summary-value" id="reviewHoursWorked">{{ shift.hours_worked }}</div>
+                        </div>
+
+                            <div class="summary-item">
+                                <div class="summary-label">Ngày công</div>
+                                <div class="summary-value" id="reviewDaysWorked">{{ shift.days_worked }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Penalty Settings Section -->
+                    <div class="form-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="section-title" style="margin-bottom: 0;">Penalty Settings</h3>
+                            <button class="section-edit-btn" type="button" onclick="openPenaltySettingsModal()">Edit</button>
+                        </div>
+                        <div class="review-items-container">
+                            <div class="summary-item">
+                                <div class="summary-label">Phạt đi muộn/về sớm</div>
+                                <div class="penalty-status {% if shift.late_early_penalty_enabled %}enabled{% else %}disabled{% endif %}" id="reviewLateEarlyPenalty">
+                                    {% if shift.late_early_penalty_enabled %}Enabled{% else %}Disabled{% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Penalty Table -->
+                            <div id="penaltyTableContainer" {% if not shift.late_early_penalty_enabled %}style="display: none;"{% endif %}>
+                                <table class="penalty-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rule Type</th>
+                                            <th>Duration</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reviewPenaltyTableBody">
+                                        {% if penalty_rules and penalty_rules|length > 0 %}
+                                            {% for rule in penalty_rules %}
+                                            <tr>
+                                                <td>
+                                                    {% if rule.type == 'late_arrival' %}Phạt đi muộn
+                                                    {% elif rule.type == 'early_departure' %}Phạt về sớm
+                                                    {% elif rule.type == 'no_entry' %}Phạt không có giờ vào
+                                                    {% else %}{{ rule.type }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ rule.timeFrom|default('0') }} - {{ rule.timeTo|default('0') }} phút</td>
+                                                <td>
+                                                    Giờ công: {{ rule.hoursDeducted|default('0') }}<br>
+                                                    Ngày công: {{ rule.daysDeducted|default('0') }}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="3" style="text-align: center; color: #6c757d; padding: 20px;">No penalty rules configured</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                        </div>
+                            
+                            <div class="summary-item">
+                                <div class="summary-label">Phạt không có giờ vào</div>
+                                <div id="noEntryPenaltyDetails" style="text-align: right;{% if not shift.no_entry_penalty_enabled %} display: none;{% endif %}">
+                                    {% if shift.no_entry_penalty_enabled %}
+                                    <div style="margin-bottom: 4px;">
+                                        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 600;">Giờ công: </span>
+                                        <span style="font-size: 0.9rem; color: #1a1a1a; font-weight: 500;" id="reviewNoEntryHoursDeducted">{{ shift.no_entry_hours_deducted }}</span>
+                                </div>
+                                    <div>
+                                        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 600;">Ngày công: </span>
+                                        <span style="font-size: 0.9rem; color: #1a1a1a; font-weight: 500;" id="reviewNoEntryDaysDeducted">{{ shift.no_entry_days_deducted }}</span>
+                                </div>
+                                    {% else %}
+                                    <span style="color: #6c757d;">Disabled</span>
+                                    {% endif %}
+                            </div>
+                        </div>
+
+                            <div class="summary-item">
+                                <div class="summary-label">Phạt không có giờ ra</div>
+                                <div id="noExitPenaltyDetails" style="text-align: right;{% if not shift.no_exit_penalty_enabled %} display: none;{% endif %}">
+                                    {% if shift.no_exit_penalty_enabled %}
+                                    <div style="margin-bottom: 4px;">
+                                        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 600;">Giờ công: </span>
+                                        <span style="font-size: 0.9rem; color: #1a1a1a; font-weight: 500;" id="reviewNoExitHoursDeducted">{{ shift.no_exit_hours_deducted }}</span>
+                        </div>
+                                    <div>
+                                        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 600;">Ngày công: </span>
+                                        <span style="font-size: 0.9rem; color: #1a1a1a; font-weight: 500;" id="reviewNoExitDaysDeducted">{{ shift.no_exit_days_deducted }}</span>
+                                </div>
+                                    {% else %}
+                                    <span style="color: #6c757d;">Disabled</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <button type="button" class="nav-btn secondary" onclick="window.location.href='/shifts'">Cancel</button>
+                <button type="button" class="nav-btn primary" onclick="updateShift()">Update Shift</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let penaltyRuleCount = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+        });
+
+        function initializeForm() {
+            {% if shift %}
+            populateFormWithShiftData();
+            {% endif %}
+        }
+
+        function populateFormWithShiftData() {
+            // Data is now displayed directly in HTML via server-side templating
+            console.log('Shift data populated via server-side templating');
+        }
+
+        // Modal functions for editing sections
+        function openShiftDetailsModal() {
+            alert('Shift Details edit modal - to be implemented');
+        }
+
+        function openTimeTrackingModal() {
+            alert('Time Tracking edit modal - to be implemented');
+        }
+
+        function openPenaltySettingsModal() {
+            alert('Penalty Settings edit modal - to be implemented');
+        }
+
+
+
+        function updateShift() {
+            // This function will be implemented when the edit modals are created
+            alert('Update functionality will be available when edit modals are implemented');
+        }
+    </script>
+</body>
+</html>
