@@ -1,0 +1,3609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a schedule - Step 3 - HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: calc(50% - 460px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .close-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .page-header {
+            
+            padding: 40px 40px 20px 40px;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: calc(50% - 470px);
+            margin-top: 80px;
+        }
+
+        .page-header-content {
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 40px 120px 40px;
+            gap: 60px;
+        }
+
+        .content-area {
+            flex: 0 0 auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 auto;
+            width: 280px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.hidden {
+            display: none;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .step-item:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 16px;
+            font-size: 0.9rem;
+        }
+
+        .step-item.active .step-number {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-item:not(.active):not(.completed) .step-number {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .step-item.active .step-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .step-item:not(.active) .step-text {
+            color: #6c757d;
+        }
+
+        .step-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #28a745;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        /* Edit Button Styles */
+        .section-edit-btn {
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-size: 1rem;
+            color: #222;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .section-edit-btn:hover {
+            background: #ececec;
+        }
+
+        /* Date input styles for modal */
+        .modal .date-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .modal .date-input-wrapper:focus-within {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .modal .form-input.date-input {
+            border: none;
+            padding: 14px 16px;
+            padding-right: 50px;
+            box-shadow: none;
+            flex: 1;
+            background: transparent;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .modal .form-input.date-input:focus {
+            border: none;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .modal .calendar-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
+        .modal .calendar-icon:hover {
+            color: #495057;
+        }
+
+        .modal .calendar-icon img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            transition: all 0.2s;
+        }
+
+        /* Calendar popup styles for modal */
+        .modal .calendar-popup {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        /* Match calendar style from step 2 (scoped to modal) */
+        .modal {
+            --dark-body: #4d4c5a;
+            --dark-main: #141529;
+            --dark-second: #79788c;
+            --dark-hover: #323048;
+            --dark-text: #f8fbff;
+
+            --light-body: #f3f8fe;
+            --light-main: #fdfdfd;
+            --light-second: #c3c2c8;
+            --light-hover: #edf0f5;
+            --light-text: #151426;
+
+            --blue: #0000ff;
+            --white: #fff;
+
+            --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+        }
+
+        .modal .light {
+            --bg-body: var(--light-body);
+            --bg-main: var(--light-main);
+            --bg-second: var(--light-second);
+            --color-hover: var(--light-hover);
+            --color-txt: var(--light-text);
+        }
+
+        .modal .calendar {
+            height: max-content;
+            width: max-content;
+            background-color: var(--bg-main);
+            border-radius: 30px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-width: 280px;
+        }
+
+        .modal .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-txt);
+            padding: 10px;
+        }
+
+        .modal .calendar-body { padding: 10px; }
+
+        .modal .month-picker {
+            font-weight: 600;
+            color: var(--color-txt);
+            cursor: pointer;
+        }
+
+        .modal .year-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal .year-change {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .modal .year-change:hover {
+            background-color: var(--color-hover);
+        }
+
+        .modal .calendar-week-day {
+            height: 40px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .modal .calendar-week-day div {
+            display: grid;
+            place-items: center;
+            color: var(--bg-second);
+        }
+
+        .modal .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            color: var(--color-txt);
+        }
+
+        .modal .calendar-days div {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            position: relative;
+            cursor: pointer;
+            animation: to-top 1s forwards;
+            font-size: 14px;
+        }
+
+        .modal .calendar-days div span { position: absolute; }
+
+        .modal .calendar-days div:hover { background-color: transparent; }
+        .modal .calendar-days div:hover span {
+            transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+        }
+
+        .modal .calendar-days div span:nth-child(1),
+        .modal .calendar-days div span:nth-child(3) {
+            width: 2px;
+            height: 0;
+            background-color: var(--color-txt);
+        }
+
+        .modal .calendar-days div:hover span:nth-child(1),
+        .modal .calendar-days div:hover span:nth-child(3) { height: 100%; }
+
+        .modal .calendar-days div span:nth-child(1) { bottom: 0; }
+        .modal .calendar-days div span:nth-child(3) { top: 0; }
+
+        .modal .calendar-days div span:nth-child(2),
+        .modal .calendar-days div span:nth-child(4) {
+            height: 2px;
+            width: 0;
+            background-color: var(--color-txt);
+        }
+
+        .modal .calendar-days div:hover span:nth-child(2),
+        .modal .calendar-days div:hover span:nth-child(4) { width: 100%; }
+
+        .modal .calendar-day {
+            text-align: center;
+            padding: 8px 4px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal .calendar-day:hover { background-color: #f8f9fa; }
+        .modal .calendar-day.selected { background-color: #1a1a1a; color: #fff; }
+        .modal .calendar-day.today { border: 1px solid #1a1a1a; font-weight: 600; }
+        .modal .calendar-day.other-month { color: #adb5bd; }
+        /* Ensure parity with step 2 selections */
+        .modal .calendar-days div.selected-date {
+            background-color: #6b46c1;
+            color: #fff;
+            border-radius: 50%;
+        }
+        .modal .calendar-days div.selected-date span { display: none; }
+        .modal .calendar-days div.curr-date span { display: none; }
+        .modal .month-list {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            background-color: var(--bg-main);
+            padding: 20px;
+            grid-template-columns: repeat(3, auto);
+            gap: 5px;
+            display: grid;
+            transform: scale(1.5);
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .modal .month-list.show {
+            transform: scale(1);
+            visibility: visible;
+            pointer-events: visible;
+            transition: all 0.2s ease-in-out;
+        }
+        .modal .month-list > div { display: grid; place-items: center; }
+        .modal .month-list > div > div {
+            width: 100%;
+            padding: 5px 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--color-txt);
+            font-size: 14px;
+        }
+        .modal .month-list > div > div:hover { background-color: var(--color-hover); }
+
+        /* Animation to match step 2 */
+        @keyframes to-top {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Step 2-like checkbox list styles inside modal */
+        #workingTimeModal .checkbox-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+        #workingTimeModal .checkbox-item {
+            display: flex; align-items: center; gap: 12px;
+            border: 1px solid #e9ecef; border-radius: 8px;
+            padding: 8px 12px; cursor: pointer; background: #fff;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        #workingTimeModal .checkbox-item:hover { border-color: #d1d5db; background: #fafafa; }
+        #workingTimeModal .checkbox-item.checked { border-color: #1a1a1a; background: #fafafa; }
+        #workingTimeModal .checkbox-input {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            background: white;
+            flex-shrink: 0;
+        }
+        #workingTimeModal .checkbox-input:checked { background: #1a1a1a; border-color: #1a1a1a; }
+        #workingTimeModal .checkbox-input:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        #workingTimeModal .day-info { display: flex; align-items: center; gap: 6px; flex: 1; }
+        #workingTimeModal .day-name { font-weight: 600; color: #1a1a1a; }
+        #workingTimeModal .day-shift { color: #6c757d; font-style: italic; margin-left: auto; }
+
+        /* Shift selection (scoped to modal) */
+        #workingTimeModal .shift-selection { display: none; margin-left: auto; width: auto; }
+        #workingTimeModal .checkbox-item.checked .shift-selection { display: flex; }
+        #workingTimeModal .shift-dropdown-group { display: flex; flex-direction: column; gap: 8px; }
+        #workingTimeModal .shift-dropdown-wrapper { position: relative; display: flex; flex-direction: column; gap: 4px; }
+        #workingTimeModal .shift-dropdown-btn {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px; border: 1px solid #ced4da; border-radius: 8px; background: #fff; cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s; min-width: 200px; width: 100%; gap: 8px;
+        }
+        #workingTimeModal .shift-dropdown-btn:hover,
+        #workingTimeModal .shift-dropdown-btn.active { border-color: #80bdff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+        #workingTimeModal .shift-dropdown-btn:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+        #workingTimeModal .dropdown-text { color: #6c757d; }
+        #workingTimeModal .dropdown-text.selected { color: #1a1a1a; font-weight: 600; }
+        #workingTimeModal .dropdown-arrow { color: #6c757d; }
+        #workingTimeModal .shift-dropdown-options {
+            position: absolute; top: 100%; left: 0; right: auto; width: 100%; background: #fff; border: 1px solid #e9ecef; border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-height: 220px; overflow-y: auto; margin-top: 4px; z-index: 3000; display: none;
+        }
+        #workingTimeModal .shift-dropdown-option { padding: 12px 16px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid #f0f0f0; font-size: 0.875rem; }
+        #workingTimeModal .shift-dropdown-option:last-child { border-bottom: none; }
+        #workingTimeModal .shift-dropdown-option:hover { background-color: #f8f9fa; }
+        #workingTimeModal .shift-dropdown-option.selected { background-color: #e7f3ff; color: #0056b3; font-weight: 500; }
+        #workingTimeModal .dropdown-option-loading { padding: 12px 16px; color: #6c757d; font-size: 0.875rem; }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow: visible;
+            box-shadow: 0 4px 32px rgba(0, 0, 0, 0.15);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        /* Ensure body scroll is locked when modal is open */
+        body.modal-open {
+            overflow: hidden !important;
+            position: fixed;
+            width: 100%;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Employee Assignment Modal Styles (from step 3) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 75vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-overlay .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+        }
+
+        .modal-overlay .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+            flex: 1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
+        .modal-overlay .modal-content {
+            padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .modal-filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+            table-layout: fixed;
+        }
+
+        .modal-table th:nth-child(1),
+        .modal-table td:nth-child(1) {
+            width: 50px;
+        }
+
+        .modal-table th:nth-child(2),
+        .modal-table td:nth-child(2) {
+            width: 60px;
+        }
+
+        .modal-table th:nth-child(3),
+        .modal-table td:nth-child(3) {
+            width: 150px;
+        }
+
+        .modal-table th:nth-child(4),
+        .modal-table td:nth-child(4) {
+            width: 120px;
+        }
+
+        .modal-table th:nth-child(5),
+        .modal-table td:nth-child(5) {
+            width: 100px;
+        }
+
+        .modal-table th:nth-child(6),
+        .modal-table td:nth-child(6) {
+            width: 100px;
+        }
+
+        .modal-overlay .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 24px;
+            border-top: 1px solid #e9ecef;
+            background: white;
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover {
+            background: #e9ecef;
+        }
+
+        .pagination-btn.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-overlay .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-secondary {
+            background: white;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .modal-overlay .modal-btn-primary {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+        }
+
+        .modal-overlay .modal-btn-primary:hover {
+            background: #333;
+        }
+
+        /* Department and Division filter dropdown styles */
+        .department-filter, .division-filter {
+            position: relative;
+            flex: 1;
+        }
+
+        .department-filter .dropdown-toggle, .division-filter .dropdown-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 48px;
+            box-sizing: border-box;
+        }
+
+        .department-filter .dropdown-toggle:hover, .division-filter .dropdown-toggle:hover {
+            border-color: #adb5bd;
+        }
+
+        .dropdown-label {
+            font-size: 0.95rem;
+            color: #495057;
+        }
+
+        .dropdown-arrow {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.2s;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            display: none;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .dropdown-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .dropdown-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .dropdown-close:hover {
+            background: #e9ecef;
+            opacity: 1;
+        }
+
+        .dropdown-content {
+            padding: 8px 0;
+        }
+
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-option:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown-radio {
+            margin-right: 12px;
+        }
+
+        .option-text {
+            font-size: 0.875rem;
+            color: #495057;
+        }
+
+        /* Employee search filter */
+        .employee-search-filter {
+            flex: 1;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 0 16px;
+            height: 48px;
+        }
+
+        .search-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            opacity: 0.6;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px 0;
+            font-size: 0.95rem;
+            background: transparent;
+            color: #495057;
+        }
+
+        .search-input::placeholder {
+            color: #6c757d;
+        }
+
+        .search-clear-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0.6;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+
+        .search-clear-btn:hover {
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
+        .table-box {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-top: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .table-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .employee-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a1a1a;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .employee-checkbox:checked {
+            background-color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .groups-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .modal-table th {
+            padding: 16px;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+            user-select: none;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-table th:last-child {
+            border-right: none;
+        }
+
+        .modal-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            font-size: 0.875rem;
+            color: #495057;
+            vertical-align: top;
+        }
+
+        .modal-table td:last-child {
+            border-right: none;
+        }
+
+        .modal-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modal-table tr:last-child th {
+            border-bottom: none;
+        }
+
+        .modal-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal-table tbody tr.selected {
+            background: #e3f2fd;
+        }
+
+        .modal-header {
+            padding: 20px 28px 16px 28px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px 28px;
+            overflow: visible;
+        }
+
+        .modal-footer {
+            padding: 16px 28px 20px 28px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .modal-btn-secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .modal-btn-primary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #333;
+        }
+
+        .modal-btn-primary:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Form styles for modals */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+            box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+        }
+
+        .section-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+            flex: 0 0 150px;
+        }
+
+        .summary-value {
+            font-size: 0.9rem;
+            color: #1a1a1a;
+            flex: 1;
+            text-align: right;
+        }
+
+        .summary-value.primary {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .edit-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-left: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .edit-link:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+        }
+
+        .schedule-preview {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .schedule-preview-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .working-days {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .working-day {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .day-name {
+            color: #6c757d;
+        }
+
+        .day-hours {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* Daily workload detailing styles */
+        .daily-workload-container {
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            margin-top: 16px;
+        }
+
+        .daily-workload-header {
+            margin-bottom: 20px;
+        }
+
+        .daily-workload-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+
+        .daily-workload-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .daily-workload-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .workload-day-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .workload-day-name {
+            color: #6c757d;
+        }
+
+        .workload-day-time {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .shift-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 20px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .total-hours {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .total-value {
+            font-size: 1.1rem;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-icon {
+            width: 20px;
+            height: 20px;
+            background: #28a745;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .success-text {
+            font-size: 0.9rem;
+            color: #155724;
+            line-height: 1.4;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .bottom-nav-content {
+            max-width: 930px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #e9ecef;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .btn-continue {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-continue:hover {
+            background: #333;
+        }
+
+        .btn-continue:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .create-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .create-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .create-title {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .multiple-shifts-indicator {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .shift-section {
+            margin-bottom: 16px;
+        }
+
+        .shift-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .review-item-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .review-item-label {
+            color: #6c757d;
+        }
+
+        .review-item-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .schedule-type-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .edit-link {
+            font-size: 0.9rem;
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .edit-link:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+        }
+
+        .review-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .working-days-section {
+            margin-top: 20px;
+        }
+
+        .working-days-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .working-days-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .working-day-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .working-day-name {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .working-day-shift {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .no-shift {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Employee table styles */
+        .employees-table-container {
+            margin-top: 16px;
+        }
+
+        .employees-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+        }
+
+        .employees-table th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #495057;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .employees-table th:last-child {
+            border-right: none;
+        }
+
+        .employees-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f3f4;
+            border-right: 1px solid #f1f3f4;
+            font-size: 0.95rem;
+        }
+
+        .employees-table td:last-child {
+            border-right: none;
+        }
+
+        .employees-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .employee-name {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .employee-email {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .no-employees {
+            text-align: center;
+            padding: 24px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-left: 4px;
+            cursor: pointer;
+        }
+
+        /* Info modal styles */
+        .info-modal {
+            display: none; /* hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 48px 32px 48px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .info-modal-content img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+        }
+
+        .info-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .info-modal-text {
+            font-size: 0.95rem;
+            color: #495057;
+            margin-bottom: 32px;
+            line-height: 1.45;
+        }
+
+        .info-modal-close {
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .info-modal-close:hover {
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <div class="logo"></div>
+                <a href="/settings/time-tracking" class="close-btn" onclick="clearScheduleFormData()">
+                    <img src="{{ url_for('static', filename='images/cross-small.png') }}" alt="Close">
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Create a schedule</h1>
+                <p class="page-subtitle">Review your schedule details and create the final schedule.</p>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Schedule Name -->
+                <div class="form-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="section-title" style="margin-bottom: 0;">Schedule name</h3>
+                        <button class="section-edit-btn" onclick="editScheduleName()">Edit</button>
+                    </div>
+                    <div class="review-item-box">
+                        <span class="review-item-label">Schedule name</span>
+                        <span id="reviewScheduleName" class="review-item-value">--</span>
+                    </div>
+                </div>
+
+
+
+                <!-- Working Time Details -->
+                <div class="form-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="section-title" style="margin-bottom: 0;">Working Time Details</h3>
+                        <button class="section-edit-btn" onclick="editWorkingTimeDetails()">Edit</button>
+                    </div>
+                    <div class="review-items-container">
+                        <div class="review-item-box">
+                            <span class="review-item-label">Date range</span>
+                            <span id="reviewDateRange" class="review-item-value">--</span>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Working Days with Shifts -->
+                    <div class="working-days-section">
+                        <h4 class="working-days-title">Working Days & Shifts</h4>
+                        <div id="workingDaysContainer" class="working-days-grid">
+                            <!-- Working day boxes will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Assignment -->
+                <div class="form-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="section-title" style="margin-bottom: 0;">Employee Assignment</h3>
+                        <button class="section-edit-btn" onclick="editEmployeeAssignment()">Edit</button>
+                    </div>
+                    <div id="assignedEmployeesTable" class="employees-table-container">
+                        <!-- Employee table will be populated here -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ol class="steps-list">
+                    <li class="step-item completed">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Name</div>
+                    </li>
+                    <li class="step-item completed">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Working time details</div>
+                    </li>
+                    <li class="step-item completed">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Assign schedule</div>
+                    </li>
+                    <li class="step-item active">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Review and finish</div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-navigation">
+            <div class="bottom-nav-content">
+                <a href="/create-schedule-step3" class="btn-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back
+                </a>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="create-info">
+                        <div class="create-label">Ready to create:</div>
+                        <div class="create-title">Your new schedule</div>
+                    </div>
+                    <button type="button" class="btn-continue" id="createScheduleBtn">Create Schedule</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info popup (hidden initially) -->
+        <div id="infoModal" class="info-modal">
+            <div class="info-modal-content">
+                <img src="{{ url_for('static', filename='images/information.png') }}" alt="Info">
+                <h2 class="info-modal-title">Work schedule type</h2>
+                <p class="info-modal-text">A fixed work schedule has specific start and end times for its workdays. A flexible work schedule allows employees to vary their start and end times.</p>
+                <button type="button" id="infoModalClose" class="info-modal-close">OK</button>
+            </div>
+        </div>
+
+        <!-- Schedule Name Modal -->
+        <div id="scheduleNameModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Edit Schedule Name</h2>
+                    <button class="close-modal" onclick="closeModal('scheduleNameModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Schedule Name</label>
+                        <input type="text" id="modalScheduleName" class="form-input" placeholder="Enter schedule name">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-primary" onclick="saveScheduleName()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Working Time Details Modal -->
+        <div id="workingTimeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Edit Working Time Details</h2>
+                    <button class="close-modal" onclick="closeModal('workingTimeModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Start Date</label>
+                            <div class="date-input-wrapper">
+                                <input type="text" id="modalStartDate" class="form-input date-input" placeholder="Start date" readonly>
+                                <button type="button" class="calendar-icon" id="modalStartDateCalendarToggle">
+                                    <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
+                                </button>
+                                <div class="calendar-popup" id="modalStartDateCalendarPopup" style="display: none;">
+                                    <div class="calendar light">
+                                        <div class="calendar-header">
+                                            <span class="month-picker" id="modalStartDate-month-picker">February</span>
+                                            <div class="year-picker">
+                                                <span class="year-change" id="modalStartDate-prev-year">
+                                                    <pre><</pre>
+                                                </span>
+                                                <span id="modalStartDate-year">2021</span>
+                                                <span class="year-change" id="modalStartDate-next-year">
+                                                    <pre>></pre>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="calendar-body">
+                                            <div class="calendar-week-day">
+                                                <div>Sun</div>
+                                                <div>Mon</div>
+                                                <div>Tue</div>
+                                                <div>Wed</div>
+                                                <div>Thu</div>
+                                                <div>Fri</div>
+                                                <div>Sat</div>
+                                            </div>
+                                            <div class="calendar-days"></div>
+                                        </div>
+                                        <div class="month-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">End Date</label>
+                            <div class="date-input-wrapper">
+                                <input type="text" id="modalEndDate" class="form-input date-input" placeholder="End date" readonly>
+                                <button type="button" class="calendar-icon" id="modalEndDateCalendarToggle">
+                                    <img src="{{ url_for('static', filename='images/calendar-lines.png') }}" alt="Calendar">
+                                </button>
+                                <div class="calendar-popup" id="modalEndDateCalendarPopup" style="display: none;">
+                                    <div class="calendar light">
+                                        <div class="calendar-header">
+                                            <span class="month-picker" id="modalEndDate-month-picker">February</span>
+                                            <div class="year-picker">
+                                                <span class="year-change" id="modalEndDate-prev-year">
+                                                    <pre><</pre>
+                                                </span>
+                                                <span id="modalEndDate-year">2021</span>
+                                                <span class="year-change" id="modalEndDate-next-year">
+                                                    <pre>></pre>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="calendar-body">
+                                            <div class="calendar-week-day">
+                                                <div>Sun</div>
+                                                <div>Mon</div>
+                                                <div>Tue</div>
+                                                <div>Wed</div>
+                                                <div>Thu</div>
+                                                <div>Fri</div>
+                                                <div>Sat</div>
+                                            </div>
+                                            <div class="calendar-days"></div>
+                                        </div>
+                                        <div class="month-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Working Days & Shifts</label>
+                        <div id="modalWorkingDaysContainer">
+                            <!-- Working days will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-primary" onclick="saveWorkingTimeDetails()">Save</button>
+                </div>
+            </div>
+        </div>
+
+                <!-- Employee Assignment Modal (exact copy from step 3) -->
+        <div class="modal-overlay" id="employeeAssignmentModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">Select Employees</h2>
+                    <button class="modal-close" onclick="closeEmployeeModal()">
+                        <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Close" style="width: 16px; height: 16px;">
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <div class="modal-filters">
+                        <div class="department-filter">
+                            <button class="dropdown-toggle" id="departmentDropdown">
+                                <span class="dropdown-label">Department</span>
+                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu" id="departmentDropdownMenu">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-title">Department</span>
+                                    <button class="dropdown-close" id="departmentDropdownClose">
+                                        <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Close" style="width: 14px; height: 14px;">
+                                    </button>
+                        </div>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-options-list" id="departmentOptionsList">
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="department" class="dropdown-radio" data-value="all" checked>
+                                            <span class="option-text">All Departments</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="department" class="dropdown-radio" data-value="IT">
+                                            <span class="option-text">IT</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="department" class="dropdown-radio" data-value="HR">
+                                            <span class="option-text">HR</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="department" class="dropdown-radio" data-value="Finance">
+                                            <span class="option-text">Finance</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="department" class="dropdown-radio" data-value="Marketing">
+                                            <span class="option-text">Marketing</span>
+                                        </label>
+                    </div>
+                </div>
+                            </div>
+                        </div>
+                        <div class="division-filter">
+                            <button class="dropdown-toggle" id="divisionDropdown">
+                                <span class="dropdown-label">Division</span>
+                                <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                            </button>
+                            <div class="dropdown-menu" id="divisionDropdownMenu">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-title">Division</span>
+                                    <button class="dropdown-close" id="divisionDropdownClose">
+                                        <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Close" style="width: 14px; height: 14px;">
+                                    </button>
+                                </div>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-options-list" id="divisionOptionsList">
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="division" class="dropdown-radio" data-value="all" checked>
+                                            <span class="option-text">All Divisions</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="division" class="dropdown-radio" data-value="Development">
+                                            <span class="option-text">Development</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="division" class="dropdown-radio" data-value="Testing">
+                                            <span class="option-text">Testing</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="division" class="dropdown-radio" data-value="Design">
+                                            <span class="option-text">Design</span>
+                                        </label>
+                                        <label class="dropdown-option">
+                                            <input type="radio" name="division" class="dropdown-radio" data-value="Management">
+                                            <span class="option-text">Management</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="employee-search-filter">
+                            <div class="search-container" id="employeeSearchContainer">
+                                <img src="{{ url_for('static', filename='images/search.png') }}" alt="Search" class="search-icon" id="employeeSearchIcon">
+                                <input type="text" class="search-input" placeholder="Search employees..." id="employeeSearchInput">
+                                <button class="search-clear-btn" id="employeeSearchClearBtn">
+                                    <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Clear" style="width: 16px; height: 16px;">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-box">
+                        <div class="table-wrapper">
+                            <table class="groups-table modal-table" id="modalEmployeeTable">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllEmployees" class="employee-checkbox"></th>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Company</th>
+                                        <th>Department</th>
+                                        <th>Division</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalEmployeeTableBody">
+                                    <!-- Employee rows will be populated here -->
+                                </tbody>
+                            </table>
+                            
+                            <div class="table-summary">
+                                <div class="pagination-info">
+                                    Total records: <span id="totalRecords">0</span>
+                                </div>
+                                
+                                <div class="pagination-controls">
+                                    <button class="pagination-btn" id="firstPage" onclick="goToPage(1)">«</button>
+                                    <button class="pagination-btn" id="prevPage" onclick="goToPage(currentPage - 1)">‹</button>
+                                    <div id="pageNumbers"></div>
+                                    <button class="pagination-btn" id="nextPage" onclick="goToPage(currentPage + 1)">›</button>
+                                    <button class="pagination-btn" id="lastPage" onclick="goToPage(totalPages)">»</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <div class="modal-actions">
+                        <button class="modal-btn modal-btn-secondary" onclick="closeEmployeeModal()">Cancel</button>
+                        <button class="modal-btn modal-btn-primary" onclick="confirmEmployeeSelection()">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // Function to clear all schedule form data
+        function clearScheduleFormData() {
+            sessionStorage.removeItem('scheduleFormData');
+            sessionStorage.removeItem('scheduleStep2Data');
+            sessionStorage.removeItem('scheduleStep3Data');
+            console.log('Schedule form data cleared');
+        }
+        
+        // Load and display saved data from previous steps
+        function loadSavedData() {
+            // Load data from step 1 (schedule name) - stored as scheduleFormData
+            const step1Data = sessionStorage.getItem('scheduleFormData');
+            // Load data from step 2 (working time details)
+            const step2Data = sessionStorage.getItem('scheduleStep2Data');
+            // Load data from step 3 (employee assignment)
+            const step3Data = sessionStorage.getItem('scheduleStep3Data');
+            
+            const data = {
+                scheduleStep1Data: step1Data ? JSON.parse(step1Data) : null,
+                scheduleStep2Data: step2Data ? JSON.parse(step2Data) : null,
+                scheduleStep3Data: step3Data ? JSON.parse(step3Data) : null
+            };
+            
+            console.log('Loaded schedule data:', data);
+            
+            // Display basic information from step 1
+            if (data.scheduleStep1Data && data.scheduleStep1Data.scheduleName) {
+                const scheduleNameElement = document.getElementById('reviewScheduleName');
+                if (scheduleNameElement) {
+                    scheduleNameElement.textContent = data.scheduleStep1Data.scheduleName;
+                }
+            }
+            
+
+            
+            // Display working time details from step 2
+            if (data.scheduleStep2Data) {
+                const step2Data = data.scheduleStep2Data;
+                
+                // Display date range
+                const reviewDateRangeElement = document.getElementById('reviewDateRange');
+                if (reviewDateRangeElement) {
+                    if (step2Data.startDate && step2Data.endDate) {
+                        reviewDateRangeElement.textContent = `${step2Data.startDate} - ${step2Data.endDate}`;
+                    } else {
+                        reviewDateRangeElement.textContent = '--';
+                    }
+                }
+                
+
+                
+                // Display working days with individual boxes for each day that has a shift
+                const workingDaysContainer = document.getElementById('workingDaysContainer');
+                if (workingDaysContainer) {
+                    if (step2Data.weekdays) {
+                        const dayNames = {
+                            'monday': 'Monday',
+                            'tuesday': 'Tuesday',
+                            'wednesday': 'Wednesday',
+                            'thursday': 'Thursday',
+                            'friday': 'Friday',
+                            'saturday-odd': 'Saturday (odd)',
+                            'saturday-even': 'Saturday (even)',
+                            'sunday': 'Sunday'
+                        };
+                        
+                        // Clear existing content
+                        workingDaysContainer.innerHTML = '';
+                        
+                        // Create boxes only for days that have shifts assigned
+                        Object.entries(step2Data.weekdays).forEach(([day, dayData]) => {
+                            if (dayData.checked && dayData.selectedShift) {
+                                const dayBox = document.createElement('div');
+                                dayBox.className = 'working-day-box';
+                                
+                                const dayName = document.createElement('span');
+                                dayName.className = 'working-day-name';
+                                dayName.textContent = dayNames[day];
+                                
+                                const dayShift = document.createElement('span');
+                                dayShift.className = 'working-day-shift';
+                                dayShift.textContent = dayData.selectedShift.shiftName;
+                                
+                                dayBox.appendChild(dayName);
+                                dayBox.appendChild(dayShift);
+                                workingDaysContainer.appendChild(dayBox);
+                            }
+                        });
+                        
+                        // If no working days have shifts assigned, show a message
+                        if (workingDaysContainer.children.length === 0) {
+                            const noDaysMessage = document.createElement('div');
+                            noDaysMessage.className = 'working-day-box';
+                            noDaysMessage.innerHTML = '<span class="working-day-name">No shifts assigned</span><span class="working-day-shift no-shift">--</span>';
+                            workingDaysContainer.appendChild(noDaysMessage);
+                        }
+                    } else {
+                        // If no weekdays data, show a message
+                        workingDaysContainer.innerHTML = '<div class="working-day-box"><span class="working-day-name">No working days data</span><span class="working-day-shift no-shift">--</span></div>';
+                    }
+                }
+            }
+            
+            // Display employee assignment table from step 3
+            if (data.scheduleStep3Data) {
+                const step3Data = data.scheduleStep3Data;
+                
+                const assignedEmployeesTable = document.getElementById('assignedEmployeesTable');
+                if (assignedEmployeesTable) {
+                    if (step3Data.assignedEmployees && step3Data.assignedEmployees.length > 0) {
+                        // Fetch employee details to display names and emails
+                        fetch('/api/get-employees')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success && data.employees) {
+                                    // Match assigned employee IDs with full employee data
+                                    const assignedEmployeeDetails = step3Data.assignedEmployees.map(employeeId => {
+                                        return data.employees.find(emp => emp.id === employeeId);
+                                    }).filter(emp => emp); // Remove any undefined entries
+                                    
+                                    if (assignedEmployeeDetails.length > 0) {
+                                        // Create table structure
+                                        const tableHTML = `
+                                            <table class="employees-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Employee Name</th>
+                                                        <th>Email</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${assignedEmployeeDetails.map(employee => `
+                                                        <tr>
+                                                            <td class="employee-name">${employee.name}</td>
+                                                            <td class="employee-email">${employee.email}</td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        `;
+                                        assignedEmployeesTable.innerHTML = tableHTML;
+                                    } else {
+                                        assignedEmployeesTable.innerHTML = '<div class="no-employees">No valid employees found</div>';
+                                    }
+                                } else {
+                                    assignedEmployeesTable.innerHTML = '<div class="no-employees">Error loading employee details</div>';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching employees:', error);
+                                assignedEmployeesTable.innerHTML = '<div class="no-employees">Error loading employee details</div>';
+                            });
+                    } else {
+                        assignedEmployeesTable.innerHTML = '<div class="no-employees">No employees assigned to this schedule</div>';
+                    }
+                }
+            }
+            
+
+        }
+        
+
+        
+        // Helper function to calculate working hours from time strings
+        function calculateWorkingHours(startTime, endTime) {
+            if (!startTime || !endTime) return null;
+            
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+            
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            
+            let diffMinutes = endMinutes - startMinutes;
+            if (diffMinutes < 0) {
+                diffMinutes += 24 * 60; // Handle overnight shifts
+            }
+            
+            return {
+                hours: Math.floor(diffMinutes / 60),
+                minutes: diffMinutes % 60
+            };
+        }
+        
+        // Handle schedule creation
+        document.getElementById('createScheduleBtn').addEventListener('click', function() {
+            // Load data from all steps
+            const step1Data = sessionStorage.getItem('scheduleFormData');
+            const step2Data = sessionStorage.getItem('scheduleStep2Data');
+            const step3Data = sessionStorage.getItem('scheduleStep3Data');
+            
+            if (!step1Data || !step2Data || !step3Data) {
+                alert('Error: Incomplete schedule data found. Please start over.');
+                window.location.href = '/create-schedule';
+                return;
+            }
+            
+            const data = {
+                step1: JSON.parse(step1Data),
+                step2: JSON.parse(step2Data),
+                step3: JSON.parse(step3Data)
+            };
+            
+            // Show loading state
+            const button = this;
+            const originalText = button.textContent;
+            button.textContent = 'Creating...';
+            button.disabled = true;
+            
+            // Send data to server
+            fetch('/api/create-schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Clear all step data only when schedule is successfully created
+                    sessionStorage.removeItem('scheduleFormData');
+                    sessionStorage.removeItem('scheduleStep2Data');
+                    sessionStorage.removeItem('scheduleStep3Data');
+                    
+                    // Redirect to return_to if present
+                    const returnTo = sessionStorage.getItem('scheduleReturnTo');
+                    if (returnTo) {
+                        window.location.href = returnTo;
+                        sessionStorage.removeItem('scheduleReturnTo');
+                    } else {
+                        // Redirect to time tracking page
+                        window.location.href = '/settings/time-tracking';
+                    }
+                } else {
+                    // Show error message
+                    alert('Error: ' + (result.error || 'Failed to create schedule'));
+                    
+                    // Reset button
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error creating schedule:', error);
+                alert('Error: Failed to create schedule. Please try again.');
+                
+                // Reset button
+                button.textContent = originalText;
+                button.disabled = false;
+            });
+        });
+        
+        // Initialize everything when page loads
+        // Store return_to param in sessionStorage if present
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const returnTo = getQueryParam('return_to');
+            if (returnTo) {
+                sessionStorage.setItem('scheduleReturnTo', returnTo);
+            }
+            // Load saved data first
+            loadSavedData();
+            
+            // Check the schedule type from sessionStorage and update the text
+            const saved = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            if (saved.scheduleDetails && saved.scheduleDetails.shifts) {
+                const firstShift = saved.scheduleDetails.shifts[1];
+                const scheduleTypeElement = document.querySelector('.schedule-type-value');
+                if (scheduleTypeElement) {
+                    if (firstShift && firstShift.includeTime) {
+                        scheduleTypeElement.textContent = 'Fixed work schedule';
+                    } else {
+                        scheduleTypeElement.textContent = 'Flexible work schedule';
+                    }
+                }
+            }
+
+            // --- Info modal logic ---
+            const infoIcon = document.querySelector('.info-icon');
+            const infoModal = document.getElementById('infoModal');
+            const infoModalClose = document.getElementById('infoModalClose');
+
+            if (infoIcon && infoModal && infoModalClose) {
+                infoIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    infoModal.style.display = 'flex';
+                });
+
+                infoModalClose.addEventListener('click', function() {
+                    infoModal.style.display = 'none';
+                });
+
+                // Close modal when clicking outside the content
+                infoModal.addEventListener('click', function(e) {
+                    if (e.target === infoModal) {
+                        infoModal.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.classList.add('modal-open');
+            
+            // Load data into modal
+            loadModalData(modalId);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.classList.remove('modal-open');
+            
+            // Special handling for employee assignment modal
+            if (modalId === 'employeeAssignmentModal') {
+                modalSelectedEmployees.clear();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal') || event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                
+                // Special handling for employee assignment modal
+                if (event.target.id === 'employeeAssignmentModal') {
+                    modalSelectedEmployees.clear();
+                }
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display === 'block') {
+                        modal.style.display = 'none';
+                        document.body.classList.remove('modal-open');
+                    }
+                });
+            }
+        });
+
+        // Load data into modals
+        function loadModalData(modalId) {
+            if (modalId === 'scheduleNameModal') {
+                const savedData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+                const scheduleName = savedData.scheduleName || '';
+                document.getElementById('modalScheduleName').value = scheduleName;
+                
+                // Store original value
+                originalScheduleName = scheduleName;
+                
+                // Set up event listener for change detection
+                document.getElementById('modalScheduleName').addEventListener('input', updateScheduleNameSaveButton);
+                
+                // Initially disable save button
+                updateScheduleNameSaveButton();
+            } else if (modalId === 'workingTimeModal') {
+                console.log('Loading working time modal data...');
+                const step2Data = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+                console.log('Step 2 data:', step2Data);
+                const startDate = step2Data.startDate || '';
+                const endDate = step2Data.endDate || '';
+                const weekdays = step2Data.weekdays || {};
+                
+                document.getElementById('modalStartDate').value = startDate;
+                document.getElementById('modalEndDate').value = endDate;
+                
+                populateModalWorkingDays(weekdays);
+                // Immediately restore shift selections before loading new data
+                restoreModalShiftSelections(weekdays);
+                // After DOM is built, load shifts for modal dropdowns
+                console.log('Setting timeout to load shifts...');
+                setTimeout(() => { 
+                    console.log('Timeout executed, calling populateModalShiftDropdowns...');
+                    populateModalShiftDropdowns(); 
+                    attachModalShiftHandlers(); 
+                    
+                    // Store original values AFTER everything is loaded and restored
+                    originalWorkingTimeDetails = {
+                        startDate: startDate,
+                        endDate: endDate,
+                        weekdays: getCurrentWeekdaysState() // Get the actual current state
+                    };
+                    console.log('=== ORIGINAL VALUES SET ===');
+                    console.log('Original working time details:', originalWorkingTimeDetails);
+                    console.log('=== END ORIGINAL VALUES ===');
+                    
+                    // Initially disable save button
+                    updateWorkingTimeSaveButton();
+                }, 100); // Small delay to ensure DOM is ready
+                
+                // Setup calendars for the modal
+                setupModalCalendar(
+                    'modalStartDate', 
+                    'modalStartDateCalendarToggle', 
+                    'modalStartDateCalendarPopup', 
+                    'modalStartDate-month-picker', 
+                    'modalStartDate-year', 
+                    'modalStartDate-prev-year', 
+                    'modalStartDate-next-year'
+                );
+                setupModalCalendar(
+                    'modalEndDate', 
+                    'modalEndDateCalendarToggle', 
+                    'modalEndDateCalendarPopup', 
+                    'modalEndDate-month-picker', 
+                    'modalEndDate-year', 
+                    'modalEndDate-prev-year', 
+                    'modalEndDate-next-year'
+                );
+                
+                // Set up event listeners for change detection
+                document.getElementById('modalStartDate').addEventListener('input', updateWorkingTimeSaveButton);
+                document.getElementById('modalEndDate').addEventListener('input', updateWorkingTimeSaveButton);
+                
+                // Set up event listeners for checkboxes
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday-odd', 'saturday-even', 'sunday'];
+                days.forEach(day => {
+                    const checkbox = document.getElementById(`modal-${day}`);
+                    if (checkbox) {
+                        checkbox.addEventListener('change', updateWorkingTimeSaveButton);
+                    }
+                });
+            } else if (modalId === 'employeeAssignmentModal') {
+                const step3Data = JSON.parse(sessionStorage.getItem('scheduleStep3Data') || '{}');
+                const assignedEmployees = step3Data.assignedEmployees || [];
+                populateModalEmployees(assignedEmployees);
+                
+                // Store original values
+                originalEmployeeAssignment = {
+                    assignedEmployees: JSON.parse(JSON.stringify(assignedEmployees))
+                };
+                
+                // Initially disable save button
+                updateEmployeeAssignmentSaveButton();
+            }
+        }
+
+        // Restore shift selections in modal immediately after DOM creation
+        function restoreModalShiftSelections(weekdays) {
+            console.log('Manually restoring shift selections from weekdays:', weekdays);
+            const days = ['monday','tuesday','wednesday','thursday','friday','saturday-odd','saturday-even','sunday'];
+            days.forEach(day => {
+                const dayData = weekdays[day];
+                if (dayData?.selectedShift?.shiftName) {
+                    const btn = document.getElementById(`modal-${day}-shift`);
+                    const ddText = btn?.querySelector('.dropdown-text');
+                    if (btn && ddText) {
+                        console.log(`Manually restoring ${day} shift:`, dayData.selectedShift.shiftName);
+                        ddText.textContent = dayData.selectedShift.shiftName;
+                        ddText.classList.add('selected');
+                        ddText.dataset.shiftId = dayData.selectedShift.id || '';
+                        ddText.dataset.shiftName = dayData.selectedShift.shiftName;
+                        ddText.dataset.startTime = dayData.selectedShift.start_time || '';
+                        ddText.dataset.endTime = dayData.selectedShift.end_time || '';
+                    }
+                }
+            });
+        }
+
+        // Load available shifts for modal dropdowns (reuses the same API)
+        async function populateModalShiftDropdowns() {
+            try {
+                console.log('Loading shifts for modal dropdowns...');
+                const resp = await fetch('/api/get-available-shifts');
+                console.log('Response status:', resp.status);
+                if (!resp.ok) {
+                    console.log('HTTP error:', resp.status, resp.statusText);
+                    throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+                }
+                const data = await resp.json();
+                console.log('API response:', data);
+                if (!data.success) {
+                    console.log('API call failed:', data);
+                    throw new Error('API call failed');
+                }
+                const shifts = data.shifts || [];
+                console.log('Found shifts:', shifts);
+                
+                // Fallback test shifts if API fails or returns no shifts
+                if (shifts.length === 0) {
+                    console.log('No shifts from API, using fallback shifts');
+                    shifts.push(
+                        { id: 1, name: 'Morning Shift', start_time: '09:00', end_time: '17:00' },
+                        { id: 2, name: 'Evening Shift', start_time: '17:00', end_time: '01:00' },
+                        { id: 3, name: 'Night Shift', start_time: '22:00', end_time: '06:00' }
+                    );
+                }
+                
+                const days = ['monday','tuesday','wednesday','thursday','friday','saturday-odd','saturday-even','sunday'];
+                days.forEach(day => {
+                    const opts = document.getElementById(`modal-${day}-shift-options`);
+                    if (!opts) return;
+                    opts.innerHTML = '';
+                    shifts.forEach(shift => {
+                        const option = document.createElement('div');
+                        option.className = 'shift-dropdown-option';
+                        const shiftName = shift.name || '';
+                        option.textContent = shiftName;
+                        option.dataset.shiftId = shift.id;
+                        option.dataset.shiftName = shiftName;
+                        option.dataset.startTime = shift.start_time;
+                        option.dataset.endTime = shift.end_time;
+                        option.addEventListener('click', () => selectModalShift(day, shift));
+                        opts.appendChild(option);
+                    });
+                    // Restore previously selected
+                    const step2 = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+                    const chosen = step2.weekdays?.[day]?.selectedShift;
+                    console.log(`Restoring shift for ${day}:`, chosen);
+                    if (chosen) {
+                        const btn = document.getElementById(`modal-${day}-shift`);
+                        const ddText = btn?.querySelector('.dropdown-text');
+                        if (ddText && chosen.shiftName) {
+                            ddText.textContent = chosen.shiftName;
+                            ddText.classList.add('selected');
+                            ddText.dataset.shiftId = chosen.id || '';
+                            ddText.dataset.shiftName = chosen.shiftName;
+                            ddText.dataset.startTime = chosen.start_time || '';
+                            ddText.dataset.endTime = chosen.end_time || '';
+                            console.log(`Restored shift text for ${day}:`, chosen.shiftName);
+                        }
+                        // Try to find and select the option by shift name if ID doesn't match
+                        let selectedOption = opts.querySelector(`[data-shift-id="${chosen.id}"]`);
+                        if (!selectedOption && chosen.shiftName) {
+                            selectedOption = opts.querySelector(`[data-shift-name="${chosen.shiftName}"]`);
+                        }
+                        if (selectedOption) {
+                            selectedOption.classList.add('selected');
+                            console.log(`Marked option as selected for ${day}:`, selectedOption.textContent);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.log('Error loading shifts:', e);
+                // Use fallback test shifts
+                const shifts = [
+                    { id: 1, name: 'Morning Shift', start_time: '09:00', end_time: '17:00' },
+                    { id: 2, name: 'Evening Shift', start_time: '17:00', end_time: '01:00' },
+                    { id: 3, name: 'Night Shift', start_time: '22:00', end_time: '06:00' }
+                ];
+                console.log('Using fallback shifts:', shifts);
+                
+                const days = ['monday','tuesday','wednesday','thursday','friday','saturday-odd','saturday-even','sunday'];
+                days.forEach(day => {
+                    const opts = document.getElementById(`modal-${day}-shift-options`);
+                    if (!opts) return;
+                    opts.innerHTML = '';
+                    shifts.forEach(shift => {
+                        const option = document.createElement('div');
+                        option.className = 'shift-dropdown-option';
+                        const shiftName = shift.name || '';
+                        option.textContent = shiftName;
+                        option.dataset.shiftId = shift.id;
+                        option.dataset.shiftName = shiftName;
+                        option.dataset.startTime = shift.start_time;
+                        option.dataset.endTime = shift.end_time;
+                        option.addEventListener('click', () => selectModalShift(day, shift));
+                        opts.appendChild(option);
+                    });
+                    // Restore previously selected with fallback shifts
+                    const step2 = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+                    const chosen = step2.weekdays?.[day]?.selectedShift;
+                    if (chosen?.shiftName) {
+                        const btn = document.getElementById(`modal-${day}-shift`);
+                        const ddText = btn?.querySelector('.dropdown-text');
+                        if (ddText) {
+                            ddText.textContent = chosen.shiftName;
+                            ddText.classList.add('selected');
+                            ddText.dataset.shiftId = chosen.id || '';
+                            ddText.dataset.shiftName = chosen.shiftName;
+                            ddText.dataset.startTime = chosen.start_time || '';
+                            ddText.dataset.endTime = chosen.end_time || '';
+                        }
+                        // Also try to mark the corresponding option as selected in fallback shifts
+                        const opts = document.getElementById(`modal-${day}-shift-options`);
+                        if (opts) {
+                            let selectedOption = opts.querySelector(`[data-shift-name="${chosen.shiftName}"]`);
+                            if (selectedOption) {
+                                selectedOption.classList.add('selected');
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function attachModalShiftHandlers() {
+            const days = ['monday','tuesday','wednesday','thursday','friday','saturday-odd','saturday-even','sunday'];
+            days.forEach(day => {
+                const btn = document.getElementById(`modal-${day}-shift`);
+                const opts = document.getElementById(`modal-${day}-shift-options`);
+                if (!btn || !opts) return;
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    console.log(`Clicked shift dropdown for ${day}`);
+                    // close others
+                    document.querySelectorAll('#workingTimeModal .shift-dropdown-options').forEach(o => { if (o!==opts) o.style.display='none'; });
+                    const isOpen = opts.style.display === 'block';
+                    if (isOpen) { 
+                        btn.classList.remove('active'); 
+                        opts.style.display='none'; 
+                        console.log(`Closed dropdown for ${day}`);
+                    } else { 
+                        btn.classList.add('active'); 
+                        opts.style.display='block'; 
+                        console.log(`Opened dropdown for ${day}, options count:`, opts.children.length);
+                    }
+                });
+            });
+            // click outside to close
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#workingTimeModal .shift-dropdown-wrapper')) {
+                    document.querySelectorAll('#workingTimeModal .shift-dropdown-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#workingTimeModal .shift-dropdown-options').forEach(o => o.style.display='none');
+                }
+            });
+        }
+
+        function selectModalShift(day, shift) {
+            const btn = document.getElementById(`modal-${day}-shift`);
+            const ddText = btn?.querySelector('.dropdown-text');
+            const opts = document.getElementById(`modal-${day}-shift-options`);
+            if (ddText) {
+                const name = shift.name || '';
+                ddText.textContent = name;
+                ddText.classList.add('selected');
+                ddText.dataset.shiftId = shift.id;
+                ddText.dataset.shiftName = name;
+                ddText.dataset.startTime = shift.start_time;
+                ddText.dataset.endTime = shift.end_time;
+            }
+            if (opts) {
+                opts.querySelectorAll('.shift-dropdown-option').forEach(o => o.classList.remove('selected'));
+                const selectedOption = opts.querySelector(`[data-shift-id="${shift.id}"]`);
+                if (selectedOption) selectedOption.classList.add('selected');
+            }
+            // Update save button state (data will be saved only when save button is clicked)
+            updateWorkingTimeSaveButton();
+            
+            // close dropdown
+            if (btn && opts) { btn.classList.remove('active'); opts.style.display='none'; }
+        }
+
+        // Populate working days in modal with checkboxes like step 2
+        function populateModalWorkingDays(weekdays) {
+            console.log('populateModalWorkingDays called with:', weekdays);
+            const container = document.getElementById('modalWorkingDaysContainer');
+            console.log('Container found:', !!container);
+            container.innerHTML = '';
+            const list = document.createElement('div');
+            list.className = 'checkbox-list';
+            
+            const dayNames = {
+                'monday': 'Monday',
+                'tuesday': 'Tuesday', 
+                'wednesday': 'Wednesday',
+                'thursday': 'Thursday',
+                'friday': 'Friday',
+                'saturday-odd': 'Saturday (odd)',
+                'saturday-even': 'Saturday (even)',
+                'sunday': 'Sunday'
+            };
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday-odd', 'saturday-even', 'sunday'];
+            
+            days.forEach(day => {
+                const dayData = weekdays[day] || { checked: false, selectedShift: null };
+                console.log(`Day ${day} data:`, dayData);
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'checkbox-item';
+                if (dayData.checked) dayDiv.classList.add('checked');
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'checkbox-input';
+                checkbox.id = `modal-${day}`;
+                checkbox.checked = dayData.checked;
+                
+                const dayInfo = document.createElement('div');
+                dayInfo.className = 'day-info';
+                const dayName = document.createElement('div');
+                dayName.className = 'day-name';
+                dayName.textContent = dayNames[day];
+                dayInfo.appendChild(dayName);
+                
+                const shiftContainer = document.createElement('div');
+                shiftContainer.className = 'shift-selection';
+                const shiftText = dayData.selectedShift?.shiftName ? dayData.selectedShift.shiftName : 'Select shift';
+                console.log(`Setting shift text for ${day}:`, shiftText);
+                shiftContainer.innerHTML = `
+                    <div class="shift-dropdown-group">
+                        <div class="shift-dropdown-wrapper">
+                            <button type="button" class="shift-dropdown-btn" id="modal-${day}-shift" data-day="${day}">
+                                <span class="dropdown-text">${shiftText}</span>
+                                <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                            </button>
+                            <div class="shift-dropdown-options" id="modal-${day}-shift-options" style="display: none;">
+                                <div class="dropdown-option-loading">Loading shifts...</div>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                dayDiv.appendChild(checkbox);
+                dayDiv.appendChild(dayInfo);
+                dayDiv.appendChild(shiftContainer);
+                list.appendChild(dayDiv);
+
+                // Toggle styling when checkbox changes
+                checkbox.addEventListener('change', () => {
+                    dayDiv.classList.toggle('checked', checkbox.checked);
+                    // When unchecked, clear shift selection visually
+                    if (!checkbox.checked) {
+                        const btn = document.getElementById(`modal-${day}-shift`);
+                        const ddText = btn?.querySelector('.dropdown-text');
+                        const opts = document.getElementById(`modal-${day}-shift-options`);
+                        if (ddText) {
+                            ddText.textContent = 'Select shift';
+                            ddText.classList.remove('selected');
+                            ddText.removeAttribute('data-shift-id');
+                            ddText.removeAttribute('data-shift-name');
+                            ddText.removeAttribute('data-start-time');
+                            ddText.removeAttribute('data-end-time');
+                        }
+                        if (opts) {
+                            opts.querySelectorAll('.shift-dropdown-option').forEach(o=>o.classList.remove('selected'));
+                        }
+                    }
+                    
+                    // Update save button state (data will be saved only when save button is clicked)
+                    updateWorkingTimeSaveButton();
+                });
+            });
+
+            container.appendChild(list);
+        }
+
+        // Populate employees in modal
+        function populateModalEmployees(employees) {
+            const container = document.getElementById('modalEmployeesContainer');
+            container.innerHTML = '';
+            
+            if (employees.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; font-style: italic;">No employees assigned</p>';
+                return;
+            }
+            
+            employees.forEach(employee => {
+                const employeeDiv = document.createElement('div');
+                employeeDiv.className = 'form-group';
+                employeeDiv.innerHTML = `
+                    <input type="text" class="form-input" value="${employee.name || employee.email}" readonly>
+                `;
+                container.appendChild(employeeDiv);
+            });
+        }
+
+        // Debug function to check sessionStorage data
+        window.debugSessionStorage = function() {
+            console.log('=== DEBUG SESSION STORAGE ===');
+            const step2Data = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+            console.log('Step 2 Data:', step2Data);
+            if (step2Data.weekdays) {
+                Object.entries(step2Data.weekdays).forEach(([day, data]) => {
+                    if (data.checked && data.selectedShift) {
+                        console.log(`${day}:`, data.selectedShift);
+                    }
+                });
+            }
+            console.log('=== END DEBUG ===');
+        };
+
+        // Original values for change detection
+        let originalScheduleName = '';
+        let originalWorkingTimeDetails = {};
+        let originalEmployeeAssignment = {};
+
+        // Functions to check for changes and update save button states
+        function updateScheduleNameSaveButton() {
+            const currentValue = document.getElementById('modalScheduleName').value;
+            const hasChanges = currentValue !== originalScheduleName;
+            const saveButton = document.querySelector('#scheduleNameModal .modal-btn-primary');
+            saveButton.disabled = !hasChanges;
+            saveButton.style.opacity = hasChanges ? '1' : '0.5';
+            saveButton.style.cursor = hasChanges ? 'pointer' : 'not-allowed';
+        }
+
+        function updateWorkingTimeSaveButton() {
+            const currentValues = {
+                startDate: document.getElementById('modalStartDate').value,
+                endDate: document.getElementById('modalEndDate').value,
+                weekdays: getCurrentWeekdaysState()
+            };
+            
+            console.log('=== WORKING TIME SAVE BUTTON DEBUG ===');
+            console.log('Current values:', currentValues);
+            console.log('Original values:', originalWorkingTimeDetails);
+            console.log('Current JSON:', JSON.stringify(currentValues));
+            console.log('Original JSON:', JSON.stringify(originalWorkingTimeDetails));
+            
+            // Check if there are any checked days without shift selections
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday-odd', 'saturday-even', 'sunday'];
+            let hasIncompleteSelections = false;
+            
+            days.forEach(day => {
+                const dayData = currentValues.weekdays[day];
+                if (dayData.checked && !dayData.selectedShift) {
+                    hasIncompleteSelections = true;
+                    console.log(`Day ${day} is checked but has no shift selected`);
+                }
+            });
+            
+            const hasChanges = JSON.stringify(currentValues) !== JSON.stringify(originalWorkingTimeDetails);
+            const canSave = hasChanges && !hasIncompleteSelections;
+            
+            console.log('Has changes:', hasChanges);
+            console.log('Has incomplete selections:', hasIncompleteSelections);
+            console.log('Can save:', canSave);
+            
+            const saveButton = document.querySelector('#workingTimeModal .modal-btn-primary');
+            saveButton.disabled = !canSave;
+            saveButton.style.opacity = canSave ? '1' : '0.5';
+            saveButton.style.cursor = canSave ? 'pointer' : 'not-allowed';
+            console.log('Save button disabled:', saveButton.disabled);
+            console.log('=== END DEBUG ===');
+        }
+
+        function updateEmployeeAssignmentSaveButton() {
+            const currentValues = {
+                assignedEmployees: getCurrentEmployeeAssignmentState()
+            };
+            
+            const hasChanges = JSON.stringify(currentValues) !== JSON.stringify(originalEmployeeAssignment);
+            const saveButton = document.querySelector('#employeeAssignmentModal .modal-btn-primary');
+            saveButton.disabled = !hasChanges;
+            saveButton.style.opacity = hasChanges ? '1' : '0.5';
+            saveButton.style.cursor = hasChanges ? 'pointer' : 'not-allowed';
+        }
+
+        // Helper function to get current weekdays state
+        function getCurrentWeekdaysState() {
+            const weekdays = {};
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday-odd', 'saturday-even', 'sunday'];
+            
+            days.forEach(day => {
+                const checkbox = document.getElementById(`modal-${day}`);
+                const shiftBtn = document.getElementById(`modal-${day}-shift`);
+                const shiftText = shiftBtn?.querySelector('.dropdown-text');
+                
+                weekdays[day] = {
+                    checked: checkbox?.checked || false,
+                    selectedShift: shiftText?.classList.contains('selected') ? {
+                        id: shiftText.dataset.shiftId,
+                        shiftName: shiftText.dataset.shiftName,
+                        start_time: shiftText.dataset.startTime,
+                        end_time: shiftText.dataset.endTime
+                    } : null
+                };
+            });
+            
+            console.log('=== GET CURRENT WEEKDAYS STATE ===');
+            console.log('Current weekdays state:', weekdays);
+            console.log('=== END GET CURRENT WEEKDAYS STATE ===');
+            
+            return weekdays;
+        }
+
+        // Helper function to get current employee assignment state
+        function getCurrentEmployeeAssignmentState() {
+            // This would need to be implemented based on the employee assignment modal structure
+            // For now, returning empty array as placeholder
+            return [];
+        }
+
+        // Save functions
+        function saveScheduleName() {
+            const newName = document.getElementById('modalScheduleName').value.trim();
+            if (!newName) {
+                alert('Please enter a schedule name');
+                return;
+            }
+            
+            // Update session storage
+            const savedData = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
+            savedData.scheduleName = newName;
+            sessionStorage.setItem('scheduleFormData', JSON.stringify(savedData));
+            
+            // Update display
+            document.getElementById('reviewScheduleName').textContent = newName;
+            
+            // Update original value
+            originalScheduleName = newName;
+            
+            // Remove event listener
+            document.getElementById('modalScheduleName').removeEventListener('input', updateScheduleNameSaveButton);
+            
+            closeModal('scheduleNameModal');
+        }
+
+        function saveWorkingTimeDetails() {
+            // Save all the data to session storage
+            const startDate = document.getElementById('modalStartDate').value;
+            const endDate = document.getElementById('modalEndDate').value;
+            const weekdaysState = getCurrentWeekdaysState();
+            
+            // Update session storage with complete data
+            const step2Data = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+            step2Data.startDate = startDate;
+            step2Data.endDate = endDate;
+            step2Data.weekdays = weekdaysState;
+            sessionStorage.setItem('scheduleStep2Data', JSON.stringify(step2Data));
+            
+            // Update the main page display
+            updateMainPageDisplay();
+            
+            // Update original values
+            originalWorkingTimeDetails = {
+                startDate: startDate,
+                endDate: endDate,
+                weekdays: getCurrentWeekdaysState()
+            };
+            
+            // Remove event listeners
+            document.getElementById('modalStartDate').removeEventListener('input', updateWorkingTimeSaveButton);
+            document.getElementById('modalEndDate').removeEventListener('input', updateWorkingTimeSaveButton);
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday-odd', 'saturday-even', 'sunday'];
+            days.forEach(day => {
+                const checkbox = document.getElementById(`modal-${day}`);
+                if (checkbox) {
+                    checkbox.removeEventListener('change', updateWorkingTimeSaveButton);
+                }
+            });
+            
+            closeModal('workingTimeModal');
+        }
+
+        function saveEmployeeAssignment() {
+            // Get selected employees and save to session storage
+            const selectedEmployeeIds = Array.from(modalSelectedEmployees);
+            const selectedEmployeeData = modalEmployees.filter(emp => selectedEmployeeIds.includes(emp.id));
+            
+            // Save to step 3 data
+            const step3Data = JSON.parse(sessionStorage.getItem('scheduleStep3Data') || '{}');
+            step3Data.selected_employees = selectedEmployeeIds;
+            step3Data.employee_data = selectedEmployeeData;
+            sessionStorage.setItem('scheduleStep3Data', JSON.stringify(step3Data));
+            
+            // Update the main page display
+            updateEmployeeAssignmentDisplay(selectedEmployeeData);
+            
+            // Update original values
+            originalEmployeeAssignment = {
+                assignedEmployees: getCurrentEmployeeAssignmentState()
+            };
+            
+            closeModal('employeeAssignmentModal');
+        }
+
+        function updateEmployeeAssignmentDisplay(employees) {
+            const container = document.getElementById('reviewEmployeeAssignment');
+            if (container) {
+                if (employees && employees.length > 0) {
+                    container.textContent = `${employees.length} employee(s) assigned`;
+                } else {
+                    container.textContent = 'No employees assigned';
+                }
+            }
+        }
+
+        // Persist modal dates into step 2 session data
+        function updateStep2DataFromModal() {
+            const startVal = (document.getElementById('modalStartDate')?.value || '').trim();
+            const endVal = (document.getElementById('modalEndDate')?.value || '').trim();
+            const current = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+            const updated = { ...current, startDate: startVal, endDate: endVal };
+            sessionStorage.setItem('scheduleStep2Data', JSON.stringify(updated));
+        }
+
+        // Update main page display after save
+        function updateMainPageDisplay() {
+            const step2Data = JSON.parse(sessionStorage.getItem('scheduleStep2Data') || '{}');
+            
+            // Update date range display
+            const reviewDateRangeElement = document.getElementById('reviewDateRange');
+            if (reviewDateRangeElement) {
+                const startDate = step2Data.startDate || '';
+                const endDate = step2Data.endDate || '';
+                reviewDateRangeElement.textContent = (startDate && endDate) ? `${startDate} - ${endDate}` : '--';
+            }
+            
+            // Update working days display
+            updateWorkingDaysDisplay(step2Data);
+        }
+        
+        // Function to update working days display on main page
+        function updateWorkingDaysDisplay(step2Data) {
+            const workingDaysContainer = document.getElementById('workingDaysContainer');
+            if (workingDaysContainer && step2Data.weekdays) {
+                const dayNames = {
+                    'monday': 'Monday',
+                    'tuesday': 'Tuesday',
+                    'wednesday': 'Wednesday',
+                    'thursday': 'Thursday',
+                    'friday': 'Friday',
+                    'saturday-odd': 'Saturday (odd)',
+                    'saturday-even': 'Saturday (even)',
+                    'sunday': 'Sunday'
+                };
+                
+                // Clear existing content
+                workingDaysContainer.innerHTML = '';
+                
+                // Create boxes only for days that have shifts assigned
+                Object.entries(step2Data.weekdays).forEach(([day, dayData]) => {
+                    if (dayData.checked && dayData.selectedShift) {
+                        const dayBox = document.createElement('div');
+                        dayBox.className = 'working-day-box';
+                        
+                        const dayName = document.createElement('span');
+                        dayName.className = 'working-day-name';
+                        dayName.textContent = dayNames[day];
+                        
+                        const dayShift = document.createElement('span');
+                        dayShift.className = 'working-day-shift';
+                        dayShift.textContent = dayData.selectedShift.shiftName;
+                        
+                        dayBox.appendChild(dayName);
+                        dayBox.appendChild(dayShift);
+                        workingDaysContainer.appendChild(dayBox);
+                    }
+                });
+                
+                // If no working days have shifts assigned, show a message
+                if (workingDaysContainer.children.length === 0) {
+                    const noDaysMessage = document.createElement('div');
+                    noDaysMessage.className = 'working-day-box';
+                    noDaysMessage.innerHTML = '<span class="working-day-name">No shifts assigned</span><span class="working-day-shift no-shift">--</span>';
+                    workingDaysContainer.appendChild(noDaysMessage);
+                }
+            }
+        }
+
+        // Edit button functions
+        function editScheduleName() {
+            openModal('scheduleNameModal');
+        }
+
+        function editWorkingTimeDetails() {
+            openModal('workingTimeModal');
+        }
+
+        function editEmployeeAssignment() {
+            openEmployeeModal();
+        }
+
+        // Exact copy of step 3 function
+        function confirmEmployeeSelection() {
+            // Get selected employees and save to session storage
+            const selectedEmployeeIds = Array.from(modalSelectedEmployees);
+            const selectedEmployeeData = modalEmployees.filter(emp => selectedEmployeeIds.includes(emp.id));
+            
+            // Save to step 3 data
+            const step3Data = JSON.parse(sessionStorage.getItem('scheduleStep3Data') || '{}');
+            step3Data.selected_employees = selectedEmployeeIds;
+            step3Data.employee_data = selectedEmployeeData;
+            sessionStorage.setItem('scheduleStep3Data', JSON.stringify(step3Data));
+            
+            // Update the main page display
+            updateEmployeeAssignmentDisplay(selectedEmployeeData);
+            
+            closeEmployeeModal();
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeAssignmentModal').style.display = 'none';
+            modalSelectedEmployees.clear();
+        }
+
+        // Employee Modal Variables (from step 3)
+        let modalEmployees = [];
+        let modalSelectedEmployees = new Set();
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let totalPages = 0;
+
+        // Employee Modal Functions (from step 3)
+        function openEmployeeModal() {
+            // Load employees from API or use mock data
+            loadModalEmployees();
+            
+            // Reset selections
+            modalSelectedEmployees.clear();
+            
+            // Setup filter dropdowns
+            setupFilterDropdowns();
+            
+            document.getElementById('employeeAssignmentModal').style.display = 'flex';
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeAssignmentModal').style.display = 'none';
+            modalSelectedEmployees.clear();
+        }
+
+        function loadModalEmployees() {
+            // Mock employee data (in a real app, this would come from an API)
+            modalEmployees = [
+                { id: 1, name: 'Minh Le', company: 'Company Name', department: 'Department', division: 'Division' },
+                { id: 2, name: 'Phu Dang', company: 'Company Name', department: 'Department', division: 'Division' },
+                { id: 3, name: 'Tan Nguyen', company: 'Company Name', department: 'Department', division: 'Division' }
+            ];
+            
+            // Calculate pagination
+            totalPages = Math.ceil(modalEmployees.length / itemsPerPage);
+            currentPage = 1;
+            
+            // Display first page
+            displayModalEmployeePage();
+            setupModalPagination();
+        }
+
+        function displayModalEmployeePage() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageEmployees = modalEmployees.slice(startIndex, endIndex);
+            
+            const tbody = document.getElementById('modalEmployeeTableBody');
+            tbody.innerHTML = '';
+            
+            pageEmployees.forEach((employee, index) => {
+                const globalIndex = startIndex + index + 1;
+                const isSelected = modalSelectedEmployees.has(employee.id);
+                
+                const row = document.createElement('tr');
+                row.className = isSelected ? 'selected' : '';
+                row.dataset.employeeId = employee.id;
+                
+                row.innerHTML = `
+                    <td><input type="checkbox" class="employee-checkbox" data-employee-id="${employee.id}" ${isSelected ? 'checked' : ''}></td>
+                    <td>${globalIndex}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.company}</td>
+                    <td>${employee.department}</td>
+                    <td>${employee.division}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Add event listeners to checkboxes
+            const checkboxes = tbody.querySelectorAll('.employee-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const employeeId = parseInt(this.dataset.employeeId);
+                    toggleModalEmployeeSelection(employeeId, this.checked);
+                });
+            });
+            
+            // Update select all checkbox state
+            updateSelectAllCheckbox();
+            // Update pagination controls
+            updatePaginationControls();
+        }
+
+        function toggleModalEmployeeSelection(employeeId, isSelected) {
+            if (isSelected) {
+                modalSelectedEmployees.add(employeeId);
+            } else {
+                modalSelectedEmployees.delete(employeeId);
+            }
+            
+            // Update row appearance
+            const row = document.querySelector(`[data-employee-id="${employeeId}"]`);
+            if (row) {
+                row.classList.toggle('selected', isSelected);
+            }
+        }
+
+        function updateSelectAllCheckbox() {
+            const selectAllCheckbox = document.getElementById('selectAllEmployees');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageEmployees = modalEmployees.slice(startIndex, endIndex);
+            
+            const allSelected = pageEmployees.every(emp => modalSelectedEmployees.has(emp.id));
+            const someSelected = pageEmployees.some(emp => modalSelectedEmployees.has(emp.id));
+            
+            selectAllCheckbox.checked = allSelected;
+            selectAllCheckbox.indeterminate = someSelected && !allSelected;
+        }
+
+        function toggleSelectAllEmployees() {
+            const selectAllCheckbox = document.getElementById('selectAllEmployees');
+            const isChecked = selectAllCheckbox.checked;
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageEmployees = modalEmployees.slice(startIndex, endIndex);
+            
+            pageEmployees.forEach(employee => {
+                if (isChecked) {
+                    modalSelectedEmployees.add(employee.id);
+                } else {
+                    modalSelectedEmployees.delete(employee.id);
+                }
+            });
+            
+            // Refresh the page display
+            displayModalEmployeePage();
+        }
+
+        function setupModalPagination() {
+            // Update total records display
+            document.getElementById('totalRecords').textContent = modalEmployees.length;
+            
+            // Setup select all checkbox
+            const selectAllCheckbox = document.getElementById('selectAllEmployees');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
+            }
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            displayModalEmployeePage();
+            updatePaginationControls();
+        }
+
+        function updatePaginationControls() {
+            // Update pagination button states
+            document.getElementById('firstPage').disabled = currentPage === 1;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            document.getElementById('lastPage').disabled = currentPage === totalPages;
+            
+            // Update page numbers
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'pagination-btn' + (i === currentPage ? ' active' : '');
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage(i);
+                pageNumbersContainer.appendChild(pageBtn);
+            }
+        }
+
+        // Filter functions
+        function setupFilterDropdowns() {
+            // Department dropdown
+            const departmentBtn = document.getElementById('departmentDropdown');
+            const departmentMenu = document.getElementById('departmentDropdownMenu');
+            const departmentClose = document.getElementById('departmentDropdownClose');
+            
+            if (departmentBtn && departmentMenu) {
+                departmentBtn.addEventListener('click', () => {
+                    departmentMenu.classList.toggle('show');
+                });
+                
+                if (departmentClose) {
+                    departmentClose.addEventListener('click', () => {
+                        departmentMenu.classList.remove('show');
+                    });
+                }
+            }
+            
+            // Division dropdown
+            const divisionBtn = document.getElementById('divisionDropdown');
+            const divisionMenu = document.getElementById('divisionDropdownMenu');
+            const divisionClose = document.getElementById('divisionDropdownClose');
+            
+            if (divisionBtn && divisionMenu) {
+                divisionBtn.addEventListener('click', () => {
+                    divisionMenu.classList.toggle('show');
+                });
+                
+                if (divisionClose) {
+                    divisionClose.addEventListener('click', () => {
+                        divisionMenu.classList.remove('show');
+                    });
+                }
+            }
+            
+            // Search functionality
+            const searchInput = document.getElementById('employeeSearchInput');
+            const searchClear = document.getElementById('employeeSearchClearBtn');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    // Filter employees based on search
+                    filterEmployees();
+                });
+            }
+            
+            if (searchClear) {
+                searchClear.addEventListener('click', function() {
+                    searchInput.value = '';
+                    filterEmployees();
+                });
+            }
+        }
+
+        function filterEmployees() {
+            const searchTerm = document.getElementById('employeeSearchInput').value.toLowerCase();
+            const selectedDepartment = document.querySelector('input[name="department"]:checked')?.dataset.value || 'all';
+            const selectedDivision = document.querySelector('input[name="division"]:checked')?.dataset.value || 'all';
+            
+            // Reset to original data before filtering
+            loadModalEmployees();
+            
+            modalEmployees = modalEmployees.filter(employee => {
+                const matchesSearch = employee.name.toLowerCase().includes(searchTerm) || 
+                                    employee.company.toLowerCase().includes(searchTerm);
+                const matchesDepartment = selectedDepartment === 'all' || employee.department === selectedDepartment;
+                const matchesDivision = selectedDivision === 'all' || employee.division === selectedDivision;
+                
+                return matchesSearch && matchesDepartment && matchesDivision;
+            });
+            
+            // Recalculate pagination and display
+            totalPages = Math.ceil(modalEmployees.length / itemsPerPage);
+            currentPage = 1;
+            displayModalEmployeePage();
+            updatePaginationControls();
+        }
+
+        // Calendar functionality for modal (parity with step 2)
+        function setupModalCalendar(inputId, toggleId, popupId, monthPickerId, yearId, prevYearId, nextYearId) {
+            const dateInput = document.getElementById(inputId);
+            const calendarToggle = document.getElementById(toggleId);
+            const calendarPopup = document.getElementById(popupId);
+
+            if (dateInput && calendarToggle && calendarPopup) {
+                let calendar = calendarPopup.querySelector('.calendar');
+                let selectedDate = null;
+
+                const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+                const isLeapYear = (year) => {
+                    return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 === 0);
+                };
+
+                const getFebDays = (year) => {
+                    return isLeapYear(year) ? 29 : 28;
+                };
+
+                const generateCalendar = (month, year) => {
+                    let calendar_days = calendar.querySelector('.calendar-days');
+                    let calendar_header_year = calendar.querySelector(`#${yearId}`);
+
+                    let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+                    calendar_days.innerHTML = '';
+
+                    let currDate = new Date();
+                    if (!month && month !== 0) month = currDate.getMonth();
+                    if (!year) year = currDate.getFullYear();
+
+                    let curr_month = `${month_names[month]}`;
+                    let month_picker = calendar.querySelector(`#${monthPickerId}`);
+                    month_picker.innerHTML = curr_month;
+                    calendar_header_year.innerHTML = year;
+
+                    // get first day of month
+                    let first_day = new Date(year, month, 1);
+
+                    for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+                        let day = document.createElement('div');
+                        if (i >= first_day.getDay()) {
+                            day.innerHTML = i - first_day.getDay() + 1;
+                            day.innerHTML += `<span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>`;
+
+                            // Check if this is the selected date
+                            if (selectedDate && i - first_day.getDay() + 1 === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
+                                day.classList.add('selected-date');
+                            }
+
+                            // Add click handler for date selection
+                            day.addEventListener('click', function(e) {
+                                e.stopPropagation();
+
+                                // Remove selected class from all days in the current view
+                                calendar_days.querySelectorAll('div').forEach(div => div.classList.remove('selected-date'));
+
+                                // Add selected class to clicked day
+                                this.classList.add('selected-date');
+
+                                // Get the actual date
+                                const dayNum = parseInt(this.textContent);
+                                selectedDate = new Date(year, month, dayNum);
+
+                                // Format date for input (DD/MM/YYYY)
+                                const dd = String(selectedDate.getDate()).padStart(2, '0');
+                                const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                                const yyyy = selectedDate.getFullYear();
+                                dateInput.value = `${dd}/${mm}/${yyyy}`;
+
+                                // Close calendar immediately
+                                calendarPopup.style.display = 'none';
+
+                                // Persist to step 2 data and review
+                                try {
+                                    if (typeof updateStep2DataFromModal === 'function') updateStep2DataFromModal();
+                                } catch (_) {}
+                            });
+                        }
+                        calendar_days.appendChild(day);
+                    }
+                };
+
+                // Build month list overlay
+                let month_list = calendar.querySelector('.month-list');
+                month_names.forEach((e, index) => {
+                    let month = document.createElement('div');
+                    month.innerHTML = `<div data-month="${index}">${e}</div>`;
+                    month.querySelector('div').onclick = () => {
+                        month_list.classList.remove('show');
+                        curr_month.value = index;
+                        generateCalendar(index, curr_year.value);
+                    };
+                    month_list.appendChild(month);
+                });
+
+                let currDate = new Date();
+                // Preselect from input if value present
+                const val = (dateInput.value || '').trim();
+                if (val && /^(\d{2})\/(\d{2})\/(\d{4})$/.test(val)) {
+                    const [, dd, mm, yyyy] = val.match(/(\d{2})\/(\d{2})\/(\d{4})/) || [];
+                    const parsed = new Date(parseInt(yyyy, 10), parseInt(mm, 10) - 1, parseInt(dd, 10));
+                    if (!isNaN(parsed.getTime())) {
+                        selectedDate = parsed;
+                        currDate = parsed;
+                    }
+                }
+                let curr_month = { value: currDate.getMonth() };
+                let curr_year = { value: currDate.getFullYear() };
+
+                let month_picker = calendar.querySelector(`#${monthPickerId}`);
+                month_picker.onclick = () => { month_list.classList.add('show'); };
+
+                generateCalendar(curr_month.value, curr_year.value);
+
+                document.querySelector(`#${prevYearId}`).onclick = () => {
+                    --curr_year.value;
+                    generateCalendar(curr_month.value, curr_year.value);
+                };
+                document.querySelector(`#${nextYearId}`).onclick = () => {
+                    ++curr_year.value;
+                    generateCalendar(curr_month.value, curr_year.value);
+                };
+
+                // Toggle calendar popup (icon and input)
+                const openCalendar = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (calendarPopup.style.display === 'none' || calendarPopup.style.display === '') {
+                        document.querySelectorAll('#workingTimeModal .calendar-popup').forEach(p => p.style.display = 'none');
+                        calendarPopup.style.display = 'block';
+                        generateCalendar(curr_month.value, curr_year.value);
+                    } else {
+                        calendarPopup.style.display = 'none';
+                        month_list.classList.remove('show');
+                    }
+                };
+                calendarToggle.addEventListener('click', openCalendar);
+                dateInput.addEventListener('click', openCalendar);
+
+                // Close calendar when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!calendarPopup.contains(e.target) && !calendarToggle.contains(e.target) && !dateInput.contains(e.target)) {
+                        calendarPopup.style.display = 'none';
+                        month_list.classList.remove('show');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

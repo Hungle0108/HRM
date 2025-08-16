@@ -417,31 +417,31 @@
 
             <div class="shift-card-row">
                 <span class="shift-card-row-label">
-                    Start Time<br>
-                    Check-in
+                    Start Time
+                    {% if shift.check_in_enabled and (shift.check_in_start_time or shift.check_in_end_time) %}<br>Check-in{% endif %}
                 </span>
                 <span class="shift-card-row-value">
-                    {{ shift.start_time }}<br>
-                    {{ shift.check_in_start_time or 'Not set' }} - {{ shift.check_in_end_time or 'Not set' }}
+                    {{ shift.start_time }}
+                    {% if shift.check_in_enabled and (shift.check_in_start_time or shift.check_in_end_time) %}
+                        <br>{{ shift.check_in_start_time or 'Not set' }} - {{ shift.check_in_end_time or 'Not set' }}
+                    {% endif %}
                 </span>
             </div>
 
             <div class="shift-card-row">
                 <span class="shift-card-row-label">
-                    End Time<br>
-                    Check-out
+                    End Time
+                    {% if shift.check_out_enabled and (shift.check_out_start_time or shift.check_out_end_time) %}<br>Check-out{% endif %}
                 </span>
                 <span class="shift-card-row-value">
-                    {{ shift.end_time }}<br>
-                    {% if shift.check_out_enabled %}
-                        {{ shift.check_out_start_time or 'Not set' }} - {{ shift.check_out_end_time or 'Not set' }}
-                    {% else %}
-                        Not enabled
+                    {{ shift.end_time }}
+                    {% if shift.check_out_enabled and (shift.check_out_start_time or shift.check_out_end_time) %}
+                        <br>{{ shift.check_out_start_time or 'Not set' }} - {{ shift.check_out_end_time or 'Not set' }}
                     {% endif %}
                 </span>
             </div>
 
-            {% if shift.break_enabled %}
+            {% if shift.break_enabled and (shift.break_start_time or shift.break_end_time) %}
             <div class="shift-card-row">
                 <span class="shift-card-row-label">Break Time</span>
                 <span class="shift-card-row-value">

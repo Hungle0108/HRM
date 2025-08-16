@@ -293,67 +293,72 @@ class StructureItem(db.Model):
 class WorkSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
-    schedule_type = db.Column(db.String(50), nullable=False)  # 'fixed' or 'flexible'
+
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_default = db.Column(db.Boolean, default=False)  # NEW: True for default templates
     # JSON field to store the complete schedule data
     schedule_data = db.Column(db.Text, nullable=False)
+    # NEW columns for quick access and reporting
+    start_date = db.Column(db.String(10))  # YYYY-MM-DD
+    end_date = db.Column(db.String(10))    # YYYY-MM-DD
+    weekdays_shifts = db.Column(db.Text)   # JSON of weekdays + selectedShift
+    employee_ids = db.Column(db.Text)      # JSON array of employee IDs
     
     organization = db.relationship('Organization', backref='schedules')
     creator = db.relationship('User', foreign_keys=[created_by], backref='created_schedules')
     
     def to_dict(self):
-        import json
-        schedule_data = json.loads(self.schedule_data)
+        try:
+            import json
+            schedule_data = json.loads(self.schedule_data) if self.schedule_data else {}
+        except Exception:
+            schedule_data = {}
         
         # Calculate total hours from the schedule data
         total_hours = 0
         working_days = []
         
-        if 'scheduleDetails' in schedule_data and 'shifts' in schedule_data['scheduleDetails']:
-            shifts = schedule_data['scheduleDetails']['shifts']
-            
-            for shift_num, shift_data in shifts.items():
-                if 'weekdays' in shift_data:
-                    for day_key, day_data in shift_data['weekdays'].items():
-                        if day_data.get('checked'):
-                            # Map day keys to proper abbreviations
-                            day_mapping = {
-                                'monday': 'Mon', 'tuesday': 'Tue', 'wednesday': 'Wed', 'thursday': 'Thu',
-                                'friday': 'Fri', 'saturday': 'Sat', 'sunday': 'Sun'
-                            }
-                            working_days.append(day_mapping.get(day_key.lower(), day_key.capitalize()[:3]))
-                            
-                            if shift_data.get('includeTime') and day_data.get('startTime') and day_data.get('endTime'):
-                                # Calculate hours from time range
-                                start_time = day_data['startTime']
-                                end_time = day_data['endTime']
-                                start_hour, start_min = map(int, start_time.split(':'))
-                                end_hour, end_min = map(int, end_time.split(':'))
+        try:
+            if 'scheduleDetails' in schedule_data and 'shifts' in schedule_data['scheduleDetails']:
+                shifts = schedule_data['scheduleDetails']['shifts']
+                
+                for shift_num, shift_data in shifts.items():
+                    if 'weekdays' in shift_data:
+                        for day_key, day_data in shift_data['weekdays'].items():
+                            if day_data.get('checked'):
+                                # Map day keys to proper abbreviations
+                                day_mapping = {
+                                    'monday': 'Mon', 'tuesday': 'Tue', 'wednesday': 'Wed', 'thursday': 'Thu',
+                                    'friday': 'Fri', 'saturday': 'Sat', 'sunday': 'Sun'
+                                }
+                                working_days.append(day_mapping.get(day_key.lower(), day_key.capitalize()[:3]))
                                 
-                                start_minutes = start_hour * 60 + start_min
-                                end_minutes = end_hour * 60 + end_min
-                                
-                                if end_minutes > start_minutes:
-                                    day_hours = (end_minutes - start_minutes) / 60
-                                    total_hours += day_hours
-                            elif day_data.get('duration'):
-                                # Add duration-based hours
-                                try:
-                                    total_hours += float(day_data['duration'])
-                                except (ValueError, TypeError):
-                                    pass
+                                if shift_data.get('includeTime') and day_data.get('startTime') and day_data.get('endTime'):
+                                    # Calculate hours from time range
+                                    start_time = day_data['startTime']
+                                    end_time = day_data['endTime']
+                                    start_hour, start_min = map(int, start_time.split(':'))
+                                    end_hour, end_min = map(int, end_time.split(':'))
+                                    
+                                    start_minutes = start_hour * 60 + start_min
+                                    end_minutes = end_hour * 60 + end_min
+                                    
+                                    if end_minutes > start_minutes:
+                                        day_hours = (end_minutes - start_minutes) / 60
+                                        total_hours += day_hours
+                                elif day_data.get('duration'):
+                                    # Add duration-based hours
+                                    try:
+                                        total_hours += float(day_data['duration'])
+                                    except (ValueError, TypeError):
+                                        pass
+        except Exception:
+            pass
         
         # Remove duplicates and sort working days
         working_days = sorted(list(set(working_days)))
-        
-        # Convert to standardized day format (Mon, Tue, Wed, etc.)
-        day_mapping = {
-            'Mon': 'Mon', 'Tue': 'Tue', 'Wed': 'Wed', 'Thu': 'Thu', 
-            'Fri': 'Fri', 'Sat': 'Sat', 'Sun': 'Sun'
-        }
         
         # Sort days in proper order (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
         day_order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -364,17 +369,22 @@ class WorkSchedule(db.Model):
         
         working_days_str = ', '.join(sorted_working_days) if sorted_working_days else ''
         
-        return {
+        result = {
             'id': self.id,
             'name': self.name,
-            'schedule_type': self.schedule_type,
             'organization_id': self.organization_id,
             'created_by': self.created_by,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'total_hours': int(total_hours) if total_hours.is_integer() else total_hours,
             'working_days': working_days_str,
-            'schedule_data': schedule_data
+            'schedule_data': schedule_data,
+            'start_date': self.start_date,
+            'end_date': self.end_date
         }
+
+        return result
+
+
 
 # Worker Type Model
 class WorkerType(db.Model):
@@ -2145,6 +2155,44 @@ def create_schedule_step2():
     
     return render_template('create_schedule_step2.html', user=user)
 
+@app.route('/api/save-schedule-step2', methods=['POST'])
+def api_save_schedule_step2():
+    """Save schedule step 2 data to session"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        # Check if request has JSON content
+        if not request.is_json:
+            logger.error("Request is not JSON")
+            return jsonify({'error': 'Request must be JSON'}), 400
+        
+        # Get JSON data with error handling
+        try:
+            schedule_data = request.get_json()
+        except Exception as json_error:
+            logger.error(f"JSON parsing error: {str(json_error)}")
+            return jsonify({'error': 'Invalid JSON data'}), 400
+        
+        if schedule_data is None:
+            logger.error("No JSON data received")
+            return jsonify({'error': 'No data received'}), 400
+        
+        logger.info(f"Received schedule data: {schedule_data}")
+        
+        # Store the schedule data in session for step 3
+        session['schedule_step2_data'] = schedule_data
+        
+        return jsonify({
+            'success': True,
+            'message': 'Schedule data saved successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error saving schedule step 2 data: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': 'Failed to save schedule data'}), 500
+
 @app.route('/create-schedule-step3')
 def create_schedule_step3():
     if 'user_id' not in session:
@@ -2152,9 +2200,111 @@ def create_schedule_step3():
     
     user = User.query.get(session['user_id'])
     if not user:
+        session.pop('user_id', None)
         return redirect('/login')
     
     return render_template('create_schedule_step3.html', user=user)
+
+@app.route('/api/save-schedule-assignment', methods=['POST'])
+def api_save_schedule_assignment():
+    """Save schedule assignment data to session"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        assignment_data = request.json
+        
+        # Store the assignment data in session for step 4
+        session['schedule_assignment_data'] = assignment_data
+        
+        return jsonify({
+            'success': True,
+            'message': 'Assignment data saved successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error saving schedule assignment data: {str(e)}")
+        return jsonify({'error': 'Failed to save assignment data'}), 500
+
+@app.route('/api/debug-shifts')
+def api_debug_shifts():
+    """Debug endpoint to check shifts in database"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get all shifts (not filtered by organization or active status)
+        all_shifts = Shift.query.all()
+        
+        # Get shifts for this organization
+        org_shifts = Shift.query.filter_by(organization_id=user.organization_id).all()
+        
+        # Get active shifts for this organization
+        active_shifts = Shift.query.filter_by(
+            organization_id=user.organization_id,
+            is_active=True
+        ).all()
+        
+        return jsonify({
+            'success': True,
+            'user_id': user.id,
+            'organization_id': user.organization_id,
+            'total_shifts': len(all_shifts),
+            'org_shifts': len(org_shifts),
+            'active_shifts': len(active_shifts),
+            'all_shifts': [{'id': s.id, 'name': s.name, 'org_id': s.organization_id, 'active': s.is_active} for s in all_shifts[:10]],  # First 10
+            'org_shifts_detail': [{'id': s.id, 'name': s.name, 'active': s.is_active} for s in org_shifts]
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in debug shifts: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get-employees')
+def api_get_employees():
+    """Get employees for assignment"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        user = User.query.get(session['user_id'])
+        if not user or not user.organization_id:
+            return jsonify({'error': 'User not found or no organization'}), 404
+        
+        # Get all employees in the organization
+        employees = User.query.filter_by(organization_id=user.organization_id).all()
+        
+        employee_list = []
+        for employee in employees:
+            employee_list.append({
+                'id': employee.id,
+                'name': f"{employee.first_name} {employee.last_name}".strip(),
+                'email': employee.email
+            })
+        
+        return jsonify({
+            'success': True,
+            'employees': employee_list
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching employees: {str(e)}")
+        return jsonify({'error': 'Failed to fetch employees'}), 500
+
+@app.route('/create-schedule-step4')
+def create_schedule_step4():
+    if 'user_id' not in session:
+        return redirect('/login')
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect('/login')
+    
+    return render_template('create_schedule_step4.html', user=user)
 
 @app.route('/shifts')
 def shifts():
@@ -2293,7 +2443,10 @@ def create_shift_step3():
 
 @app.route('/api/create-schedule', methods=['POST'])
 def api_create_schedule():
+    logger.info(f"Session keys: {list(session.keys())}")
+    logger.info(f"Session user_id: {session.get('user_id')}")
     if 'user_id' not in session:
+        logger.warning("No user_id in session - unauthorized request")
         return jsonify({'error': 'Unauthorized'}), 401
     
     user = User.query.get(session['user_id'])
@@ -2305,40 +2458,72 @@ def api_create_schedule():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
-        # Extract schedule name and type
-        schedule_details = data.get('scheduleDetails', {})
-        schedule_name = data.get('scheduleName', 'Untitled Schedule')
-        
-        # Determine schedule type based on whether any shift includes time
-        schedule_type = 'flexible'  # default
-        shifts = schedule_details.get('shifts', {})
-        for shift_data in shifts.values():
-            if shift_data.get('includeTime'):
-                schedule_type = 'fixed'
-                break
-        
-        # Create new schedule
+        # Handle both legacy format and new step-based format
+        if 'step1' in data and 'step2' in data and 'step3' in data:
+            # New step-based format from create-schedule-step4
+            step1_data = data.get('step1', {})
+            step2_data = data.get('step2', {})
+            step3_data = data.get('step3', {})
+            
+            logger.info(f"Step1 data: {step1_data}")
+            logger.info(f"Step2 data: {step2_data}")
+            logger.info(f"Step3 data: {step3_data}")
+            
+            schedule_name = step1_data.get('scheduleName', 'Untitled Schedule')
+
+            start_date = step2_data.get('startDate')
+            end_date = step2_data.get('endDate')
+            weekdays = step2_data.get('weekdays')
+            employee_ids = step3_data.get('selected_employees') or step3_data.get('assignedEmployees')
+            
+            logger.info(f"Extracted employee_ids: {employee_ids}")
+        else:
+            # Legacy format (backward compatibility)
+            schedule_details = data.get('scheduleDetails', {})
+            schedule_name = data.get('scheduleName', 'Untitled Schedule')
+            
+            start_date = data.get('startDate') or data.get('scheduleStep2Data', {}).get('startDate')
+            end_date = data.get('endDate') or data.get('scheduleStep2Data', {}).get('endDate')
+            weekdays = data.get('weekdays') or data.get('scheduleStep2Data', {}).get('weekdays')
+            employee_ids = data.get('selected_employees') or data.get('scheduleStep3Data', {}).get('selected_employees')
+
+        # Create schedule
         new_schedule = WorkSchedule(
             name=schedule_name,
-            schedule_type=schedule_type,
             organization_id=user.organization_id,
             created_by=user.id,
-            schedule_data=json.dumps(data)
+            schedule_data=json.dumps(data),
+            start_date=start_date,
+            end_date=end_date,
+            weekdays_shifts=json.dumps(weekdays) if weekdays else None,
+            employee_ids=json.dumps(employee_ids) if employee_ids else None
         )
         
         db.session.add(new_schedule)
+        db.session.flush()  # Flush to get the ID without committing
+        
+        schedule_id = new_schedule.id
         db.session.commit()
         
         return jsonify({
             'success': True,
             'message': 'Schedule created successfully',
-            'schedule_id': new_schedule.id
+            'schedule_id': schedule_id
         })
         
     except Exception as e:
         db.session.rollback()
+        import traceback
+        error_details = traceback.format_exc()
         logger.error(f"Error creating schedule: {str(e)}")
-        return jsonify({'error': 'Failed to create schedule'}), 500
+        logger.error(f"Full traceback: {error_details}")
+        logger.error(f"Request data: {data}")
+        return jsonify({
+            'error': 'Failed to create schedule',
+            'details': str(e) if app.config.get('DEBUG') else 'Server error'
+        }), 500
+
+
 
 @app.route('/api/delete-schedule/<int:schedule_id>', methods=['DELETE'])
 def api_delete_schedule(schedule_id):
@@ -2377,6 +2562,95 @@ def api_delete_schedule(schedule_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to delete schedule'}), 500
+
+@app.route('/api/delete-shift/<int:shift_id>', methods=['DELETE'])
+def api_delete_shift(shift_id):
+    """API endpoint to delete an individual shift"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+
+    try:
+        # Find the shift
+        shift = Shift.query.filter_by(
+            id=shift_id,
+            organization_id=user.organization_id
+        ).first()
+
+        if not shift:
+            return jsonify({'error': 'Shift not found'}), 404
+
+        # Optional: Check if shift is being used by any employees
+        # For now, we'll allow deletion regardless
+
+        db.session.delete(shift)
+        db.session.commit()
+
+        return jsonify({
+            'success': True, 
+            'message': 'Shift deleted successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete shift'}), 500
+
+@app.route('/api/cleanup-shifts-data', methods=['POST'])
+def api_cleanup_shifts_data():
+    """Cleanup shifts data to fix empty string values that should be None"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+
+    try:
+        # Find all shifts in the organization
+        shifts = Shift.query.filter_by(organization_id=user.organization_id).all()
+        
+        updated_count = 0
+        for shift in shifts:
+            updated = False
+            
+            # Clean up check-in times
+            if shift.check_in_start_time == '':
+                shift.check_in_start_time = None
+                updated = True
+            if shift.check_in_end_time == '':
+                shift.check_in_end_time = None
+                updated = True
+                
+            # Clean up check-out times
+            if shift.check_out_start_time == '':
+                shift.check_out_start_time = None
+                updated = True
+            if shift.check_out_end_time == '':
+                shift.check_out_end_time = None
+                updated = True
+                
+            # Clean up break times
+            if shift.break_start_time == '':
+                shift.break_start_time = None
+                updated = True
+            if shift.break_end_time == '':
+                shift.break_end_time = None
+                updated = True
+                
+            if updated:
+                updated_count += 1
+
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Cleaned up {updated_count} shifts with empty time values'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to cleanup shifts: {str(e)}'}), 500
 
 @app.route('/api/create-shift-step3', methods=['POST'])
 def api_create_shift_step3():
@@ -2472,18 +2746,18 @@ def api_create_shift_step3():
             
             # Check-in settings
             check_in_enabled=coerce_bool(get_first('checkInToggle', 'checkIn')),
-            check_in_start_time=step1_data.get('checkInStartTime', ''),
-            check_in_end_time=step1_data.get('checkInEndTime', ''),
+            check_in_start_time=step1_data.get('checkInStartTime') or None,
+            check_in_end_time=step1_data.get('checkInEndTime') or None,
             
             # Check-out settings
             check_out_enabled=coerce_bool(get_first('checkOutToggle', 'checkOut')),
-            check_out_start_time=step1_data.get('checkOutStartTime', ''),
-            check_out_end_time=step1_data.get('checkOutEndTime', ''),
+            check_out_start_time=step1_data.get('checkOutStartTime') or None,
+            check_out_end_time=step1_data.get('checkOutEndTime') or None,
             
             # Break settings
             break_enabled=coerce_bool(get_first('breakToggle', 'break')),
-            break_start_time=step1_data.get('breakStartTime', ''),
-            break_end_time=step1_data.get('breakEndTime', ''),
+            break_start_time=step1_data.get('breakStartTime') or None,
+            break_end_time=step1_data.get('breakEndTime') or None,
             
             # Time tracking settings
             time_submission_method=time_submission_method,
@@ -2525,6 +2799,112 @@ def api_create_shift_step3():
         logger.error(f"Error creating shift: {str(e)}")
         db.session.rollback()
         return jsonify({'error': 'Failed to create shift'}), 500
+
+
+# Duplicate check for shift name and shift id (Step 1 validation)
+@app.route('/api/get-available-shifts', methods=['GET'])
+def api_get_available_shifts():
+    """Get all available shifts from the database for dropdown selection"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User not found or no organization'}), 400
+    
+    try:
+        logger.info(f"Fetching shifts for organization_id: {user.organization_id}")
+        
+        # Get all active shifts from the organization
+        shifts = Shift.query.filter_by(
+            organization_id=user.organization_id,
+            is_active=True
+        ).order_by(Shift.name).all()
+        
+        logger.info(f"Found {len(shifts)} shifts")
+        
+        shift_options = []
+        for shift in shifts:
+            shift_options.append({
+                'id': shift.id,
+                'name': shift.name,
+                'shift_id': shift.shift_id,
+                'start_time': shift.start_time,
+                'end_time': shift.end_time,
+                'display_text': f"{shift.name} ({shift.start_time} - {shift.end_time})"
+            })
+        
+        logger.info(f"Returning shift options: {shift_options}")
+        
+        return jsonify({
+            'success': True,
+            'shifts': shift_options
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching available shifts: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({'error': 'Failed to fetch shifts'}), 500
+
+@app.route('/api/check-shift-duplicates', methods=['POST'])
+def api_check_shift_duplicates():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    user = User.query.get(session['user_id'])
+    if not user or not user.organization_id:
+        return jsonify({'error': 'User organization not found'}), 400
+
+    try:
+        data = request.get_json(silent=True) or {}
+        input_name = (data.get('name') or '').strip()
+        input_shift_id = (data.get('shiftId') or '').strip()
+
+        name_duplicate = False
+        id_duplicate = False
+
+        # Check duplicates in new Shift model (active only)
+        if input_name:
+            existing_name = (
+                Shift.query.filter_by(organization_id=user.organization_id, is_active=True)
+                .filter(db.func.lower(Shift.name) == input_name.lower())
+                .first()
+            )
+            name_duplicate = existing_name is not None
+
+        if input_shift_id:
+            existing_id = (
+                Shift.query.filter_by(organization_id=user.organization_id, is_active=True, shift_id=input_shift_id)
+                .first()
+            )
+            id_duplicate = existing_id is not None
+
+        # Also check legacy schedule-based shifts for NAME duplicates only
+        if input_name and not name_duplicate:
+            schedules = WorkSchedule.query.filter_by(organization_id=user.organization_id).all()
+            for sched in schedules:
+                try:
+                    sd = json.loads(sched.schedule_data or '{}')
+                    shifts = (sd.get('scheduleDetails') or {}).get('shifts') or {}
+                    for _sid, sdata in shifts.items():
+                        sname = (sdata.get('name') or '').strip()
+                        if sname and sname.lower() == input_name.lower():
+                            name_duplicate = True
+                            break
+                    if name_duplicate:
+                        break
+                except Exception:
+                    # Ignore malformed legacy data
+                    pass
+
+        return jsonify({
+            'success': True,
+            'nameDuplicate': bool(name_duplicate),
+            'idDuplicate': bool(id_duplicate)
+        })
+    except Exception as e:
+        logger.error(f"Error checking shift duplicates: {str(e)}")
+        return jsonify({'error': 'Failed to check duplicates'}), 500
 
 @app.route('/api/create-shift', methods=['POST'])
 def api_create_shift():
@@ -2584,7 +2964,7 @@ def api_create_shift():
         # For now, we'll store this as a simple schedule with one shift
         # In a real implementation, you might want a separate Shift model
         schedule_name = f"Schedule - {shift_name}"
-        schedule_type = 'fixed' if include_time else 'flexible'
+
         
         # Create schedule data structure
         schedule_data = {
@@ -2608,7 +2988,7 @@ def api_create_shift():
         # Create new schedule
         new_schedule = WorkSchedule(
             name=schedule_name,
-            schedule_type=schedule_type,
+
             organization_id=user.organization_id,
             created_by=user.id,
             schedule_data=json.dumps(schedule_data)
@@ -2741,14 +3121,7 @@ def api_edit_schedule():
         # Update fields
         schedule_details = data.get('scheduleDetails', {})
         schedule.name = data.get('scheduleName', schedule.name)
-        # Determine schedule type
-        schedule_type = 'flexible'
-        shifts = schedule_details.get('shifts', {})
-        for shift_data in shifts.values():
-            if shift_data.get('includeTime'):
-                schedule_type = 'fixed'
-                break
-        schedule.schedule_type = schedule_type
+
         schedule.schedule_data = json.dumps(data)
         logger.debug(f'Updated schedule (before commit): {schedule.to_dict()}')
         db.session.commit()
@@ -3575,7 +3948,7 @@ def assign_workers():
         schedules_list.append({
             'id': schedule.id,
             'name': schedule.name,
-            'schedule_type': schedule.schedule_type,
+
             'is_default': schedule.is_default
         })
     
@@ -3749,6 +4122,118 @@ def edit_shift(shift_id):
             parsed_penalty_rules = []
     
     return render_template('edit_shift.html', shift=shift, penalty_rules=parsed_penalty_rules, user=user)
+
+@app.route('/api/update-shift-details/<int:shift_id>', methods=['POST'])
+def update_shift_details(shift_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        data = request.get_json()
+        
+        # Find the shift
+        shift = Shift.query.get(shift_id)
+        if not shift:
+            return jsonify({'success': False, 'message': 'Shift not found'}), 404
+        
+        # Check if user owns this shift
+        if shift.created_by != session['user_id']:
+            return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+        
+        # Update shift details
+        shift.name = data.get('name')
+        shift.shift_id = data.get('shift_id')
+        shift.start_time = data.get('start_time')
+        shift.end_time = data.get('end_time')
+        shift.check_in_enabled = data.get('check_in_enabled', False)
+        shift.check_out_enabled = data.get('check_out_enabled', False)
+        shift.break_enabled = data.get('break_enabled', False)
+        shift.check_in_start_time = data.get('check_in_start_time') if data.get('check_in_enabled') else None
+        shift.check_in_end_time = data.get('check_in_end_time') if data.get('check_in_enabled') else None
+        shift.check_out_start_time = data.get('check_out_start_time') if data.get('check_out_enabled') else None
+        shift.check_out_end_time = data.get('check_out_end_time') if data.get('check_out_enabled') else None
+        shift.break_start_time = data.get('break_start_time') if data.get('break_enabled') else None
+        shift.break_end_time = data.get('break_end_time') if data.get('break_enabled') else None
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Shift details updated successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/update-time-tracking/<int:shift_id>', methods=['POST'])
+def update_time_tracking(shift_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    try:
+        data = request.get_json()
+        
+        # Find the shift
+        shift = Shift.query.get(shift_id)
+        if not shift:
+            return jsonify({'success': False, 'message': 'Shift not found'}), 404
+        
+        # Check if user owns this shift
+        if shift.created_by != session['user_id']:
+            return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+        
+        # Update time tracking settings
+        shift.time_submission_method = data.get('time_submission_method')
+        shift.hours_worked = data.get('hours_worked')
+        shift.days_worked = data.get('days_worked')
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Time tracking updated successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/update-penalty-settings/<int:shift_id>', methods=['POST'])
+def update_penalty_settings(shift_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    try:
+        data = request.get_json() or {}
+
+        # Find the shift
+        shift = Shift.query.get(shift_id)
+        if not shift:
+            return jsonify({'success': False, 'message': 'Shift not found'}), 404
+
+        # Authorize: any user in the same organization can update
+        user = User.query.get(session['user_id'])
+        if not user or user.organization_id != shift.organization_id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+
+        # Update penalty settings (coerce numeric fields safely)
+        shift.late_early_penalty_enabled = bool(data.get('late_early_penalty_enabled', False))
+        shift.no_entry_penalty_enabled = bool(data.get('no_entry_penalty_enabled', False))
+        shift.no_exit_penalty_enabled = bool(data.get('no_exit_penalty_enabled', False))
+
+        def to_float(value, default=0.0):
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        shift.no_entry_hours_deducted = to_float(data.get('no_entry_hours_deducted'), 0.0)
+        shift.no_entry_days_deducted = to_float(data.get('no_entry_days_deducted'), 0.0)
+        shift.no_exit_hours_deducted = to_float(data.get('no_exit_hours_deducted'), 0.0)
+        shift.no_exit_days_deducted = to_float(data.get('no_exit_days_deducted'), 0.0)
+
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Penalty settings updated successfully'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/update-shift/<int:shift_id>', methods=['POST'])
 def update_shift(shift_id):

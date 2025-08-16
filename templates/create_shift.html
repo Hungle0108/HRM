@@ -245,6 +245,19 @@
             transition: all 0.2s;
         }
 
+        /* Generic error style for inputs */
+        .form-input.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .field-warning {
+            margin-top: 6px;
+            color: #dc3545;
+            font-size: 0.85rem;
+            display: none;
+        }
+
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: #80bdff;
@@ -923,12 +936,14 @@
                          <div class="form-row">
                              <div class="form-group full-width">
                                  <input type="text" id="shiftName" name="shiftName" class="form-input" placeholder="Shift name *" required>
+                                 <div id="shiftNameWarning" class="field-warning">A shift with this name already exists.</div>
                              </div>
                          </div>
                          
                          <div class="form-row">
                              <div class="form-group full-width">
                                  <input type="text" id="shiftId" name="shiftId" class="form-input" placeholder="Shift ID *" required>
+                                 <div id="shiftIdWarning" class="field-warning">This shift ID is already in use.</div>
                              </div>
                          </div>
                      </div>
@@ -1106,6 +1121,70 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('createShiftForm');
             const notification = document.getElementById('formValidationNotification');
+            const shiftNameEl = document.getElementById('shiftName');
+            const shiftIdEl = document.getElementById('shiftId');
+            const shiftNameWarning = document.getElementById('shiftNameWarning');
+            const shiftIdWarning = document.getElementById('shiftIdWarning');
+
+            let duplicateState = { name: false, id: false };
+            let dupCheckTimer = null;
+
+            function setFieldWarning(el, warningEl, on) {
+                if (!el || !warningEl) return;
+                if (on) {
+                    el.classList.add('error');
+                    warningEl.style.display = 'block';
+                } else {
+                    el.classList.remove('error');
+                    warningEl.style.display = 'none';
+                }
+            }
+
+            async function checkDuplicatesDebounced() {
+                if (dupCheckTimer) clearTimeout(dupCheckTimer);
+                dupCheckTimer = setTimeout(checkDuplicatesNow, 350);
+            }
+
+            async function checkDuplicatesNow() {
+                try {
+                    const name = (shiftNameEl.value || '').trim();
+                    const sid = (shiftIdEl.value || '').trim();
+                    if (!name && !sid) {
+                        duplicateState = { name: false, id: false };
+                        setFieldWarning(shiftNameEl, shiftNameWarning, false);
+                        setFieldWarning(shiftIdEl, shiftIdWarning, false);
+                        updateContinueButton();
+                        return;
+                    }
+                    const resp = await fetch('/api/check-shift-duplicates', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, shiftId: sid })
+                    });
+                    if (!resp.ok) {
+                        // In case of error, do not block user, clear warnings
+                        duplicateState = { name: false, id: false };
+                        setFieldWarning(shiftNameEl, shiftNameWarning, false);
+                        setFieldWarning(shiftIdEl, shiftIdWarning, false);
+                        updateContinueButton();
+                        return;
+                    }
+                    const data = await resp.json();
+                    duplicateState = {
+                        name: !!data.nameDuplicate,
+                        id: !!data.idDuplicate
+                    };
+                    setFieldWarning(shiftNameEl, shiftNameWarning, duplicateState.name);
+                    setFieldWarning(shiftIdEl, shiftIdWarning, duplicateState.id);
+                    updateContinueButton();
+                } catch (_) {
+                    // Network or other errors: don't hard-block user
+                    duplicateState = { name: false, id: false };
+                    setFieldWarning(shiftNameEl, shiftNameWarning, false);
+                    setFieldWarning(shiftIdEl, shiftIdWarning, false);
+                    updateContinueButton();
+                }
+            }
 
             // --- State Persistence ---
             const formFields = [
@@ -1657,6 +1736,10 @@
             const errors = validateForm();
 
             let enable = errors.length === 0;
+            // Block when duplicates detected
+            if (duplicateState.name || duplicateState.id) {
+                enable = false;
+            }
 
             // Failsafe: if DOM checks failed, confirm completeness using stored state
             if (!enable) {
@@ -1693,8 +1776,14 @@
             }
         });
 
+        // Hook duplicate checks to inputs
+        if (shiftNameEl) shiftNameEl.addEventListener('input', checkDuplicatesDebounced);
+        if (shiftIdEl) shiftIdEl.addEventListener('input', checkDuplicatesDebounced);
+
         // Initial validation
         updateContinueButton();
+        // Initial duplicate check if values present (e.g., from restore)
+        checkDuplicatesDebounced();
 
         // Escape key functionality to clear all form data
         document.addEventListener('keydown', function(e) {
@@ -1743,7 +1832,7 @@
             const errors = validateForm();
             // If BFCache or timing issues cause stale disabled state, force-enable submission when fields are valid
             const continueBtn = document.querySelector('.btn-create');
-            if (errors.length === 0 && continueBtn) {
+            if (errors.length === 0 && continueBtn && !(duplicateState.name || duplicateState.id)) {
                 continueBtn.disabled = false;
                 continueBtn.style.opacity = '1';
                 continueBtn.style.cursor = 'pointer';
@@ -1753,6 +1842,20 @@
                 const notification = document.getElementById('formValidationNotification');
                 const notificationText = notification.querySelector('.notification-text');
                 notificationText.textContent = errors.join(', ');
+                notification.style.display = 'block';
+                setTimeout(() => { notification.style.display = 'none'; }, 3000);
+                return;
+            }
+            if (duplicateState.name || duplicateState.id) {
+                e.preventDefault();
+                const msg = duplicateState.name && duplicateState.id
+                    ? 'Duplicate shift name and shift ID. Please choose different values.'
+                    : duplicateState.name
+                        ? 'Duplicate shift name. Please choose a different name.'
+                        : 'Duplicate shift ID. Please choose a different ID.';
+                const notification = document.getElementById('formValidationNotification');
+                const notificationText = notification.querySelector('.notification-text');
+                notificationText.textContent = msg;
                 notification.style.display = 'block';
                 setTimeout(() => { notification.style.display = 'none'; }, 3000);
                 return;

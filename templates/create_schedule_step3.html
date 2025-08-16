@@ -3,12 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a schedule - Step 3 - HR Management System</title>
+    <title>Create a schedule - Assign Schedule - HR Management System</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        /* Hide scrollbars for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: transparent;
+        }
+
+        /* Hide scrollbars for Firefox */
+        * {
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbars for IE/Edge */
+        * {
+            -ms-overflow-style: none;
         }
 
         body {
@@ -75,7 +103,6 @@
         }
 
         .page-header {
-            
             padding: 40px 40px 20px 40px;
             display: flex;
             justify-content: flex-start;
@@ -105,7 +132,7 @@
         .main-container {
             flex: 1;
             display: flex;
-            
+            background: #f8f9fa;
             justify-content: center;
             align-items: flex-start;
             padding: 20px 40px 120px 40px;
@@ -116,6 +143,8 @@
             flex: 0 0 auto;
             max-width: 600px;
             width: 100%;
+            position: relative;
+            overflow: visible;
         }
 
         .sidebar {
@@ -148,6 +177,7 @@
             padding: 0;
             margin: 0;
         }
+
         .step-item:not(:last-child) {
             margin-bottom: 24px;
         }
@@ -194,15 +224,6 @@
             color: #6c757d;
         }
 
-        .step-badge {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #28a745;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
         .form-section {
             background: white;
             border: 1px solid #e9ecef;
@@ -210,6 +231,8 @@
             padding: 32px;
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: visible;
         }
 
         .section-title {
@@ -226,207 +249,41 @@
             line-height: 1.4;
         }
 
-        .summary-item {
+        .form-group {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 16px 0;
-            border-bottom: 1px solid #f1f3f4;
+            flex-direction: column;
+            margin-bottom: 24px;
         }
 
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-
-        .summary-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-            font-weight: 500;
-            flex: 0 0 150px;
-        }
-
-        .summary-value {
-            font-size: 0.9rem;
-            color: #1a1a1a;
-            flex: 1;
-            text-align: right;
-        }
-
-        .summary-value.primary {
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .edit-link {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 0.8rem;
-            margin-left: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
+        .form-input, .form-select {
+            padding: 14px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
             transition: all 0.2s;
         }
 
-        .edit-link:hover {
-            background: #f8f9fa;
-            text-decoration: none;
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
-        .schedule-preview {
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            padding: 0;
-            margin: 16px 0;
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23666666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 48px;
+            cursor: pointer;
         }
 
-        .schedule-preview-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .working-days {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .working-day {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 16px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: white;
-        }
-
-        .day-name {
-            color: #6c757d;
-        }
-
-        .day-hours {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        /* Daily workload detailing styles */
-        .daily-workload-container {
-            background: transparent;
-            border-radius: 0;
-            padding: 0;
-            margin-top: 16px;
-        }
-
-        .daily-workload-header {
-            margin-bottom: 20px;
-        }
-
-        .daily-workload-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin: 0 0 8px 0;
-        }
-
-        .daily-workload-subtitle {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        .daily-workload-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .workload-day-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 16px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: white;
-        }
-
-        .workload-day-name {
-            color: #6c757d;
-        }
-
-        .workload-day-time {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .shift-section-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #495057;
-            margin: 20px 0 12px 0;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .total-hours {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .total-label {
-            font-size: 0.9rem;
-            color: #495057;
-            font-weight: 600;
-        }
-
-        .total-value {
-            font-size: 1.1rem;
-            color: #1a1a1a;
-            font-weight: 700;
-        }
-
-        .success-message {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .success-icon {
-            width: 20px;
-            height: 20px;
-            background: #28a745;
-            border-radius: 50%;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .success-text {
-            font-size: 0.9rem;
-            color: #155724;
-            line-height: 1.4;
+        .form-input::placeholder {
+            color: #999;
         }
 
         .bottom-navigation {
@@ -491,157 +348,1019 @@
             cursor: not-allowed;
         }
 
-        .create-info {
+        .next-step-info {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             text-align: right;
         }
 
-        .create-label {
+        .next-step-label {
             font-size: 0.8rem;
             color: #6c757d;
             margin-bottom: 4px;
         }
 
-        .create-title {
+        .next-step-title {
             font-size: 0.9rem;
             color: #495057;
             font-weight: 500;
         }
 
-        .multiple-shifts-indicator {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 4px;
-            font-style: italic;
+        /* Search and table styles */
+        .filters-box {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .shift-section {
-            margin-bottom: 16px;
-        }
-
-        .shift-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 8px;
-        }
-
-        .review-item-box {
+        .filters-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 16px;
-            border: 1px solid #e9ecef;
+            gap: 16px;
+        }
+
+        .filters-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .search-container {
+            position: relative;
+            height: 44px;
+            width: 44px;
+            max-width: 300px;
+            transition: width 0.3s ease;
+            cursor: pointer;
             border-radius: 8px;
-            font-size: 0.95rem;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Expanded state */
+        .search-container.expanded {
+            width: 300px;
             background: white;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
-        .review-item-label {
-            color: #6c757d;
+        .search-container:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
         }
 
-        .review-item-value {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
+        .search-container.expanded:hover {
+            background: white;
+            border-color: #80bdff;
         }
 
-        .schedule-type-value {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
+        .search-input {
+            width: 0;
+            padding: 0;
+            border: none !important;
+            outline: none !important;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: transparent;
+            transition: all 0.3s ease;
+            opacity: 0;
+            margin-left: 40px;
+            box-shadow: none !important;
         }
 
-        .edit-link {
-            font-size: 0.9rem;
-            color: #007bff;
-            text-decoration: none;
-            margin-left: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
+        /* Visible input in expanded state */
+        .search-container.expanded .search-input {
+            width: calc(100% - 50px);
+            padding: 10px 16px 10px 0;
+            opacity: 1;
+            background: transparent;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .search-input:focus {
+            outline: none !important;
+            background: transparent;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .search-container.expanded .search-icon {
+            opacity: 0.8;
+        }
+
+        .search-icon:hover {
+            opacity: 1;
+        }
+
+        .search-clear-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            z-index: 3;
+            display: none;
+        }
+
+        .search-clear-btn:hover {
+            opacity: 1;
+        }
+
+        .search-clear-btn.show {
+            display: block;
+            opacity: 0.6;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .add-employee-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             transition: all 0.2s;
         }
 
-        .edit-link:hover {
-            background: #f8f9fa;
-            text-decoration: none;
+        .add-employee-btn:hover {
+            background: #333;
         }
 
-        .review-items-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .add-employee-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
         }
 
-        .info-icon {
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-left: 4px;
+        .remove-employee-btn {
+            background: none;
+            border: none;
+            padding: 4px;
+            border-radius: 4px;
             cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.2s;
         }
 
-        /* Info modal styles */
-        .info-modal {
-            display: none; /* hidden by default */
+        .remove-employee-btn:hover {
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(2px);
-            z-index: 3000;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+            flex: 1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
+        .modal-content {
+            padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .modal-filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+
+        .modal-table th {
+            padding: 16px;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+            user-select: none;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-table th:last-child {
+            border-right: none;
+        }
+
+        .modal-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            font-size: 0.875rem;
+            color: #495057;
+            vertical-align: top;
+        }
+
+        .modal-table td:last-child {
+            border-right: none;
+        }
+
+        .modal-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modal-table tr:last-child th {
+            border-bottom: none;
+        }
+
+        .modal-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .employee-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a1a1a;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .employee-checkbox:checked {
+            background-color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-top: none;
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover {
+            background: #e9ecef;
+        }
+
+        .pagination-btn.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-secondary {
+            background: white;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #d1d5db;
+        }
+
+        .modal-btn-primary {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+        }
+
+        .modal-btn-primary:hover {
+            background: #333;
+        }
+
+        /* Department filter dropdown styles */
+        .department-filter {
+            position: relative;
+        }
+
+        .department-filter .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+            justify-content: space-between;
+        }
+
+        .department-filter .dropdown-toggle:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .department-filter .dropdown-toggle.active {
+            background: white;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .department-filter .dropdown-label {
+            font-weight: 500;
+        }
+
+        .department-filter .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            opacity: 0.7;
+            transition: transform 0.2s ease;
+        }
+
+        .department-filter .dropdown-toggle.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .department-filter .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 300px;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+        }
+
+        .department-filter .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .department-filter .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: none !important;
+        }
+
+        .department-filter .dropdown-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .department-filter .dropdown-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .department-filter .dropdown-close:hover {
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
+        .department-filter .dropdown-content {
+            padding: 0 20px 16px 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: none !important;
+        }
+
+        .department-filter .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            background-color: transparent;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .department-filter .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .department-filter .dropdown-radio {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            accent-color: #1a1a1a;
+        }
+
+        .department-filter .option-text {
+            font-size: 0.875rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .department-filter .dropdown-footer {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+        }
+
+        .department-filter .btn-show-results {
+            flex: 1;
+            padding: 10px 16px;
+            background: #1a1a1a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .department-filter .btn-show-results:hover {
+            background: #333;
+            border-color: #333;
+        }
+
+        /* Division filter dropdown styles */
+        .division-filter {
+            position: relative;
+        }
+
+        .division-filter .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+            justify-content: space-between;
+        }
+
+        .division-filter .dropdown-toggle:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .division-filter .dropdown-toggle.active {
+            background: white;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .division-filter .dropdown-label {
+            font-weight: 500;
+        }
+
+        .division-filter .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            opacity: 0.7;
+            transition: transform 0.2s ease;
+        }
+
+        .division-filter .dropdown-toggle.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .division-filter .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 300px;
+            padding: 16px;
+            border: 1px solid #e9ecef;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+        }
+
+        .division-filter .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .division-filter .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: none !important;
+        }
+
+        .division-filter .dropdown-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .division-filter .dropdown-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .division-filter .dropdown-close:hover {
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
+        .division-filter .dropdown-content {
+            padding: 0 20px 16px 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: none !important;
+        }
+
+        .division-filter .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            background-color: transparent;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .division-filter .dropdown-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .division-filter .dropdown-radio {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            accent-color: #1a1a1a;
+        }
+
+        .division-filter .option-text {
+            font-size: 0.875rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        /* Employee search filter styles */
+        .employee-search-filter .search-container {
+            position: relative;
+            height: 38px;
+            width: 44px;
+            max-width: 300px;
+            transition: width 0.3s ease;
+            cursor: pointer;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .employee-search-filter .search-container.expanded {
+            width: 300px;
+            background: white;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .employee-search-filter .search-container:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .employee-search-filter .search-container.expanded:hover {
+            background: white;
+            border-color: #80bdff;
+        }
+
+        .employee-search-filter .search-input {
+            width: 0;
+            padding: 0;
+            border: none !important;
+            outline: none !important;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: transparent;
+            transition: all 0.3s ease;
+            opacity: 0;
+            margin-left: 40px;
+            box-shadow: none !important;
+        }
+
+        .employee-search-filter .search-container.expanded .search-input {
+            width: calc(100% - 50px);
+            padding: 10px 16px 10px 0;
+            opacity: 1;
+            background: transparent;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .employee-search-filter .search-input:focus {
+            outline: none !important;
+            background: transparent;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .employee-search-filter .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .employee-search-filter .search-container.expanded .search-icon {
+            opacity: 0.8;
+        }
+
+        .employee-search-filter .search-icon:hover {
+            opacity: 1;
+        }
+
+        .employee-search-filter .search-clear-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: none;
             align-items: center;
             justify-content: center;
         }
 
-        .info-modal-content {
-            background: #fff;
+        .employee-search-filter .search-clear-btn.show {
+            display: flex;
+            opacity: 0.7;
+        }
+
+        .employee-search-filter .search-clear-btn:hover {
+            opacity: 1;
+        }
+
+        /* Table styles */
+        .table-box {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-top: 1px solid #e9ecef;
             border-radius: 12px;
-            width: 90%;
-            max-width: 420px;
-            padding: 40px 48px 32px 48px;
-            box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .table-summary {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.875rem;
+            color: #6c757d;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* In modal popup, keep separator above controls but avoid double-thick bottom edge */
+        .modal .table-summary {
+            border-top: 1px solid #e9ecef;
+            border-bottom: none;
+        }
+
+        .employees-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+
+        .employees-table th {
+            padding: 16px;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+            user-select: none;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        .employees-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            font-size: 0.875rem;
+            color: #495057;
+            vertical-align: top;
+        }
+
+        .employees-table td:last-child {
+            border-right: none;
+        }
+
+        .employees-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .employees-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .employees-table tr.selected {
+            background: white;
+        }
+
+        /* Actions column width */
+        .employees-table td:last-child,
+        .employees-table th:last-child {
+            width: 60px;
             text-align: center;
+            padding: 12px 8px;
+            position: relative;
         }
 
-        .info-modal-content img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 24px;
+        /* Edit button styles */
+        .edit-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
         }
 
-        .info-modal-title {
-            font-size: 1.25rem;
+        .edit-btn:hover {
+            background: #f8f9fa;
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .edit-btn:active {
+            transform: scale(0.95);
+        }
+
+        .employee-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .employee-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6c757d;
+            flex-shrink: 0;
+        }
+
+        .employee-details h4 {
+            font-size: 0.95rem;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 12px;
+            margin-bottom: 2px;
         }
 
-        .info-modal-text {
-            font-size: 0.95rem;
-            color: #495057;
-            margin-bottom: 32px;
-            line-height: 1.45;
+        .employee-details p {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 0;
         }
 
-        .info-modal-close {
-            background: #1a1a1a;
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
+
+
+        .no-employees {
+            padding: 40px 24px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
         }
 
-        .info-modal-close:hover {
-            background: #333;
-        }
+
     </style>
 </head>
 <body>
@@ -660,7 +1379,7 @@
         <div class="page-header">
             <div class="page-header-content">
                 <h1 class="page-title">Create a schedule</h1>
-                <p class="page-subtitle">Review your schedule details and create the final schedule.</p>
+                <p class="page-subtitle">Select employees to assign this schedule to.</p>
             </div>
         </div>
 
@@ -668,46 +1387,56 @@
         <div class="main-container">
             <!-- Content Area -->
             <div class="content-area">
-                <!-- Schedule Name -->
-                <div class="form-section">
-                    <h3 class="section-title" style="margin-bottom: 16px;">Schedule name</h3>
-                    <div class="review-item-box">
-                        <span class="review-item-label">Schedule name</span>
-                        <span id="reviewScheduleName" class="review-item-value">--</span>
+                <form id="schedule-form-assign" method="POST" action="/create-schedule-step4">
+                    <!-- Filters Box -->
+                    <div class="filters-box">
+                        <div class="filters-section">
+                            <div class="filters-left">
+                                <div class="search-container" id="searchContainer">
+                                    <img src="{{ url_for('static', filename='images/search.png') }}" alt="Search" class="search-icon" id="searchIcon">
+                                    <input type="text" class="search-input" placeholder="Search by name..." id="searchInput">
+                                    <button class="search-clear-btn" id="searchClearBtn">
+                                        <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Clear" style="width: 16px; height: 16px;">
+                                    </button>
                     </div>
                 </div>
 
-
-
-                <!-- Working Hours -->
-                <div class="form-section">
-                    <h3 class="section-title" style="margin-bottom: 16px;">Working Hours</h3>
-                    <div class="review-items-container">
-                        <div class="review-item-box">
-                            <span class="review-item-label">Numbers of hours per week</span>
-                            <span id="reviewWeeklyHours" class="review-item-value">--</span>
+                            <div class="action-buttons-group">
+                                <button type="button" class="add-employee-btn" id="addSelectedBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"/>
+                                    </svg>
+                                    Add Selected
+                                </button>
                         </div>
-                        <div class="review-item-box">
-                            <span class="review-item-label">
-                                Work schedule type
-                                <img src="{{ url_for('static', filename='images/info (1).png') }}" alt="info" class="info-icon">
-                            </span>
-                            <div class="review-item-content">
-                                <span class="schedule-type-value">Flexible work schedule</span>
                             </div>
                         </div>
+                
+                    <!-- Search Results Table Box -->
+                    <div class="table-box">
+                        <div class="table-wrapper">
+                            <div class="table-summary" id="tableSummary">Total 0 employees</div>
+                            <table class="employees-table" id="employeesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Email</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeesBody">
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="no-employees">Loading employees...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                     </div>
                 </div>
                 
-                <!-- Working Time Details -->
-                <div class="form-section">
-                    <h3 class="section-title">Working time details</h3>
-                    <p class="section-description">Your weekly schedule configuration.</p>
                     
-                    <div id="schedulePreviewContainer">
-                        <!-- Schedule preview will be populated by JavaScript -->
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!-- Sidebar -->
@@ -723,6 +1452,10 @@
                     </li>
                     <li class="step-item active">
                         <div class="step-number">3</div>
+                        <div class="step-text">Assign schedule</div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">4</div>
                         <div class="step-text">Review and finish</div>
                     </li>
                 </ol>
@@ -732,408 +1465,1047 @@
         <!-- Bottom Navigation -->
         <div class="bottom-navigation">
             <div class="bottom-nav-content">
-                <a href="/create-schedule-step2" class="btn-back">
+                <a href="/create-schedule-step2" class="btn-back" id="backBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
                     Back
                 </a>
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div class="create-info">
-                        <div class="create-label">Ready to create:</div>
-                        <div class="create-title">Your new schedule</div>
+                    <div class="next-step-info">
+                        <div class="next-step-label">Next step:</div>
+                        <div class="next-step-title">4. Review and finish</div>
                     </div>
-                    <button type="button" class="btn-continue" id="createScheduleBtn">Create Schedule</button>
+                    <button type="submit" class="btn-continue" form="schedule-form-assign" id="continueBtn">Continue</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Info popup (hidden initially) -->
-        <div id="infoModal" class="info-modal">
-            <div class="info-modal-content">
-                <img src="{{ url_for('static', filename='images/information.png') }}" alt="Info">
-                <h2 class="info-modal-title">Work schedule type</h2>
-                <p class="info-modal-text">A fixed work schedule has specific start and end times for its workdays. A flexible work schedule allows employees to vary their start and end times.</p>
-                <button type="button" id="infoModalClose" class="info-modal-close">OK</button>
             </div>
         </div>
 
     <script>
-        // Function to clear all schedule form data
-        function clearScheduleFormData() {
-            sessionStorage.removeItem('scheduleFormData');
-            console.log('Schedule form data cleared');
-        }
-        
-        // Load and display saved data from previous steps
-        function loadSavedData() {
-            const savedData = sessionStorage.getItem('scheduleFormData');
-            if (!savedData) {
-                console.warn('No saved schedule data found');
-                return;
-            }
-            
-            const data = JSON.parse(savedData);
-            console.log('Loaded schedule data:', data);
-            
-            // Display basic information
-            if (data.scheduleName) {
-                const scheduleNameElement = document.getElementById('reviewScheduleName');
-                if (scheduleNameElement) {
-                    scheduleNameElement.textContent = data.scheduleName;
-                }
-            }
-            
+        let allEmployees = [];
+        let selectedEmployees = new Set();
+        let filteredEmployees = [];
+        let assignedEmployees = new Set();
 
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load employees
+            fetchEmployees();
             
-            // Display schedule details
-            if (data.scheduleDetails) {
-                const details = data.scheduleDetails;
-                const scheduleType = details.specifyDuration ? 'Duration-based schedule' : 'Basic schedule';
-                const scheduleTypeElement = document.querySelector('.schedule-type-value');
-                if (scheduleTypeElement) {
-                    scheduleTypeElement.textContent = scheduleType;
-                }
-                
-                // Calculate total weekly hours from all shifts
-                let totalWeeklyHours = 0;
-                if (details.shifts) {
-                    const numberOfShifts = details.numberOfShifts || 1;
-                    for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
-                        if (details.shifts[shiftNum] && details.shifts[shiftNum].weekdays) {
-                            const shiftData = details.shifts[shiftNum];
-                            const weekdaysData = shiftData.weekdays;
-                            
-                            Object.keys(weekdaysData).forEach(day => {
-                                const dayData = weekdaysData[day];
-                                if (dayData && dayData.checked) {
-                                    if (shiftData.includeTime && dayData.startTime && dayData.endTime) {
-                                        // Time-based: calculate hours from start/end times
-                                        const duration = calculateWorkingHours(dayData.startTime, dayData.endTime);
-                                        if (duration) {
-                                            totalWeeklyHours += duration.hours + (duration.minutes / 60);
-                                        }
-                                    } else if (!shiftData.includeTime && dayData.duration) {
-                                        // Duration-based: use duration directly
-                                        totalWeeklyHours += parseFloat(dayData.duration) || 0;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
-                
-                // Display the calculated weekly hours
-                const reviewWeeklyHoursElement = document.getElementById('reviewWeeklyHours');
-                if (reviewWeeklyHoursElement) {
-                    if (totalWeeklyHours > 0) {
-                        reviewWeeklyHoursElement.textContent = `${totalWeeklyHours.toFixed(1)} hrs`;
-                    } else if (details.weeklyDuration) {
-                        // Fallback to saved weeklyDuration if calculation fails
-                        reviewWeeklyHoursElement.textContent = `${details.weeklyDuration} hrs`;
-                    } else {
-                        reviewWeeklyHoursElement.textContent = '--';
-                    }
-                } else {
-                    console.warn('reviewWeeklyHours element not found');
-                }
+            // Add event listeners
+            setupEventListeners();
+        });
 
-                // Show shift count if multiple shifts
-                if (details.numberOfShifts && details.numberOfShifts > 1) {
-                    const shiftCountElement = document.getElementById('reviewShiftCount');
-                    if (shiftCountElement) {
-                        shiftCountElement.textContent = `(${details.numberOfShifts} shifts)`;
-                    }
-                }
-                
-                // Generate schedule preview
-                generateSchedulePreview(details);
-            }
-        }
-        
-        function generateSchedulePreview(scheduleDetails) {
-            const container = document.getElementById('schedulePreviewContainer');
-            
-            if (!scheduleDetails.shifts || Object.keys(scheduleDetails.shifts).length === 0) {
-                container.innerHTML = '<p style="color: #6c757d; font-style: italic;">No working time details configured.</p>';
-                return;
-            }
-            
-            const shifts = scheduleDetails.shifts;
-            const numberOfShifts = scheduleDetails.numberOfShifts || 1;
-            
-            let previewHTML = '';
-            
-            // Check if any shift has start/end time configured (includeTime toggle was ON)
-            let hasTimeDetails = false;
-            for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
-                if (shifts[shiftNum] && shifts[shiftNum].includeTime) {
-                    hasTimeDetails = true;
-                    break;
-                }
-            }
-            
-            // Only show the new format if start/end time toggle was enabled
-            if (hasTimeDetails) {
-                previewHTML += `
-                    <div class="daily-workload-container">
-                        <div class="daily-workload-header">
-                            <h4 class="daily-workload-title">Daily workload detailing</h4>
-                            <p class="daily-workload-subtitle">Specify the working days, the hours for each day, start & end times, etc.</p>
-                        </div>
-                        <div class="daily-workload-details">
-                `;
-                
-                // Generate preview for each shift
-                for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
-                    if (!shifts[shiftNum]) continue;
-                    
-                    const shiftData = shifts[shiftNum];
-                    
-                    // Check if the shift has any actual data (checked days) before rendering its title.
-                    const hasData = shiftData.weekdays && Object.values(shiftData.weekdays).some(day => day.checked);
-
-                    if (!hasData) continue; // Skip this shift if it has no data
-                    
-                    if (numberOfShifts > 1) {
-                        previewHTML += `<div class="shift-section-title">Shift ${shiftNum}</div>`;
-                    }
-                    
-                    // Days of the week
-                    const dayNames = {
-                        'monday': 'Monday',
-                        'tuesday': 'Tuesday', 
-                        'wednesday': 'Wednesday',
-                        'thursday': 'Thursday',
-                        'friday': 'Friday',
-                        'saturday': 'Saturday',
-                        'sunday': 'Sunday'
-                    };
-                    
-                    for (const [dayKey, dayName] of Object.entries(dayNames)) {
-                        if (shiftData.weekdays && shiftData.weekdays[dayKey] && shiftData.weekdays[dayKey].checked) {
-                            const dayData = shiftData.weekdays[dayKey];
-                            
-                            if (shiftData.includeTime && dayData.startTime && dayData.endTime) {
-                                // Calculate duration for display
-                                const duration = calculateWorkingHours(dayData.startTime, dayData.endTime);
-                                let durationText = '';
-                                if (duration) {
-                                    if (duration.hours > 0 && duration.minutes > 0) {
-                                        durationText = `${duration.hours} hr ${duration.minutes} min`;
-                                    } else if (duration.hours > 0) {
-                                        durationText = `${duration.hours} hr`;
-                                    } else if (duration.minutes > 0) {
-                                        durationText = `${duration.minutes} min`;
-                                    }
-                                }
-                                
-                                previewHTML += `
-                                    <div class="workload-day-item">
-                                        <span class="workload-day-name">${dayName}</span>
-                                        <span class="workload-day-time">${dayData.startTime} - ${dayData.endTime}</span>
-                                    </div>
-                                `;
-                            }
-                        }
-                    }
-                }
-                
-                previewHTML += `
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Fall back to original format for duration-based schedules
-                previewHTML += '<div class="schedule-preview">';
-                
-                for (let shiftNum = 1; shiftNum <= numberOfShifts; shiftNum++) {
-                    if (!shifts[shiftNum]) continue;
-                    
-                    const shiftData = shifts[shiftNum];
-                    
-                    // Also apply the check here for the duration-based view.
-                    const hasData = shiftData.weekdays && Object.values(shiftData.weekdays).some(day => day.checked);
-
-                    if (!hasData) continue;
-                    
-                    if (numberOfShifts > 1) {
-                        previewHTML += `<div class="schedule-preview-title">Shift ${shiftNum}</div>`;
-                    }
-                    
-                    previewHTML += '<div class="working-days">';
-                    
-                    const dayNames = {
-                        'monday': 'Monday',
-                        'tuesday': 'Tuesday', 
-                        'wednesday': 'Wednesday',
-                        'thursday': 'Thursday',
-                        'friday': 'Friday',
-                        'saturday': 'Saturday',
-                        'sunday': 'Sunday'
-                    };
-                    
-                    for (const [dayKey, dayName] of Object.entries(dayNames)) {
-                        if (shiftData.weekdays && shiftData.weekdays[dayKey] && shiftData.weekdays[dayKey].checked) {
-                            const dayData = shiftData.weekdays[dayKey];
-                            let dayHours = '';
-                            
-                            if (!shiftData.includeTime && dayData.duration) {
-                                // Duration-based
-                                dayHours = `${dayData.duration} hours`;
-                            } else {
-                                dayHours = 'Working day';
-                            }
-                            
-                            previewHTML += `
-                                <div class="working-day">
-                                    <span class="day-name">${dayName}</span>
-                                    <span class="day-hours">${dayHours}</span>
-                                </div>
-                            `;
-                        }
-                    }
-                    
-                    previewHTML += '</div>';
-                }
-                
-                previewHTML += '</div>';
-            }
-            
-            container.innerHTML = previewHTML;
-        }
-        
-        // Helper function to calculate working hours from time strings
-        function calculateWorkingHours(startTime, endTime) {
-            if (!startTime || !endTime) return null;
-            
-            const [startHour, startMin] = startTime.split(':').map(Number);
-            const [endHour, endMin] = endTime.split(':').map(Number);
-            
-            const startMinutes = startHour * 60 + startMin;
-            const endMinutes = endHour * 60 + endMin;
-            
-            let diffMinutes = endMinutes - startMinutes;
-            if (diffMinutes < 0) {
-                diffMinutes += 24 * 60; // Handle overnight shifts
-            }
-            
-            return {
-                hours: Math.floor(diffMinutes / 60),
-                minutes: diffMinutes % 60
+        // Save form data to session storage
+        function saveFormData() {
+            const formData = {
+                assignedEmployees: Array.from(assignedEmployees),
+                searchTerm: document.getElementById('searchInput')?.value || ''
             };
+            
+            sessionStorage.setItem('scheduleStep3Data', JSON.stringify(formData));
         }
-        
-        // Handle schedule creation
-        document.getElementById('createScheduleBtn').addEventListener('click', function() {
-            const savedData = sessionStorage.getItem('scheduleFormData');
+
+        // Restore form data from session storage
+        function restoreFormData() {
+            const savedData = sessionStorage.getItem('scheduleStep3Data');
             if (!savedData) {
-                alert('Error: No schedule data found. Please start over.');
-                window.location.href = '/create-schedule';
                 return;
             }
             
-            const data = JSON.parse(savedData);
+            try {
+                const formData = JSON.parse(savedData);
+                
+                // Restore assigned employees
+                if (formData.assignedEmployees && Array.isArray(formData.assignedEmployees)) {
+                    assignedEmployees = new Set(formData.assignedEmployees);
+                }
+                
+                // Restore search term
+                if (formData.searchTerm) {
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.value = formData.searchTerm;
+                        // Expand search container if there's a search term
+                        const searchContainer = document.getElementById('searchContainer');
+                        if (searchContainer) {
+                            searchContainer.classList.add('expanded');
+                        }
+                        // Show clear button if there's text
+                        const searchClearBtn = document.getElementById('searchClearBtn');
+                        if (searchClearBtn) {
+                            searchClearBtn.classList.add('show');
+                        }
+                        // Apply the search filter
+                        filterEmployees(formData.searchTerm);
+                    }
+                }
+            } catch (error) {
+                console.error('Error restoring form data:', error);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            const searchContainer = document.getElementById('searchContainer');
+            const searchClearBtn = document.getElementById('searchClearBtn');
+
+            // Search container click to expand
+            searchContainer.addEventListener('click', function() {
+                if (!this.classList.contains('expanded')) {
+                    this.classList.add('expanded');
+                    searchInput.focus();
+                }
+            });
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const hasValue = this.value.trim().length > 0;
+                    searchClearBtn.classList.toggle('show', hasValue);
+                    
+                    // Filter table based on search term
+                    filterEmployees(this.value);
+                    
+                    // Save form data
+                    saveFormData();
+                });
+
+                searchInput.addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        searchContainer.classList.remove('expanded');
+                    }
+                });
+
+                // Prevent Enter key from submitting the form
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                });
+            }
+
+            if (searchClearBtn) {
+                searchClearBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    searchInput.value = '';
+                    searchContainer.classList.remove('expanded');
+                    this.classList.remove('show');
+                    filterEmployees('');
+                    
+                    // Save form data
+                    saveFormData();
+                });
+            }
+
+            // Click outside to collapse search
+            document.addEventListener('click', function(e) {
+                if (!searchContainer.contains(e.target) && !searchInput.value.trim()) {
+                    searchContainer.classList.remove('expanded');
+                }
+            });
+
+
+
+            // Add selected button
+            const addSelectedBtn = document.getElementById('addSelectedBtn');
+            if (addSelectedBtn) {
+                addSelectedBtn.addEventListener('click', function() {
+                    openEmployeeModal();
+                });
+            }
+
+            // Form submission
+            const form = document.getElementById('schedule-form-assign');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleFormSubmission();
+                });
+            }
+        }
+
+        
+
+        // Fetch employees from the server
+        async function fetchEmployees() {
+            try {
+                const response = await fetch('/api/get-employees');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allEmployees = data.employees;
+                    filteredEmployees = [...allEmployees];
+                    
+                    // Restore form data after employees are loaded
+                    restoreFormData();
+                    
+                    renderEmployeeTable();
+                    updateTableSummary();
+                    } else {
+                    console.error('Failed to fetch employees:', data.error);
+                    showEmployeeLoadingError();
+                }
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+                showEmployeeLoadingError();
+            }
+        }
+
+                // Render employee table (shows assigned employees)
+        function renderEmployeeTable() {
+            const employeesBody = document.getElementById('employeesBody');
             
-            // Show loading state
-            const button = this;
-            const originalText = button.textContent;
-            button.textContent = 'Creating...';
-            button.disabled = true;
+            // Get assigned employees from the filtered list
+            const assignedFilteredEmployees = filteredEmployees.filter(employee => 
+                assignedEmployees.has(employee.id)
+            );
             
-            // Send data to server
-            fetch('/api/create-schedule', {
+            if (assignedFilteredEmployees.length === 0) {
+                employeesBody.innerHTML = '<tr><td colspan="3"><div class="no-employees">No employees assigned</div></td></tr>';
+                return;
+            }
+            
+            employeesBody.innerHTML = '';
+            
+            assignedFilteredEmployees.forEach(employee => {
+                const row = document.createElement('tr');
+                row.dataset.employeeId = employee.id;
+                row.classList.add('selected');
+                
+                const initials = getInitials(employee.name);
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="employee-info">
+                            <div class="employee-avatar">${initials}</div>
+                            <div class="employee-details">
+                                <h4>${employee.name}</h4>
+                                <p>Employee</p>
+                        </div>
+                        </div>
+                    </td>
+                    <td>${employee.email}</td>
+                    <td>
+                        <button class="edit-btn" onclick="removeAssignedEmployee(${employee.id})" title="Remove employee">
+                            <img src="{{ url_for('static', filename='images/trash.png') }}" alt="Remove" style="width: 16px; height: 16px;">
+                        </button>
+                    </td>
+                `;
+                
+                employeesBody.appendChild(row);
+            });
+            
+            updateAddButton();
+        }
+
+        // Filter employees based on search
+        function filterEmployees(searchTerm) {
+            if (!searchTerm.trim()) {
+                filteredEmployees = [...allEmployees];
+            } else {
+                const term = searchTerm.toLowerCase();
+                filteredEmployees = allEmployees.filter(employee => 
+                    employee.name.toLowerCase().includes(term) ||
+                    employee.email.toLowerCase().includes(term)
+                );
+            }
+            // IMPORTANT: keep the main table showing ONLY assigned employees
+            renderEmployeeTable();
+            updateTableSummary();
+        }
+
+        // Render search results for selection
+        function renderSearchResults() {
+            const employeesBody = document.getElementById('employeesBody');
+            
+            if (filteredEmployees.length === 0) {
+                employeesBody.innerHTML = '<tr><td colspan="3"><div class="no-employees">No employees found</div></td></tr>';
+                return;
+            }
+            
+            employeesBody.innerHTML = '';
+            
+            filteredEmployees.forEach(employee => {
+                const row = document.createElement('tr');
+                row.dataset.employeeId = employee.id;
+                
+                const isSelected = selectedEmployees.has(employee.id);
+                if (isSelected) {
+                    row.classList.add('selected');
+                }
+                
+                const initials = getInitials(employee.name);
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="employee-info">
+                            <div class="employee-avatar">${initials}</div>
+                            <div class="employee-details">
+                                <h4>${employee.name}</h4>
+                                <p>Employee</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${employee.email}</td>
+                    <td></td>
+                `;
+                
+                // Add row click handler to select/deselect employee
+                row.addEventListener('click', function(e) {
+                    toggleEmployeeSelection(employee.id, !selectedEmployees.has(employee.id));
+                });
+                
+                employeesBody.appendChild(row);
+            });
+            
+            updateAddButton();
+        }
+
+        // Toggle employee selection
+        function toggleEmployeeSelection(employeeId, isSelected) {
+            if (isSelected) {
+                selectedEmployees.add(employeeId);
+                            } else {
+                selectedEmployees.delete(employeeId);
+            }
+            
+            // Update visual state
+            const row = document.querySelector(`[data-employee-id="${employeeId}"]`);
+            if (row) {
+                if (isSelected) {
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            }
+            
+            updateAddButton();
+        }
+
+        
+
+
+
+        // Update table summary
+        function updateTableSummary() {
+            const tableSummary = document.getElementById('tableSummary');
+            const assignedCount = assignedEmployees.size;
+            tableSummary.textContent = `Assigned ${assignedCount} employee${assignedCount !== 1 ? 's' : ''}`;
+        }
+
+        // Update add button state
+        function updateAddButton() {
+            const addSelectedBtn = document.getElementById('addSelectedBtn');
+            
+            // Button is always enabled since it opens a modal
+            addSelectedBtn.disabled = false;
+            addSelectedBtn.textContent = 'Add Selected';
+        }
+
+        // Add selected employees to assignment table
+        function addSelectedEmployees() {
+            const count = selectedEmployees.size;
+            if (count === 0) return;
+
+            // Add selected employees to assigned employees
+            selectedEmployees.forEach(employeeId => {
+                const employee = allEmployees.find(emp => emp.id === employeeId);
+                if (employee && !assignedEmployees.has(employeeId)) {
+                    assignedEmployees.add(employeeId);
+                }
+            });
+
+            // Clear selection
+            selectedEmployees.clear();
+            
+            // Update the table
+            renderEmployeeTable();
+            updateAddButton();
+        }
+
+
+
+        // Remove employee from assignment
+        function removeAssignedEmployee(employeeId) {
+            assignedEmployees.delete(employeeId);
+            renderEmployeeTable();
+            saveFormData();
+        }
+
+        // Get initials from name
+        function getInitials(name) {
+            return name.split(' ')
+                .map(word => word.charAt(0))
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+        }
+
+        // Show error when employees fail to load
+        function showEmployeeLoadingError() {
+            const employeesBody = document.getElementById('employeesBody');
+            if (employeesBody) {
+                employeesBody.innerHTML = '<tr><td colspan="2"><div class="no-employees">Error loading employees</div></td></tr>';
+            }
+        }
+
+        // Handle form submission
+        async function handleFormSubmission() {
+            if (assignedEmployees.size === 0) {
+                alert('Please add at least one employee to assign the schedule to.');
+                return;
+            }
+            
+            // Prepare assignment data
+            const assignmentData = {
+                assignment_type: 'individual',
+                selected_employees: Array.from(assignedEmployees),
+                schedule_data: {} // This will be populated from previous steps
+            };
+            
+            try {
+                const response = await fetch('/api/save-schedule-assignment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    // Clear the session storage
-                    sessionStorage.removeItem('scheduleFormData');
-                    
-                    // Redirect to return_to if present
-                    const returnTo = sessionStorage.getItem('scheduleReturnTo');
-                    if (returnTo) {
-                        window.location.href = returnTo;
-                        sessionStorage.removeItem('scheduleReturnTo');
-                    } else {
-                        // Redirect to time tracking page
-                        window.location.href = '/settings/time-tracking';
-                    }
-                } else {
-                    // Show error message
-                    alert('Error: ' + (result.error || 'Failed to create schedule'));
-                    
-                    // Reset button
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error creating schedule:', error);
-                alert('Error: Failed to create schedule. Please try again.');
+                    body: JSON.stringify(assignmentData)
+                });
                 
-                // Reset button
-                button.textContent = originalText;
-                button.disabled = false;
-            });
-        });
-        
-        // Initialize everything when page loads
-        // Store return_to param in sessionStorage if present
-        function getQueryParam(name) {
-            const url = new URL(window.location.href);
-            return url.searchParams.get(name);
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            const returnTo = getQueryParam('return_to');
-            if (returnTo) {
-                sessionStorage.setItem('scheduleReturnTo', returnTo);
-            }
-            // Load saved data first
-            loadSavedData();
-            
-            // Check the schedule type from sessionStorage and update the text
-            const saved = JSON.parse(sessionStorage.getItem('scheduleFormData') || '{}');
-            if (saved.scheduleDetails && saved.scheduleDetails.shifts) {
-                const firstShift = saved.scheduleDetails.shifts[1];
-                const scheduleTypeElement = document.querySelector('.schedule-type-value');
-                if (scheduleTypeElement) {
-                    if (firstShift && firstShift.includeTime) {
-                        scheduleTypeElement.textContent = 'Fixed work schedule';
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Redirect to step 4 (review and finish)
+                    window.location.href = '/create-schedule-step4';
                     } else {
-                        scheduleTypeElement.textContent = 'Flexible work schedule';
-                    }
+                    alert('Error saving assignment data: ' + data.error);
                 }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while saving the assignment data.');
             }
+        }
 
-            // --- Info modal logic ---
-            const infoIcon = document.querySelector('.info-icon');
-            const infoModal = document.getElementById('infoModal');
-            const infoModalClose = document.getElementById('infoModalClose');
+        // Clear schedule form data (for close button)
+        function clearScheduleFormData() {
+            // Clear any stored schedule data
+            sessionStorage.removeItem('scheduleData');
+            sessionStorage.removeItem('scheduleStep3Data');
+        }
 
-            if (infoIcon && infoModal && infoModalClose) {
-                infoIcon.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    infoModal.style.display = 'flex';
-                });
+        // Modal variables
+        let modalEmployees = [];
+        let modalSelectedEmployees = new Set();
+        let currentPage = 1;
+        let totalPages = 1;
+        let itemsPerPage = 10;
 
-                infoModalClose.addEventListener('click', function() {
-                    infoModal.style.display = 'none';
-                });
-
-                // Close modal when clicking outside the content
-                infoModal.addEventListener('click', function(e) {
-                    if (e.target === infoModal) {
-                        infoModal.style.display = 'none';
-                    }
-                });
+        // Modal functions
+        function openEmployeeModal() {
+            // Check if there's an active search term
+            const searchInput = document.getElementById('employeeSearchInput');
+            const searchTerm = searchInput ? searchInput.value.trim() : '';
+            
+            if (searchTerm) {
+                // Apply search filtering (which also filters out assigned employees)
+                filterEmployeesBySearch(searchTerm);
+            } else {
+                // Filter out employees that are already assigned
+                modalEmployees = allEmployees.filter(employee => !assignedEmployees.has(employee.id));
+                currentPage = 1;
+                totalPages = Math.ceil(modalEmployees.length / itemsPerPage);
+                
+                renderModalTable();
+                updateModalPagination();
+                updateTotalRecords();
             }
+            
+            modalSelectedEmployees.clear();
+            
+            document.getElementById('employeeModal').style.display = 'flex';
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeModal').style.display = 'none';
+            modalSelectedEmployees.clear();
+        }
+
+        function renderModalTable() {
+            const tbody = document.getElementById('modalEmployeeTableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageEmployees = modalEmployees.slice(startIndex, endIndex);
+            
+            tbody.innerHTML = '';
+            
+            pageEmployees.forEach((employee, index) => {
+                const row = document.createElement('tr');
+                const globalIndex = startIndex + index + 1;
+                const isSelected = modalSelectedEmployees.has(employee.id);
+                
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="employee-checkbox" 
+                               ${isSelected ? 'checked' : ''} 
+                               data-employee-id="${employee.id}">
+                    </td>
+                    <td>${globalIndex}</td>
+                    <td>${employee.name}</td>
+                    <td>Company Name</td>
+                    <td>Department</td>
+                    <td>Division</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Add event listeners to individual checkboxes
+            const checkboxes = tbody.querySelectorAll('.employee-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const employeeId = parseInt(this.getAttribute('data-employee-id'));
+                    toggleModalEmployeeSelection(employeeId, this.checked);
+                });
+            });
+            
+            updateSelectAllCheckbox();
+        }
+
+        function toggleModalEmployeeSelection(employeeId, isSelected) {
+            if (isSelected) {
+                modalSelectedEmployees.add(employeeId);
+            } else {
+                modalSelectedEmployees.delete(employeeId);
+            }
+            updateSelectAllCheckbox();
+        }
+
+        function updateSelectAllCheckbox() {
+            const selectAllCheckbox = document.getElementById('selectAllEmployees');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageEmployees = modalEmployees.slice(startIndex, endIndex);
+            
+            const allSelected = pageEmployees.every(emp => modalSelectedEmployees.has(emp.id));
+            const someSelected = pageEmployees.some(emp => modalSelectedEmployees.has(emp.id));
+            
+            selectAllCheckbox.checked = allSelected;
+            selectAllCheckbox.indeterminate = someSelected && !allSelected;
+        }
+
+        function toggleSelectAllEmployees() {
+            const selectAllCheckbox = document.getElementById('selectAllEmployees');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageEmployees = modalEmployees.slice(startIndex, endIndex);
+            
+            pageEmployees.forEach(employee => {
+                if (selectAllCheckbox.checked) {
+                    modalSelectedEmployees.add(employee.id);
+                } else {
+                    modalSelectedEmployees.delete(employee.id);
+                }
+            });
+            
+            renderModalTable();
+        }
+
+
+
+        function updateModalPagination() {
+            const pageNumbers = document.getElementById('pageNumbers');
+            const firstPage = document.getElementById('firstPage');
+            const prevPage = document.getElementById('prevPage');
+            const nextPage = document.getElementById('nextPage');
+            const lastPage = document.getElementById('lastPage');
+            
+            // Update page numbers
+            pageNumbers.innerHTML = '';
+            
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage(i);
+                pageNumbers.appendChild(pageBtn);
+            }
+            
+            // Update navigation buttons
+            firstPage.disabled = currentPage === 1;
+            prevPage.disabled = currentPage === 1;
+            nextPage.disabled = currentPage === totalPages;
+            lastPage.disabled = currentPage === totalPages;
+        }
+
+        function goToPage(page) {
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderModalTable();
+                updateModalPagination();
+            }
+        }
+
+        function updateTotalRecords() {
+            document.getElementById('totalRecords').textContent = modalEmployees.length;
+        }
+
+        function confirmEmployeeSelection() {
+            // Add selected employees to assigned employees
+            modalSelectedEmployees.forEach(employeeId => {
+                if (!assignedEmployees.has(employeeId)) {
+                    assignedEmployees.add(employeeId);
+                }
+            });
+            
+            // Update the main table
+            renderEmployeeTable();
+            updateTableSummary();
+            
+            // Remove newly assigned employees from modal list
+            modalEmployees = modalEmployees.filter(employee => !assignedEmployees.has(employee.id));
+            
+            // Save form data
+            saveFormData();
+            
+            // Close modal
+            closeEmployeeModal();
+        }
+
+        // Add event listener for select all checkbox
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('selectAllEmployees');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', toggleSelectAllEmployees);
+            }
+            
+            // Setup department dropdown
+            setupDepartmentDropdown();
+            
+            // Setup division dropdown
+            setupDivisionDropdown();
+            
+            // Setup employee search
+            setupEmployeeSearch();
         });
+
+        // Department dropdown functionality
+        function setupDepartmentDropdown() {
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            const departmentDropdownMenu = document.getElementById('departmentDropdownMenu');
+            const departmentDropdownClose = document.getElementById('departmentDropdownClose');
+            const departmentOptionsList = document.getElementById('departmentOptionsList');
+
+            if (!departmentDropdown || !departmentDropdownMenu) return;
+
+            // Toggle dropdown
+            departmentDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                
+                const isActive = departmentDropdown.classList.contains('active');
+                
+                // Close all other dropdowns first
+                closeAllDropdowns();
+                
+                if (!isActive) {
+                    departmentDropdown.classList.add('active');
+                    departmentDropdownMenu.classList.add('show');
+                    
+                    const arrow = departmentDropdown.querySelector('.dropdown-arrow');
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                }
+            });
+
+            // Close dropdown
+            departmentDropdownClose.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeDepartmentDropdown();
+            });
+
+            // Apply filter immediately when radio button changes
+            const departmentRadios = document.querySelectorAll('input[name="department"]');
+            departmentRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const departmentValue = this.getAttribute('data-value');
+                    updateDepartmentDropdownLabel(departmentValue);
+                    filterEmployeesByDepartment(departmentValue);
+                    closeDepartmentDropdown();
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!departmentDropdown.contains(e.target) && !departmentDropdownMenu.contains(e.target)) {
+                    closeDepartmentDropdown();
+                }
+            });
+        }
+
+        function closeDepartmentDropdown() {
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            const departmentDropdownMenu = document.getElementById('departmentDropdownMenu');
+            
+            if (departmentDropdown) {
+                departmentDropdown.classList.remove('active');
+                const arrow = departmentDropdown.querySelector('.dropdown-arrow');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+            
+            if (departmentDropdownMenu) {
+                departmentDropdownMenu.classList.remove('show');
+            }
+        }
+
+        function closeAllDropdowns() {
+            closeDepartmentDropdown();
+        }
+
+        function updateDepartmentDropdownLabel(departmentValue) {
+            const departmentDropdown = document.getElementById('departmentDropdown');
+            const dropdownLabel = departmentDropdown.querySelector('.dropdown-label');
+            
+            if (departmentValue === 'all') {
+                dropdownLabel.textContent = 'Department';
+            } else {
+                dropdownLabel.textContent = departmentValue;
+            }
+        }
+
+        function filterEmployeesByDepartment(department) {
+            // This function would filter employees based on department
+            // For now, we'll just log the selected department
+            console.log('Filtering by department:', department);
+            
+            // You can implement the actual filtering logic here
+            // For example, filter modalEmployees based on department
+            // and then call renderModalTable() to update the display
+        }
+
+        // Division dropdown functionality
+        function setupDivisionDropdown() {
+            const divisionDropdown = document.getElementById('divisionDropdown');
+            const divisionDropdownMenu = document.getElementById('divisionDropdownMenu');
+            const divisionDropdownClose = document.getElementById('divisionDropdownClose');
+            const divisionOptionsList = document.getElementById('divisionOptionsList');
+
+            if (!divisionDropdown || !divisionDropdownMenu) return;
+
+            // Toggle dropdown
+            divisionDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const isActive = divisionDropdown.classList.contains('active');
+                
+                // Close all other dropdowns first
+                closeAllDropdowns();
+                
+                if (!isActive) {
+                    divisionDropdown.classList.add('active');
+                    divisionDropdownMenu.classList.add('show');
+                    
+                    const arrow = divisionDropdown.querySelector('.dropdown-arrow');
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
+                }
+            });
+
+            // Close dropdown
+            divisionDropdownClose.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeDivisionDropdown();
+            });
+
+            // Apply filter immediately when radio button changes
+            const divisionRadios = document.querySelectorAll('input[name="division"]');
+            divisionRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const divisionValue = this.getAttribute('data-value');
+                    updateDivisionDropdownLabel(divisionValue);
+                    filterEmployeesByDivision(divisionValue);
+                    closeDivisionDropdown();
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!divisionDropdown.contains(e.target) && !divisionDropdownMenu.contains(e.target)) {
+                    closeDivisionDropdown();
+                }
+            });
+        }
+
+        function closeDivisionDropdown() {
+            const divisionDropdown = document.getElementById('divisionDropdown');
+            const divisionDropdownMenu = document.getElementById('divisionDropdownMenu');
+            
+            if (divisionDropdown) {
+                divisionDropdown.classList.remove('active');
+                const arrow = divisionDropdown.querySelector('.dropdown-arrow');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+            
+            if (divisionDropdownMenu) {
+                divisionDropdownMenu.classList.remove('show');
+            }
+        }
+
+        function updateDivisionDropdownLabel(divisionValue) {
+            const divisionDropdown = document.getElementById('divisionDropdown');
+            const dropdownLabel = divisionDropdown.querySelector('.dropdown-label');
+            
+            if (divisionValue === 'all') {
+                dropdownLabel.textContent = 'Division';
+            } else {
+                dropdownLabel.textContent = divisionValue;
+            }
+        }
+
+        function filterEmployeesByDivision(division) {
+            console.log('Filtering by division:', division);
+            // Implement division filtering logic here
+        }
+
+        // Employee search functionality
+        function setupEmployeeSearch() {
+            const employeeSearchContainer = document.getElementById('employeeSearchContainer');
+            const employeeSearchInput = document.getElementById('employeeSearchInput');
+            const employeeSearchClearBtn = document.getElementById('employeeSearchClearBtn');
+
+            if (!employeeSearchContainer || !employeeSearchInput) return;
+
+            // Search container click to expand
+            employeeSearchContainer.addEventListener('click', function() {
+                if (!this.classList.contains('expanded')) {
+                    this.classList.add('expanded');
+                    employeeSearchInput.focus();
+                }
+            });
+
+            // Search input functionality
+            employeeSearchInput.addEventListener('input', function() {
+                const hasValue = this.value.trim().length > 0;
+                employeeSearchClearBtn.classList.toggle('show', hasValue);
+                
+                // Filter employees based on search term
+                filterEmployeesBySearch(this.value);
+            });
+
+            employeeSearchInput.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    employeeSearchContainer.classList.remove('expanded');
+                }
+            });
+
+            // Prevent Enter key from submitting any form
+            employeeSearchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+            // Clear search
+            employeeSearchClearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                employeeSearchInput.value = '';
+                employeeSearchContainer.classList.remove('expanded');
+                this.classList.remove('show');
+                filterEmployeesBySearch('');
+            });
+
+            // Click outside to collapse search
+            document.addEventListener('click', function(e) {
+                if (!employeeSearchContainer.contains(e.target) && !employeeSearchInput.value.trim()) {
+                    employeeSearchContainer.classList.remove('expanded');
+                }
+            });
+        }
+
+        function filterEmployeesBySearch(searchTerm) {
+            console.log('Filtering by search:', searchTerm);
+            
+            // First, filter all employees by search term
+            let filteredEmployees = allEmployees;
+            
+            if (searchTerm.trim()) {
+                const searchLower = searchTerm.toLowerCase();
+                filteredEmployees = allEmployees.filter(employee => 
+                    employee.name.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            // Then filter out already assigned employees
+            modalEmployees = filteredEmployees.filter(employee => !assignedEmployees.has(employee.id));
+            
+            // Reset pagination
+            currentPage = 1;
+            totalPages = Math.ceil(modalEmployees.length / itemsPerPage);
+            
+            // Update the display
+            renderModalTable();
+            updateModalPagination();
+            updateTotalRecords();
+        }
+
+        function closeAllDropdowns() {
+            closeDepartmentDropdown();
+            closeDivisionDropdown();
+        }
     </script>
+
+    <!-- Employee Selection Modal -->
+    <div class="modal-overlay" id="employeeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Employees</h2>
+                <button class="modal-close" onclick="closeEmployeeModal()">
+                    <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Close" style="width: 16px; height: 16px;">
+                </button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="modal-filters">
+                    <div class="department-filter">
+                        <button class="dropdown-toggle" id="departmentDropdown">
+                            <span class="dropdown-label">Department</span>
+                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="departmentDropdownMenu">
+                            <div class="dropdown-header">
+                                <span class="dropdown-title">Department</span>
+                                <button class="dropdown-close" id="departmentDropdownClose">
+                                    <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Close" style="width: 14px; height: 14px;">
+                                </button>
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-options-list" id="departmentOptionsList">
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="department" class="dropdown-radio" data-value="all" checked>
+                                        <span class="option-text">All Departments</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="department" class="dropdown-radio" data-value="IT">
+                                        <span class="option-text">IT</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="department" class="dropdown-radio" data-value="HR">
+                                        <span class="option-text">HR</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="department" class="dropdown-radio" data-value="Finance">
+                                        <span class="option-text">Finance</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="department" class="dropdown-radio" data-value="Marketing">
+                                        <span class="option-text">Marketing</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="division-filter">
+                        <button class="dropdown-toggle" id="divisionDropdown">
+                            <span class="dropdown-label">Division</span>
+                            <img src="{{ url_for('static', filename='images/angle-small-down.png') }}" alt="Dropdown" class="dropdown-arrow">
+                        </button>
+                        <div class="dropdown-menu" id="divisionDropdownMenu">
+                            <div class="dropdown-header">
+                                <span class="dropdown-title">Division</span>
+                                <button class="dropdown-close" id="divisionDropdownClose">
+                                    <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Close" style="width: 14px; height: 14px;">
+                                </button>
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-options-list" id="divisionOptionsList">
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="division" class="dropdown-radio" data-value="all" checked>
+                                        <span class="option-text">All Divisions</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="division" class="dropdown-radio" data-value="Development">
+                                        <span class="option-text">Development</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="division" class="dropdown-radio" data-value="Testing">
+                                        <span class="option-text">Testing</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="division" class="dropdown-radio" data-value="Design">
+                                        <span class="option-text">Design</span>
+                                    </label>
+                                    <label class="dropdown-option">
+                                        <input type="radio" name="division" class="dropdown-radio" data-value="Management">
+                                        <span class="option-text">Management</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="employee-search-filter">
+                        <div class="search-container" id="employeeSearchContainer">
+                            <img src="{{ url_for('static', filename='images/search.png') }}" alt="Search" class="search-icon" id="employeeSearchIcon">
+                            <input type="text" class="search-input" placeholder="Search employees..." id="employeeSearchInput">
+                            <button class="search-clear-btn" id="employeeSearchClearBtn">
+                                <img src="{{ url_for('static', filename='images/cross.png') }}" alt="Clear" style="width: 16px; height: 16px;">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-box">
+                    <div class="table-wrapper">
+                        <table class="groups-table modal-table" id="modalEmployeeTable">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllEmployees" class="employee-checkbox"></th>
+                                    <th>No.</th>
+                                    <th>Name</th>
+                                    <th>Company</th>
+                                    <th>Department</th>
+                                    <th>Division</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalEmployeeTableBody">
+                                <!-- Employee rows will be populated here -->
+                            </tbody>
+                        </table>
+                        
+                        <div class="table-summary">
+                            <div class="pagination-info">
+                                Total records: <span id="totalRecords">0</span>
+                            </div>
+                            
+                            <div class="pagination-controls">
+                                <button class="pagination-btn" id="firstPage" onclick="goToPage(1)">«</button>
+                                <button class="pagination-btn" id="prevPage" onclick="goToPage(currentPage - 1)">‹</button>
+                                <div id="pageNumbers"></div>
+                                <button class="pagination-btn" id="nextPage" onclick="goToPage(currentPage + 1)">›</button>
+                                <button class="pagination-btn" id="lastPage" onclick="goToPage(totalPages)">»</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-secondary" onclick="closeEmployeeModal()">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" onclick="confirmEmployeeSelection()">Select</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 

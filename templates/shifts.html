@@ -296,6 +296,137 @@
         transition: background-color 0.2s ease;
     }
 
+    .shifts-table th .sort-icon {
+        display: inline-block;
+        margin-left: 8px;
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        vertical-align: baseline;
+        transform: translateY(-2px);
+        cursor: pointer;
+    }
+
+    .shifts-table th .sort-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        vertical-align: middle;
+        transition: none;
+    }
+
+    .shifts-table th.sortable:hover .sort-icon,
+    .shifts-table th.sorted .sort-icon {
+        opacity: 1;
+    }
+
+    .header-menu-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        opacity: 0;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        z-index: 2;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .shifts-table th:hover .header-menu-icon {
+        opacity: 0.7;
+    }
+
+    .header-menu-icon:hover {
+        opacity: 1;
+    }
+
+    /* Header dropdown menu styles (from groups page) */
+    .header-dropdown {
+        position: fixed;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+        max-width: 220px;
+        width: auto;
+        z-index: 1001;
+        display: none;
+        padding: 6px 0;
+        animation: fadeIn 0.15s ease-out;
+        white-space: nowrap;
+    }
+    
+    .header-dropdown.positioned-above {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.15s ease;
+        white-space: nowrap;
+        min-height: auto;
+        box-sizing: border-box;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f3f4f6;
+    }
+
+    .dropdown-item img {
+        width: 16px;
+        height: 16px;
+        opacity: 0.7;
+        transition: opacity 0.15s ease;
+        flex-shrink: 0;
+    }
+
+    .dropdown-item:hover img {
+        opacity: 1;
+    }
+
+    /* Prevent dropdown from being too wide or stretching */
+    #portal-root .header-dropdown {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #portal-root .dropdown-item {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-wrap: nowrap;
+    }
+
     .shifts-table th:last-child {
         border-right: none;
     }
@@ -589,6 +720,263 @@
         opacity: 1;
     }
 
+    /* Customize Columns Modal (from groups page) */
+    .customize-modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 400px;
+        background: white;
+        border-left: 1px solid #e9ecef;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1020;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customize-modal.show {
+        transform: translateX(0);
+    }
+
+    .customize-modal-content {
+        background: white;
+        border-radius: 0;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .customize-modal-header {
+        padding: 24px 24px 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .customize-modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .customize-modal-body {
+        padding: 24px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        color: #6c757d;
+        transition: all 0.2s;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+
+    .close-btn:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .column-option {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .column-option:hover {
+        background: #f8f9fa;
+    }
+
+    .column-option:last-child {
+        margin-bottom: 0;
+    }
+
+    .select-all-option {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .select-all-option .column-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 0;
+    }
+    .select-all-option .column-name {
+        margin-left: 0;
+    }
+
+    .select-all-option:hover {
+        background: #e9ecef;
+    }
+
+    .column-checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 0;
+    }
+
+    .column-checkbox {
+        margin-right: 12px;
+        width: 16px;
+        height: 16px;
+        accent-color: #1a1a1a;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('/static/images/box.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .column-checkbox:checked {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .column-checkbox:indeterminate {
+        background-image: none;
+        background-color: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .column-checkbox:indeterminate::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 8px;
+        height: 2px;
+        background: white;
+        transform: translate(-50%, -50%);
+    }
+
+    .column-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+        margin-left: 12px;
+    }
+
+    .column-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-left: 12px;
+    }
+
+    .selection-count {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .customize-modal-footer {
+        padding: 20px 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: white;
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .btn-reset {
+        padding: 10px 20px;
+        background: transparent;
+        color: #6c757d;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+    .btn-save {
+        padding: 10px 20px;
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-save:hover {
+        background: #333;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
     /* Empty state */
     .empty-state {
         text-align: center;
@@ -701,20 +1089,45 @@
                 <div class="table-wrapper">
                     <div class="table-summary">Total {{ shifts|length }} shift{% if shifts|length != 1 %}s{% endif %}</div>
                     {% if shifts %}
-                    <table class="shifts-table">
+                    <table class="shifts-table" id="shiftsTable">
                         <thead>
                             <tr>
-                                <th>Shift Name</th>
-                                <th>Shift ID</th>
-                                <th>Time Configuration</th>
-                                <th>Ngày công</th>
-                                <th>Giờ công</th>
-                                <th></th>
+                                <th class="sortable" data-sort="name">
+                                    Shift Name
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'name')">
+                                </th>
+                                <th class="sortable" data-sort="shift_id">
+                                    Shift ID
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'shift_id')">
+                                </th>
+                                <th class="sortable" data-sort="time_config">
+                                    Time Configuration
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'time_config')">
+                                </th>
+                                <th class="sortable" data-sort="days_worked">
+                                    Ngày công
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'days_worked')">
+                                </th>
+                                <th class="sortable" data-sort="hours_worked">
+                                    Giờ công
+                                    <span class="sort-icon"><img src="/static/images/arrow-small-up.png" alt="Sort"></span>
+                                    <img src="/static/images/menu-dots-vertical.png" alt="Menu" class="header-menu-icon" onclick="event.stopPropagation(); showSortDropdown(this, 'hours_worked')">
+                                </th>
+                                <th style="width: 60px;"></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="shiftsBody">
                             {% for shift in shifts %}
-                            <tr data-shift-name="{{ shift.name.lower() }}">
+                            <tr data-shift-name="{{ shift.name.lower() }}" 
+                                data-shift-id="{{ shift.shift_id.lower() }}"
+                                data-days-worked="{{ shift.days_worked }}"
+                                data-hours-worked="{{ shift.hours_worked }}"
+                                data-start-time="{{ shift.start_time }}"
+                                data-end-time="{{ shift.end_time }}">
                                 <td>
                                     {% if shift.shift_type == 'new' %}
                                     <div class="shift-name clickable" onclick="viewShiftDetails('{{ shift.id }}')" title="Click to view details">{{ shift.name }}</div>
@@ -777,12 +1190,89 @@
     </div>
 </div>
 
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="modalOverlay"></div>
+
+<!-- Customize Columns Modal -->
+<div class="customize-modal" id="customizeModal">
+    <div class="customize-modal-content">
+        <div class="customize-modal-header">
+            <h3 class="customize-modal-title">Customize columns</h3>
+            <button class="close-btn" id="customizeCloseBtn">
+                <img src="/static/images/cross.png" alt="Close" style="width: 14px; height: 14px;">
+            </button>
+        </div>
+        
+        <div class="customize-modal-body">
+            <div class="column-option select-all-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" id="selectAllColumns">
+                    <div class="column-info">
+                        <span class="column-name">Select all</span>
+                        <span class="selection-count" id="selectionCount">5 / 5 selected</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="shift-name" checked>
+                    <span class="column-name">Shift Name</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="shift-id" checked>
+                    <span class="column-name">Shift ID</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="time-config" checked>
+                    <span class="column-name">Time Configuration</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="days-worked" checked>
+                    <span class="column-name">Ngày công</span>
+                </label>
+            </div>
+
+            <div class="column-option">
+                <label class="column-checkbox-label">
+                    <input type="checkbox" class="column-checkbox" data-column="hours-worked" checked>
+                    <span class="column-name">Giờ công</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="customize-modal-footer">
+            <button class="btn-reset" id="customizeResetBtn">Reset</button>
+            <button class="btn-save" id="customizeSaveBtn">Save</button>
+        </div>
+    </div>
+</div>
+
 <script>
+// Global variables for sorting and original data
+let originalShiftData = [];
+let currentSort = {
+    field: 'name',
+    direction: 'asc'
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     const searchContainer = document.getElementById('searchContainer');
     const searchInput = document.getElementById('searchInput');
     const searchIcon = document.getElementById('searchIcon');
     const searchClearBtn = document.getElementById('searchClearBtn');
+
+    // Initialize sorting data
+    initializeSortingData();
 
     // Search container click handler (match groups page)
     searchContainer.addEventListener('click', function() {
@@ -800,25 +1290,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.shifts-table tbody tr');
+        const searchTerm = this.value.trim();
         
-        rows.forEach(row => {
-            const shiftName = row.getAttribute('data-shift-name') || '';
-            
-            if (shiftName.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
         // Show/hide clear button
         if (searchTerm.length > 0) {
             searchClearBtn.classList.add('show');
         } else {
             searchClearBtn.classList.remove('show');
         }
+        
+        // Update table view with new search term
+        updateTableView();
     });
 
     // Clear search button behavior (match groups page)
@@ -827,9 +1309,8 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.value = '';
         searchContainer.classList.remove('expanded');
         this.classList.remove('show');
-        // Trigger filtering reset
-        const rows = document.querySelectorAll('.shifts-table tbody tr');
-        rows.forEach(row => { row.style.display = ''; });
+        // Update table view to reset filtering
+        updateTableView();
     });
 
     // Collapse on blur if empty (match groups page)
@@ -864,7 +1345,228 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('no-scroll');
         }
     });
+
+    // Setup customize columns functionality
+    setupCustomizeModal();
+
+    // Customize columns button click handler
+    const customizeColumnsBtn = document.getElementById('customizeColumnsBtn');
+    if (customizeColumnsBtn) {
+        customizeColumnsBtn.addEventListener('click', function() {
+            openCustomizeModal();
+        });
+    }
 });
+
+// Function to update selection count
+function updateSelectionCount() {
+    const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+    const selectionCount = document.getElementById('selectionCount');
+    const selectAllCheckbox = document.getElementById('selectAllColumns');
+    
+    if (!selectionCount || !selectAllCheckbox) return;
+    
+    const totalColumns = columnCheckboxes.length;
+    const checkedColumns = document.querySelectorAll('.column-checkbox[data-column]:checked').length;
+    selectionCount.textContent = `${checkedColumns} / ${totalColumns} selected`;
+    
+    // Update select all checkbox state
+    if (checkedColumns === totalColumns) {
+        selectAllCheckbox.checked = true;
+        selectAllCheckbox.indeterminate = false;
+    } else if (checkedColumns === 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+    } else {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = true;
+    }
+}
+
+// Open customize modal
+function openCustomizeModal() {
+    const modal = document.getElementById('customizeModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const settingsContent = document.querySelector('.settings-content');
+    
+    modal.classList.add('show');
+    modalOverlay.classList.add('show');
+    if (settingsContent) {
+        settingsContent.classList.add('modal-open');
+    }
+    
+    // Update selection count
+    updateSelectionCount();
+}
+
+// Setup customize modal functionality
+function setupCustomizeModal() {
+    const modal = document.getElementById('customizeModal');
+    const closeBtn = document.getElementById('customizeCloseBtn');
+    const resetBtn = document.getElementById('customizeResetBtn');
+    const saveBtn = document.getElementById('customizeSaveBtn');
+    const selectAllCheckbox = document.getElementById('selectAllColumns');
+    const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+    const selectionCount = document.getElementById('selectionCount');
+
+    if (!modal || !closeBtn || !resetBtn || !saveBtn || !selectAllCheckbox || !selectionCount) {
+        console.log('Some customize modal elements not found, skipping setup');
+        return;
+    }
+
+    // Close modal function
+    function closeModal() {
+        modal.classList.remove('show');
+        document.getElementById('modalOverlay').classList.remove('show');
+        const settingsContent = document.querySelector('.settings-content');
+        if (settingsContent) {
+            settingsContent.classList.remove('modal-open');
+        }
+    }
+
+    // Function to update table columns visibility
+    function updateTableColumns() {
+        const columnMapping = {
+            'shift-name': 0,
+            'shift-id': 1,
+            'time-config': 2,
+            'days-worked': 3,
+            'hours-worked': 4
+            // Actions column (index 5) is always visible
+        };
+        
+        const table = document.querySelector('.shifts-table');
+        const rows = table.querySelectorAll('tr');
+        
+        // Update header row
+        const headerRow = rows[0];
+        Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+            const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+            const headerCell = headerRow.cells[columnIndex];
+            
+            if (checkbox && headerCell) {
+                if (checkbox.checked) {
+                    headerCell.style.display = 'table-cell';
+                } else {
+                    headerCell.style.display = 'none';
+                }
+            }
+        });
+        
+        // Update data rows
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            Object.entries(columnMapping).forEach(([columnKey, columnIndex]) => {
+                const checkbox = document.querySelector(`[data-column="${columnKey}"]`);
+                const cell = row.cells[columnIndex];
+                
+                if (checkbox && cell) {
+                    if (checkbox.checked) {
+                        cell.style.display = 'table-cell';
+                    } else {
+                        cell.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // Update empty state colspan
+        updateEmptyStateColspan();
+    }
+
+    // Function to calculate visible columns and update empty state colspan
+    function updateEmptyStateColspan() {
+        const columnCheckboxes = document.querySelectorAll('.column-checkbox[data-column]');
+        let visibleColumns = 1; // Actions column is always visible
+        
+        columnCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                visibleColumns++;
+            }
+        });
+        
+        // Update all empty state colspans
+        const emptyStateCells = document.querySelectorAll('td[colspan]');
+        emptyStateCells.forEach(cell => {
+            cell.setAttribute('colspan', visibleColumns);
+        });
+    }
+
+    // Initial setup
+    updateSelectionCount();
+    updateEmptyStateColspan();
+
+    // Event listeners
+    closeBtn.addEventListener('click', closeModal);
+
+    // Close on overlay click
+    const modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (modal.classList.contains('show') && e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+    }
+
+    // Select all functionality
+    selectAllCheckbox.addEventListener('change', function() {
+        const shouldCheck = this.checked;
+        columnCheckboxes.forEach(checkbox => {
+            checkbox.checked = shouldCheck;
+        });
+        updateSelectionCount();
+    });
+
+    // Individual checkbox changes
+    columnCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectionCount();
+        });
+    });
+
+    // Reset button
+    resetBtn.addEventListener('click', function() {
+        // Reset to default state (all checked)
+        columnCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        updateSelectionCount();
+        
+        // Immediately update table and close popup
+        updateTableColumns();
+        closeModal();
+    });
+
+    // Save button
+    saveBtn.addEventListener('click', function() {
+        // Apply column visibility changes
+        console.log('Saving column preferences...');
+        
+        // Get selected columns
+        const selectedColumns = [];
+        columnCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedColumns.push(checkbox.dataset.column);
+            }
+        });
+        
+        console.log('Selected columns:', selectedColumns);
+        
+        // Apply the table column changes
+        updateTableColumns();
+        
+        // Close the modal
+        closeModal();
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+            closeModal();
+        }
+    });
+}
 
 function toggleShiftActionMenu(event, shiftId) {
     event.stopPropagation();
@@ -953,30 +1655,441 @@ function editShift(shiftId, shiftType) {
 
 function deleteShift(shiftId) {
     if (confirm('Are you sure you want to delete this shift? This action cannot be undone.')) {
-        // Extract schedule ID from shift ID (format: scheduleId_shiftId)
-        const scheduleId = shiftId.split('_')[0];
-        
-        // For now, redirect to delete schedule page
-        // In a real implementation, you might want to delete just the shift
-        if (confirm('This will delete the entire schedule containing this shift. Continue?')) {
-            fetch(`/api/delete-schedule/${scheduleId}`, {
+        // Check if this is a new shift (from Shift model) or legacy shift (from WorkSchedule)
+        if (shiftId.toString().startsWith('shift_')) {
+            // New shift format: "shift_X" where X is the actual database ID
+            const actualShiftId = shiftId.replace('shift_', '');
+            
+            fetch(`/api/delete-shift/${actualShiftId}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Schedule deleted successfully!');
+                    alert('Shift deleted successfully!');
                     window.location.reload();
                 } else {
-                    alert('Error deleting schedule: ' + (data.error || 'Unknown error'));
+                    alert('Error deleting shift: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error deleting schedule. Please try again.');
+                alert('Error deleting shift. Please try again.');
             });
+        } else {
+            // Legacy shift format: "scheduleId_shiftId" - delete entire schedule
+            // For legacy shifts, we cannot delete individual shifts, only entire schedules
+            const scheduleId = shiftId.split('_')[0];
+            
+            if (confirm('This is a legacy shift from a schedule. Deleting it will remove the entire schedule and all its shifts. Continue?')) {
+                fetch(`/api/delete-schedule/${scheduleId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Schedule and all its shifts deleted successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting schedule: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting schedule. Please try again.');
+                });
+            }
         }
     }
+}
+
+// Initialize sorting data from table rows
+function initializeSortingData() {
+    const rows = document.querySelectorAll('#shiftsBody tr');
+    originalShiftData = [];
+    
+    rows.forEach(row => {
+        const shiftData = {
+            element: row,
+            name: row.getAttribute('data-shift-name') || '',
+            shift_id: row.getAttribute('data-shift-id') || '',
+            days_worked: parseFloat(row.getAttribute('data-days-worked') || '0'),
+            hours_worked: parseFloat(row.getAttribute('data-hours-worked') || '0'),
+            start_time: row.getAttribute('data-start-time') || '',
+            end_time: row.getAttribute('data-end-time') || ''
+        };
+        originalShiftData.push(shiftData);
+    });
+    
+    console.log('Initialized sorting with', originalShiftData.length, 'shifts');
+    
+    // Setup sorting event listeners
+    setupSorting();
+    
+    // Apply default sort
+    updateSortArrows();
+}
+
+// Setup sorting event listeners
+function setupSorting() {
+    document.querySelectorAll('.sortable').forEach(header => {
+        header.addEventListener('click', function(event) {
+            // Only sort when clicking the sort icon
+            if (event.target.closest('.sort-icon')) {
+                const sortField = this.dataset.sort;
+                
+                if (currentSort.field === sortField) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.field = sortField;
+                    currentSort.direction = 'asc';
+                }
+                
+                updateTableView();
+            }
+        });
+    });
+}
+
+// Update sort arrows
+function updateSortArrows() {
+    document.querySelectorAll('.sortable').forEach(header => {
+        const sortIcon = header.querySelector('.sort-icon img');
+        const sortField = header.dataset.sort;
+        
+        // Remove sorted class from all headers
+        header.classList.remove('sorted');
+        
+        if (currentSort.field === sortField) {
+            // Add sorted class to active column
+            header.classList.add('sorted');
+            // Set the correct arrow direction for the active column
+            sortIcon.src = currentSort.direction === 'asc' ? 
+                '/static/images/arrow-small-up.png' : 
+                '/static/images/arrow-small-down.png';
+        } else {
+            // Other columns default to the 'up' arrow when no sorting is active
+            sortIcon.src = '/static/images/arrow-small-up.png';
+        }
+    });
+}
+
+// Update table view with sorting and filtering
+function updateTableView() {
+    // Get search term
+    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+    
+    // Filter data based on search term
+    let filteredData = originalShiftData.filter(item => {
+        // Search by shift name
+        const matchesSearch = !searchTerm || 
+            (item.name && item.name.includes(searchTerm));
+        
+        return matchesSearch;
+    });
+    
+    // Sort the filtered data
+    let sortedData = [...filteredData];
+    
+    // Only sort if a sort field is specified
+    if (currentSort.field) {
+        sortedData = sortedData.sort((a, b) => {
+            let aVal, bVal;
+
+            switch (currentSort.field) {
+                case 'name':
+                    aVal = a.name || '';
+                    bVal = b.name || '';
+                    break;
+                case 'shift_id':
+                    aVal = a.shift_id || '';
+                    bVal = b.shift_id || '';
+                    break;
+                case 'time_config':
+                    // Sort by start time
+                    aVal = a.start_time || '';
+                    bVal = b.start_time || '';
+                    break;
+                case 'days_worked':
+                    aVal = a.days_worked;
+                    bVal = b.days_worked;
+                    break;
+                case 'hours_worked':
+                    aVal = a.hours_worked;
+                    bVal = b.hours_worked;
+                    break;
+                default:
+                    return 0;
+            }
+
+            // Handle numeric vs string comparison
+            if (typeof aVal === 'number' && typeof bVal === 'number') {
+                if (currentSort.direction === 'asc') {
+                    return aVal - bVal;
+                } else {
+                    return bVal - aVal;
+                }
+            } else {
+                // String comparison
+                aVal = String(aVal).toLowerCase();
+                bVal = String(bVal).toLowerCase();
+                
+                if (currentSort.direction === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                }
+            }
+        });
+    }
+
+    // Update visual indicators for sorting
+    updateSortArrows();
+
+    // Render the filtered and sorted data
+    const tbody = document.getElementById('shiftsBody');
+    tbody.innerHTML = '';
+    
+    if (sortedData.length === 0) {
+        if (originalShiftData.length === 0) {
+            // Show empty state if no shifts exist
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <img src="/static/images/calendar-lines.png" alt="No shifts" width="64" height="64">
+                            </div>
+                            <div class="empty-state-title">No shifts found</div>
+                            <div class="empty-state-description">Create your first schedule to add shifts to your organization.</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            // Show no results message for filtered results
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <img src="/static/images/calendar-lines.png" alt="No results" width="64" height="64">
+                            </div>
+                            <div class="empty-state-title">No shifts match your search</div>
+                            <div class="empty-state-description">Try adjusting your search terms.</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    } else {
+        // Show filtered and sorted results
+        sortedData.forEach(shiftData => {
+            tbody.appendChild(shiftData.element);
+        });
+    }
+    
+    // Update table summary
+    updateTableSummary(sortedData.length);
+}
+
+// Update table summary with count
+function updateTableSummary(count) {
+    const summaryEl = document.querySelector('.table-summary');
+    if (summaryEl) {
+        summaryEl.textContent = `Total ${count} shift${count !== 1 ? 's' : ''}`;
+    }
+}
+
+// Portal dropdown utilities (from groups page)
+let currentPortalTrigger = null; // keep track of which header icon opened dropdown
+let portalOutsideHandler = null; // keep reference to active outside-click listener
+
+function openPortalDropdown(trigger, html) {
+    // Close any open action menus
+    document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show'));
+    document.body.classList.remove('no-scroll');
+
+    // If an old outside-click handler exists, remove it to avoid stacking
+    if (portalOutsideHandler) {
+        document.removeEventListener('mousedown', portalOutsideHandler);
+        portalOutsideHandler = null;
+    }
+
+    // Check if there's already an open dropdown
+    const portalRoot = document.getElementById('portal-root');
+    const existingDropdown = portalRoot.querySelector('.header-dropdown');
+    
+    // If a dropdown is already open, decide whether to close or replace it
+    if (existingDropdown && existingDropdown.classList.contains('show')) {
+        if (currentPortalTrigger === trigger) {
+            // Same trigger was clicked again → just close (toggle off)
+            closePortalDropdown();
+            currentPortalTrigger = null;
+            return;
+        } else {
+            // Different trigger → close existing then proceed to open a new one
+            closePortalDropdown();
+        }
+    }
+
+    // Remember which trigger opened the dropdown
+    currentPortalTrigger = trigger;
+
+    portalRoot.innerHTML = html;
+
+    const rect = trigger.getBoundingClientRect();
+    const gap = 4;
+    const minMargin = 8;
+
+    const dropdown = portalRoot.querySelector('.header-dropdown');
+    dropdown.style.position = 'fixed';
+    dropdown.style.width = 'auto';
+    dropdown.style.minWidth = '180px';
+    dropdown.style.maxWidth = '220px';
+
+    // Position dropdown below the trigger
+    dropdown.style.top = (rect.bottom + gap) + 'px';
+    
+    // Calculate horizontal position - prefer aligning right edge with trigger
+    const dropdownWidth = 200; // estimated width
+    let left = rect.right - dropdownWidth;
+    
+    // If that would go off the left edge, align with left edge of trigger
+    if (left < minMargin) {
+        left = rect.left;
+    }
+    
+    // If that would go off the right edge, stick to right margin
+    if (left + dropdownWidth > window.innerWidth - minMargin) {
+        left = window.innerWidth - dropdownWidth - minMargin;
+    }
+    
+    dropdown.style.left = Math.max(minMargin, left) + 'px';
+
+    // Add outside click handler
+    portalOutsideHandler = function(e) {
+        const portalRoot = document.getElementById('portal-root');
+        if (!portalRoot.contains(e.target) && !trigger.contains(e.target)) {
+            closePortalDropdown();
+        }
+    };
+    document.addEventListener('mousedown', portalOutsideHandler);
+
+    // Lock body scroll while header dropdown is open
+    document.body.classList.add('no-scroll');
+}
+
+function closePortalDropdown() {
+    const portalRoot = document.getElementById('portal-root');
+    portalRoot.innerHTML = '';
+    // Re-enable body scroll
+    document.body.classList.remove('no-scroll');
+    currentPortalTrigger = null;
+    // Remove any lingering outside-click handler
+    if (portalOutsideHandler) {
+        document.removeEventListener('mousedown', portalOutsideHandler);
+        portalOutsideHandler = null;
+    }
+}
+
+// Sort dropdown functionality
+function showSortDropdown(trigger, column) {
+    // Check if this column is currently sorted
+    const isCurrentlySorted = currentSort.field === column;
+    const currentDirection = currentSort.direction;
+    
+    let dropdownHtml = `
+        <div class="header-dropdown show" id="sort-dropdown-${column}">`;
+    
+    if (isCurrentlySorted && currentSort.field !== null) {
+        // If column is sorted, show opposite sort option and unsort
+        const oppositeDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+        const oppositeText = oppositeDirection === 'asc' ? 'Sort by ASC' : 'Sort by DESC';
+        const oppositeIcon = oppositeDirection === 'asc' ? 'arrow-small-up.png' : 'arrow-small-down.png';
+        
+        dropdownHtml += `
+            <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="${oppositeDirection}">
+                <img src="/static/images/${oppositeIcon}" alt="Sort ${oppositeDirection.toUpperCase()}">
+                ${oppositeText}
+            </div>
+            <div class="dropdown-item" data-action="unsort">
+                <img src="/static/images/cross.png" alt="Unsort">
+                Unsort
+            </div>`;
+    } else {
+        // If column is not sorted, show both sort options
+        dropdownHtml += `
+            <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="asc">
+                <img src="/static/images/arrow-small-up.png" alt="Sort ASC">
+                Sort by ASC
+            </div>
+            <div class="dropdown-item" data-action="sort" data-column="${column}" data-direction="desc">
+                <img src="/static/images/arrow-small-down.png" alt="Sort DESC">
+                Sort by DESC
+            </div>`;
+    }
+    
+    dropdownHtml += `
+            <div class="dropdown-item" data-action="customize">
+                <img src="/static/images/columns-3.png" alt="Customize">
+                Customize columns
+            </div>
+        </div>
+    `;
+    
+    openPortalDropdown(trigger, dropdownHtml);
+    
+    // Add event listeners after the dropdown is created
+    setTimeout(() => {
+        const dropdown = document.getElementById(`sort-dropdown-${column}`);
+        if (dropdown) {
+            dropdown.addEventListener('click', function(e) {
+                const item = e.target.closest('.dropdown-item');
+                if (!item) return;
+                
+                e.stopPropagation();
+                
+                const action = item.getAttribute('data-action');
+                const col = item.getAttribute('data-column');
+                const direction = item.getAttribute('data-direction');
+                
+                // Close dropdown first
+                closePortalDropdown();
+                
+                // Then execute action
+                if (action === 'sort') {
+                    sortColumn(col, direction);
+                } else if (action === 'unsort') {
+                    unsortColumn();
+                } else if (action === 'customize') {
+                    openCustomizeModal();
+                }
+            });
+        }
+    }, 50);
+}
+
+// Sort column function
+function sortColumn(field, direction) {
+    console.log('Sorting by', field, direction);
+    
+    // Update current sort state
+    currentSort = { field: field, direction: direction };
+    
+    // Update table view with new sorting
+    updateTableView();
+}
+
+// Unsort column function
+function unsortColumn() {
+    console.log('Unsorting - removing all sorting');
+    
+    // Reset current sort state to no sorting
+    currentSort = { field: null, direction: null };
+    
+    // Update table view without sorting
+    updateTableView();
 }
 </script>
 {% endblock %} 

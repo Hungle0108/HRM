@@ -688,6 +688,14 @@
             cursor: not-allowed;
         }
 
+        .btn-create.disabled {
+            background: #6c757d !important;
+            color: #adb5bd !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            opacity: 0.5 !important;
+        }
+
         /* Penalty Modal styles */
         .penalty-modal {
             display: none;
@@ -1137,7 +1145,7 @@
                         <div class="next-step-label">Next step:</div>
                         <div class="next-step-title">3. Review & Create</div>
                     </div>
-                    <a href="/create-shift-step3" class="btn-create" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" onclick="localStorage.removeItem('formClearedByEscape');">Continue</a>
+                    <a href="/create-shift-step3" id="continueBtn" class="btn-create" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" onclick="return validateFormAndContinue();">Continue</a>
                 </div>
             </div>
         </div>
@@ -1418,17 +1426,8 @@
                         localStorage.setItem('createShiftStep2FormState', JSON.stringify(data));
                     }
                     
-                    // Reset penalty-related form fields
-                    const noEntryPenaltyToggle = document.getElementById('noEntryPenaltyToggle');
-                    const noExitPenaltyToggle = document.getElementById('noExitPenaltyToggle');
-                    if (noEntryPenaltyToggle) {
-                        noEntryPenaltyToggle.checked = false;
-                        noEntryPenaltyToggle.dispatchEvent(new Event('change'));
-                    }
-                    if (noExitPenaltyToggle) {
-                        noExitPenaltyToggle.checked = false;
-                        noExitPenaltyToggle.dispatchEvent(new Event('change'));
-                    }
+                    // Update continue button state after clearing penalty data
+                    updateContinueButtonState();
                 }
             });
 
@@ -1452,6 +1451,9 @@
                     
                     // Save the cleared state
                     saveStep2FormState();
+                    
+                    // Update continue button state after clearing fields
+                    updateContinueButtonState();
                 }
             });
 
@@ -1475,6 +1477,9 @@
                     
                     // Save the cleared state
                     saveStep2FormState();
+                    
+                    // Update continue button state after clearing fields
+                    updateContinueButtonState();
                 }
             });
 
@@ -1725,6 +1730,9 @@
                 
                 // Save form state after adding penalty row
                 saveStep2FormState();
+                
+                // Update continue button state after adding penalty
+                updateContinueButtonState();
             }
 
             // Function to get penalty type text
@@ -1757,6 +1765,9 @@
                 
                 // Save form state after updating penalty row
                 saveStep2FormState();
+                
+                // Update continue button state after updating penalty
+                updateContinueButtonState();
             }
 
             // Function to delete a penalty row
@@ -1768,6 +1779,8 @@
                     saveStep2FormState();
                     // Update empty state after deleting penalty row
                     updatePenaltyTableEmptyState();
+                    // Update continue button state after deleting penalty
+                    updateContinueButtonState();
                 }
             };
 
@@ -1945,11 +1958,15 @@
                 }
             }
             // Call this after adding/removing penalties
-            // Patch addPenaltyRow to call updatePenaltyTableEmptyState
+            // Patch addPenaltyRow to call updatePenaltyTableEmptyState and button state
             const originalAddPenaltyRow = addPenaltyRow;
             addPenaltyRow = function(...args) {
                 originalAddPenaltyRow.apply(this, args);
                 updatePenaltyTableEmptyState();
+                // Also update continue button state when penalties are restored
+                if (typeof updateContinueButtonState === 'function') {
+                    updateContinueButtonState();
+                }
             };
             document.addEventListener('DOMContentLoaded', updatePenaltyTableEmptyState);
 
@@ -2032,6 +2049,170 @@
             window.addEventListener('beforeunload', function() {
                 localStorage.removeItem('formClearedByEscape');
             });
+
+            // ===== CONTINUE BUTTON VALIDATION =====
+            
+            // Function to validate if form is complete based on checked boxes
+            function isFormValid() {
+                const penaltyToggle = document.getElementById('penaltyToggle');
+                const noEntryPenaltyToggle = document.getElementById('noEntryPenaltyToggle');
+                const noExitPenaltyToggle = document.getElementById('noExitPenaltyToggle');
+                
+                // Check penalty toggle validation
+                if (penaltyToggle && penaltyToggle.checked) {
+                    // Penalty is enabled, check if there are penalty rows with data
+                    const penaltyTableBody = document.getElementById('penaltyTableBody');
+                    const penaltyRows = Array.from(penaltyTableBody.children).filter(row => row.id !== 'penaltyTableEmptyState');
+                    
+                    if (penaltyRows.length === 0) {
+                        return false; // No penalty data added
+                    }
+                }
+                
+                // Check no entry penalty validation
+                if (noEntryPenaltyToggle && noEntryPenaltyToggle.checked) {
+                    const hoursInput = document.getElementById('noEntryHoursDeducted');
+                    const daysInput = document.getElementById('noEntryDaysDeducted');
+                    
+                    if (!hoursInput || !daysInput || 
+                        hoursInput.value.trim() === '' || daysInput.value.trim() === '' ||
+                        isNaN(hoursInput.value) || isNaN(daysInput.value) ||
+                        Number(hoursInput.value) < 0 || Number(daysInput.value) < 0) {
+                        return false; // Required fields not filled or invalid
+                    }
+                }
+                
+                // Check no exit penalty validation
+                if (noExitPenaltyToggle && noExitPenaltyToggle.checked) {
+                    const hoursInput = document.getElementById('noExitHoursDeducted');
+                    const daysInput = document.getElementById('noExitDaysDeducted');
+                    
+                    if (!hoursInput || !daysInput || 
+                        hoursInput.value.trim() === '' || daysInput.value.trim() === '' ||
+                        isNaN(hoursInput.value) || isNaN(daysInput.value) ||
+                        Number(hoursInput.value) < 0 || Number(daysInput.value) < 0) {
+                        return false; // Required fields not filled or invalid
+                    }
+                }
+                
+                return true; // All validations passed
+            }
+            
+            // Function to update continue button state
+            function updateContinueButtonState() {
+                const continueBtn = document.getElementById('continueBtn');
+                if (!continueBtn) return;
+                
+                const isValid = isFormValid();
+                
+                if (isValid) {
+                    // Enable button
+                    continueBtn.style.opacity = '1';
+                    continueBtn.style.cursor = 'pointer';
+                    continueBtn.style.pointerEvents = 'auto';
+                    continueBtn.style.background = '#1a1a1a';
+                    continueBtn.style.color = 'white';
+                    continueBtn.classList.remove('disabled');
+                } else {
+                    // Disable button
+                    continueBtn.style.opacity = '0.5';
+                    continueBtn.style.cursor = 'not-allowed';
+                    continueBtn.style.pointerEvents = 'none';
+                    continueBtn.style.background = '#6c757d';
+                    continueBtn.style.color = '#adb5bd';
+                    continueBtn.classList.add('disabled');
+                }
+            }
+            
+            // Function called when continue button is clicked
+            window.validateFormAndContinue = function() {
+                if (!isFormValid()) {
+                    // Show specific error messages based on what's missing
+                    let errorMessages = [];
+                    
+                    const penaltyToggle = document.getElementById('penaltyToggle');
+                    const noEntryPenaltyToggle = document.getElementById('noEntryPenaltyToggle');
+                    const noExitPenaltyToggle = document.getElementById('noExitPenaltyToggle');
+                    
+                    if (penaltyToggle && penaltyToggle.checked) {
+                        const penaltyTableBody = document.getElementById('penaltyTableBody');
+                        const penaltyRows = Array.from(penaltyTableBody.children).filter(row => row.id !== 'penaltyTableEmptyState');
+                        if (penaltyRows.length === 0) {
+                            errorMessages.push('- Please add at least one penalty rule for "Phạt đi muộn/về sớm"');
+                        }
+                    }
+                    
+                    if (noEntryPenaltyToggle && noEntryPenaltyToggle.checked) {
+                        const hoursInput = document.getElementById('noEntryHoursDeducted');
+                        const daysInput = document.getElementById('noEntryDaysDeducted');
+                        if (!hoursInput || !daysInput || 
+                            hoursInput.value.trim() === '' || daysInput.value.trim() === '' ||
+                            isNaN(hoursInput.value) || isNaN(daysInput.value) ||
+                            Number(hoursInput.value) < 0 || Number(daysInput.value) < 0) {
+                            errorMessages.push('- Please fill in valid hours and days deducted for "Phạt không có giờ vào"');
+                        }
+                    }
+                    
+                    if (noExitPenaltyToggle && noExitPenaltyToggle.checked) {
+                        const hoursInput = document.getElementById('noExitHoursDeducted');
+                        const daysInput = document.getElementById('noExitDaysDeducted');
+                        if (!hoursInput || !daysInput || 
+                            hoursInput.value.trim() === '' || daysInput.value.trim() === '' ||
+                            isNaN(hoursInput.value) || isNaN(daysInput.value) ||
+                            Number(hoursInput.value) < 0 || Number(daysInput.value) < 0) {
+                            errorMessages.push('- Please fill in valid hours and days deducted for "Phạt không có giờ ra"');
+                        }
+                    }
+                    
+                    if (errorMessages.length > 0) {
+                        alert('Please complete the required fields:\n\n' + errorMessages.join('\n'));
+                    }
+                    
+                    return false; // Prevent navigation
+                }
+                
+                // Clear the flag and proceed
+                localStorage.removeItem('formClearedByEscape');
+                return true; // Allow navigation
+            };
+            
+            // Add event listeners to update button state when form changes
+            const noEntryHoursInput = document.getElementById('noEntryHoursDeducted');
+            const noEntryDaysInput = document.getElementById('noEntryDaysDeducted');
+            const noExitHoursInput = document.getElementById('noExitHoursDeducted');
+            const noExitDaysInput = document.getElementById('noExitDaysDeducted');
+            
+            // Add event listeners for checkboxes (using already declared variables)
+            if (penaltyToggle) {
+                penaltyToggle.addEventListener('change', updateContinueButtonState);
+            }
+            if (noEntryPenaltyToggle) {
+                noEntryPenaltyToggle.addEventListener('change', updateContinueButtonState);
+            }
+            if (noExitPenaltyToggle) {
+                noExitPenaltyToggle.addEventListener('change', updateContinueButtonState);
+            }
+            
+            // Add event listeners for input fields
+            if (noEntryHoursInput) {
+                noEntryHoursInput.addEventListener('input', updateContinueButtonState);
+                noEntryHoursInput.addEventListener('change', updateContinueButtonState);
+            }
+            if (noEntryDaysInput) {
+                noEntryDaysInput.addEventListener('input', updateContinueButtonState);
+                noEntryDaysInput.addEventListener('change', updateContinueButtonState);
+            }
+            if (noExitHoursInput) {
+                noExitHoursInput.addEventListener('input', updateContinueButtonState);
+                noExitHoursInput.addEventListener('change', updateContinueButtonState);
+            }
+            if (noExitDaysInput) {
+                noExitDaysInput.addEventListener('input', updateContinueButtonState);
+                noExitDaysInput.addEventListener('change', updateContinueButtonState);
+            }
+            
+            // Update button state on page load
+            setTimeout(updateContinueButtonState, 200);
         });
     </script>
 </body>

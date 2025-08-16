@@ -107,9 +107,20 @@
     left: 0;
     height: calc(100vh - 80px);
     overflow-y: auto;
+    overflow-x: hidden;
+    /* Hide scrollbar for all browsers with high specificity */
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* Internet Explorer 10+ */
     border-radius: 0 0 12px 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     z-index: 100;
+}
+
+/* Hide scrollbar for webkit browsers with high specificity */
+.settings-sidebar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    background: transparent !important;
 }
 
 /* Sidebar header */
@@ -313,9 +324,9 @@
     transition: none !important;
 }
 
-/* Fix for any overflow issues */
+/* Additional scrollbar hiding for maximum compatibility */
 .settings-sidebar {
-    overflow-x: hidden;
+    overflow-x: hidden !important;
 }
 
 /* Ensure proper spacing */
@@ -326,6 +337,15 @@
 /* Remove any potential artifacts */
 .settings-sidebar * {
     box-sizing: border-box;
+}
+
+/* Global scrollbar hiding applied when sidebar is present */
+:root body::-webkit-scrollbar {
+    display: none !important;
+}
+:root body {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE 10+ */
 }
 
 /* Icons */
@@ -369,20 +389,28 @@
         sidebar.classList.add('no-transition');
         
         // Check if this is the first visit to organization settings in this session
-        const isFirstVisit = !sessionStorage.getItem('orgSettingsVisited');
+        // or if there's no saved state at all
+        const hasExpandedState = localStorage.getItem('sidebarExpandedSections');
+        const isFirstVisit = !sessionStorage.getItem('orgSettingsVisited') && !hasExpandedState;
         
         if (isFirstVisit) {
-            // First visit - collapse all dropdowns
+            // First visit and no saved state - collapse all dropdowns
             collapseAllDropdowns();
             // Mark that user has visited organization settings
             sessionStorage.setItem('orgSettingsVisited', 'true');
             console.log('First visit to organization settings - all dropdowns collapsed');
-        } else {
-            // Not first visit - restore previous state and expand active parent
-            restoreExpandedState();
-            expandActiveParent();
-            console.log('Returning to organization settings - restoring previous state');
         }
+        
+        // Always restore previous state if it exists, then expand active parent
+        restoreExpandedState();
+        expandActiveParent();
+        
+        // Mark that user has visited organization settings (if not already marked)
+        if (!sessionStorage.getItem('orgSettingsVisited')) {
+            sessionStorage.setItem('orgSettingsVisited', 'true');
+        }
+        
+        console.log('Organization settings sidebar initialized - state restored');
         
         // Get all expandable items
         const expandableItems = document.querySelectorAll('.nav-item.expandable');
@@ -455,6 +483,9 @@
         localStorage.removeItem('sidebarExpandedSections');
         
         console.log('All dropdowns collapsed - clean slate for first visit');
+        
+        // Save the collapsed state
+        saveExpandedState();
     }
 
     function saveExpandedState() {
@@ -489,10 +520,13 @@
                 const navItem = document.querySelector(`.nav-item.expandable[data-section="${parentSection}"]`);
                 const subitems = document.querySelector(`[data-parent="${parentSection}"]`);
                 if (navItem && subitems) {
-                    navItem.classList.add('expanded');
-                    subitems.classList.add('expanded');
-                    saveExpandedState();
-                    console.log('Expanded parent section for active page:', parentSection);
+                    // Always ensure the parent of the active page is expanded
+                    if (!navItem.classList.contains('expanded')) {
+                        navItem.classList.add('expanded');
+                        subitems.classList.add('expanded');
+                        saveExpandedState();
+                        console.log('Expanded parent section for active page:', parentSection);
+                    }
                 }
             }
         }

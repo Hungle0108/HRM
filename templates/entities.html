@@ -478,23 +478,16 @@
         }
     }
 
-    /* Scrollbar styling */
+    /* Hide scrollbar with high specificity */
+    .settings-sidebar {
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+    }
+
     .settings-sidebar::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .settings-sidebar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-
-    .settings-sidebar::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-
-    .settings-sidebar::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
+        display: none !important; /* Webkit browsers */
+        width: 0 !important;
+        background: transparent !important;
     }
 
     .dropdown-arrow img {

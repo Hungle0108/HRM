@@ -1339,13 +1339,10 @@
                 .then(data => {
                     console.log('Response data:', data);
                     if (data.message) {
-                        // Success
-                alert('Shift created successfully!');
-                
-                // Clear localStorage after successful creation
-                localStorage.removeItem('createShiftFormState');
-                localStorage.removeItem('createShiftStep2FormState');
-                
+                        // Success - Clear localStorage after successful creation
+                        localStorage.removeItem('createShiftFormState');
+                        localStorage.removeItem('createShiftStep2FormState');
+                        
                         // Redirect to shifts page
                 window.location.href = '/shifts';
                     } else {
@@ -1601,10 +1598,16 @@
 
          // Modal functions
          function openModal(modalId) {
-             document.getElementById(modalId).style.display = 'block';
+             const modal = document.getElementById(modalId);
+             if (!modal) return;
+             modal.style.display = 'block';
              loadModalData(modalId);
              setupModalEventListeners(modalId);
-             // Lock body scroll using both methods for better compatibility
+
+             // Preserve current scroll position to avoid jumping to top
+             const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+             document.body.dataset.scrollY = String(scrollY);
+             document.body.style.top = `-${scrollY}px`;
              document.body.style.overflow = 'hidden';
              document.body.classList.add('modal-open');
              // Set flag to track modal state
@@ -1612,10 +1615,18 @@
          }
 
          function closeModal(modalId) {
-             document.getElementById(modalId).style.display = 'none';
+             const modal = document.getElementById(modalId);
+             if (modal) modal.style.display = 'none';
              // Unlock body scroll using both methods for better compatibility
              document.body.style.overflow = '';
              document.body.classList.remove('modal-open');
+
+             // Restore previous scroll position
+             const stored = document.body.dataset.scrollY || '0';
+             const scrollY = parseInt(stored, 10) || 0;
+             document.body.style.top = '';
+             delete document.body.dataset.scrollY;
+             window.scrollTo(0, scrollY);
              // Clear modal state flag
              window.currentModalOpen = null;
          }
