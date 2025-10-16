@@ -8,7 +8,9 @@ This project is actively maintained and fully functional. Core features includin
 
 ## Project Screenshots
 
-*Screenshots can be added here to showcase the main features of the application*
+![Dashboard](https://github.com/Hungle0108/HRM/blob/d4eb01b51732faa9e94fe8cf4b208bab55605e29/Screenshot%202025-10-16%20191415.png)
+![Filter](https://github.com/Hungle0108/HRM/blob/d4eb01b51732faa9e94fe8cf4b208bab55605e29/Screenshot%202025-10-16%20191524.png)
+![Setting](https://github.com/Hungle0108/HRM/blob/d4eb01b51732faa9e94fe8cf4b208bab55605e29/Screenshot%202025-10-16%20191546.png)
 
 ## Features
 
@@ -338,13 +340,14 @@ Planned features for future iterations include:
 
 Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
 
-## License
 
-[Specify your license here]
 
 ## Contact
 
-For questions or support, please contact the development team.
+For questions or support, please contact the development team. 
+Developers:
+1. duyphudang2007@gmail.com
+2. hunglegia2008@gmail.com
 
 ---
 
